@@ -255,6 +255,10 @@ const PAGE_FACTS = `async () => {
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     dup: [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))],
     unsized: [...document.querySelectorAll("img")].filter((i) => !i.getAttribute("width") || !i.getAttribute("height")).length,
+    // Visible text squeezed to nothing: clipped, so no other check sees it.
+    collapsed: [...document.querySelectorAll("table, .rich-text, .heading, .text")]
+      .filter((e) => e.checkVisibility() && e.textContent.trim() && e.getBoundingClientRect().width < 1)
+      .map((e) => e.tagName.toLowerCase() + "." + [...e.classList].join(".")),
     links: [...document.querySelectorAll("a[href]")].map((a) => a.href),
     has: Object.fromEntries(Object.entries({
       nav: ".nav_toggle", accordion: "details.accordion_item", dropdown: "details.dropdown_wrap",
@@ -307,6 +311,7 @@ async function testPage(driver: Driver, page: Page, path: string) {
       overflow: number;
       dup: string[];
       unsized: number;
+      collapsed: string[];
       links: string[];
       has: Record<string, boolean>;
     }>(PAGE_FACTS);
@@ -324,6 +329,12 @@ async function testPage(driver: Driver, page: Page, path: string) {
       "images have width and height",
       f.unsized === 0,
       `${f.unsized}`,
+    );
+    check(
+      where,
+      "text and tables have width",
+      f.collapsed.length === 0,
+      f.collapsed.slice(0, 3).join(", "),
     );
     const axe = await page.evaluate<string[]>(AXE);
     check(where, "WCAG 2.2 AA (axe)", axe.length === 0, axe.join(" || "));

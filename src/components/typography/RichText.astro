@@ -55,6 +55,11 @@ const content = (await slotContent(Astro.slots)).replace(
 <style is:global>
   @layer components {
     .rich-text {
+      /* In a parent that sizes it to its content (a Section, align start),
+         a wide table would push it past the edge: capped, the table scrolls
+         inside it instead. */
+      max-width: 100%;
+
       &
         :is(
           h1,
@@ -122,9 +127,6 @@ const content = (await slotContent(Astro.slots)).replace(
         max-width: 100%;
         overflow-x: auto;
         overflow-wrap: normal;
-        /* Its width must not size the text block around it, or the table
-           widens the page instead of scrolling inside it. */
-        contain: inline-size;
         border-collapse: collapse;
       }
       & :is(th, td) {
