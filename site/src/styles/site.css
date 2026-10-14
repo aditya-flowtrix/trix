@@ -267,13 +267,17 @@
     }
   }
 
-  /* ---------- Code ---------- */
+  /* ---------- Code: what it is, the code, Copy level with its first line ---------- */
 
+  :root {
+    /* The code themes' backgrounds (code-theme.ts), from the palette. */
+    --code-background: var(--neutral-100);
+  }
+  :root[data-mode="dark"] {
+    --code-background: var(--neutral-950);
+  }
   pre.astro-code {
-    padding: var(--space-5);
     overflow-x: auto;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-medium);
     font-family: var(--mono-family);
     font-size: var(--text-small);
     line-height: 1.6;
@@ -281,33 +285,57 @@
   .astro-code,
   .astro-code span {
     color: var(--shiki-light);
-    background-color: var(--shiki-light-bg);
   }
   :root[data-mode="dark"] :is(.astro-code, .astro-code span) {
     color: var(--shiki-dark);
-    background-color: var(--shiki-dark-bg);
   }
-  .copy_host {
-    position: relative;
+  /* The box — the pre itself until the script wraps it, then the wrapper. */
+  pre.astro-code,
+  .code_wrap {
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-medium);
+    background-color: var(--code-background);
+    text-align: start;
+  }
+  .code_wrap {
+    padding-top: var(--space-4);
+
+    pre.astro-code {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+    }
+  }
+  .code_lang {
+    margin-bottom: var(--space-3);
+    color: var(--text-2);
+    font-family: var(--mono-family);
+    font-size: var(--text-xsmall);
+  }
+  .code_body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    column-gap: var(--space-4);
   }
   .copy_button {
-    position: absolute;
-    top: var(--space-3);
-    right: var(--space-3);
-    padding: 0.125rem 0.5rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-small);
-    background-color: var(--background);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    /* Exactly one code line tall, so it sits level with the first line. */
+    height: calc(var(--text-small) * 1.6);
+    padding: 0;
+    border: 0;
+    background: none;
     color: var(--text-2);
     font: inherit;
     font-size: var(--text-xsmall);
     cursor: pointer;
-    opacity: 0;
-    transition: opacity var(--hover-duration) var(--hover-ease);
 
-    .copy_host:hover &,
-    &:focus-visible {
-      opacity: 1;
+    &:hover {
+      color: var(--text);
     }
   }
 
@@ -319,7 +347,7 @@
     border-radius: var(--radius-medium);
     overflow: hidden;
 
-    pre.astro-code {
+    > :is(pre.astro-code, .code_wrap) {
       border: 0;
       border-top: var(--border-width) solid var(--border);
       border-radius: 0;

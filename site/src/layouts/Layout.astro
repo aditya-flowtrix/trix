@@ -7,6 +7,7 @@ import GridOverlay from "@/components/utility/GridOverlay.astro";
 import Reveal from "@/components/utility/Reveal.astro";
 import Header from "~/components/Header.astro";
 import Search from "~/components/Search.astro";
+import Icon from "@/components/media/Icon.astro";
 import type { SeoProps } from "@/types.ts";
 import { SITE_LOCALE } from "@/consts.ts";
 
@@ -27,22 +28,56 @@ type Props = SeoProps;
     <Search />
     <GridOverlay />
     <Reveal />
+    <template id="copy-icon"><Icon name="copy" variant="small" /></template>
     <script>
-      // Every code block gets a copy button.
-      for (const pre of document.querySelectorAll("pre.astro-code")) {
+      // Every code block: what it is, above it, and Copy level with its first
+      // line — as lumosframework.com lays out its terminal.
+      const NAMES: Record<string, string> = {
+        bash: "Terminal",
+        sh: "Terminal",
+        shell: "Terminal",
+        astro: "Astro",
+        ts: "TypeScript",
+        js: "JavaScript",
+        css: "CSS",
+        json: "JSON",
+        jsonc: "JSON",
+        html: "HTML",
+        mdx: "MDX",
+        text: "",
+      };
+      const icon =
+        document.querySelector<HTMLTemplateElement>("#copy-icon")?.content;
+      for (const pre of document.querySelectorAll<HTMLElement>(
+        "pre.astro-code",
+      )) {
+        const lang = pre.dataset.language ?? "";
+        const wrap = document.createElement("div");
+        wrap.className = "code_wrap";
+        const label = NAMES[lang] ?? lang;
+        if (label) {
+          const name = document.createElement("p");
+          name.className = "code_lang";
+          name.textContent = label;
+          wrap.append(name);
+        }
         const button = document.createElement("button");
         button.type = "button";
         button.className = "copy_button";
-        button.textContent = "Copy";
+        const text = document.createElement("span");
+        text.textContent = "Copy";
+        if (icon) button.append(icon.cloneNode(true));
+        button.append(text);
         button.addEventListener("click", async () => {
           await navigator.clipboard.writeText(pre.textContent ?? "");
-          button.textContent = "Copied";
-          setTimeout(() => (button.textContent = "Copy"), 1500);
+          text.textContent = "Copied";
+          setTimeout(() => (text.textContent = "Copy"), 1500);
         });
-        const host = document.createElement("div");
-        host.className = "copy_host";
-        pre.before(host);
-        host.append(pre, button);
+        const body = document.createElement("div");
+        body.className = "code_body";
+        pre.before(wrap);
+        body.append(pre, button);
+        wrap.append(body);
       }
     </script>
   </body>
