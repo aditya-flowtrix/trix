@@ -24,6 +24,7 @@
     "docs:dev": "cd site && astro dev",
     "docs:build": "cd site && astro build",
     "docs:preview": "cd site && astro preview",
+    "docs:deploy": "npm run docs:build && wrangler deploy",
     "astro": "astro",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

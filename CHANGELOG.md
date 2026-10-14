@@ -129,11 +129,12 @@ SEO phase, fonts from any source and the design-change skill.
   pattern lists, the token reference and the skills list are read at build.
 - Search (⌘K, Ctrl+K or `/`) from a static index of every page and section;
   light and dark mode; a sidebar that is a drawer on phones.
-- `npm run docs:dev`, `docs:build`, `docs:preview`; `site/wrangler.jsonc`
-  deploys it to Cloudflare as the `trix` Worker —
-  [trix.flowtrix.workers.dev](https://trix.flowtrix.workers.dev). CI
-  type-checks, builds and audits it. The starter's own Worker is now
-  `trix-starter`.
+- `npm run docs:dev`, `docs:build`, `docs:preview`, `docs:deploy`. The
+  repository's `wrangler.jsonc` now deploys the website — the `trix` Worker,
+  [trix.flowtrix.workers.dev](https://trix.flowtrix.workers.dev) — and
+  Cloudflare builds it on every push (`npm run docs:build`, then
+  `npx wrangler deploy`). Projects get their own config from the installer.
+  CI type-checks, builds and audits it.
 - Across all 64 pages: SEO audit clean; 1453/1453 browser checks in Chrome,
   WebKit and Brave.
 

@@ -35,8 +35,10 @@ with Trix itself (`npm run docs:dev`, `npm run docs:build`). It renders the
 components in `src/` directly, so a component change shows up there as it is.
 When a component's behaviour, variants or props change, update its page in
 `site/src/content/docs/components/` — the props table regenerates on its own,
-the prose does not. Projects created with `npm create trix-astro` don't have
-`site/`.
+the prose does not. The root `wrangler.jsonc` deploys it: Cloudflare runs
+`npm run docs:build` and `npx wrangler deploy` on every push to `main`.
+Projects created with `npm create trix-astro` have neither `site/` nor this
+config — the installer writes them their own.
 
 ## Astro documentation
 

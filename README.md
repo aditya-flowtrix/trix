@@ -41,8 +41,12 @@ is [`site/`](site/), built with Trix itself:
 
 ```bash
 npm run docs:dev        # http://localhost:4321
-npm run docs:build      # → site/dist, deployed by site/wrangler.jsonc
+npm run docs:build      # → site/dist
+npm run docs:deploy     # build and deploy it (wrangler.jsonc)
 ```
+
+Cloudflare builds and deploys it on every push to `main`: build command
+`npm run docs:build`, deploy command `npx wrangler deploy`.
 
 Its pages are MDX in `site/src/content/docs/`. Props tables, the utility and
 pattern lists, the token reference and the skills list are read from the

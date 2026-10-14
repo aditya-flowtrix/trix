@@ -1,19 +1,20 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "trix-starter",
+  // The Trix website — the docs in site/, at https://trix.flowtrix.workers.dev.
+  // A project made with `npm create trix-astro` gets its own config instead:
+  // this file is withheld from the template (.gitattributes).
+  "name": "trix",
   "compatibility_date": "2026-08-13",
 
-  // The built site. There is no `main`, so this deploys as an assets-only
-  // Worker: Cloudflare serves the files and no script runs per request.
+  // Built by `npm run docs:build` (Cloudflare's build command for this
+  // repository). Assets only: Cloudflare serves the files, no script runs.
   "assets": {
-    "directory": "./dist",
+    "directory": "./site/dist",
     "not_found_handling": "404-page",
   },
 
-  // The domain the Worker answers on. `custom_domain` makes Cloudflare create
-  // and manage the DNS record for it, so the zone needs to be in this account.
-  // Set it per project:
-  // "routes": [{ "pattern": "www.example.com", "custom_domain": true }],
+  // A custom domain goes here (and in SITE_URL, site/src/consts.ts):
+  // "routes": [{ "pattern": "trix.example.com", "custom_domain": true }],
 
   "observability": {
     "enabled": true,
