@@ -83,3 +83,22 @@ On the reference project (a Lumos-for-Webflow + Mast site), measure →
 propose → generate → verify reproduced the source's type and spacing with all
 108 checks identical, and the class map caught four same-name/different-value
 classes and two classes with no CSS at all.
+
+## The CMS pipeline
+
+```
+Webflow API / MCP export ─┐
+WordPress REST API ───────┼─► src/utils/cms/*  ─► .trix/cms/<source>.json   (one shape: model.ts)
+CSV (Framer, Wix, …) ─────┘                         │
+                                     scripts/cms/write.ts ─► src/content/<collection>/*.md
+                                                     │         src/content/collections.ts (zod)
+                                                     │         src/assets/cms/, public/cms/
+                                                     │         public/_redirects
+                                     --headless ─► cmsLoader (same importers, at build)
+                                     scripts/cms/verify.ts ─► counts, schemas, no old URLs, pages
+```
+
+The importers live in `src/utils/cms/` because both sides use them: the
+scripts at the command line, and `cmsLoader` inside Astro's build. Every
+source becomes the same `CmsExport` (`model.ts`), so the writer, the
+loader, the schemas and the checks know nothing about Webflow or WordPress.

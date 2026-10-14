@@ -1,0 +1,45 @@
+{
+  "skill_name": "trix-cms",
+  "evals": [
+    {
+      "id": 0,
+      "name": "webflow-blog-files",
+      "prompt": "Move the blog and the team members from our Webflow site (site id in PROJECT.md) into the Astro project.",
+      "expected_output": "Collections read through the Webflow MCP or API (not scraped from pages), imported with import.ts, written with write.ts with a route for the blog, images downloaded, astro sync and build passing, verify.ts passing, list filters recorded in PROJECT.md.",
+      "files": [],
+      "assertions": [
+        "Items came from the Webflow CMS (MCP or API), not from scraping rendered pages",
+        "Every collection the blog refers to was imported too, so references are reference() fields",
+        "No image or file URL on cdn.prod.website-files.com remains under src/",
+        "scripts/cms/verify.ts reports every check passing",
+        "PROJECT.md records each collection list's filter, sort and limit"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "wordpress-permalinks",
+      "prompt": "Migrate the posts and categories from https://example.com (WordPress) — URLs are /2024/05/post-name/ and must keep working.",
+      "expected_output": "Imported through the REST API; written with --route so every dated permalink gets a 301 to the new URL (or the trailing-slash style kept); redirects in public/_redirects; parity check planned.",
+      "files": [],
+      "assertions": [
+        "import.ts wordpress was used with --url, not a scrape",
+        "Every old permalink is either served as is or has a 301 line in public/_redirects",
+        "Category references on posts are reference(\"categories\") fields",
+        "The report names the SEO parity check as the next step"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "keep-editing-in-webflow",
+      "prompt": "Our editors want to keep writing posts in Webflow, but the site should be Astro.",
+      "expected_output": "Headless: write.ts --headless generates cmsLoader collections, WEBFLOW_TOKEN set in the host's build environment, image domains configured, a deploy hook triggered by Webflow publish, the decision recorded.",
+      "files": [],
+      "assertions": [
+        "src/content/collections.ts uses cmsLoader for the Webflow collections",
+        "No Webflow token appears in any committed file",
+        "The CMS image host is in image.domains in astro.config.mjs",
+        "PROJECT.md records the headless decision and how publishing triggers a build"
+      ]
+    }
+  ]
+}

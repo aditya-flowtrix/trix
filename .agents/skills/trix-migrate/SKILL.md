@@ -138,11 +138,11 @@ table headers, `rel="noopener"` on `target="_blank"` links, and no
 
 ## Phase 5 — Data
 
-- **CMS → content collections.** One collection per source collection in
-  `src/content.config.ts`, schema from the source's fields, one route per
-  template. Images as local assets. References as `reference()`. Rich text as
-  Markdown/MDX or sanitized HTML. Counts must match the source exactly. A
-  headless CMS later only changes the loader.
+- **CMS → content collections** with `/trix-cms`: every collection read
+  through the platform's API (or its full export), written as typed
+  collections with every image and file downloaded — or headless, if the
+  editors keep their CMS. Counts must match the source exactly
+  (`scripts/cms/verify.ts`).
 - **Lists** — every filter, sort and limit, read from the platform (they are
   not in exports), written into `PROJECT.md`. Empty states, pagination and
   filter controls have no runtime in a static site: build them (`.filter()`

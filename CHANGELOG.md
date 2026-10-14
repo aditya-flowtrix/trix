@@ -79,6 +79,42 @@ SEO phase, fonts from any source and the design-change skill.
   feeds the Organization's profiles. The demo links to a non-existent
   `/about` (found by the audit) now point at real pages.
 
+### CMS
+
+- `trix-cms` skill and `scripts/cms/`: any CMS into typed content
+  collections. Importers for Webflow (Data API v2, the MCP connector's
+  export, or CSV), WordPress (REST API: post types, taxonomies, ACF, Yoast,
+  drafts with an application password), and CSV (Framer, Wix, Airtable,
+  Notion, spreadsheets — column types read from the values); any other CMS
+  through the common JSON shape.
+- `write.ts`: one Markdown file per item (exact JSON frontmatter, rich text
+  kept as HTML so Markdown changes nothing), zod schemas with `reference()`,
+  enums and `image()`, every image and file downloaded from the CMS's own
+  hosts (`--host` for the old domain's PDFs), platform markup stripped,
+  internal links moved to new paths, 301s for changed URLs, page scaffolds,
+  heading demotion, re-runs that remove deleted items.
+- Headless: `cmsLoader` reads Webflow or WordPress at build with the same
+  importers; `write.ts --headless` generates it and authorises the CMS's
+  image host.
+- `verify.ts`: item counts, schemas (`astro sync`), nothing left on the old
+  CMS or site, a page per item. `npm run test:cms` (in CI) covers every
+  field type and the pipeline on a fixture.
+- Tested on real data: the Remsons Webflow CMS (8 collections, every field
+  type, drafts, circular references) and a public WordPress site (posts,
+  22 categories, 269 tags, Jetpack images, dated permalinks → 301s), as
+  files and headless; and Framer-style CSVs with quoted newlines.
+
+### Browsers
+
+- `npm run test:browsers` (`tests/browsers.ts`): every page crawled from
+  `/`, at phone, tablet and desktop widths, in every browser on the
+  machine — Chrome, Chromium, Edge, Brave, Firefox, WebKit, and real
+  Safari through safaridriver — for script errors, failed requests,
+  sideways scroll, unique ids, sized images and WCAG 2.2 AA, and every
+  component on the page driven by mouse and keyboard.
+- CI runs it once per browser: Chrome, Edge, Brave, Firefox and WebKit on
+  Linux, Safari on macOS.
+
 ### Style guide and docs
 
 - `/style-guide`: section navigation, a Layout grid group (overlay toggle,

@@ -6,7 +6,7 @@
 
 import { createServer, type Server } from "node:http";
 import { readFile, stat } from "node:fs/promises";
-import { extname, join, normalize, resolve } from "node:path";
+import { dirname, extname, join, normalize, resolve } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { chromium, type Browser, type Page } from "playwright-core";
 
@@ -107,8 +107,8 @@ export function args(): Record<string, string | true> {
 
 /** Writes into `.trix/` (git-ignored) and returns the path. */
 export function output(name: string, content: string): string {
-  mkdirSync(".trix", { recursive: true });
   const path = join(".trix", name);
+  mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, content);
   return path;
 }

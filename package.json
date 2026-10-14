@@ -18,6 +18,7 @@
     "build": "astro build",
     "seo": "node scripts/seo/audit.ts --dir dist",
     "test:browsers": "node tests/browsers.ts",
+    "test:cms": "node tests/cms.ts",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",

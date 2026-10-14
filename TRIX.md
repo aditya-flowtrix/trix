@@ -77,6 +77,15 @@ preloads the first. After any font change run
 leading trim from the font's real metrics. `/trix-design-system` → fonts has
 the whole procedure.
 
+## Content
+
+CMS content lives in `src/content/<collection>/` as Markdown with typed
+frontmatter, schemas in `src/content/collections.ts` (generated — rerun
+`scripts/cms/write.ts` rather than editing it), assets in
+`src/assets/cms/` and `public/cms/`. A headless collection reads its CMS at
+build through `cmsLoader` (`src/utils/cms/loader.ts`). `/trix-cms` has the
+procedure for every platform.
+
 ## SEO
 
 Pages set `title`, `description`, `image` and `schema` on `BaseLayout`;
