@@ -6,8 +6,8 @@
 export const SITE_NAME = "Trix";
 export const SITE_DESCRIPTION =
   "A design-ready Astro framework: Lumos's components, Mast's 12-column grid, tokens shared with Figma, and agent skills that move sites in.";
-/** Set to the docs domain before the first deploy. */
-export const SITE_URL = "https://trix.example.com";
+/** The docs' address — change it here when a custom domain is added. */
+export const SITE_URL = "https://trix.flowtrix.workers.dev";
 export const SITE_LOCALE = "en-US";
 export const SITE_SOCIALS: string[] = [
   "https://github.com/aditya-flowtrix/trix",

@@ -36,7 +36,8 @@ and agent skills for Claude Code and Codex.
 
 ## Documentation
 
-[github.com/aditya-flowtrix/trix](https://github.com/aditya-flowtrix/trix)
+[trix.flowtrix.workers.dev](https://trix.flowtrix.workers.dev) · source on
+[GitHub](https://github.com/aditya-flowtrix/trix)
 
 ## License
 

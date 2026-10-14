@@ -35,8 +35,9 @@ value by value against the original.
 
 ## Documentation
 
-The docs site — every component live with its props, the system, the guides,
-and search — is in [`site/`](site/), built with Trix itself:
+**[trix.flowtrix.workers.dev](https://trix.flowtrix.workers.dev)** — every
+component live with its props, the system, the guides, and search. Its source
+is [`site/`](site/), built with Trix itself:
 
 ```bash
 npm run docs:dev        # http://localhost:4321

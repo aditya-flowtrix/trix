@@ -306,7 +306,7 @@ build pages and components here is in [TRIX.md](TRIX.md).
       "",
       `Set the site's name and URL in ${bold("src/consts.ts")}, and record decisions in ${bold("PROJECT.md")}.`,
       `With an agent: ${bold("/trix-new-project")} sets the name, domain, fonts and brand.`,
-      `Docs: ${bold("https://github.com/aditya-flowtrix/trix")}`,
+      `Docs: ${bold("https://trix.flowtrix.workers.dev")}`,
       "",
     ].join("\n"),
   );
