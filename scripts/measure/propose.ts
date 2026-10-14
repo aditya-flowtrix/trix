@@ -267,6 +267,7 @@ function assign(
   values: number[],
   names: [string, number][],
   label: string,
+  overflow: string[] = [],
 ): Map<number, string> {
   const v = [...values].sort((a, b) => a - b);
   const [n, m] = [v.length, names.length];
@@ -290,7 +291,8 @@ function assign(
     }
   }
   for (const extra of v.slice(fit)) {
-    const name = `${names.at(-1)?.[0] ?? label}-${out.size + 1}`;
+    const name =
+      overflow.shift() ?? `${names.at(-1)?.[0] ?? label}-${out.size + 1}`;
     out.set(extra, name);
     ask.push(
       `${label}: ${n} values measured, ${m} names exist — ${extra} was named \`${name}\`. Rename it, or consolidate with a neighbour?`,
@@ -392,23 +394,59 @@ if (stepped.length)
     `${stepped.length} spacing series change at breakpoints instead of scaling (e.g. ${stepped[0].values.join("/")}). They belong in component media queries, not the scale.`,
   );
 
-const sectionNames = ["xsmall", "small", "medium", "large", "xlarge", "huge"];
-const sections = pairs(
-  [
-    ...design.sectionPadding,
-    ...design.spacing.filter(
-      (s: { props: string[]; values: number[] }) =>
-        s.props.includes("spacer") && Math.max(...s.values) >= 48,
-    ),
-  ],
-  1,
-).filter((s) => s.max >= 48);
-if (sections.length > sectionNames.length)
-  ask.push(
-    `${sections.length} section paddings measured; ${sectionNames.length} names exist. Consolidate?`,
-  );
-const radii = pairs(design.radius, 1);
-const radiusNames = ["xsmall", "small", "medium", "large", "xlarge", "huge"];
+const sections = (() => {
+  const all = pairs(
+    [
+      ...design.sectionPadding,
+      ...design.spacing.filter(
+        (s: { props: string[]; values: number[] }) =>
+          s.props.includes("spacer") && Math.max(...s.values) >= 48,
+      ),
+    ],
+    1,
+  ).filter((s) => s.max >= 48);
+  // One pair per desktop value: the most used.
+  return [
+    ...new Map(
+      all.sort((a, b) => a.count - b.count).map((s) => [s.max, s]),
+    ).values(),
+  ].sort((a, b) => a.max - b.max);
+})();
+const sectionDefaults = scale("section-space-").length
+  ? tokens
+      .filter(
+        (t) =>
+          /^section-space-.+-max$/.test(t.name) && !t.name.includes("overlap"),
+      )
+      .map((t) => [t.name.slice(14, -4), Number(t.value)] as [string, number])
+      .sort((a, b) => a[1] - b[1])
+  : [];
+const sectionMap = assign(
+  sections.map((s) => s.max),
+  sectionDefaults,
+  "section space",
+  ["huge", "xhuge", "xxhuge"],
+);
+const sectionName = (s: { max: number }) => sectionMap.get(s.max)!;
+
+const radii = pairs(design.radius, 1).filter((r) => r.max < 999);
+const radiusDefaults = tokens
+  .filter((t) => /^radius-[a-z]+$/.test(t.name) && t.name !== "radius-round")
+  .map(
+    (t) =>
+      [
+        t.name.slice(7),
+        (parseFloat(t.value) || 0) * (t.value.endsWith("rem") ? 16 : 1),
+      ] as [string, number],
+  )
+  .sort((a, b) => a[1] - b[1]);
+const radiusMap = assign(
+  [...new Set(radii.map((r) => r.max))],
+  radiusDefaults,
+  "radius",
+  ["xlarge", "huge", "xhuge"],
+);
+const radiusName = (r: { max: number }) => radiusMap.get(r.max)!;
 
 /* ---------------- color ---------------- */
 
@@ -602,31 +640,64 @@ group(
     `  --space-${i + 1}-max: ${fmt(s.max)};`,
   ]),
 );
-if (sections.length)
-  group(
-    "Spacing — section",
-    sections
-      .slice(0, sectionNames.length)
-      .flatMap((s, i) => [
-        `  --section-space-${sectionNames[i]}-min: ${fmt(s.min)};`,
-        `  --section-space-${sectionNames[i]}-max: ${fmt(s.max)};`,
-      ]),
-  );
-if (radii.length)
-  group("Radius", [
-    ...radii
-      .filter((r) => r.max < 999)
-      .slice(0, radiusNames.length)
-      .flatMap((r, i) =>
-        r.min === r.max
-          ? [`  --radius-${radiusNames[i]}: ${fmt(r.max / 16)}rem;`]
-          : [
-              `  --radius-${radiusNames[i]}-min: ${fmt(r.min)};`,
-              `  --radius-${radiusNames[i]}-max: ${fmt(r.max)};`,
-            ],
+group("Spacing — section", [
+  ...sectionDefaults
+    .map(([name]) => name)
+    .concat(
+      [...sectionMap.values()].filter(
+        (n) => !sectionDefaults.some(([d]) => d === n),
       ),
-    `  --radius-round: 100vw;`,
-  ]);
+    )
+    .flatMap((name) => {
+      const s = sections.find((x) => sectionName(x) === name);
+      if (s)
+        return [
+          `  --section-space-${name}-min: ${fmt(s.min)};`,
+          `  --section-space-${name}-max: ${fmt(s.max)};`,
+        ];
+      return tokens
+        .filter(
+          (t) =>
+            t.name === `section-space-${name}-min` ||
+            t.name === `section-space-${name}-max`,
+        )
+        .map(
+          (t) => `  --${t.name}: ${t.value}; /* Trix default, not measured */`,
+        );
+    }),
+  ...tokens
+    .filter((t) => t.name.startsWith("section-space-nav-overlap"))
+    .map(
+      (t) =>
+        `  --${t.name}: ${t.value}; /* nav height + first section's top padding — set if the nav overlaps */`,
+    ),
+]);
+group("Radius", [
+  ...radiusDefaults
+    .map(([name]) => name)
+    .concat(
+      [...radiusMap.values()].filter(
+        (n) => !radiusDefaults.some(([d]) => d === n),
+      ),
+    )
+    .flatMap((name) => {
+      const r = radii.find((x) => radiusName(x) === name);
+      if (!r)
+        return tokens
+          .filter((t) => t.name === `radius-${name}`)
+          .map(
+            (t) =>
+              `  --${t.name}: ${t.value}; /* Trix default, not measured */`,
+          );
+      return r.min === r.max
+        ? [`  --radius-${name}: ${fmt(r.max / 16)}rem;`]
+        : [
+            `  --radius-${name}-min: ${fmt(r.min)};`,
+            `  --radius-${name}-max: ${fmt(r.max)};`,
+          ];
+    }),
+  `  --radius-round: 100vw;`,
+]);
 group("Layout — fluid range (px)", [
   `  --viewport-min: ${viewportMin};`,
   `  --viewport-max: ${viewportMax};`,
@@ -796,15 +867,13 @@ const report = [
   "## Section space",
   "",
   ...sections.map(
-    (s, i) =>
-      `- ${sectionNames[i] ?? "?"}: ${s.min} → ${s.max}px (×${s.count})`,
+    (s) => `- ${sectionName(s)}: ${s.min} → ${s.max}px (×${s.count})`,
   ),
   "",
   "## Radius",
   "",
   ...radii.map(
-    (r, i) =>
-      `- ${r.max >= 999 ? "round" : radiusNames[i]}: ${r.min} → ${r.max}px (×${r.count})`,
+    (r) => `- ${radiusName(r)}: ${r.min} → ${r.max}px (×${r.count})`,
   ),
   "",
   "## Palette",
