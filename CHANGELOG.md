@@ -142,12 +142,17 @@ SEO phase, fonts from any source and the design-change skill.
 
 - `npm create trix-astro@latest my-site` — `packages/create-trix-astro`,
   modelled on `create-lumos`. It downloads Trix at one exact commit, leaves
-  out the framework's own parts (`site/`, `packages/`, CI, its installer
-  test), names the project after its folder, stamps `package.json` → `trix`
+  out the framework's own parts (`site/`, `packages/`, the dependency bots,
+  its installer test), names the project after its folder, stamps `package.json` → `trix`
   with `version`, `commit` and `created`, writes the project's own README and
   `wrangler.jsonc`, and installs with the package manager that ran it.
 - `npm run test:create` (in CI): the installer on an archive of the commit,
   as GitHub serves it.
+- Projects keep `.github/workflows/ci.yml`: one workflow for the framework
+  and every project, its docs-site and installer steps running only where
+  those exist. Real Safari runs on public repositories; a private project,
+  where GitHub bills macOS at ten times Linux, relies on WebKit unless its
+  `TRIX_SAFARI` variable is `on`.
 - `.wrangler/` (local Cloudflare state) is no longer tracked.
 
 ### Found while building the docs

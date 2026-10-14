@@ -20,7 +20,7 @@ git init
 ```
 
 The installer copies Trix at one exact commit, leaves out the framework's own
-parts (its docs site, installer and CI), names the project after the folder,
+parts (its docs site, installer and dependency bots), names the project after the folder,
 gives it its own README and `wrangler.jsonc`, installs dependencies, and
 stamps `package.json` → `trix` with `version`, `commit` and `created` — what
 `/trix-upgrade` merges against.
@@ -38,7 +38,7 @@ later upgrade becomes a guess — so add it by hand from
 A project copied any other way (a clone, GitHub's **Use this template**) needs
 by hand what the installer does: `name` and `version: "0.1.0"`, the stamp,
 `description` and `repository` removed, and the framework's own parts gone —
-`rm -rf site packages tests/create.ts .github`, the `docs:*` and `test:create`
+`rm -rf site packages tests/create.ts .github/dependabot.yml .github/workflows/dependabot-automerge.yml`, the `docs:*` and `test:create`
 scripts, and `npm uninstall @astrojs/mdx` unless the project writes MDX.
 
 ## 3. Name and domain

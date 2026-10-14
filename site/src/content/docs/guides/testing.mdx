@@ -46,11 +46,23 @@ automation**.
 
 ## In CI
 
-GitHub Actions runs on every push and pull request, and every Monday:
+Every Trix project has `.github/workflows/ci.yml`, the same workflow the
+framework runs. Once the project is on GitHub, it runs on every push and pull
+request, and every Monday:
 
 - **Type-check and build** — dependency audit, formatting, `npm run check`,
   the CMS tests, the build, the SEO audit.
-- **Browsers** — six machines at once: Chrome, Edge, Brave, Firefox and WebKit
-  on Linux, and real Safari on macOS. A failure uploads the report.
+- **Browsers** — Chrome, Edge, Brave, Firefox and WebKit on Linux, at the
+  same time. A failure uploads the report.
+- **Safari** — the real one, on macOS.
 - **Astro latest** — the newest Astro, as a warning, never a failure: it says
-  when Trix needs a look before an upgrade does.
+  when the project needs a look before an upgrade does.
+
+A commit that fails any of them is marked red on GitHub.
+
+<Aside title="Real Safari in a private repository">
+  GitHub bills macOS at ten times the Linux rate in a private repository, so
+  there the Safari job is skipped and WebKit — Safari's engine — covers it. To
+  run it anyway, set a repository variable: Settings → Secrets and variables →
+  Actions → Variables → `TRIX_SAFARI` = `on`. Public repositories always run it.
+</Aside>

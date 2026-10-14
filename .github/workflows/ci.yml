@@ -1,3 +1,6 @@
+# The checks every push must pass — in the Trix repository and in every
+# project made from it (`npm create trix-astro` copies this file). Steps for
+# the framework's own docs site and installer run only where those exist.
 name: CI
 
 on:
@@ -37,7 +40,9 @@ jobs:
 
       - run: npm run test:cms
 
-      - run: npm run test:create
+      - name: The installer (framework only)
+        if: hashFiles('packages/create-trix-astro/package.json') != ''
+        run: npm run test:create
 
       - run: npm run build
 
@@ -47,9 +52,12 @@ jobs:
 
       # The docs site renders every component as it is now, so a component
       # change that breaks its page fails here.
-      - run: cd site && npx astro check
-      - run: npm run docs:build
-      - run: node scripts/seo/audit.ts --dir site/dist
+      - name: The docs site (framework only)
+        if: hashFiles('site/astro.config.mjs') != ''
+        run: |
+          (cd site && npx astro check)
+          npm run docs:build
+          node scripts/seo/audit.ts --dir site/dist
 
   browsers:
     name: Browser (${{ matrix.browser }})
@@ -65,8 +73,6 @@ jobs:
           - { browser: brave, os: ubuntu-latest }
           - { browser: firefox, os: ubuntu-latest }
           - { browser: webkit, os: ubuntu-latest }
-          # The real Safari, which only runs on macOS.
-          - { browser: safari, os: macos-latest }
     steps:
       - uses: actions/checkout@v7
 
@@ -95,16 +101,44 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
           sudo apt-get update && sudo apt-get install -y brave-browser
 
-      - name: Allow Safari to be automated
-        if: matrix.browser == 'safari'
-        run: sudo safaridriver --enable
-
       - run: node tests/browsers.ts --browser ${{ matrix.browser }}
 
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: browsers-${{ matrix.browser }}
+          path: .trix/browsers.md
+
+  safari:
+    name: Browser (safari)
+    # The real Safari runs only on macOS, which GitHub bills at ten times the
+    # Linux rate in a private repository. So it runs on every push of a public
+    # one; a private project relies on WebKit — Safari's engine, tested above —
+    # unless its repository variable TRIX_SAFARI is "on". Never on the weekly
+    # run, which is there for Astro releases.
+    if: github.event_name != 'schedule' && (!github.event.repository.private || vars.TRIX_SAFARI == 'on')
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.19.0
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: sudo safaridriver --enable
+
+      - run: node tests/browsers.ts --browser safari
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browsers-safari
           path: .trix/browsers.md
 
   astro-latest:

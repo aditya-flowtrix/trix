@@ -62,7 +62,8 @@ npm run dev
 
 The installer is [`packages/create-trix-astro`](packages/create-trix-astro/):
 it copies Trix at one exact commit, names and stamps the project, and leaves
-the framework's own docs site, installer and CI behind.
+the framework's own docs site and installer behind. The project keeps the CI
+workflow, so its pushes are checked the way the framework's are.
 
 Then run the `trix-new-project` skill (or follow
 [its steps](.agents/skills/trix-new-project/SKILL.md)) to stamp, name and brand

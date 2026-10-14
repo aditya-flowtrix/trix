@@ -59,7 +59,9 @@ try {
     for (const path of [
       "site",
       "packages",
-      ".github",
+      "tests/create.ts",
+      ".github/dependabot.yml",
+      ".github/workflows/dependabot-automerge.yml",
       ".gitattributes",
       ".claude/launch.json",
     ])
@@ -78,6 +80,12 @@ try {
       !Object.keys(pkg.scripts).some((s) => /^(docs:|test:create)/.test(s)),
     );
     assert.equal(pkg.devDependencies["@astrojs/mdx"], undefined);
+  });
+  it("the framework's CI, which runs the same checks on the project's pushes", () => {
+    assert.match(
+      readFileSync(join(site, ".github/workflows/ci.yml"), "utf8"),
+      /tests\/browsers\.ts/,
+    );
   });
   it("a README of its own", () => {
     assert.match(
