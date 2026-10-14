@@ -130,6 +130,25 @@ const pairs: [text: string, surface: string, min: number][] = [
   ["button-2-text", "button-2-background", 4.5],
   ["button-2-text-hover", "button-2-background-hover", 4.5],
 ];
+// An owner can keep a failing pair on purpose (a migration that must match
+// its source): `--text-2: …; /* contrast: accepted — why */` on that line,
+// in that theme. It is reported, not failed.
+const themesCss = read("src/styles/themes.css");
+const accepted = (selector: string, token: string) => {
+  // The block this theme's selector list starts — not a later mention of
+  // it, like `.theme-brand .theme-invert` inside another theme's list.
+  const head = new RegExp(
+    `(?:^|\\})\\s*${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[,{]`,
+    "m",
+  ).exec(themesCss);
+  if (!head) return false;
+  const start = themesCss.indexOf("{", head.index);
+  const block = themesCss.slice(start, themesCss.indexOf("}", start));
+  return new RegExp(`--${token}:[^;]*;[ \\t]*/\\*[^*]*contrast: accepted`).test(
+    block,
+  );
+};
+const notes: string[] = [];
 for (const theme of model.themes) {
   const scope = [theme.tokens, model.byName];
   const page = resolveColor("var(--background)", scope);
@@ -140,13 +159,16 @@ for (const theme of model.themes) {
     if (!fg || !bg) continue;
     const base = over(bg, over(page, [1, 1, 1, 1]));
     const r = ratio(over(fg, base), base);
-    if (r < min)
-      problems.push(
-        `src/styles/themes.css  theme-${theme.name}: --${text} on --${surface} is ${r.toFixed(2)}:1, needs ${min}:1`,
-      );
+    if (r >= min) continue;
+    const line = `theme-${theme.name}: --${text} on --${surface} is ${r.toFixed(2)}:1, needs ${min}:1`;
+    if (accepted(theme.selectors[0], text))
+      notes.push(`${line} (accepted in themes.css)`);
+    else problems.push(`src/styles/themes.css  ${line}`);
   }
 }
 
+if (notes.length)
+  console.log(`Contrast kept below AA on purpose:\n  ${notes.join("\n  ")}`);
 if (problems.length) {
   console.error(
     `Convention problems (${problems.length}):\n  ${problems.join("\n  ")}`,

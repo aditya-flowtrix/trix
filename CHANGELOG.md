@@ -88,6 +88,36 @@ SEO phase, fonts from any source and the design-change skill.
 - Designer guide: the layout grid per frame, how spans stack, what to
   annotate. `TRIX.md`: which layout component a design calls for.
 
+### Found by the end-to-end audit (Chrome and WebKit, axe WCAG 2.2 AA)
+
+Most of these were inherited from Lumos for Astro, and are fixed at the
+source so every project gets them:
+
+- Contrast: secondary text (`--text-2`) 60% → 70% and the light heading
+  accent now pass AA in every theme; components use the token instead of
+  their own 60% mixes. `npm run check` fails any theme text role below AA,
+  unless that theme's line says `contrast: accepted`.
+- Slider dots are 24px targets (WCAG 2.2); scrollable rows and rich-text
+  tables are keyboard-reachable; Safari returns focus from a closed modal
+  and follows the skip link.
+- Long words in headings and text break instead of widening the page on a
+  phone; wide rich-text tables scroll inside the text.
+- URLs: one form per page with no trailing slash (`trailingSlash: "never"`,
+  `build.format: "file"`), so links and migrated Webflow URLs answer without
+  a redirect; canonicals, noindex and the current nav link read the page
+  path in any build format. The audit flags file-name canonicals and links
+  that would redirect.
+- Hosting: `public/_headers` (security headers, a year's caching for
+  fingerprinted assets) and `public/_redirects` (real 301s), verified in
+  Cloudflare's local runtime.
+- `ThemeToggle` renders in the nav when `COLOR_MODE` is `auto`.
+- Measurement is deterministic: elements are matched across widths by
+  their place among their siblings and their text, not their index in the
+  page; one text slot per size, with other weights put to the owner.
+- Same checks on the three demo sites: Lumos 15 elements failing
+  (target size), Mast 80 (contrast, target size) and a script error, Trix
+  none.
+
 ### Measuring and skills
 
 - `design.ts` measures the layout grid: the content edge most text sits on

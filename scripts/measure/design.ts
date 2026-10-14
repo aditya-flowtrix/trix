@@ -60,6 +60,8 @@ if (!paths.length) paths = ["/"];
 type Raw = {
   text: {
     i: number;
+    /** Stable across widths and runs: the element's path, and its text. */
+    id: string;
     tag: string;
     cls: string;
     chars: number;
@@ -76,6 +78,8 @@ type Raw = {
   }[];
   box: {
     i: number;
+    /** Stable across widths and runs: the element's path, and its text. */
+    id: string;
     tag: string;
     cls: string;
     area: number;
@@ -106,6 +110,25 @@ type Raw = {
 function measure(): Raw {
   const all = [...document.querySelectorAll("body *")];
   const index = new Map(all.map((e, i) => [e, i]));
+  // An element's place among its own siblings, up to <body>. A script that
+  // adds or moves elements elsewhere (a slider cloning slides) cannot shift
+  // it, unlike its position in the whole page.
+  const pathOf = (e: Element) => {
+    const parts: string[] = [];
+    for (
+      let n: Element | null = e;
+      n && n !== document.body;
+      n = n.parentElement
+    ) {
+      const same = n.parentElement
+        ? [...n.parentElement.children].filter((c) => c.tagName === n!.tagName)
+        : [n];
+      parts.push(
+        `${n.tagName.toLowerCase()}${same.length > 1 ? same.indexOf(n) : ""}`,
+      );
+    }
+    return parts.reverse().join(">");
+  };
   const px = (v: string) => (v.endsWith("px") ? parseFloat(v) : 0);
   const visible = (e: Element, cs: CSSStyleDeclaration) =>
     cs.display !== "none" &&
@@ -136,6 +159,7 @@ function measure(): Raw {
       const size = parseFloat(cs.fontSize);
       text.push({
         i: index.get(e)!,
+        id: `${pathOf(e)}|${own.slice(0, 60)}`,
         tag: e.tagName.toLowerCase(),
         cls: (e.getAttribute("class") ?? "").slice(0, 80),
         chars: own.length,
@@ -176,6 +200,7 @@ function measure(): Raw {
     const rect = e.getBoundingClientRect();
     const b = {
       i: index.get(e)!,
+      id: pathOf(e),
       tag: e.tagName.toLowerCase(),
       cls: (e.getAttribute("class") ?? "").slice(0, 80),
       area: Math.round((rect.width * rect.height) / 1000),
@@ -399,9 +424,9 @@ for (const { path, runs } of perPage) {
   const [first] = runs;
   const at = (w: number) => runs[WIDTHS.indexOf(w)];
   const desktop = at(1440);
-  const textBy = runs.map((run) => new Map(run.text.map((t) => [t.i, t])));
+  const textBy = runs.map((run) => new Map(run.text.map((t) => [t.id, t])));
   for (const t of desktop.text) {
-    const across = textBy.map((m) => m.get(t.i));
+    const across = textBy.map((m) => m.get(t.id));
     if (across.some((x) => !x)) continue;
     const key = [
       t.family,
@@ -429,9 +454,9 @@ for (const { path, runs } of perPage) {
     type.set(key, hit);
     bump(colors.text, t.color, {}, t.chars);
   }
-  const boxBy = runs.map((run) => new Map(run.box.map((b) => [b.i, b])));
+  const boxBy = runs.map((run) => new Map(run.box.map((b) => [b.id, b])));
   for (const b of desktop.box) {
-    const across = boxBy.map((m) => m.get(b.i));
+    const across = boxBy.map((m) => m.get(b.id));
     if (across.some((x) => !x)) continue;
     for (const prop of [
       "spacer",

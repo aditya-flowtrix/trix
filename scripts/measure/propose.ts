@@ -152,17 +152,21 @@ const eyebrow = types
   )
   .sort((a, b) => b.count - a.count)[0];
 
+/**
+ * One cluster per size: a slot is a size, so the most used cluster at it
+ * takes the slot. The same size at another weight is not a bigger or smaller
+ * style — it is listed for the owner (a weight utility, or its own style).
+ */
+const weightVariants: TypeCluster[] = [];
 const distinct = (list: TypeCluster[]) => {
   const out: TypeCluster[] = [];
   for (const t of list.sort(
     (a, b) => desktop(b) - desktop(a) || b.count - a.count,
   )) {
-    if (
-      !out.some(
-        (o) => Math.abs(desktop(o) - desktop(t)) < 1.5 && o.weight === t.weight,
-      )
-    )
-      out.push(t);
+    const same = out.find((o) => Math.abs(desktop(o) - desktop(t)) < 1.5);
+    if (!same) out.push(t);
+    else if (same.weight !== t.weight && !weightVariants.includes(t))
+      weightVariants.push(t);
   }
   return out;
 };
@@ -226,6 +230,10 @@ for (const t of [...larger.slice(2), ...smaller.slice(2)]) {
     `Unassigned text style ${pair(t.sizes).min}→${pair(t.sizes).max}px weight ${t.weight} "${t.samples[0]}" (×${t.count}) — snap to the nearest style, or add one?`,
   );
 }
+for (const t of weightVariants)
+  ask.push(
+    `${pair(t.sizes).min}→${pair(t.sizes).max}px also appears at weight ${t.weight} "${t.samples[0]}" (×${t.count}) — the same style with a weight utility, or a style of its own?`,
+  );
 notes.push(
   `Heading slots are assigned by size. Check the level each one belongs to — a 112px stat counter is not necessarily h1.`,
 );

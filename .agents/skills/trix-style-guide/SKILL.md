@@ -173,7 +173,11 @@ group. The file's comment headings are the groups; keep them.
   references must be remapped **by value** to the nearest new step, and the
   map recorded in `PROJECT.md`.
 - **Colors** — palette ramps, then each theme in `themes.css` with the full
-  set of semantic tokens. Alpha variants are `color-mix(in lab, … N%,
+  set of semantic tokens. `npm run check` fails any text role below WCAG AA
+  in any theme. If the source itself is below AA and the owner chooses to
+  keep it identical, mark that line in that theme
+  `/* contrast: accepted — <reason> */` and record the decision in
+  `PROJECT.md`; the check then reports it instead of failing. Alpha variants are `color-mix(in lab, … N%,
 transparent)` of a swatch or `currentcolor`.
 - **Layout grid** — `--site-margin`, `--site-gutter` and `--max-width-main`
   from the proposal's _Layout grid_. Check with the overlay: Shift+G on the
