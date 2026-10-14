@@ -1,0 +1,479 @@
+#!/usr/bin/env node
+/**
+ * Measures a site's design system from what the browser actually renders —
+ * whatever platform built it, and whether or not it ever had a style guide.
+ *
+ * Every visible element is measured at seven viewport widths, so a value is
+ * known as a series (320 → 1920), which is exactly what a fluid token is.
+ * Nothing is read from class or variable names.
+ *
+ * Usage
+ *   node scripts/measure/design.ts --url https://example.com [--pages /,/about]
+ *   node scripts/measure/design.ts --dir path/to/export [--pages /index.html]
+ *   node scripts/measure/design.ts --url https://example.com --sample 8
+ *       (pages from .trix/inventory.json: the homepage, then the most varied)
+ *
+ * Writes .trix/design.json (series + frequencies) and .trix/design.md.
+ */
+
+import { existsSync, readFileSync } from "node:fs";
+import { WIDTHS, args, launch, open, output, pool, serve } from "./browser.ts";
+
+const opts = args();
+let origin: string;
+let close = () => {};
+if (typeof opts.dir === "string") {
+  const s = await serve(opts.dir);
+  origin = s.origin;
+  close = () => s.server.close();
+} else if (typeof opts.url === "string") {
+  origin = new URL(opts.url).origin;
+} else {
+  console.error(
+    "usage: design.ts --url <site> | --dir <export> [--pages /,/about] [--sample 8]",
+  );
+  process.exit(1);
+}
+
+let paths: string[] =
+  typeof opts.pages === "string" ? opts.pages.split(",") : [];
+if (!paths.length && existsSync(".trix/inventory.json")) {
+  const inv = JSON.parse(readFileSync(".trix/inventory.json", "utf8"));
+  const ranked = [...inv.pages]
+    .filter((p: { headings?: string[] }) => p.headings)
+    .sort(
+      (a: { headings: string[] }, b: { headings: string[] }) =>
+        b.headings.length - a.headings.length,
+    );
+  const home = inv.pages.find(
+    (p: { path: string }) => p.path === "/" || p.path === "/index.html",
+  );
+  paths = [
+    ...new Set([
+      home?.path ?? "/",
+      ...ranked.map((p: { path: string }) => p.path),
+    ]),
+  ].slice(0, Number(opts.sample ?? 8));
+}
+if (!paths.length) paths = ["/"];
+
+type Raw = {
+  text: {
+    i: number;
+    tag: string;
+    cls: string;
+    chars: number;
+    sample: string;
+    family: string;
+    size: number;
+    weight: string;
+    lh: number;
+    ls: number;
+    transform: string;
+    color: string;
+  }[];
+  box: {
+    i: number;
+    tag: string;
+    cls: string;
+    area: number;
+    section: boolean;
+    spacer: number;
+    pt: number;
+    pr: number;
+    pb: number;
+    pl: number;
+    mt: number;
+    mb: number;
+    rg: number;
+    cg: number;
+    radius: number;
+    bg: string;
+    border: string;
+    bw: number;
+    maxw: number;
+  }[];
+  vars: Record<string, string>;
+  media: string[];
+};
+
+function measure(): Raw {
+  const all = [...document.querySelectorAll("body *")];
+  const index = new Map(all.map((e, i) => [e, i]));
+  const px = (v: string) => (v.endsWith("px") ? parseFloat(v) : 0);
+  const visible = (e: Element, cs: CSSStyleDeclaration) =>
+    cs.display !== "none" &&
+    cs.visibility !== "hidden" &&
+    e.getClientRects().length > 0;
+  const text: Raw["text"] = [];
+  const box: Raw["box"] = [];
+  const skip = new Set([
+    "SCRIPT",
+    "STYLE",
+    "NOSCRIPT",
+    "TEMPLATE",
+    "svg",
+    "path",
+    "IFRAME",
+  ]);
+  for (const e of all) {
+    if (skip.has(e.tagName)) continue;
+    const cs = getComputedStyle(e);
+    if (!visible(e, cs)) continue;
+    const own = [...e.childNodes]
+      .filter((n) => n.nodeType === 3)
+      .map((n) => n.textContent ?? "")
+      .join("")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (own.length > 1) {
+      const size = parseFloat(cs.fontSize);
+      text.push({
+        i: index.get(e)!,
+        tag: e.tagName.toLowerCase(),
+        cls: (e.getAttribute("class") ?? "").slice(0, 80),
+        chars: own.length,
+        sample: own.slice(0, 60),
+        family: cs.fontFamily.split(",")[0].replace(/["']/g, "").trim(),
+        size,
+        weight: cs.fontWeight,
+        lh:
+          cs.lineHeight === "normal"
+            ? +(size * 1.2).toFixed(2)
+            : px(cs.lineHeight),
+        ls: cs.letterSpacing === "normal" ? 0 : px(cs.letterSpacing),
+        transform: cs.textTransform,
+        color: cs.color,
+      });
+    }
+    const rect = e.getBoundingClientRect();
+    const b = {
+      i: index.get(e)!,
+      tag: e.tagName.toLowerCase(),
+      cls: (e.getAttribute("class") ?? "").slice(0, 80),
+      area: Math.round((rect.width * rect.height) / 1000),
+      section:
+        rect.width >= innerWidth * 0.95 &&
+        (e.tagName === "SECTION" ||
+          e.parentElement === document.body ||
+          e.parentElement?.tagName === "MAIN"),
+      spacer:
+        !e.children.length &&
+        !(e.textContent ?? "").trim() &&
+        !/^(IMG|VIDEO|CANVAS|INPUT|SELECT|TEXTAREA|BUTTON|HR|BR)$/.test(
+          e.tagName,
+        ) &&
+        cs.backgroundImage === "none" &&
+        /rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) &&
+        rect.height > 0 &&
+        rect.height <= 240
+          ? +rect.height.toFixed(2)
+          : 0,
+      pt: px(cs.paddingTop),
+      pr: px(cs.paddingRight),
+      pb: px(cs.paddingBottom),
+      pl: px(cs.paddingLeft),
+      mt: px(cs.marginTop),
+      mb: px(cs.marginBottom),
+      rg: /flex|grid/.test(cs.display) ? px(cs.rowGap) : 0,
+      cg: /flex|grid/.test(cs.display) ? px(cs.columnGap) : 0,
+      radius: px(cs.borderTopLeftRadius),
+      bg: cs.backgroundColor,
+      border: px(cs.borderTopWidth) > 0 ? cs.borderTopColor : "",
+      bw: px(cs.borderTopWidth),
+      maxw: cs.maxWidth === "none" ? 0 : px(cs.maxWidth),
+    };
+    if (
+      b.spacer ||
+      b.pt ||
+      b.pr ||
+      b.pb ||
+      b.pl ||
+      b.mt ||
+      b.mb ||
+      b.rg ||
+      b.cg ||
+      b.radius ||
+      b.bw ||
+      b.maxw ||
+      !/rgba\(0, 0, 0, 0\)|transparent/.test(b.bg)
+    )
+      box.push(b);
+  }
+  const vars: Record<string, string> = {};
+  const media = new Set<string>();
+  const root = getComputedStyle(document.documentElement);
+  const walk = (rules: CSSRuleList) => {
+    for (const r of rules) {
+      if (r instanceof CSSMediaRule) media.add(r.conditionText);
+      if ("cssRules" in r && (r as CSSGroupingRule).cssRules)
+        walk((r as CSSGroupingRule).cssRules);
+      if (
+        r instanceof CSSStyleRule &&
+        /(^|,)\s*(:root|html)\s*(,|$)/.test(r.selectorText)
+      ) {
+        for (const p of r.style)
+          if (p.startsWith("--")) vars[p] = root.getPropertyValue(p).trim();
+      }
+    }
+  };
+  for (const sheet of document.styleSheets) {
+    try {
+      walk(sheet.cssRules);
+    } catch {}
+  }
+  return { text, box, vars, media: [...media] };
+}
+
+const browser = await launch();
+const perPage = await pool(paths, 2, async (path) => {
+  const page = await browser.newPage();
+  const runs: Raw[] = [];
+  try {
+    for (const width of WIDTHS) {
+      await open(page, origin + path, width);
+      runs.push(await page.evaluate(measure));
+    }
+  } catch (error) {
+    console.error(`${path}: ${error}`);
+  } finally {
+    await page.close();
+  }
+  return { path, runs };
+});
+await browser.close();
+close();
+
+/* ---------------- aggregate ---------------- */
+
+const r = (n: number) => Math.round(n * 100) / 100;
+const series = (values: number[]) => values.map(r).join("/");
+const bump = (
+  map: Map<string, { count: number; [k: string]: unknown }>,
+  key: string,
+  extra: Record<string, unknown> = {},
+  weight = 1,
+) => {
+  const hit = map.get(key) ?? { count: 0, ...extra };
+  hit.count += weight;
+  map.set(key, hit);
+  return hit;
+};
+
+const type = new Map<
+  string,
+  {
+    count: number;
+    tags: Set<string>;
+    samples: string[];
+    classes: Set<string>;
+    colors: Set<string>;
+    pages: Set<string>;
+  }
+>();
+const spacing = new Map<string, { count: number; props: Set<string> }>();
+const sections = new Map<string, { count: number }>();
+const radius = new Map<string, { count: number }>();
+const maxWidths = new Map<string, { count: number }>();
+const colors = {
+  text: new Map<string, { count: number }>(),
+  background: new Map<string, { count: number }>(),
+  border: new Map<string, { count: number }>(),
+};
+const media = new Map<string, { count: number }>();
+const vars: Record<string, string[]> = {};
+
+for (const { path, runs } of perPage) {
+  if (runs.length !== WIDTHS.length) continue;
+  const [first] = runs;
+  const at = (w: number) => runs[WIDTHS.indexOf(w)];
+  const desktop = at(1440);
+  const textBy = runs.map((run) => new Map(run.text.map((t) => [t.i, t])));
+  for (const t of desktop.text) {
+    const across = textBy.map((m) => m.get(t.i));
+    if (across.some((x) => !x)) continue;
+    const key = [
+      t.family,
+      t.weight,
+      t.transform,
+      series(across.map((x) => x!.size)),
+      (t.lh / t.size).toFixed(2),
+      (t.ls / t.size).toFixed(3),
+    ].join("|");
+    const hit = type.get(key) ?? {
+      count: 0,
+      tags: new Set(),
+      samples: [],
+      classes: new Set(),
+      colors: new Set(),
+      pages: new Set(),
+    };
+    hit.count++;
+    hit.tags.add(t.tag);
+    if (hit.samples.length < 3 && !hit.samples.includes(t.sample))
+      hit.samples.push(t.sample);
+    if (t.cls) hit.classes.add(t.cls.split(" ").slice(0, 2).join(" "));
+    hit.colors.add(t.color);
+    hit.pages.add(path);
+    type.set(key, hit);
+    bump(colors.text, t.color, {}, t.chars);
+  }
+  const boxBy = runs.map((run) => new Map(run.box.map((b) => [b.i, b])));
+  for (const b of desktop.box) {
+    const across = boxBy.map((m) => m.get(b.i));
+    if (across.some((x) => !x)) continue;
+    for (const prop of [
+      "spacer",
+      "pt",
+      "pr",
+      "pb",
+      "pl",
+      "mt",
+      "mb",
+      "rg",
+      "cg",
+    ] as const) {
+      const values = across.map((x) => x![prop]);
+      if (values.every((v) => v === 0) || values.some((v) => v < 0)) continue;
+      const hit = bump(spacing, series(values), {
+        props: new Set<string>(),
+      }) as { count: number; props: Set<string> };
+      hit.props.add(prop);
+    }
+    if (b.section)
+      for (const prop of ["pt", "pb"] as const) {
+        const values = across.map((x) => x![prop]);
+        if (values.some((v) => v > 0)) bump(sections, series(values));
+      }
+    if (b.radius) bump(radius, series(across.map((x) => x!.radius)));
+    if (b.maxw) bump(maxWidths, String(r(b.maxw)));
+    if (!/rgba\(0, 0, 0, 0\)|transparent/.test(b.bg))
+      bump(colors.background, b.bg, {}, Math.max(1, b.area));
+    if (b.border) bump(colors.border, b.border);
+  }
+  for (const m of first.media) bump(media, m);
+  for (const [k, v] of Object.entries(desktop.vars)) (vars[k] ??= []).push(v);
+}
+
+const sorted = <T extends { count: number }>(map: Map<string, T>) =>
+  [...map.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([key, v]) => ({ key, ...v }));
+
+const result = {
+  source: opts.dir ?? opts.url,
+  widths: WIDTHS,
+  pages: paths,
+  type: sorted(type).map((t) => {
+    const [family, weight, transform, sizes, lineHeight, letterSpacing] =
+      t.key.split("|");
+    return {
+      family,
+      weight,
+      transform,
+      sizes: sizes.split("/").map(Number),
+      lineHeight: Number(lineHeight),
+      letterSpacingEm: Number(letterSpacing),
+      count: t.count,
+      tags: [...t.tags],
+      samples: t.samples,
+      classes: [...t.classes].slice(0, 5),
+      colors: [...t.colors],
+      pages: t.pages.size,
+    };
+  }),
+  spacing: sorted(spacing).map((s) => ({
+    values: s.key.split("/").map(Number),
+    count: s.count,
+    props: [...s.props],
+  })),
+  sectionPadding: sorted(sections).map((s) => ({
+    values: s.key.split("/").map(Number),
+    count: s.count,
+  })),
+  radius: sorted(radius).map((s) => ({
+    values: s.key.split("/").map(Number),
+    count: s.count,
+  })),
+  maxWidths: sorted(maxWidths).map((s) => ({
+    px: Number(s.key),
+    count: s.count,
+  })),
+  colors: {
+    text: sorted(colors.text).map((c) => ({ color: c.key, count: c.count })),
+    background: sorted(colors.background).map((c) => ({
+      color: c.key,
+      count: c.count,
+    })),
+    border: sorted(colors.border).map((c) => ({
+      color: c.key,
+      count: c.count,
+    })),
+  },
+  media: sorted(media).map((m) => ({ query: m.key, count: m.count })),
+  variables: Object.fromEntries(
+    Object.entries(vars).map(([k, v]) => [k, v[0]]),
+  ),
+};
+
+const file = output("design.json", JSON.stringify(result, null, 2));
+const md = [
+  `# Design measurement — ${result.source}`,
+  "",
+  `Pages: ${paths.join(", ")} · widths: ${WIDTHS.join(", ")}px`,
+  "",
+  "## Type (by element count)",
+  "",
+  `| Sizes ${WIDTHS.join("/")} | Family | Weight | LH | LS em | Transform | Count | Tags | Sample |`,
+  "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+  ...result.type
+    .slice(0, 40)
+    .map(
+      (t) =>
+        `| ${t.sizes.join("/")} | ${t.family} | ${t.weight} | ${t.lineHeight} | ${t.letterSpacingEm} | ${t.transform} | ${t.count} | ${t.tags.join(" ")} | ${t.samples[0]?.replace(/\|/g, "")} |`,
+    ),
+  "",
+  "## Spacing series (px at each width)",
+  "",
+  ...result.spacing
+    .slice(0, 40)
+    .map(
+      (s) => `- ${s.values.join(" / ")} ×${s.count} (${s.props.join(", ")})`,
+    ),
+  "",
+  "## Section padding",
+  "",
+  ...result.sectionPadding
+    .slice(0, 12)
+    .map((s) => `- ${s.values.join(" / ")} ×${s.count}`),
+  "",
+  "## Radius",
+  "",
+  ...result.radius
+    .slice(0, 12)
+    .map((s) => `- ${s.values.join(" / ")} ×${s.count}`),
+  "",
+  "## Colors",
+  "",
+  ...(["text", "background", "border"] as const).flatMap((k) => [
+    `**${k}**: ${result.colors[k]
+      .slice(0, 12)
+      .map((c) => `${c.color} ×${c.count}`)
+      .join(" · ")}`,
+    "",
+  ]),
+  "## Media queries",
+  "",
+  ...result.media.map((m) => `- \`${m.query}\` ×${m.count}`),
+  "",
+  `## Root variables (${Object.keys(result.variables).length})`,
+  "",
+  ...Object.entries(result.variables)
+    .slice(0, 80)
+    .map(([k, v]) => `- \`${k}: ${v}\``),
+].join("\n");
+output("design.md", md);
+console.log(
+  `Measured ${paths.length} page(s) at ${WIDTHS.length} widths: ${result.type.length} type styles, ${result.spacing.length} spacing series, ${result.colors.text.length + result.colors.background.length} colors, ${result.media.length} media queries.`,
+);
+console.log(`Wrote ${file} and .trix/design.md`);

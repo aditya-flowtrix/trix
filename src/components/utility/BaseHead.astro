@@ -1,6 +1,6 @@
 ---
-import { Font } from "astro:assets";
-import { SITE_NAME, SITE_DESCRIPTION } from "@/consts.ts";
+import { Font, fontData } from "astro:assets";
+import { SITE_NAME, SITE_DESCRIPTION, COLOR_MODE } from "@/consts.ts";
 import { isNoindexRoute } from "@/utils/seo.ts";
 import type { SeoProps } from "@/types.ts";
 
@@ -15,6 +15,15 @@ const {
 } = Astro.props;
 
 const isNoindex = noindex ?? isNoindexRoute(Astro.url.pathname);
+const fontPreload = fontData["--font-inter"]?.[0]?.src[0]?.url;
+
+/* Applies the saved or system color mode before first paint. */
+const colorModeScript = `(() => {
+  let saved;
+  try { saved = localStorage.getItem("trix-mode"); } catch {}
+  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.dataset.mode = dark ? "dark" : "light";
+})();`;
 
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -26,7 +35,19 @@ const socialImage = new URL(image, Astro.site);
   @layer base, patterns, components, utilities;
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<Font cssVariable="--font-inter" preload />
+<Font cssVariable="--font-inter" />
+{
+  fontPreload && (
+    <link
+      rel="preload"
+      href={fontPreload}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  )
+}
+{COLOR_MODE === "auto" && <script is:inline set:html={colorModeScript} />}
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
@@ -44,6 +65,7 @@ const socialImage = new URL(image, Astro.site);
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={socialImage} />
 
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="generator" content={Astro.generator} />

@@ -1,47 +1,105 @@
-<p align="center">
-  <img src=".github/assets/banner.png" alt="Lumos For Astro" width="720">
-</p>
+# Trix
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/create-lumos"><img alt="npm version" src="https://img.shields.io/npm/v/create-lumos?labelColor=1E1E1E&color=C6FB50"></a>
-  <a href="LICENSE"><img alt="license" src="https://img.shields.io/npm/l/create-lumos?labelColor=1E1E1E&color=C6FB50"></a>
-  <a href="https://github.com/lumosframework/lumos-for-astro/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lumosframework/lumos-for-astro/actions/workflows/ci.yml/badge.svg"></a>
-</p>
+**A design-ready Astro framework.** One design system with two surfaces — the
+variables, text styles and components a designer uses in Figma, and the
+tokens, classes and components a developer uses in Astro — sharing every name.
+What gets designed is what ships.
 
-A component and styling framework for building Astro sites, designed around
-efficiency, scalability and accessibility.
+Trix also moves existing sites onto it: Webflow, Framer, WordPress or anything
+else, measured in a real browser, rebuilt with Trix's components and verified
+value by value against the original.
 
-Documentation lives at **[lumosframework.com](https://lumosframework.com)**.
+## Why Trix
 
-## Getting started
+- **Designers and developers speak the same language.** `space/7` in Figma is
+  `--space-7` in CSS, `gap-7` in a utility and `"7"` in a typed prop. The Figma
+  variables are generated from the code ([`design/tokens/`](design/tokens/)).
+- **One file is the design system.** [`src/styles/tokens.css`](src/styles/tokens.css)
+  holds every value as plain numbers — fluid sizes are a Mobile and a Desktop
+  value. Everything else (clamps, text styles, utilities, prop types, Figma
+  files, the token docs) is generated from it and kept in sync by CI.
+- **A style guide that cannot drift.** [`/style-guide`](src/pages/style-guide.astro)
+  renders straight from the tokens: brand, type, color, themes, spacing,
+  radius, layout, icons.
+- **Migrations without guesswork.** The measuring toolkit reads what a site
+  renders at seven widths and maps it to Trix by value, never by name — then
+  proves the rebuild matches.
+- **Fast by default.** Static Astro, zero runtime dependencies, native
+  `<details>` and `<dialog>`, icons inlined at build time, local variable fonts,
+  cascade layers so nothing needs `!important`.
+- **Agent-ready.** Every procedure is a skill with scripts; every project keeps
+  its decisions in `PROJECT.md`.
 
-```sh
-npm create lumos@latest my-site
-```
+## Start a project
 
-That scaffolds a new site from this repository and installs its dependencies
-with whichever package manager you ran it with. Then:
-
-```sh
+```bash
+npx degit aditya-flowtrix/trix my-site
 cd my-site
+npm install
 npm run dev
 ```
 
-| Script            | What it does                      |
-| ----------------- | --------------------------------- |
-| `npm run dev`     | Starts the dev server             |
-| `npm run build`   | Builds the site to `dist/`        |
-| `npm run preview` | Serves the built site             |
-| `npm run check`   | Type-checks every `.astro` file   |
-| `npm run format`  | Formats the project with Prettier |
+Then run the `trix-new-project` skill (or follow
+[its steps](.agents/skills/trix-new-project/SKILL.md)) to stamp, name and brand
+the project. Open `/style-guide` and `/components`.
 
-Node 22.19 or newer is required.
+## For designers
 
-## Documentation
+Start with [Designing with Trix](docs/design/README.md) — the rules, the
+breakpoints, the naming — then [Figma setup](docs/design/figma-setup.md) to
+import the variables and build the file, and the
+[handoff checklist](docs/design/handoff.md).
 
-Component reference, styling guides and examples are at
-[lumosframework.com](https://lumosframework.com).
+## For developers
+
+| Read                                           | For                                               |
+| ---------------------------------------------- | ------------------------------------------------- |
+| [`TRIX.md`](TRIX.md)                           | how to build pages, components, styles and tokens |
+| [`docs/components.md`](docs/components.md)     | every component and its variants                  |
+| [`docs/tokens.md`](docs/tokens.md)             | every token, generated                            |
+| [`docs/architecture.md`](docs/architecture.md) | how Trix works and why                            |
+| [`PROJECT.md`](PROJECT.md)                     | the project's own record                          |
+
+| Command          | Does                                                           |
+| ---------------- | -------------------------------------------------------------- |
+| `npm run dev`    | dev server; regenerates tokens on save                         |
+| `npm run tokens` | regenerate everything derived from `tokens.css` / `themes.css` |
+| `npm run check`  | tokens in sync, conventions, type-check                        |
+| `npm run build`  | static build to `dist/`                                        |
+
+## Skills
+
+In [`.agents/skills/`](.agents/skills/), loaded by Claude Code as
+`/trix-<name>` and readable by any assistant:
+
+| Skill                  | Does                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `trix-new-project`     | start a new site from Trix                                                  |
+| `trix-style-guide`     | build the design system from any source — measured, never guessed, verified |
+| `trix-migrate`         | migrate from Webflow, Framer, WordPress, Wix, Squarespace or anything else  |
+| `trix-import-figma`    | build tokens and pages from a Figma file                                    |
+| `trix-audit-props`     | keep component props consistent                                             |
+| `trix-scaling-graphic` | build a graphic that scales as one piece                                    |
+| `trix-upgrade`         | upgrade a site to the latest Trix; sync Trix with Lumos                     |
+
+The measuring toolkit they share is in [`scripts/measure/`](scripts/measure/):
+`inventory`, `design`, `propose`, `variables`, `classes`, `verify`.
+
+## Roadmap
+
+[ROADMAP.md](ROADMAP.md) — phase 2 adds the SEO skills.
+
+## Credits
+
+Trix is built on **[Lumos for Astro](https://github.com/lumosframework/lumos-for-astro)**
+by Timothy Ricks (MIT) — its component library, cascade layers, conventions and
+skills are the foundation, and its history is preserved in this repository.
+Ideas from **[Mast for Astro](https://github.com/CoreyMoen/mast-astro)** by
+Corey Moen / No-Code Supply Co. (MIT) — the token file organised like a
+variables panel with generated fluid formulas, build-time icons, site-wide
+color mode, and skill evals. Icons by [Phosphor](https://phosphoricons.com)
+(MIT). Typeface [Inter](https://rsms.me/inter/) by Rasmus Andersson (OFL).
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE).

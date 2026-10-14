@@ -68,17 +68,17 @@ const {
 if (import.meta.env.DEV && render) {
   if (!src) {
     console.warn(
-      "[lumos] <Video> rendered without a `src`; nothing was output.",
+      "[trix] <Video> rendered without a `src`; nothing was output.",
     );
   }
   if (autoplay && !muted) {
     console.warn(
-      "[lumos] <Video autoplay> without `muted` is blocked by every major browser. Set muted, or drop autoplay and let the viewer start it.",
+      "[trix] <Video autoplay> without `muted` is blocked by every major browser. Set muted, or drop autoplay and let the viewer start it.",
     );
   }
   if (variant === "custom" && !ratio) {
     console.warn(
-      '[lumos] <Video variant="custom"> has no `ratio`, so no aspect ratio is applied. Set one, or pick a preset variant.',
+      '[trix] <Video variant="custom"> has no `ratio`, so no aspect ratio is applied. Set one, or pick a preset variant.',
     );
   }
 }

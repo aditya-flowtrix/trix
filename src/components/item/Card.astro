@@ -7,6 +7,7 @@ import Button from "@/components/Button.astro";
 import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
 import Img from "@/components/media/Img.astro";
 import Overlay from "@/components/media/Overlay.astro";
+import type { Theme } from "@/styles/generated/tokens.ts";
 
 type ImageSource = ImageMetadata | string;
 
@@ -28,7 +29,7 @@ type Base = HTMLAttributes<"div"> & {
   /** Card layout. */
   variant?: "default" | "cover" | "stacked";
   /** Color theme of element and its children. */
-  theme?: "inherit" | "light" | "dark" | "brand" | "invert";
+  theme?: "inherit" | Theme | "invert";
 };
 
 type Props = Base &
@@ -91,17 +92,17 @@ const buttonKind =
 if (import.meta.env.DEV && render) {
   if (variant === "stacked" && theme !== "inherit") {
     console.warn(
-      '[lumos] <Card variant="stacked"> has no surface to color, so `theme` was dropped. It keeps the theme around it.',
+      '[trix] <Card variant="stacked"> has no surface to color, so `theme` was dropped. It keeps the theme around it.',
     );
   }
   if (variant === "default" && image) {
     console.warn(
-      '[lumos] <Card variant="default"> holds no image, so `image` was dropped. Use the cover or stacked variant to show it.',
+      '[trix] <Card variant="default"> holds no image, so `image` was dropped. Use the cover or stacked variant to show it.',
     );
   }
   if (variant !== "default" && !image) {
     console.warn(
-      `[lumos] <Card variant="${variant}"> has no \`image\`, so it renders as a plain card.`,
+      `[trix] <Card variant="${variant}"> has no \`image\`, so it renders as a plain card.`,
     );
   }
 }
@@ -153,7 +154,7 @@ if (import.meta.env.DEV && render) {
 <style is:global>
   @layer components {
     .card_wrap {
-      --_padding: var(--space-6);
+      --_padding: var(--space-7);
       --_min-height: 20rem;
       --_visual-ratio: 3 / 2;
       width: 100%;
@@ -162,7 +163,7 @@ if (import.meta.env.DEV && render) {
       gap: var(--_padding);
       position: relative;
       background-color: var(--background-2);
-      border-radius: var(--radius-main);
+      border-radius: var(--card-radius);
       overflow: clip;
 
       &.cover {
@@ -210,7 +211,7 @@ if (import.meta.env.DEV && render) {
        grows. This outranks the margin `.button-wrapper` sets for itself. */
     .card_content > .button-wrapper:last-child {
       margin-top: auto;
-      padding-top: var(--space-6);
+      padding-top: var(--space-7);
     }
 
     .card_content {

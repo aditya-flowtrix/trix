@@ -1,0 +1,34 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { slotContent } from "@/utils/slots.ts";
+
+interface Props extends HTMLAttributes<"h2"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true, class: className, ...rest } = Astro.props;
+
+const content = await slotContent(Astro.slots);
+---
+
+{
+  render && content && (
+    <h2
+      class:list={["style-guide-title_wrap text-style-h3", className]}
+      {...rest}
+    >
+      <Fragment set:html={content} />
+    </h2>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-title_wrap {
+      width: 100%;
+      padding-bottom: var(--space-4);
+      border-bottom: 0.125rem solid var(--border);
+    }
+  }
+</style>

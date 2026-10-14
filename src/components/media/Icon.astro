@@ -1,27 +1,77 @@
 ---
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import type { HTMLAttributes, SvgComponent } from "astro/types";
 
-interface Props extends HTMLAttributes<"svg"> {
+type Base = HTMLAttributes<"svg"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
-  /** Imported SVG. Omit to render nothing. */
-  src?: SvgComponent;
   /** Icon size. */
   variant?: "small" | "medium" | "large" | "full-width";
-}
+};
+
+type Props = Base &
+  (
+    | {
+        /** Imported SVG. Omit to render nothing. */
+        src?: SvgComponent;
+        name?: never;
+        weight?: never;
+      }
+    | {
+        /** Phosphor icon name, as on phosphoricons.com — `arrow-right`. Inlined at build time. */
+        name: string;
+        /** Phosphor weight. */
+        weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
+        src?: never;
+      }
+  );
+
+type AllProps = Base & {
+  src?: SvgComponent;
+  name?: string;
+  weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
+};
 
 const {
   render = true,
   src: Svg,
+  name,
+  weight = "regular",
   variant = "medium",
   class: className,
   ...rest
-} = Astro.props;
+} = Astro.props as AllProps;
 
 const labelled = Boolean(rest["aria-label"] ?? rest["aria-labelledby"]);
 
-if (import.meta.env.DEV && render && !Svg) {
-  console.warn("[lumos] <Icon> rendered without a `src`; nothing was output.");
+function phosphor(icon: string) {
+  const file = weight === "regular" ? icon : `${icon}-${weight}`;
+  let svg: string;
+  try {
+    svg = readFileSync(
+      createRequire(import.meta.url).resolve(
+        `@phosphor-icons/core/assets/${weight}/${file}.svg`,
+      ),
+      "utf8",
+    );
+  } catch {
+    throw new Error(
+      `[trix] <Icon name="${icon}" weight="${weight}"> is not a Phosphor icon. Names are listed on phosphoricons.com.`,
+    );
+  }
+  return {
+    viewBox: svg.match(/viewBox="([^"]+)"/)?.[1],
+    inner: svg.replace(/^<svg[^>]*>|<\/svg>\s*$/g, ""),
+  };
+}
+
+const named = render && name ? phosphor(name) : undefined;
+
+if (import.meta.env.DEV && render && !Svg && !name) {
+  console.warn(
+    "[trix] <Icon> rendered without a `src` or `name`; nothing was output.",
+  );
 }
 ---
 
@@ -31,6 +81,19 @@ if (import.meta.env.DEV && render && !Svg) {
       class:list={["icon", variant, className]}
       aria-hidden={labelled ? undefined : "true"}
       {...rest}
+    />
+  )
+}
+{
+  named && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={named.viewBox}
+      fill="currentColor"
+      class:list={["icon", variant, className]}
+      aria-hidden={labelled ? undefined : "true"}
+      {...rest}
+      set:html={named.inner}
     />
   )
 }
