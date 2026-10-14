@@ -54,6 +54,8 @@ jobs:
   browsers:
     name: Browser (${{ matrix.browser }})
     runs-on: ${{ matrix.os }}
+    # A browser that hangs fails here, instead of holding a runner for hours.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:

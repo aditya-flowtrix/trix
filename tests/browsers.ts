@@ -250,13 +250,33 @@ const PAGE_FACTS = `async () => {
   }
   scrollTo(0, 0);
   await new Promise((r) => setTimeout(r, 300));
-  // Reveals still fading in read as low contrast; wait for every finite one.
-  await Promise.all(document.getAnimations()
-    .filter((a) => Number.isFinite(a.effect?.getTiming().iterations ?? 1))
-    .map((a) => a.finished.catch(() => {})));
+  // Reveals still fading in read as low contrast; wait for every finite one —
+  // for at most 3s, since a headless browser may hold animations paused.
+  await Promise.race([
+    Promise.all(document.getAnimations()
+      .filter((a) => Number.isFinite(a.effect?.getTiming().iterations ?? 1))
+      .map((a) => a.finished.catch(() => {}))),
+    new Promise((r) => setTimeout(r, 3000)),
+  ]);
   const ids = [...document.querySelectorAll("[id]")].map((e) => e.id);
+  const width = document.documentElement.clientWidth;
+  const overflow = document.documentElement.scrollWidth - width;
+  // What sticks out: past the right edge, and not inside anything that scrolls
+  // or clips it (the body's own clip aside — it hides, but iOS still pans).
+  const contained = (e) => {
+    for (let a = e.parentElement; a && a !== document.body; a = a.parentElement)
+      if (getComputedStyle(a).overflowX !== "visible") return true;
+    return false;
+  };
+  const wide = overflow > 0
+    ? [...document.querySelectorAll("body *")]
+        .filter((e) => e.getBoundingClientRect().right > width + 0.5 && !contained(e))
+        .slice(0, 3)
+        .map((e) => e.tagName.toLowerCase() + "." + [...e.classList].slice(0, 2).join(".") + " (right " + Math.round(e.getBoundingClientRect().right) + "px)")
+    : [];
   return {
-    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    overflow,
+    wide,
     dup: [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))],
     unsized: [...document.querySelectorAll("img")].filter((i) => !i.getAttribute("width") || !i.getAttribute("height")).length,
     // Visible text squeezed to nothing: clipped, so no other check sees it.
@@ -316,6 +336,7 @@ async function testPage(driver: Driver, page: Page, path: string) {
     await page.goto(url, w);
     const f = await page.evaluate<{
       overflow: number;
+      wide: string[];
       dup: string[];
       unsized: number;
       collapsed: string[];
@@ -330,7 +351,12 @@ async function testPage(driver: Driver, page: Page, path: string) {
       page.errors().length === 0,
       page.errors().slice(0, 3).join(" | "),
     );
-    check(where, "no sideways scroll", f.overflow <= 0, `${f.overflow}px`);
+    check(
+      where,
+      "no sideways scroll",
+      f.overflow <= 0,
+      `${f.overflow}px — ${f.wide.join(", ") || "no element found past the edge"}`,
+    );
     check(where, "unique ids", f.dup.length === 0, f.dup.join(", "));
     check(
       where,
