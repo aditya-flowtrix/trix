@@ -1,0 +1,417 @@
+/*
+ * The docs site's own styles: the shell, prose, examples and code. Built on
+ * Trix's tokens like any Trix project's components, so the docs look like the
+ * framework they document — and change with it.
+ */
+
+@layer components {
+  :root {
+    --mono-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---------- Shell ---------- */
+
+  .docs_wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: var(--max-width-main);
+    margin-inline: auto;
+    padding-inline: var(--site-margin);
+
+    @media (width >= 62rem) {
+      grid-template-columns: 15rem minmax(0, 46rem);
+      gap: var(--space-11);
+    }
+  }
+  .docs_menu {
+    position: sticky;
+    top: 3.5rem;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-inline: calc(var(--site-margin) * -1);
+    padding: var(--space-3) var(--site-margin);
+    border: 0;
+    border-bottom: var(--border-width) solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+
+    @media (width >= 62rem) {
+      display: none;
+    }
+  }
+
+  /* ---------- Sidebar: a drawer on a phone, a column from 62rem ---------- */
+
+  .docs-nav_wrap {
+    inset: 0 auto 0 0;
+    width: min(20rem, 85vw);
+    height: 100dvh;
+    margin: 0;
+    padding: var(--space-6) var(--space-5);
+    overflow-y: auto;
+    border: 0;
+    border-right: var(--border-width) solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+
+    &::backdrop {
+      background-color: rgb(0 0 0 / 0.4);
+    }
+
+    @media (width >= 62rem) {
+      position: sticky;
+      top: 3.5rem;
+      display: block;
+      width: auto;
+      height: calc(100dvh - 3.5rem);
+      padding: var(--space-8) var(--space-2) var(--space-8) 0;
+      border: 0;
+      background: none;
+    }
+  }
+  .docs-nav_group + .docs-nav_group {
+    margin-top: var(--space-7);
+  }
+  .docs-nav_label {
+    margin-bottom: var(--space-2);
+    color: var(--text-2);
+    font-size: var(--text-xsmall);
+    font-weight: var(--primary-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .docs-nav_list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.3125rem 0.625rem;
+      border-radius: var(--radius-small);
+      color: var(--text-2);
+      font-size: var(--text-small);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--text);
+      }
+      &[aria-current] {
+        color: var(--text);
+        background-color: var(--background-2);
+        font-weight: var(--primary-medium);
+      }
+    }
+  }
+  .docs-nav_badge,
+  .docs_badge {
+    padding: 0 0.375rem;
+    border-radius: var(--radius-xsmall);
+    background-color: var(--background-3);
+    color: var(--text);
+    font-size: 0.6875rem;
+    font-weight: var(--primary-semibold);
+    line-height: 1.6;
+  }
+
+  /* ---------- Page ---------- */
+
+  .docs_main {
+    min-width: 0;
+    padding-block: var(--space-9) var(--space-12);
+  }
+  .docs_header {
+    padding-bottom: var(--space-7);
+    margin-bottom: var(--space-8);
+    border-bottom: var(--border-width) solid var(--border);
+  }
+  .docs_eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-2);
+    font-size: var(--text-xsmall);
+    font-weight: var(--primary-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .docs_source {
+    margin-left: auto;
+    padding: 0.125rem 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-small);
+    color: var(--text);
+    letter-spacing: 0;
+    text-decoration: none;
+    text-transform: none;
+  }
+  .docs_title {
+    margin-top: var(--space-4);
+    font-size: var(--h3);
+  }
+  .docs_lead {
+    margin-top: var(--space-4);
+    color: var(--text-2);
+    font-size: var(--text-large);
+  }
+  .docs_footer {
+    margin-top: var(--space-11);
+    padding-top: var(--space-7);
+    border-top: var(--border-width) solid var(--border);
+  }
+  .docs_edit {
+    color: var(--text-2);
+    font-size: var(--text-small);
+  }
+  .docs_pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  .docs_pager_link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-medium);
+    color: var(--text);
+    font-weight: var(--primary-medium);
+    text-decoration: none;
+
+    span {
+      color: var(--text-2);
+      font-size: var(--text-xsmall);
+      font-weight: var(--primary-regular);
+    }
+    &:hover {
+      border-color: var(--text-2);
+    }
+    &.next {
+      grid-column: 2;
+      align-items: end;
+      text-align: end;
+    }
+  }
+
+  /* ---------- Prose: only the page's own top-level blocks ---------- */
+
+  .docs-prose {
+    > * + * {
+      margin-top: var(--space-5);
+    }
+    > h2 {
+      margin-top: var(--space-11);
+      font-size: var(--h4);
+    }
+    > h3 {
+      margin-top: var(--space-9);
+      font-size: var(--h6);
+    }
+    > :is(h2, h3) + * {
+      margin-top: var(--space-4);
+    }
+    > :is(ul, ol) {
+      padding-left: 1.25em;
+
+      li + li {
+        margin-top: var(--space-2);
+      }
+    }
+    > :is(p, ul, ol, table, .aside_wrap) a {
+      color: var(--link-text);
+      text-decoration-color: var(--link-border);
+      text-underline-offset: 0.2em;
+
+      &:hover {
+        text-decoration-color: currentcolor;
+      }
+    }
+    > :is(p, ul, ol, table, .aside_wrap, h2, h3) code {
+      padding: 0.0625em 0.3em;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-xsmall);
+      background-color: var(--background-2);
+      font-family: var(--mono-family);
+      font-size: 0.875em;
+    }
+    > table {
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+      border-collapse: collapse;
+      font-size: var(--text-small);
+    }
+    > table :is(th, td) {
+      padding: var(--space-3) var(--space-4) var(--space-3) 0;
+      border-bottom: var(--border-width) solid var(--border);
+      text-align: start;
+      vertical-align: top;
+    }
+    > table th {
+      font-weight: var(--primary-semibold);
+    }
+    > blockquote {
+      padding-left: var(--space-5);
+      border-left: 0.1875rem solid var(--border);
+      color: var(--text-2);
+    }
+  }
+
+  /* ---------- Code ---------- */
+
+  pre.astro-code {
+    padding: var(--space-5);
+    overflow-x: auto;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-medium);
+    font-family: var(--mono-family);
+    font-size: var(--text-small);
+    line-height: 1.6;
+  }
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+  :root[data-mode="dark"] :is(.astro-code, .astro-code span) {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
+  .copy_host {
+    position: relative;
+  }
+  .copy_button {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    padding: 0.125rem 0.5rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-small);
+    background-color: var(--background);
+    color: var(--text-2);
+    font: inherit;
+    font-size: var(--text-xsmall);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--hover-duration) var(--hover-ease);
+
+    .copy_host:hover &,
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+
+  /* ---------- Example: the component live, then its code ---------- */
+
+  .example_wrap {
+    margin-inline: 0;
+    border: var(--border-width) solid var(--border);
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+
+    pre.astro-code {
+      border: 0;
+      border-top: var(--border-width) solid var(--border);
+      border-radius: 0;
+    }
+  }
+  .example_stage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-8) var(--space-7);
+
+    > [class] {
+      margin-block: 0;
+    }
+    &[data-stage="stack"] {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-5);
+    }
+    &[data-stage="block"] {
+      display: block;
+    }
+    &[data-stage="full"] {
+      display: block;
+      padding: 0;
+    }
+  }
+
+  /* ---------- Props ---------- */
+
+  .props_wrap {
+    overflow-x: auto;
+  }
+  .props_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+
+    :is(th, td) {
+      padding: var(--space-3) var(--space-4) var(--space-3) 0;
+      border-bottom: var(--border-width) solid var(--border);
+      text-align: start;
+      vertical-align: top;
+    }
+    thead th {
+      color: var(--text-2);
+      font-weight: var(--primary-medium);
+    }
+    tbody th {
+      white-space: nowrap;
+    }
+    code {
+      font-family: var(--mono-family);
+      font-size: 0.875em;
+    }
+  }
+  .props_required {
+    display: block;
+    color: var(--text-2);
+    font-size: var(--text-xsmall);
+    font-weight: var(--primary-regular);
+  }
+  .props_type {
+    color: var(--text-2);
+  }
+  .props_note {
+    color: var(--text-2);
+    font-size: var(--text-small);
+  }
+
+  /* ---------- Aside ---------- */
+
+  .aside_wrap {
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-width) solid var(--border);
+    border-left-width: 0.1875rem;
+    border-radius: var(--radius-small);
+    background-color: var(--background-2);
+
+    > * + * {
+      margin-top: var(--space-2);
+    }
+    &.tip {
+      border-left-color: var(--heading-accent);
+    }
+    &.caution {
+      border-left-color: var(--text);
+    }
+  }
+  .aside_title {
+    font-size: var(--text-small);
+    font-weight: var(--primary-semibold);
+  }
+}

@@ -1,0 +1,19 @@
+---
+title: GridOverlay
+description: The 12-column grid drawn over the page, to check a build against the design.
+order: 77
+component: utility/GridOverlay
+badge: Mast
+---
+
+Press <kbd>Shift</kbd> <kbd>G</kbd> on any page of this site to see it, or use
+a button:
+
+```astro live
+<Button data-grid-overlay-toggle aria-pressed="false">Show grid overlay</Button>
+```
+
+It draws the columns, gutters and margins from the same tokens `Row` uses, so
+what you see is the grid the page is built on. The choice is remembered.
+`BaseLayout` includes it in development; `gridOverlay` turns it on anywhere
+else.

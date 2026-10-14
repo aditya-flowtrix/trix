@@ -1,0 +1,47 @@
+---
+title: Deploying
+description: Cloudflare is set up out of the box — static files, long caching, security headers, real 404s and 301s. Any static host works.
+order: 8
+---
+
+`npm run build` writes a static site to `dist/`. Any static host can serve it;
+Trix comes ready for Cloudflare.
+
+## Cloudflare
+
+`wrangler.jsonc` deploys `dist/` as an assets-only Worker: Cloudflare serves
+the files from its edge, and no code runs per request.
+
+**From GitHub** — Cloudflare dashboard → Workers & Pages → Create → Import a
+repository. Build command `npm run build`, deploy command `npx wrangler deploy`.
+Every push to `main` deploys, and other branches can build preview versions.
+
+**From your machine:**
+
+```bash
+npm run build
+npx wrangler deploy
+```
+
+**A domain** — add it in the Worker's settings, or in `wrangler.jsonc`:
+
+```jsonc
+"routes": [{ "pattern": "www.example.com", "custom_domain": true }]
+```
+
+## What's already set
+
+- **`public/_headers`** — files in `/_astro/` are fingerprinted, so browsers
+  keep them for a year; every page gets `nosniff`, a referrer policy,
+  `X-Frame-Options` and a permissions policy.
+- **`public/_redirects`** — real 301s, one per line: `/old /new 301`.
+  `/trix-cms` adds a block for moved CMS items.
+- **404** — `src/pages/404.astro`, served with a 404 status.
+- **URLs** — one per page, no trailing slash (`/about`), the way Webflow and
+  Framer publish them, so migrated URLs answer without a redirect.
+
+## Elsewhere
+
+Netlify reads the same `_headers` and `_redirects`. Vercel, GitHub Pages and
+any server serving files work with `dist/`; set the redirects in their own
+format.

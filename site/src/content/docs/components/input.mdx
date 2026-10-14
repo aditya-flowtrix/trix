@@ -1,0 +1,30 @@
+---
+title: Input
+description: A labelled text field whose variant sets the type, keyboard and autofill — so phones show the right keys and browsers fill it in.
+order: 62
+component: form/Input
+---
+
+```astro live stage="stack"
+<Input variant="email" required />
+<Input variant="phone" placeholder="000 000 0000" />
+<Input variant="date" label="Start date" />
+```
+
+| Variant                               | Type, keyboard and autofill            |
+| ------------------------------------- | -------------------------------------- |
+| `text`                                | plain text                             |
+| `first-name`, `last-name`             | `given-name`, `family-name` autofill   |
+| `email`                               | email keyboard, `email` autofill       |
+| `phone`                               | phone keypad, `tel` autofill           |
+| `date`                                | the native date picker                 |
+| `zip-code`                            | numeric keypad, `postal-code` autofill |
+| `number`, `search`, `url`, `password` | their native types                     |
+
+The label defaults to the variant's name, `name` to the label's slug.
+`required` marks the label and the browser enforces it. `labelHidden` hides the
+label visually and keeps it for screen readers.
+
+## Props
+
+<Props of="form/Input" />

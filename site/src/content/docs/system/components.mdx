@@ -1,0 +1,62 @@
+---
+title: How components work
+description: The contract every component keeps — render, props in one order, variants as props, utilities only on the outside — and the naming rules for your own.
+order: 7
+---
+
+## The contract
+
+- **`render`** — every component takes it. `render={false}` outputs nothing,
+  and so does a component missing a required prop or slot: an empty `Card`
+  never renders an empty box.
+- **Other attributes pass to the root element** — `id`, `aria-*`, `data-*`,
+  event handlers.
+- **`class` takes utility classes only.** One instance can be adjusted
+  (`class="margin-top-0"`); a new look for the component is a variant.
+- **Props describe intent, not CSS.** `emphasis="secondary"`, not
+  `background="transparent"`.
+- **Wrong combinations don't type-check.** Variant-specific props sit behind a
+  discriminated union: `direction` exists only on `variant="arrow"`, `href`
+  only on `element="link"`.
+
+## Props in one order
+
+Every component declares its props the same way, so autocomplete reads the
+same everywhere: `render`, the content that changes per instance, `variant`,
+props that only apply to some variants, then occasional settings. `class` and
+the rest last. `/trix-audit-props` checks it.
+
+## When to make a component
+
+Only when custom CSS or a script belongs to an element. Grouping markup,
+shortening a page and anticipating reuse are not reasons. Most sections are a
+`Section`, a `ContentWrapper`, and the typography and buttons inside it.
+
+## Naming
+
+| Thing                        | Name                                               | Example                                       |
+| ---------------------------- | -------------------------------------------------- | --------------------------------------------- |
+| a content block              | its role and variant, in `src/components/content/` | `HeroHome`, `CtaMain`, `PricingTable`         |
+| a section that owns a script | the same, in `src/components/section/`             | `ScrollStory`                                 |
+| the root class               | the family name, ending in `_wrap`                 | `.blog-gallery_wrap`                          |
+| a child                      | the family name, then its role                     | `.blog-gallery_layout`, `.blog-gallery_title` |
+| a variant                    | a bare class beside the root                       | `.tabs_wrap.side`                             |
+| a token                      | kebab-case, scale steps numbered or sized          | `--space-8`, `--radius-small`                 |
+| a utility                    | the property and the step                          | `padding-top-8`, `gap-4`                      |
+
+The `_wrap` ending matters: variants are bare classes, so a component whose
+root is `.card` would quietly inherit every variant named `card`. Children are
+named for their role, never their mechanism — `_layout`, not `_grid` — because
+the property behind them changes.
+
+## Styling a component
+
+- CSS in the component's own `<style is:global>`, inside `@layer components`.
+- Tokens only: `rem` for lengths, `ch` for a measure, `em` for anything that
+  tracks the font size. No `px`.
+- One media query per component where possible, nested in the rule it
+  changes, at a [breakpoint](/docs/system/fluid-sizing#breakpoints-still-exist).
+- Never style a library component from outside it. Style the plain HTML your
+  component owns.
+
+`TRIX.md` in the project has the full checklists.

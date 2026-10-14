@@ -35,6 +35,15 @@ In `package.json`: set `name` to the project's, `version` to `0.1.0`, and add
 keeping `trix.version`. Remove `description` and `repository` (they describe
 the framework) or replace them with the project's.
 
+Then remove the framework's own documentation site — it documents Trix, not
+the project:
+
+```bash
+rm -rf site
+npm pkg delete scripts.docs:dev scripts.docs:build scripts.docs:preview
+npm uninstall @astrojs/mdx   # unless the project will write MDX
+```
+
 ## 3. Name and domain
 
 `src/consts.ts`:

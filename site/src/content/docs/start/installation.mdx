@@ -1,0 +1,58 @@
+---
+title: Installation
+description: Start a new site from Trix, run it locally, and make it yours — name, domain, tokens, fonts and navigation.
+order: 2
+---
+
+## Requirements
+
+- [Node.js](https://nodejs.org) 22.19 or newer.
+- A code editor. [VS Code](https://code.visualstudio.com) with the Astro
+  extension shows every prop's description as you type.
+
+## Create a project
+
+```bash
+npm create astro@latest my-site -- --template aditya-flowtrix/trix
+cd my-site
+npm run dev
+```
+
+The site opens at `http://localhost:4321`, with the home page, the
+[style guide](/docs/guides/designers-and-figma) at `/style-guide` and every
+component at `/components`.
+
+Prefer GitHub? **Use this template** on the
+[repository](https://github.com/aditya-flowtrix/trix) creates a copy in your
+account.
+
+<Aside type="tip" title="With an agent">
+  Ask Claude Code or Codex to “start a new site with Trix”. The
+  `/trix-new-project` skill copies the framework, names it, sets the domain,
+  fonts and brand, and hands over to the style guide or migration skill.
+</Aside>
+
+## Make it yours
+
+1. **`src/consts.ts`** — the site's name, description, URL, locale and color
+   mode.
+2. **`src/styles/tokens.css`** and **`themes.css`** — the design system. They
+   are the only two style files you edit; everything else is
+   [generated from them](/docs/system/tokens).
+3. **`astro.config.mjs`** → `fonts` — the [font families](/docs/system/typography).
+4. **`src/components/global/Nav.astro`** and **`Footer.astro`** — the site's own
+   navigation and footer.
+5. **`PROJECT.md`** — the project record: write each decision down as it is
+   made.
+
+## Commands
+
+| Command                 | Does                                                                             |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`           | the dev server, regenerating everything derived from the tokens as you save      |
+| `npm run build`         | the production site in `dist/`                                                   |
+| `npm run check`         | tokens in sync, conventions held, colour contrast, types                         |
+| `npm run tokens`        | regenerate CSS, types, Figma variables and the token reference                   |
+| `npm run seo`           | what search engines read, page by page, in the build                             |
+| `npm run test:browsers` | every page in every installed browser: errors, layout, WCAG 2.2 AA, interactions |
+| `npm run format`        | Prettier, Astro files included                                                   |

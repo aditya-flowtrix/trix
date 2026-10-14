@@ -1,0 +1,33 @@
+---
+title: RichText
+description: Long-form and CMS content — headings, lists, quotes, images, tables — spaced and styled without a class on any element.
+order: 23
+component: typography/RichText
+---
+
+## Usage
+
+```astro live stage="stack"
+<RichText>
+  <h3>A heading inside rich text</h3>
+  <p>
+    Paragraphs, <a href="/docs">links</a>, <strong>bold</strong> and <em
+      >italic</em
+    >.
+  </p>
+  <ul><li>A list item</li><li>Another</li></ul>
+  <blockquote>A quote.</blockquote>
+</RichText>
+```
+
+Everything a CMS or Markdown produces is styled by element, so content needs
+no classes. Wide tables scroll inside the text instead of widening the page,
+and are reachable by keyboard. A CMS body goes in as HTML:
+
+```astro
+<RichText><Content /></RichText>
+```
+
+## Props
+
+<Props of="typography/RichText" />

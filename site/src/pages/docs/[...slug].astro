@@ -1,0 +1,83 @@
+---
+import { render } from "astro:content";
+import Layout from "~/layouts/Layout.astro";
+import Sidebar from "~/components/Sidebar.astro";
+import Icon from "@/components/media/Icon.astro";
+import { allDocs, docPath, groupLabel, type Doc } from "~/docs.ts";
+import { components } from "~/mdx.ts";
+import { REPO } from "@/consts.ts";
+
+export async function getStaticPaths() {
+  const docs = await allDocs();
+  return docs.map((doc, i) => ({
+    params: { slug: docPath(doc).replace(/^\/docs\/?/, "") || undefined },
+    props: { doc, prev: docs[i - 1], next: docs[i + 1] },
+  }));
+}
+
+interface Props {
+  doc: Doc;
+  prev?: Doc;
+  next?: Doc;
+}
+
+const { doc, prev, next } = Astro.props;
+const { Content } = await render(doc);
+const { title, description, badge, component } = doc.data;
+---
+
+<Layout title={title} description={description}>
+  <div class="docs_wrap">
+    <button class="docs_menu" type="button" popovertarget="docs-nav">
+      <Icon name="list" variant="small" />
+      Menu
+    </button>
+    <Sidebar current={docPath(doc)} />
+    <article class="docs_main">
+      <header class="docs_header">
+        <p class="docs_eyebrow">
+          <span>{groupLabel(doc)}</span>
+          {badge && <span class="docs_badge">{badge}</span>}
+          {
+            component && (
+              <a
+                class="docs_source"
+                href={`${REPO}/blob/main/src/components/${component}.astro`}
+              >
+                Source
+              </a>
+            )
+          }
+        </p>
+        <h1 class="docs_title">{title}</h1>
+        <p class="docs_lead">{description}</p>
+      </header>
+      <div class="docs-prose">
+        <Content components={components} />
+      </div>
+      <footer class="docs_footer">
+        <a class="docs_edit" href={`${REPO}/edit/main/site/${doc.filePath}`}>
+          Edit this page on GitHub
+        </a>
+        <nav class="docs_pager" aria-label="Previous and next">
+          {
+            prev && (
+              <a class="docs_pager_link" href={docPath(prev)} rel="prev">
+                <span>Previous</span>
+                {prev.data.title}
+              </a>
+            )
+          }
+          {
+            next && (
+              <a class="docs_pager_link next" href={docPath(next)} rel="next">
+                <span>Next</span>
+                {next.data.title}
+              </a>
+            )
+          }
+        </nav>
+      </footer>
+    </article>
+  </div>
+</Layout>

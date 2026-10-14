@@ -1,0 +1,40 @@
+---
+title: Modal
+description: A dialog over the page — small, a side panel, or full screen — opened by any button or link that names it.
+order: 52
+component: interactive/Modal
+---
+
+```astro live
+<Button data-modal-open="docs-modal">Open modal</Button>
+<Button data-modal-open="docs-panel" emphasis="secondary"
+  >Open side panel</Button
+>
+<Modal id="docs-modal" label="Example modal">
+  <ContentWrapper centered>
+    <Heading tag="h2" variant="h4">A small modal</Heading>
+    <Paragraph>Escape, the close button or a click outside closes it.</Paragraph
+    >
+  </ContentWrapper>
+</Modal>
+<Modal id="docs-panel" label="Example side panel" variant="side-panel">
+  <ContentWrapper>
+    <Heading tag="h2" variant="h4">A side panel</Heading>
+    <Paragraph>For filters, a cart, or a menu.</Paragraph>
+  </ContentWrapper>
+</Modal>
+```
+
+It is a native `<dialog>`: focus moves into it and stays there, the page
+behind is inert, and Escape closes it. When it closes, focus returns to what
+opened it.
+
+Three ways to open one:
+
+- a button with `data-modal-open="<id>"`,
+- a link to `#<id>`,
+- a URL with `?modal=<id>` — a modal you can link to from an email.
+
+## Props
+
+<Props of="interactive/Modal" />

@@ -250,6 +250,10 @@ const PAGE_FACTS = `async () => {
   }
   scrollTo(0, 0);
   await new Promise((r) => setTimeout(r, 300));
+  // Reveals still fading in read as low contrast; wait for every finite one.
+  await Promise.all(document.getAnimations()
+    .filter((a) => Number.isFinite(a.effect?.getTiming().iterations ?? 1))
+    .map((a) => a.finished.catch(() => {})));
   const ids = [...document.querySelectorAll("[id]")].map((e) => e.id);
   return {
     overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -258,6 +262,9 @@ const PAGE_FACTS = `async () => {
     // Visible text squeezed to nothing: clipped, so no other check sees it.
     collapsed: [...document.querySelectorAll("table, .rich-text, .heading, .text")]
       .filter((e) => e.checkVisibility() && e.textContent.trim() && e.getBoundingClientRect().width < 1)
+      .map((e) => e.tagName.toLowerCase() + "." + [...e.classList].join(".")),
+    shownHidden: [...document.querySelectorAll('[hidden]:not([hidden="until-found"])')]
+      .filter((e) => e.checkVisibility())
       .map((e) => e.tagName.toLowerCase() + "." + [...e.classList].join(".")),
     links: [...document.querySelectorAll("a[href]")].map((a) => a.href),
     has: Object.fromEntries(Object.entries({
@@ -312,6 +319,7 @@ async function testPage(driver: Driver, page: Page, path: string) {
       dup: string[];
       unsized: number;
       collapsed: string[];
+      shownHidden: string[];
       links: string[];
       has: Record<string, boolean>;
     }>(PAGE_FACTS);
@@ -335,6 +343,12 @@ async function testPage(driver: Driver, page: Page, path: string) {
       "text and tables have width",
       f.collapsed.length === 0,
       f.collapsed.slice(0, 3).join(", "),
+    );
+    check(
+      where,
+      "hidden elements stay hidden",
+      f.shownHidden.length === 0,
+      f.shownHidden.slice(0, 3).join(", "),
     );
     const axe = await page.evaluate<string[]>(AXE);
     check(where, "WCAG 2.2 AA (axe)", axe.length === 0, axe.join(" || "));

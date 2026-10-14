@@ -1,0 +1,37 @@
+---
+title: Form
+description: A form that posts to any endpoint and shows its own sent and failed messages — no page reload, no provider lock-in.
+order: 60
+component: form/Form
+---
+
+```astro live stage="stack"
+<Form name="docs-contact">
+  <Fieldset legend="Contact" variant="columns">
+    <Input variant="first-name" required />
+    <Input variant="last-name" />
+    <Input variant="email" required />
+    <Select
+      label="Topic"
+      options={["Design", "Development", "Something else"]}
+    />
+  </Fieldset>
+  <Textarea label="Message" required />
+  <ButtonWrapper marginTop="5">
+    <Button type="submit">Send</Button>
+  </ButtonWrapper>
+</Form>
+```
+
+`action` is the endpoint — Formspree, Basin, Web3Forms, a Cloudflare Worker,
+your own API. The form posts its fields there as `FormData` with
+`Accept: application/json`, then shows `successMessage` or `errorMessage` in
+place. Without `action` it validates and shows the message without sending,
+which is how it is designed and tested before a provider is chosen.
+
+The browser validates first: required fields, email format, patterns. Without
+JavaScript it is an ordinary form posting to `action`.
+
+## Props
+
+<Props of="form/Form" />

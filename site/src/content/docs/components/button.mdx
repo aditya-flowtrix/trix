@@ -1,0 +1,34 @@
+---
+title: Button
+description: A link or a button — written, or a mark on its own — that renders the right element for what it does.
+order: 30
+component: Button
+---
+
+One component, two elements. A `Button` that goes somewhere renders an `<a>`
+(`element="link"` with an `href`); one that does something renders a
+`<button>`. The difference decides how a keyboard activates it, whether it
+opens in a new tab, and how a screen reader announces it.
+
+## Kinds
+
+```astro live
+<Button>Primary</Button>
+<Button emphasis="secondary">Secondary</Button>
+<Button variant="link" element="link" href="/docs">Link</Button>
+```
+
+`variant` is what kind of button it is; `emphasis` is how much weight it
+carries.
+
+```astro live
+<Button variant="arrow" direction="back" />
+<Button variant="arrow" />
+<Button variant="play" />
+<Button variant="play" pressed />
+<Button variant="close" />
+```
+
+## Props
+
+<Props of="Button" />

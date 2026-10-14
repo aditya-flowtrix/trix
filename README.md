@@ -33,12 +33,25 @@ value by value against the original.
 - **Agent-ready.** Every procedure is a skill with scripts; every project keeps
   its decisions in `PROJECT.md`.
 
+## Documentation
+
+The docs site — every component live with its props, the system, the guides,
+and search — is in [`site/`](site/), built with Trix itself:
+
+```bash
+npm run docs:dev        # http://localhost:4321
+npm run docs:build      # → site/dist, deployed by site/wrangler.jsonc
+```
+
+Its pages are MDX in `site/src/content/docs/`. Props tables, the utility and
+pattern lists, the token reference and the skills list are read from the
+source when it builds, so they cannot fall behind the code.
+
 ## Start a project
 
 ```bash
-npx degit aditya-flowtrix/trix my-site
+npm create astro@latest my-site -- --template aditya-flowtrix/trix
 cd my-site
-npm install
 npm run dev
 ```
 

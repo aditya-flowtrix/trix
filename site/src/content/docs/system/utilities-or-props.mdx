@@ -1,0 +1,31 @@
+---
+title: Utility or prop?
+description: When to reach for a utility class, a prop, a new variant or a token — and the signs you chose the wrong one.
+order: 8
+---
+
+Four ways to change how something looks, each for a different job:
+
+| You want to change                           | Use                  | Example                          |
+| -------------------------------------------- | -------------------- | -------------------------------- |
+| one instance, in one way                     | a utility class      | `<Heading class="margin-top-0">` |
+| something the component was designed to vary | a prop               | `<Section paddingTop="large">`   |
+| a look the component doesn't have yet        | a new variant        | `<Card variant="compact">`       |
+| every instance at once                       | a token or a default | `--button-padding-inline`        |
+
+## The signs you chose wrong
+
+- **The same utility on every instance** — the default is wrong. Change the
+  token, or the prop's default.
+- **Several utilities that only work together** — that look is a variant.
+- **A custom class on a library component** — never. Add a variant, or wrap
+  the plain HTML your own component owns.
+- **A margin fighting the container** — use the section's `gap`, or a
+  `Spacer`.
+
+## What's a utility
+
+One property, one step, always the same result: `padding-8`, `gap-4`,
+`radius-small`, `alignment-center`, `display-none`. Spacing, radius,
+weight, line height and letter spacing utilities are generated from the
+tokens, so they follow the scale. See [Utilities](/docs/classes/utilities).

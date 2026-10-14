@@ -1,0 +1,48 @@
+---
+title: Section
+description: A full-width band of the page — its theme, padding, background and the centered container its content sits in.
+order: 10
+component: wrapper/Section
+---
+
+Every page is a stack of sections. A `Section` renders three things: the band
+(`<section>`, with its theme and padding), an optional background behind
+everything, and a container at the site's width whose children are spaced by
+`gap`.
+
+## Usage
+
+```astro live stage="full"
+<Section theme="dark" paddingTop="small" paddingBottom="small" gap="5">
+  <Eyebrow>Eyebrow</Eyebrow>
+  <Heading tag="h3" variant="h4">A section with a gap of 5</Heading>
+  <Paragraph>Every block inside is spaced by the container's gap.</Paragraph>
+</Section>
+```
+
+## Padding
+
+`paddingTop` and `paddingBottom` take the section sizes — `xsmall` …
+`xlarge`, fluid tokens — plus `none`, `even` and `navoverlap` (enough to clear
+a nav fixed over the page). The default is `medium`.
+
+## Background
+
+Anything in the `background` slot fills the band behind the content: an image,
+a video, an overlay.
+
+```astro
+<Section fullHeight theme="dark">
+  <Img src={hero} slot="background" />
+  <Overlay slot="background" />
+  <Heading tag="h1">Over the image</Heading>
+</Section>
+```
+
+## Alignment
+
+`align="center"` centers the container's children and their text together.
+
+## Props
+
+<Props of="wrapper/Section" />

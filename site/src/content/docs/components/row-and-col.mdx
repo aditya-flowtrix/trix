@@ -1,0 +1,79 @@
+---
+title: Row and Col
+description: Layouts on the 12-column grid — spans, offsets and order on desktop, automatic stacking on tablet and phone.
+order: 11
+component: wrapper/Col
+badge: Mast
+---
+
+`Row` is the 12-column grid; each `Col` spans some of it. The columns line up
+with the grid the designer draws on, and with every other row on the page.
+
+```astro live stage="block"
+<Row>
+  <Col span={8} class="background-skeleton radius-small padding-5">span 8</Col>
+  <Col span={4} class="background-skeleton radius-small padding-5">span 4</Col>
+</Row>
+```
+
+## Offset and center
+
+`offset` skips columns before this one. `offset="center"` centers it.
+
+```astro live stage="block"
+<Row>
+  <Col span={5} offset={1} class="background-skeleton radius-small padding-5"
+    >span 5, offset 1</Col
+  >
+  <Col span={6} class="background-skeleton radius-small padding-5">span 6</Col>
+  <Col
+    span={8}
+    offset="center"
+    class="background-skeleton radius-small padding-5">span 8, centered</Col
+  >
+</Row>
+```
+
+## Stacking on smaller screens
+
+`span` is the desktop width. Smaller screens follow automatically:
+
+| `span` | Below 30rem | From 30rem | From 48rem                     |
+| ------ | ----------- | ---------- | ------------------------------ |
+| 1      | 1           | 1          | 1                              |
+| 2      | half        | half       | half                           |
+| 3      | full        | half       | half                           |
+| 4–6    | full        | full       | half                           |
+| 7–8    | full        | full       | half (a lone 7 or 8 goes full) |
+| 9–12   | full        | full       | full                           |
+
+Set `xsmall`, `small`, `medium` or `large` only where the design differs —
+they win over `span`. `offset` and `order` apply from 62rem, where the columns
+sit side by side.
+
+## Order
+
+`order="first"` or `"last"` moves a column on desktop without changing the
+source order — so a phone reads it in the order that makes sense there.
+
+```astro
+<Row>
+  <Col span={8}>The article</Col>
+  <Col span={4} order="first">The sidebar, on the left on desktop</Col>
+</Row>
+```
+
+## Gaps and alignment
+
+The gap is the grid's gutter, `--site-gutter`. Change `gap` only to leave the
+grid; `rowGap` adds room between stacked columns without touching the gutter.
+`align` sets the vertical alignment of the columns, and `Col`'s own `align`
+overrides it for one.
+
+## Row props
+
+<Props of="wrapper/Row" />
+
+## Col props
+
+<Props of="wrapper/Col" />

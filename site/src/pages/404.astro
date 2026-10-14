@@ -1,0 +1,24 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
+import Button from "@/components/Button.astro";
+---
+
+<Layout title="Page not found" noindex>
+  <Section paddingTop="xlarge" paddingBottom="xlarge" align="center">
+    <Heading tag="h1" variant="h2">Page not found</Heading>
+    <Paragraph maxWidth={36} class="alignment-center">
+      That page has moved or never existed. Search the docs, or start from the
+      introduction.
+    </Paragraph>
+    <ButtonWrapper>
+      <Button data-search-open>Search the docs</Button>
+      <Button element="link" href="/docs" emphasis="secondary"
+        >Introduction</Button
+      >
+    </ButtonWrapper>
+  </Section>
+</Layout>

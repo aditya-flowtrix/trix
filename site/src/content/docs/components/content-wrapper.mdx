@@ -1,0 +1,58 @@
+---
+title: ContentWrapper
+description: A block of eyebrow, heading, text and buttons — alone, or beside media in one of eight arrangements.
+order: 13
+component: wrapper/ContentWrapper
+---
+
+import background from "@/assets/graphics/background.svg";
+
+Most sections are a `ContentWrapper` inside a `Section`. It ties the alignment
+of everything inside to one variable, so `centered` moves the text, the
+buttons and the block together.
+
+## Usage
+
+```astro live stage="stack"
+<ContentWrapper centered>
+  <Eyebrow>Eyebrow</Eyebrow>
+  <Heading tag="h3" variant="h4">A centered block</Heading>
+  <Paragraph maxWidth={36}
+    >Text, buttons and the block itself all follow the same alignment.</Paragraph
+  >
+  <ButtonWrapper>
+    <Button>Primary</Button>
+    <Button emphasis="secondary">Secondary</Button>
+  </ButtonWrapper>
+</ContentWrapper>
+```
+
+## Beside media
+
+Put the media in the `column2` slot and choose the arrangement:
+
+```astro live stage="stack"
+<ContentWrapper variant="columns">
+  <Heading tag="h3" variant="h4">Columns</Heading>
+  <Paragraph>Text on one side, media on the other.</Paragraph>
+  <Img slot="column2" src={background} width={1920} height={1080} />
+</ContentWrapper>
+```
+
+| Variant          | Arrangement                                                    |
+| ---------------- | -------------------------------------------------------------- |
+| `stack`          | one column (default)                                           |
+| `auto-width`     | heading on one side, text on the other, each as wide as needed |
+| `columns`        | two equal columns                                              |
+| `breakout`       | media runs to the edge of the screen                           |
+| `contain`        | media sits in a contained box                                  |
+| `sticky-content` | the text stays in view while long media scrolls                |
+| `sticky-visual`  | the media stays in view while long text scrolls                |
+| `card`           | the text sits on a card over the media                         |
+
+`reverse` puts the second column first. The `/components` page of a new
+project shows every variant.
+
+## Props
+
+<Props of="wrapper/ContentWrapper" />

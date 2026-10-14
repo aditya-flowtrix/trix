@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "trix-docs",
+  "compatibility_date": "2026-08-13",
+
+  // The docs site, built by `npm run docs:build`. Assets only: Cloudflare
+  // serves the files and no script runs per request.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+  },
+
+  // The docs domain, once chosen (also SITE_URL in site/src/consts.ts):
+  // "routes": [{ "pattern": "trix.example.com", "custom_domain": true }],
+
+  "observability": {
+    "enabled": true,
+  },
+}

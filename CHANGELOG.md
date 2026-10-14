@@ -115,6 +115,41 @@ SEO phase, fonts from any source and the design-change skill.
 - CI runs it once per browser: Chrome, Edge, Brave, Firefox and WebKit on
   Linux, Safari on macOS.
 
+### Documentation site
+
+- `site/` — the framework's docs, built with Trix itself and rendering the
+  components in `src/` directly: Start here, The system (cascade, tokens,
+  fluid sizing, theming, typography and fonts, layout, components, utilities
+  or props, motion, accessibility), a page per component, Classes, and Guides
+  (Lumos, Mast and Trix; agent skills; designers and Figma; migrating a site;
+  moving a CMS; SEO; testing; deploying; upgrading).
+- Live examples: a fence marked `astro live` renders the component and shows
+  its code. Props tables are read from each component's source with
+  `scripts/props.ts` (shared with `/trix-audit-props`); the utility and
+  pattern lists, the token reference and the skills list are read at build.
+- Search (⌘K, Ctrl+K or `/`) from a static index of every page and section;
+  light and dark mode; a sidebar that is a drawer on phones.
+- `npm run docs:dev`, `docs:build`, `docs:preview`; `site/wrangler.jsonc`
+  deploys it to Cloudflare. CI type-checks, builds and audits it.
+- Across all 64 pages: SEO audit clean; 1453/1453 browser checks in Chrome,
+  WebKit and Brave.
+
+### Found while building the docs
+
+- The `hidden` attribute did not hide a paragraph or heading: the leading
+  trim's `display: flow-root` overrode it. `base.css` now makes `hidden` win.
+- The local test server answered `/blog` with `blog/index.html` when a
+  `blog/` folder existed, so a site with a list page and its posts read as a
+  404 to the SEO audit and browser tests. It now looks files up as Cloudflare
+  does: `blog.html` first.
+- Tables inside RichText collapsed to zero width in a parent sized to its
+  content. RichText is capped at its container instead.
+- The reveal script is its own component, `Utility/Reveal`, so a layout other
+  than `BaseLayout` can include it.
+- The browser test fails on visible text or tables narrower than 1px, and on
+  a `hidden` element that shows; it waits for reveals to finish before axe
+  measures contrast.
+
 ### Style guide and docs
 
 - `/style-guide`: section navigation, a Layout grid group (overlay toggle,

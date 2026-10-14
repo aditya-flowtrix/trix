@@ -1,0 +1,49 @@
+---
+import "@/styles/global.css";
+import "~/styles/site.css";
+import BaseHead from "@/components/utility/BaseHead.astro";
+import SkipLink from "@/components/global/SkipLink.astro";
+import GridOverlay from "@/components/utility/GridOverlay.astro";
+import Reveal from "@/components/utility/Reveal.astro";
+import Header from "~/components/Header.astro";
+import Search from "~/components/Search.astro";
+import type { SeoProps } from "@/types.ts";
+import { SITE_LOCALE } from "@/consts.ts";
+
+type Props = SeoProps;
+---
+
+<!doctype html>
+<html lang={SITE_LOCALE}>
+  <head>
+    <BaseHead {...Astro.props} />
+  </head>
+  <body>
+    <SkipLink />
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Search />
+    <GridOverlay />
+    <Reveal />
+    <script>
+      // Every code block gets a copy button.
+      for (const pre of document.querySelectorAll("pre.astro-code")) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "copy_button";
+        button.textContent = "Copy";
+        button.addEventListener("click", async () => {
+          await navigator.clipboard.writeText(pre.textContent ?? "");
+          button.textContent = "Copied";
+          setTimeout(() => (button.textContent = "Copy"), 1500);
+        });
+        const host = document.createElement("div");
+        host.className = "copy_host";
+        pre.before(host);
+        host.append(pre, button);
+      }
+    </script>
+  </body>
+</html>

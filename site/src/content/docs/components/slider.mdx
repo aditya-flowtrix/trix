@@ -1,0 +1,35 @@
+---
+title: Slider
+description: A row of slides that scrolls — as many in view as you ask for at each breakpoint, by touch, mouse or keyboard.
+order: 54
+component: interactive/Slider
+---
+
+## Usage
+
+```astro live stage="block"
+<Slider label="Services" small={2} medium={3}>
+  <Card heading="Strategy" text="What to build, and why." />
+  <Card heading="Design" text="How it looks and feels." />
+  <Card heading="Development" text="Building it, and proving it works." />
+  <Card heading="Research" text="Who it is for." />
+  <Card heading="Support" text="After launch." />
+</Slider>
+```
+
+It is a scrolling list with snap points, so touch, trackpad and keyboard
+scrolling all work, with or without JavaScript. The arrows and dots are
+buttons with labels.
+
+`xsmall`, `small`, `medium` and `large` set how many slides show — fractions
+show part of the next one, to say there is more.
+
+| Variant      | Bounds                                                     |
+| ------------ | ---------------------------------------------------------- |
+| `bleed`      | slides run past the container to the screen edge (default) |
+| `crop-start` | they start in line with the content and run off the right  |
+| `contained`  | they stay inside the container                             |
+
+## Props
+
+<Props of="interactive/Slider" />

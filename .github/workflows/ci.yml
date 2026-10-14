@@ -43,6 +43,12 @@ jobs:
       # one h1, alt text, structured data, broken links, sitemap.
       - run: npm run seo
 
+      # The docs site renders every component as it is now, so a component
+      # change that breaks its page fails here.
+      - run: cd site && npx astro check
+      - run: npm run docs:build
+      - run: node scripts/seo/audit.ts --dir site/dist
+
   browsers:
     name: Browser (${{ matrix.browser }})
     runs-on: ${{ matrix.os }}

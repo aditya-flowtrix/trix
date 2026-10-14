@@ -1,0 +1,56 @@
+---
+title: Testing
+description: What every push is checked against — tokens, conventions, contrast, types, SEO, and every page in every browser.
+order: 7
+---
+
+## On your machine
+
+| Command                 | Checks                                                                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`         | generated files in sync with the tokens; conventions (breakpoints, no `px`, no undefined `var()`); colour contrast in every theme; types |
+| `npm run seo`           | every page of the build, as a search engine reads it                                                                                     |
+| `npm run test:browsers` | every page in every installed browser                                                                                                    |
+| `npm run test:cms`      | the CMS importers and the whole import pipeline                                                                                          |
+
+## Every page, every browser
+
+```bash
+npm run build
+npm run test:browsers                         # every browser installed on this machine
+npm run test:browsers -- --browser firefox    # one, or a list: chrome,brave,webkit
+```
+
+It finds every page by following links from the home page, and checks each at
+375, 768 and 1440 wide:
+
+- no script errors or failed requests;
+- no sideways scrolling, no text or table squeezed to nothing;
+- unique ids, images with width and height;
+- WCAG 2.2 AA with axe;
+- the 12-column grid and Spacer measure what they should;
+- every component on the page, driven by mouse and keyboard — the skip link,
+  nav, accordion, dropdown, tabs, modal, slider, marquee, video and reveal.
+
+The report is `.trix/browsers.md`. Options: `--widths 375,1440`,
+`--pages /,/about`.
+
+| Browser                       | How it runs                                                        |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Chrome, Edge, Brave, Chromium | your installed copy, through Playwright                            |
+| Firefox, WebKit               | Playwright's builds — `npx playwright-core install firefox webkit` |
+| Safari                        | the real one, on a Mac, through `safaridriver`                     |
+
+Safari needs one setting first: Safari → Settings → Developer → **Allow remote
+automation**.
+
+## In CI
+
+GitHub Actions runs on every push and pull request, and every Monday:
+
+- **Type-check and build** — dependency audit, formatting, `npm run check`,
+  the CMS tests, the build, the SEO audit.
+- **Browsers** — six machines at once: Chrome, Edge, Brave, Firefox and WebKit
+  on Linux, and real Safari on macOS. A failure uploads the report.
+- **Astro latest** — the newest Astro, as a warning, never a failure: it says
+  when Trix needs a look before an upgrade does.

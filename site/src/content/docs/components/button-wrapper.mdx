@@ -1,0 +1,22 @@
+---
+title: ButtonWrapper
+description: A row of buttons, links or tags — spaced, wrapping, and aligned with the block around it.
+order: 14
+component: wrapper/ButtonWrapper
+---
+
+```astro live stage="stack"
+<ButtonWrapper marginTop="0">
+  <Button>Primary</Button>
+  <Button emphasis="secondary">Secondary</Button>
+  <Button variant="link" element="link" href="/docs">Link</Button>
+</ButtonWrapper>
+```
+
+It follows the alignment of the `ContentWrapper` or `Section` it sits in, and
+brings its own space above (`marginTop`), so a button row under text needs no
+margin of its own.
+
+## Props
+
+<Props of="wrapper/ButtonWrapper" />

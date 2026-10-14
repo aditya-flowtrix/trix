@@ -1,0 +1,46 @@
+---
+title: Motion
+description: Reveal on scroll with one prop, timing from tokens, and nothing moving for visitors who asked it not to.
+order: 9
+---
+
+## Reveal on scroll
+
+`Section`, `Row`, `Col` and `Grid` take `animate`. Their children fade up one
+after another the first time they scroll into view:
+
+```astro
+<Row animate>
+  <Col span={4}>…</Col>
+  <Col span={4}>…</Col>
+  <Col span={4}>…</Col>
+</Row>
+```
+
+Timing is four tokens: `--reveal-duration`, `--reveal-ease`,
+`--reveal-distance` and `--reveal-stagger`. The script is the `Reveal`
+component, which `BaseLayout` includes — a custom layout must include it too.
+
+The content is never hidden from anyone who can't see it animate: visitors who
+prefer reduced motion, printed pages, and browsers without JavaScript see it
+straight away.
+
+## Hover and open
+
+`--hover-duration` and `--hover-ease` time every hover; `--open-duration` and
+`--open-ease` every accordion, dropdown and menu. One change in `tokens.css`
+retimes the site.
+
+## Moving content can be paused
+
+WCAG 2.2.2: anything that moves for more than five seconds must be pausable.
+
+- **Video** that autoplays shows a pause button — `pauseButton`, on by default
+  with `autoplay`, in any of nine `pausePosition`s.
+- **Marquee** has a pause control, and holds still while anything inside it
+  has focus, so a link can't travel away from the keyboard.
+- **Tabs** with `playback="auto"` have a pause control, and hold while
+  focused or off screen.
+
+With reduced motion, autoplaying video starts paused, marquees stand still and
+tabs don't advance.

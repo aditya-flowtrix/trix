@@ -1,0 +1,16 @@
+---
+interface Props {
+  /** What kind of note it is. */
+  type?: "note" | "tip" | "caution";
+  /** The label above it. Defaults to the type. */
+  title?: string;
+}
+
+const { type = "note", title } = Astro.props;
+const label = title ?? { note: "Note", tip: "Tip", caution: "Caution" }[type];
+---
+
+<aside class:list={["aside_wrap", type]}>
+  <p class="aside_title">{label}</p>
+  <slot />
+</aside>

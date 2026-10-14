@@ -1,0 +1,32 @@
+---
+title: Upgrading
+description: Bring a site onto the latest Trix without losing its customisations — and how Trix itself takes in new Lumos releases.
+order: 9
+---
+
+A Trix site is a copy, not a dependency, so an upgrade is a merge.
+`/trix-upgrade` does it, holding two things true at once: **nothing the
+project wrote is lost**, and **nothing is left on old conventions**.
+
+1. **Find where the site started.** `/trix-new-project` stamps the Trix
+   version and commit into `package.json` → `trix`. That commit is the merge
+   base, so it is exact which lines are the framework's and which are the
+   project's.
+2. **Commit what is there.** It refuses a dirty tree; an empty "Before Trix
+   upgrade" commit becomes the anchor the whole review is read against.
+3. **Photograph the site**, so the result can be compared page by page.
+4. **Three-way merge** — what the site started from, what it has now, what
+   Trix ships today. Renamed props and classes are renamed, moved components
+   moved. Where the three disagree, it asks rather than guesses.
+5. **Prove it** — `npm run check`, the build, and the same pages compared.
+
+`PROJECT.md` is never touched.
+
+## Trix and Lumos
+
+Trix records the Lumos for Astro release it is based on (`package.json` →
+`trix.basedOn`). When Lumos releases, the same skill pulls the changes into
+Trix itself, keeping what Trix added.
+
+The [changelog](https://github.com/aditya-flowtrix/trix/blob/main/CHANGELOG.md)
+lists what changed in each version.

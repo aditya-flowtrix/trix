@@ -1,0 +1,21 @@
+---
+title: ThemeToggle
+description: The light and dark switch — remembered, and applied before the page paints.
+order: 56
+component: interactive/ThemeToggle
+---
+
+```astro live
+<ThemeToggle />
+```
+
+It renders only when `COLOR_MODE` in `src/consts.ts` is `auto`. The choice is
+saved in the browser and applied by an inline script in `BaseHead` before the
+first paint, so a dark-mode visitor never sees a white flash. Until someone
+chooses, it follows the system setting.
+
+The same switch is in this site's header.
+
+## Props
+
+<Props of="interactive/ThemeToggle" />

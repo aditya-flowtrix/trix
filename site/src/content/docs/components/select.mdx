@@ -1,0 +1,20 @@
+---
+title: Select
+description: A native select with ready-made option lists — months, days, years, US states — or your own.
+order: 64
+component: form/Select
+---
+
+```astro live stage="stack"
+<Select label="Role" options={["Designer", "Developer", "Producer"]} />
+<Select variant="state" />
+```
+
+`variant="list"` takes `options` — strings, or `{ label, value }`. `month`,
+`day`, `year` (with `from` and `to`) and `state` bring their own. It is the
+browser's own select, so it works with every keyboard, screen reader and
+phone picker.
+
+## Props
+
+<Props of="form/Select" />

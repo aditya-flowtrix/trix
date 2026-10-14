@@ -1,0 +1,118 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import Eyebrow from "@/components/typography/Eyebrow.astro";
+import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
+import Button from "@/components/Button.astro";
+import Row from "@/components/wrapper/Row.astro";
+import Col from "@/components/wrapper/Col.astro";
+import Icon from "@/components/media/Icon.astro";
+import { Code } from "astro:components";
+import { organization, website } from "@/utils/schema.ts";
+import { CREATE_COMMAND, REPO } from "@/consts.ts";
+import pkg from "../../../package.json";
+
+const features = [
+  {
+    icon: "squares-four",
+    title: "A 12-column grid",
+    text: "Row and Col on the grid the designer draws on: spans, offsets and order, stacking on tablet and phone without a line of CSS.",
+  },
+  {
+    icon: "arrows-out-line-horizontal",
+    title: "Fluid by default",
+    text: "Every size is two numbers, phone and desktop. Type and spacing scale smoothly between them and with the reader's font size.",
+  },
+  {
+    icon: "figma-logo",
+    title: "One token system with Figma",
+    text: "Tokens export as Figma variables and import back from them, so design and code share every name and value.",
+  },
+  {
+    icon: "stack",
+    title: "Lumos components",
+    text: "Sections, layouts, typography, media, forms and interactive components that already know how to be accessible.",
+  },
+  {
+    icon: "arrows-left-right",
+    title: "Moves a site in",
+    text: "Agent skills migrate Webflow, Framer and WordPress sites — pages, CMS collections, assets and redirects — and prove it.",
+  },
+  {
+    icon: "check-circle",
+    title: "Tested everywhere",
+    text: "Every page in Chrome, Edge, Brave, Firefox, WebKit and Safari, against WCAG 2.2 AA, on every push.",
+  },
+];
+---
+
+<Layout schema={[organization(), website()]}>
+  <Section paddingTop="large" paddingBottom="medium" align="center" gap="7">
+    <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
+    <Heading tag="h1" variant="display" maxWidth={14} class="alignment-center">
+      A design-ready framework for Astro
+    </Heading>
+    <Paragraph variant="large" maxWidth={34} class="alignment-center">
+      Lumos's components and tokens, Mast's 12-column grid, and one design
+      system shared between Figma and code.
+    </Paragraph>
+    <div class="home-install_wrap">
+      <Code
+        code={CREATE_COMMAND}
+        lang="bash"
+        themes={{ light: "github-light-default", dark: "github-dark-default" }}
+        defaultColor={false}
+      />
+    </div>
+    <ButtonWrapper marginTop="0">
+      <Button element="link" href="/docs">Read the docs</Button>
+      <Button element="link" href={REPO} emphasis="secondary">GitHub</Button>
+    </ButtonWrapper>
+  </Section>
+  <Section paddingTop="small" paddingBottom="large">
+    <Row rowGap="9" animate>
+      {
+        features.map((f) => (
+          <Col span={4}>
+            <div class="home-feature_wrap">
+              <Icon name={f.icon} variant="medium" />
+              <Heading tag="h2" variant="h6">
+                {f.title}
+              </Heading>
+              <Paragraph variant="small" class="color-faded">
+                {f.text}
+              </Paragraph>
+            </div>
+          </Col>
+        ))
+      }
+    </Row>
+  </Section>
+</Layout>
+
+<style is:global>
+  @layer components {
+    .home-install_wrap {
+      width: min(100%, 36rem);
+
+      pre.astro-code {
+        text-align: start;
+      }
+    }
+    .home-feature_wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      height: 100%;
+      padding: var(--space-6);
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-medium);
+
+      > [class] {
+        margin-block: 0;
+      }
+    }
+  }
+</style>

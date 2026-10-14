@@ -5,6 +5,7 @@ import SkipLink from "@/components/global/SkipLink.astro";
 import Nav from "@/components/global/Nav.astro";
 import Footer from "@/components/global/Footer.astro";
 import GridOverlay from "@/components/utility/GridOverlay.astro";
+import Reveal from "@/components/utility/Reveal.astro";
 import type { SeoProps } from "@/types.ts";
 import { COLOR_MODE, SITE_LOCALE } from "@/consts.ts";
 import type { Theme } from "@/styles/generated/tokens.ts";
@@ -48,32 +49,6 @@ const {
     </main>
     <Footer />
     {gridOverlay && <GridOverlay />}
-    <script>
-      // Reveal: number each [data-animate] element's children for the
-      // stagger, then mark it revealed the first time it scrolls into view.
-      // The CSS that hides and animates them is in patterns.css.
-      const targets = document.querySelectorAll<HTMLElement>("[data-animate]");
-      if (
-        targets.length &&
-        matchMedia("(prefers-reduced-motion: no-preference)").matches
-      ) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (!entry.isIntersecting) continue;
-              entry.target.classList.add("is-revealed");
-              observer.unobserve(entry.target);
-            }
-          },
-          { rootMargin: "0px 0px -5% 0px" },
-        );
-        for (const target of targets) {
-          [...target.children].forEach((child, i) =>
-            (child as HTMLElement).style.setProperty("--_reveal-index", `${i}`),
-          );
-          observer.observe(target);
-        }
-      }
-    </script>
+    <Reveal />
   </body>
 </html>

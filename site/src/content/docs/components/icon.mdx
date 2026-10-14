@@ -1,0 +1,32 @@
+---
+title: Icon
+description: Any Phosphor icon by name, or your own SVG — inlined at build, so there is no icon font and no request.
+order: 42
+component: media/Icon
+---
+
+```astro live
+<Icon name="arrow-right" />
+<Icon name="heart" weight="fill" />
+<Icon name="lightning" weight="duotone" variant="large" />
+<Icon name="github-logo" variant="small" />
+```
+
+`name` is any of the 1,500 [Phosphor](https://phosphoricons.com) icons, in six
+weights. For your own icons, import the SVG from `src/assets/icons/`:
+
+```astro
+---
+import logo from "@/assets/logo/logo-icon.svg";
+---
+
+<Icon src={logo} variant="large" />
+```
+
+Icons take the text color (`currentcolor`). An icon that means something on its
+own needs an `aria-label`; one beside text is decorative and hidden from screen
+readers.
+
+## Props
+
+<Props of="media/Icon" />

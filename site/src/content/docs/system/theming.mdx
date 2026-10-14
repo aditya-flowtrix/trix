@@ -1,0 +1,65 @@
+---
+title: Theming
+description: Themes redefine the same semantic colors, so anything inside one picks up the right colors — and a site can follow the visitor's light or dark setting.
+order: 4
+---
+
+A theme is a class that redefines the semantic color tokens. Components only
+ever read those tokens, so wrapping anything in a theme recolors it — text,
+buttons, borders, fields — with no component knowing.
+
+## Sections take a theme
+
+```astro live stage="stack"
+<Section theme="dark" paddingTop="small" paddingBottom="small">
+  <Heading tag="h3" variant="h5">Dark section</Heading>
+  <Button>Primary</Button>
+</Section>
+<Section theme="brand" paddingTop="small" paddingBottom="small">
+  <Heading tag="h3" variant="h5">Brand section</Heading>
+  <Button>Primary</Button>
+</Section>
+```
+
+| Theme          | Use                                            |
+| -------------- | ---------------------------------------------- |
+| `light`        | the default, also applied to `:root`           |
+| `dark`         | dark sections, and the whole site in dark mode |
+| `brand`        | the brand color as the background              |
+| `theme-invert` | a class: the opposite of the theme around it   |
+
+`Section` and `Card` take a `theme` prop; anything else takes the class
+(`theme-dark`). A theme nests: a light card in a dark section is
+`<Card theme="invert">`.
+
+## The tokens a theme defines
+
+`--background`, `--background-2`, `--background-3`, `--background-skeleton`,
+`--text`, `--text-2`, `--border`, `--heading-accent`, the selection colors, and
+the `--button-*`, `--button-2-*` and `--link-*` sets. Adding a theme is copying
+a block in `themes.css`, renaming the class and keeping every token.
+
+## Contrast is checked
+
+`npm run check` measures every text pair in every theme against WCAG AA —
+4.5:1 for text, 3:1 for the heading accent — and fails the build when one
+falls short. A pair the owner has decided to accept is marked in that theme's
+block, with the reason:
+
+```css
+/* contrast: accepted — the brand green on white is the client's logo color */
+```
+
+It is then reported, not failed — the decision is written down.
+
+## Dark mode
+
+`COLOR_MODE` in `src/consts.ts`:
+
+- `light` (default) or `dark` — fixed.
+- `auto` — follow the visitor's system setting, remember a
+  [`ThemeToggle`](/docs/components/theme-toggle) choice, and apply it before
+  the first paint, so there is no flash.
+
+Dark mode swaps the root to the dark theme. Sections with their own `theme`
+keep it. This site runs in `auto` — try the switch in the header.

@@ -28,6 +28,15 @@ Use `astro dev stop`, `astro dev status`, and `astro dev logs` to manage it.
 
 Never edit `src/styles/generated/`, `design/tokens/` or `docs/tokens.md`.
 
+## The docs site
+
+`site/` is the framework's documentation site, built with Trix itself
+(`npm run docs:dev`, `npm run docs:build`). It renders the components in
+`src/` directly, so a component change shows up there as it is. When a
+component's behaviour, variants or props change, update its page in
+`site/src/content/docs/components/` — the props table regenerates on its own,
+the prose does not. A project started from Trix deletes `site/`.
+
 ## Astro documentation
 
 Use the relevant [Astro documentation](https://docs.astro.build) before working

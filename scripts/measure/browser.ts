@@ -69,15 +69,31 @@ export async function serve(
 ): Promise<{ origin: string; server: Server }> {
   const root = resolve(dir);
   const server = createServer(async (req, res) => {
-    let path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0]));
-    if (path.endsWith("/")) path += "index.html";
-    let file = join(root, path);
-    if (!file.startsWith(root)) return res.writeHead(403).end();
-    try {
-      if ((await stat(file)).isDirectory()) file = join(file, "index.html");
-    } catch {
-      if (!extname(file)) file += ".html";
-    }
+    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0]));
+    if (!join(root, path).startsWith(root)) return res.writeHead(403).end();
+    // As Cloudflare and Netlify look it up: `/blog` is blog.html before
+    // blog/index.html — a site with /blog and /blog/post has both a file
+    // and a folder named blog.
+    const candidates = path.endsWith("/")
+      ? [join(root, path, "index.html")]
+      : extname(path)
+        ? [join(root, path)]
+        : [
+            `${join(root, path)}.html`,
+            join(root, path, "index.html"),
+            join(root, path),
+          ];
+    let file = "";
+    for (const candidate of candidates)
+      if (
+        await stat(candidate).then(
+          (s) => s.isFile(),
+          () => false,
+        )
+      ) {
+        file = candidate;
+        break;
+      }
     try {
       const body = await readFile(file);
       res.writeHead(200, {

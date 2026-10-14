@@ -1,0 +1,30 @@
+---
+title: Img
+description: Every image — optimised at build, sized so nothing shifts, responsive with a srcset, and lazy by default.
+order: 40
+component: media/Img
+---
+
+import background from "@/assets/graphics/background.svg";
+
+```astro live stage="block"
+<Img src={background} width={1920} height={1080} class="radius-medium" />
+```
+
+An image imported from `src/assets` is optimised at build — converted, resized
+into a `srcset`, given its width and height so nothing shifts as it loads.
+Files in `public/` are served as they are.
+
+| Variant       | For                                                    |
+| ------------- | ------------------------------------------------------ |
+| `full-width`  | images as wide as the screen or their column (default) |
+| `constrained` | images up to their own width                           |
+| `densities`   | small fixed-size images: logos, avatars — 1x and 2x    |
+
+`alt` describes the image; leave it out for a decorative one. The image above
+the fold — usually the hero — takes `loading="eager"` and
+`fetchPriority="high"`; everything else stays lazy.
+
+## Props
+
+<Props of="media/Img" />

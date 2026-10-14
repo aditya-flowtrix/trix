@@ -1,0 +1,55 @@
+---
+title: Lumos, Mast and Trix
+description: What Trix took from Lumos for Astro, what it took from Mast for Astro, and what is new.
+order: 1
+---
+
+Trix starts from [Lumos for Astro](https://lumosframework.com) 0.0.5 — its
+history is preserved in the repository — and adds the parts of
+[Mast for Astro](https://github.com/CoreyMoen/mast-astro) that fit Lumos's way
+of working. Where the two disagreed, Lumos's conventions won, and Mast's idea
+was rebuilt to follow them.
+
+## From Lumos
+
+- The four cascade layers, and the rule that a page carries no CSS.
+- Fluid tokens as phone and desktop pairs; rem everywhere.
+- Themes — light, dark, brand, invert — redefining the same semantic tokens.
+- Every component: Section, ContentWrapper, Grid, ButtonWrapper, Heading,
+  Paragraph, Eyebrow, RichText, Button, Card, Img, Video, Icon, Overlay,
+  Accordion, Tabs, Modal, Dropdown, Slider, Marquee, the form components, Nav,
+  Footer, SkipLink, BaseHead, FormattedDate.
+- `render` on everything, variants as props, discriminated unions, props in
+  one order.
+- The style guide page, and the skills it started with: import from Figma,
+  audit props, scaling graphics, import a Webflow site, upgrade.
+
+## From Mast, made to fit
+
+| Mast had                                 | In Trix                                                                     |
+| ---------------------------------------- | --------------------------------------------------------------------------- |
+| a 12-column grid with automatic stacking | `Row` and `Col` — CSS grid, mobile-first, offsets that work on any column   |
+| a grid overlay                           | `GridOverlay` — Shift+G, drawn from the same tokens                         |
+| a spacer component                       | `Spacer` — exact: it takes the container's gap back on both sides           |
+| tokens laid out like a variables panel   | `tokens.css` groups, each a Figma collection, with generated fluid formulas |
+| build-time icons                         | `Icon name` — any Phosphor icon, inlined at build                           |
+| site-wide color mode                     | `COLOR_MODE` and `ThemeToggle`, applied before first paint                  |
+| reveal on scroll                         | `animate` on Section, Row, Col and Grid; tokens for timing                  |
+| skill evals                              | evals for every Trix skill                                                  |
+
+## New in Trix
+
+- **Figma, both ways.** Tokens export as Figma variable collections and import
+  back; `/trix-design-system` updates fonts, type and colors from a Figma style
+  guide or by asking.
+- **Leading trim**, measured from each font's real metrics.
+- **Fonts from anywhere** — local files, Google, Adobe, Fontshare, Bunny,
+  Fontsource, npm — always self-hosted.
+- **SEO** — structured data helpers, Breadcrumbs, canonicals without trailing
+  slashes, an audit of every page, and migration parity checks.
+- **Moving sites in** — `/trix-migrate` for whole sites, `/trix-cms` for
+  Webflow, WordPress, Framer and CSV content, both proving the result.
+- **Checks** — colour contrast in every theme, the conventions, every page in
+  every browser against WCAG 2.2 AA, in CI.
+- **Hosting** — Cloudflare-ready, with caching and security headers.
+- **Video pause button** in nine positions, for WCAG 2.2.2.

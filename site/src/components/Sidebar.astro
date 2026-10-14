@@ -1,0 +1,56 @@
+---
+import { GROUPS, allDocs, docPath, groupOf } from "~/docs.ts";
+
+interface Props {
+  /** The current page's path, to mark its link. */
+  current: string;
+}
+
+const { current } = Astro.props;
+const docs = await allDocs();
+---
+
+<nav class="docs-nav_wrap" id="docs-nav" popover aria-label="Documentation">
+  {
+    GROUPS.map(([group, label]) => (
+      <div class="docs-nav_group">
+        <p class="docs-nav_label">{label}</p>
+        <ul class="docs-nav_list">
+          {docs
+            .filter((d) => groupOf(d) === group)
+            .map((d) => (
+              <li>
+                <a
+                  href={docPath(d)}
+                  aria-current={docPath(d) === current ? "page" : undefined}
+                >
+                  {d.data.title}
+                  {d.data.badge && (
+                    <span class="docs-nav_badge">{d.data.badge}</span>
+                  )}
+                </a>
+              </li>
+            ))}
+        </ul>
+      </div>
+    ))
+  }
+</nav>
+
+<script>
+  const nav = document.querySelector<HTMLElement>("#docs-nav");
+  // Show the current page's link without scrolling the page itself — in the
+  // column, and each time the phone drawer opens.
+  const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+  const reveal = () => {
+    if (nav && current)
+      nav.scrollTop = current.offsetTop - nav.clientHeight / 2;
+  };
+  reveal();
+  nav?.addEventListener("toggle", reveal);
+  // Open on a phone, the menu closes once a link is chosen.
+  nav?.addEventListener("click", (event) => {
+    if ((event.target as Element).closest("a") && nav.matches(":popover-open"))
+      nav.hidePopover();
+  });
+</script>

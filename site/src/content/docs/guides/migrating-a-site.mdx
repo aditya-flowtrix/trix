@@ -1,0 +1,54 @@
+---
+title: Migrating a site
+description: Move a Webflow, Framer, WordPress, Wix or Squarespace site onto Trix — visually identical, with its content, URLs and SEO, and none of the old platform.
+order: 4
+---
+
+**The finished site is indistinguishable from the published one and contains
+none of the old platform.** Every section is a Trix component, every value a
+token. Content, URLs and metadata survive exactly. `/trix-migrate` runs the
+whole procedure; this is its outline.
+
+## Collect first
+
+1. **The live URL** — the rendered truth, and the only place to see motion.
+2. **Platform access** — the Webflow connector, a Framer invite, WordPress
+   admin or its REST API.
+3. **Content** — the CMS through its API, or its CSVs.
+4. **The code export**, where the platform has one (Webflow).
+5. **The redirects** — the platform's existing 301 list. Most platforms have no
+   API for it, and once the old site is gone, so is the list.
+
+Each goes into `PROJECT.md` the moment it arrives.
+
+## The phases
+
+|                    |                                                                                | Proved by                               |
+| ------------------ | ------------------------------------------------------------------------------ | --------------------------------------- |
+| **1. Style guide** | `/trix-style-guide` measures the live site: type, colors, spacing, grid, fonts | every value checked identical           |
+| **2. Groundwork**  | images, icons, class and variable maps, a component list                       | assets local, maps written              |
+| **3. First slice** | nav, footer and homepage, all the way to done                                  | the owner has seen it and signed off    |
+| **4. The rest**    | a page at a time, following the slice's patterns                               | content parity per page                 |
+| **5. Data**        | CMS, forms, redirects, SEO                                                     | item counts, form tests, redirect tests |
+| **6. Cutover**     | DNS, Search Console, the old site switched off                                 | live checks                             |
+
+**Why the first slice comes first:** every page depends on the nav and footer,
+and the homepage uses nearly the whole library. Getting them right decides
+almost every question the other pages will ask — so a mistake costs one page,
+not sixty.
+
+## Measured, not eyeballed
+
+The style guide is measured from the live site at several widths in a real
+browser — font sizes, spacing, the grid, leading trim — and proposed as
+tokens. `verify.ts` then measures the Trix build the same way and compares.
+Differences are listed, not hidden: each is fixed or recorded as the owner's
+decision.
+
+## What has no direct equivalent
+
+E-commerce, memberships, logic and automations, native site search and
+multi-language sites each change the shape of a project. The skill stops and
+asks before rebuilding anything that depends on one.
+
+The CMS is its own step: [Moving a CMS](/docs/guides/moving-a-cms).

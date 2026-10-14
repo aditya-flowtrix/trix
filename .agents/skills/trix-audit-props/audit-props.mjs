@@ -13,8 +13,9 @@
  * Usage: node audit-props.mjs [src/components] [--json]
  */
 
-import { readdirSync, statSync, readFileSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, relative, extname } from "node:path";
+import { readComponent as readProps } from "../../../scripts/props.ts";
 
 const root =
   process.argv[2] && !process.argv[2].startsWith("--")
@@ -35,75 +36,7 @@ function walk(dir, out = []) {
 
 /** Props in declaration order, each with the doc comment above it. */
 function readComponent(file) {
-  const src = readFileSync(file, "utf8");
-  const fm = src.startsWith("---") ? src.split("---")[1] : "";
-  const props = [];
-  const seen = new Set();
-
-  /* Only look inside type declarations. Scanning the whole frontmatter reads
-     object literals as props — a `const marks = { play, close, arrow }` is not
-     an API, and neither is a lookup table of variant names. */
-  const blocks = [];
-  /* Capture a whole declaration: `interface X { … }` by brace matching, and
-     `type X = … ;` to its terminating semicolon at depth zero. A union spreads
-     its props over several branches, and cutting at the first branch loses the
-     documented ones. */
-  for (const decl of fm.matchAll(/\b(interface|type)\s+(\w+)/g)) {
-    let i = decl.index;
-    let depth = 0;
-    let started = false;
-    for (; i < fm.length; i++) {
-      const ch = fm[i];
-      if (ch === "{" || ch === "(") {
-        depth++;
-        started = true;
-      } else if (ch === "}" || ch === ")") {
-        depth--;
-        if (started && depth === 0 && decl[1] === "interface") {
-          i++;
-          break;
-        }
-      } else if (ch === ";" && depth === 0) {
-        break;
-      } // also ends a brace-less union
-    }
-    blocks.push(fm.slice(decl.index, i + 1));
-  }
-  const re =
-    /(?:\/\*\*([\s\S]*?)\*\/\s*)?^(\s{2,8})([a-zA-Z_]\w*)(\?)?:\s*([^\n]+)$/gm;
-  /* Only a declaration that actually holds props counts towards "spans a
-     union" — a bare `type Tag = "span" | "p"` is a vocabulary, not a shape. */
-  let blocksWithProps = 0;
-  for (const block of blocks) {
-    const before = props.length;
-    for (const m of block.matchAll(re)) {
-      const [, doc, , name, , type] = m;
-      if (name === "type" && /^\s*(never|"[^"]*")/.test(type)) continue;
-      if (seen.has(name)) continue;
-      /* `never` marks a prop that belongs to a different variant branch. */
-      if (/^never;?$/.test(type.trim())) continue;
-      seen.add(name);
-      props.push({
-        name,
-        type: type.replace(/;$/, "").trim(),
-        doc: doc
-          ? doc
-              .replace(/^\s*\*\s?/gm, "")
-              .replace(/\s+/g, " ")
-              .trim()
-          : null,
-      });
-    }
-    if (props.length > before) blocksWithProps++;
-  }
-  const multiBlock = blocksWithProps > 1;
-
-  const d = fm.match(/const \{([\s\S]*?)\} = Astro\.props/);
-  const destructured = d
-    ? [...d[1].matchAll(/^\s*([a-zA-Z_]\w*)/gm)].map((x) => x[1])
-    : [];
-
-  return { file: relative(root, file), props, destructured, multiBlock };
+  return { file: relative(root, file), ...readProps(file) };
 }
 
 const components = walk(root)

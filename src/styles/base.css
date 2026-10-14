@@ -14,6 +14,12 @@
   margin: 0;
 }
 
+/* `hidden` hides, whatever display a class or the leading trim gives the
+   element. `until-found` stays findable: the browser hides it its own way. */
+[hidden]:not([hidden="until-found"]) {
+  display: none !important;
+}
+
 body {
   display: flex;
   flex-direction: column;

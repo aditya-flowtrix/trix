@@ -1,0 +1,29 @@
+---
+title: Heading
+description: A heading whose level and look are set separately, so the outline stays right whatever the design's sizes.
+order: 20
+component: typography/Heading
+---
+
+```astro live stage="stack"
+<Heading tag="h2">An h2 that looks like an h2</Heading>
+<Heading tag="h2" variant="h5">An h2 designed small</Heading>
+<Heading tag="h3" variant="display">An h3 at display size</Heading>
+```
+
+`tag` is the level: what screen readers navigate by and search engines read.
+`variant` is any [text style](/docs/system/typography); it defaults to the
+tag. Keep one `h1` per page and don't skip levels — `npm run seo` checks both.
+
+`maxWidth` caps the line length in characters, so a headline breaks where the
+design does.
+
+```astro live stage="stack"
+<Heading tag="h3" variant="h4" maxWidth={14}
+  >A heading that breaks after about fourteen characters</Heading
+>
+```
+
+## Props
+
+<Props of="typography/Heading" />

@@ -1,0 +1,58 @@
+---
+title: Tokens
+description: Two files hold the design system; everything else — CSS, types, Figma variables, docs — is generated from them.
+order: 2
+---
+
+`src/styles/tokens.css` is the design system and `src/styles/themes.css` its
+color themes. **They are the only style files you edit.** Save either one while
+`npm run dev` runs, or run `npm run tokens`, and everything derived from them
+is regenerated:
+
+| Generated                              | From                                                                                    |
+| -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `src/styles/generated/fluid.css`       | each `-min` / `-max` pair → a `clamp()` (see [Fluid sizing](/docs/system/fluid-sizing)) |
+| `src/styles/generated/text-styles.css` | each group with a `-font-family` token → `.text-style-*`, and `h1`–`h6`, `body`         |
+| `src/styles/generated/utilities.css`   | spacing, section, radius, line height, letter spacing, weight and grid-span utilities   |
+| `src/styles/generated/tokens.ts`       | the prop types that follow the scales: `SpaceStep`, `TextStyle`, `Theme`, `Radius`…     |
+| `design/tokens/*.tokens.json`          | the Figma variable collections, one file per mode                                       |
+| `docs/tokens.md`                       | the [token reference](/docs/classes/tokens)                                             |
+
+`npm run check` fails if any generated file is out of date, so CI catches a
+token edited without regenerating.
+
+## Add a step and everything follows
+
+Add `--space-13-min` and `--space-13-max` and you get `padding-13`, `gap-13`,
+`margin-top-13` and the rest, `"13"` in the `SpaceStep` type — so
+`<Section gap="13">` type-checks — a `space/13` Figma variable, and a row in the
+reference. Remove one and every use that no longer exists fails the type check.
+
+## Groups
+
+Each comment heading in `tokens.css` is a group, and each group is a Figma
+variable collection:
+
+- **Color — palette**: `--neutral-50` … `--neutral-950`, `--brand-50` … `--brand-950`.
+  Only themes read these.
+- **Typography**: families, weights, leading trim, line heights, letter
+  spacing, and one group per text style (`--h1-min`, `--h1-max`,
+  `--h1-font-family`, `--h1-font-weight`…).
+- **Spacing**: `--space-1` … `--space-12`, and the section sizes `xsmall` … `xlarge`.
+- **Radius**, **Layout** (viewport, breakpoints, site margin and gutter, grid
+  columns, max widths), **Motion** (hover, open, reveal) and **Components**
+  (button, field and card padding and radius).
+
+## The rules
+
+- **Components read semantic tokens, never the palette**: `--background`,
+  `--text`, `--border`, `--button-*`. A theme redefines them; the component
+  never changes.
+- **A muted color is a mix, not a swatch**: `--text-2` is
+  `color-mix(in lab, currentcolor 70%, transparent)`, so it works on every
+  background.
+- **Component settings are tokens.** Button, field and card padding and radius
+  live in the _Components_ group, so a project restyles every button in one
+  place.
+- **Never write a `clamp()` or a `px` length by hand.** `npm run check` rejects
+  `px` lengths in components.

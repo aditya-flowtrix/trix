@@ -1,0 +1,21 @@
+---
+title: Dropdown
+description: A button that opens a small panel — a menu, a filter, a language list.
+order: 53
+component: interactive/Dropdown
+---
+
+```astro live
+<Dropdown label="Resources">
+  <Paragraph><a href="/docs">Documentation</a></Paragraph>
+  <Paragraph><a href="/docs/guides/agent-skills">Agent skills</a></Paragraph>
+</Dropdown>
+```
+
+A native `<details>`, so it works without JavaScript. The script adds the
+rest: arrow keys move between its links, Escape closes it and returns focus to
+the button, and a click outside closes it.
+
+## Props
+
+<Props of="interactive/Dropdown" />

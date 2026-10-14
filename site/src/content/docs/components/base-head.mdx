@@ -1,0 +1,32 @@
+---
+title: BaseHead
+description: Everything in the head — title, description, canonical, social cards, structured data, fonts, icons and the color mode.
+order: 74
+component: utility/BaseHead
+---
+
+`BaseLayout` renders it from the page's props:
+
+```astro
+<BaseLayout
+  title="About"
+  description="Who we are and how we work."
+  image="/og/about.jpg"
+  schema={organization()}
+/>
+```
+
+| It writes                        | From                                                               |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `<title>` — `About \| Site name` | `title`, and `SITE_NAME`                                           |
+| meta description                 | `description`, or `SITE_DESCRIPTION`                               |
+| canonical URL                    | the page's path on `SITE_URL`, without `.html` or a trailing slash |
+| `noindex`                        | `noindex`, or a route in `NOINDEX_ROUTES`                          |
+| Open Graph and Twitter cards     | title, description, `image`, `type`, `SITE_LOCALE`                 |
+| JSON-LD                          | `schema` — see [SEO](/docs/guides/seo)                             |
+| fonts                            | every family in `astro.config.mjs`, the first preloaded            |
+| the color-mode script            | `COLOR_MODE` is `auto`                                             |
+| the cascade layer order          | always first                                                       |
+
+Its props are the page's: `title`, `description`, `image`, `type`, `noindex`
+and `schema`, which `BaseLayout` passes through.
