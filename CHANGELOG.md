@@ -134,6 +134,18 @@ SEO phase, fonts from any source and the design-change skill.
 - Across all 64 pages: SEO audit clean; 1453/1453 browser checks in Chrome,
   WebKit and Brave.
 
+### Installer
+
+- `npm create trix-astro@latest my-site` — `packages/create-trix-astro`,
+  modelled on `create-lumos`. It downloads Trix at one exact commit, leaves
+  out the framework's own parts (`site/`, `packages/`, CI, its installer
+  test), names the project after its folder, stamps `package.json` → `trix`
+  with `version`, `commit` and `created`, writes the project's own README and
+  `wrangler.jsonc`, and installs with the package manager that ran it.
+- `npm run test:create` (in CI): the installer on an archive of the commit,
+  as GitHub serves it.
+- `.wrangler/` (local Cloudflare state) is no longer tracked.
+
 ### Found while building the docs
 
 - The `hidden` attribute did not hide a paragraph or heading: the leading

@@ -14,35 +14,32 @@ project is.
 ## 1. Copy
 
 ```bash
-npx degit aditya-flowtrix/trix my-site
+npm create trix-astro@latest my-site
 cd my-site
-git init && npm install
+git init
 ```
 
-(Or GitHub → **Use this template** on `aditya-flowtrix/trix`, then clone.)
+The installer copies Trix at one exact commit, leaves out the framework's own
+parts (its docs site, installer and CI), names the project after the folder,
+gives it its own README and `wrangler.jsonc`, installs dependencies, and
+stamps `package.json` → `trix` with `version`, `commit` and `created` — what
+`/trix-upgrade` merges against.
 
-## 2. Stamp
-
-Record which Trix the project started from — `/trix-upgrade` merges against
-this commit, and without it every upgrade is a guess.
+## 2. Check the stamp
 
 ```bash
-git ls-remote https://github.com/aditya-flowtrix/trix HEAD
+node -p "require('./package.json').trix"
 ```
 
-In `package.json`: set `name` to the project's, `version` to `0.1.0`, and add
-`"created"` (today's date) and `"commit"` (the hash above) inside `trix`,
-keeping `trix.version`. Remove `description` and `repository` (they describe
-the framework) or replace them with the project's.
+It should show `commit`. If the installer was offline it can't, and every
+later upgrade becomes a guess — so add it by hand from
+`git ls-remote https://github.com/aditya-flowtrix/trix HEAD`.
 
-Then remove the framework's own documentation site — it documents Trix, not
-the project:
-
-```bash
-rm -rf site
-npm pkg delete scripts.docs:dev scripts.docs:build scripts.docs:preview
-npm uninstall @astrojs/mdx   # unless the project will write MDX
-```
+A project copied any other way (a clone, GitHub's **Use this template**) needs
+by hand what the installer does: `name` and `version: "0.1.0"`, the stamp,
+`description` and `repository` removed, and the framework's own parts gone —
+`rm -rf site packages tests/create.ts .github`, the `docs:*` and `test:create`
+scripts, and `npm uninstall @astrojs/mdx` unless the project writes MDX.
 
 ## 3. Name and domain
 

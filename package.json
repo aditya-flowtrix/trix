@@ -19,6 +19,7 @@
     "seo": "node scripts/seo/audit.ts --dir dist",
     "test:browsers": "node tests/browsers.ts",
     "test:cms": "node tests/cms.ts",
+    "test:create": "node tests/create.ts",
     "preview": "astro preview",
     "docs:dev": "cd site && astro dev",
     "docs:build": "cd site && astro build",

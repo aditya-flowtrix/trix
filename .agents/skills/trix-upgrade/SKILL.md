@@ -26,7 +26,8 @@ An upgrade is only as good as its knowledge of the starting point.
 node -p "JSON.parse(require('fs').readFileSync('package.json')).trix ?? 'unstamped'"
 ```
 
-- **Stamped** — `{ version, commit, created }` written by `/trix-new-project`.
+- **Stamped** — `{ version, commit, created }` written by `npm create trix-astro`
+  (or by hand, per `/trix-new-project`).
   The version is the release the site came from, for reading; the commit is
   what to merge against, and it is the one that matters. They are not
   redundant: a site scaffolded between releases is that version plus whatever

@@ -18,5 +18,4 @@ export const COLOR_MODE: "light" | "dark" | "auto" = "auto";
 /** Where the framework lives: edit links, the header, installation. */
 export const REPO = "https://github.com/aditya-flowtrix/trix";
 /** The command that starts a project. */
-export const CREATE_COMMAND =
-  "npm create astro@latest -- --template aditya-flowtrix/trix";
+export const CREATE_COMMAND = "npm create trix-astro@latest";

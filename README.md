@@ -50,10 +50,14 @@ source when it builds, so they cannot fall behind the code.
 ## Start a project
 
 ```bash
-npm create astro@latest my-site -- --template aditya-flowtrix/trix
+npm create trix-astro@latest my-site
 cd my-site
 npm run dev
 ```
+
+The installer is [`packages/create-trix-astro`](packages/create-trix-astro/):
+it copies Trix at one exact commit, names and stamps the project, and leaves
+the framework's own docs site, installer and CI behind.
 
 Then run the `trix-new-project` skill (or follow
 [its steps](.agents/skills/trix-new-project/SKILL.md)) to stamp, name and brand

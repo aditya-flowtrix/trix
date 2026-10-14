@@ -13,7 +13,7 @@ order: 2
 ## Create a project
 
 ```bash
-npm create astro@latest my-site -- --template aditya-flowtrix/trix
+npm create trix-astro@latest my-site
 cd my-site
 npm run dev
 ```
@@ -22,9 +22,11 @@ The site opens at `http://localhost:4321`, with the home page, the
 [style guide](/docs/guides/designers-and-figma) at `/style-guide` and every
 component at `/components`.
 
-Prefer GitHub? **Use this template** on the
-[repository](https://github.com/aditya-flowtrix/trix) creates a copy in your
-account.
+The installer copies Trix at one exact commit, names the project after its
+folder, records which Trix it started from — so
+[upgrades](/docs/guides/upgrading) know what to merge against — writes a
+Cloudflare config of its own, and installs dependencies with whichever of
+npm, pnpm, yarn or bun ran it. `--no-install` skips the install.
 
 <Aside type="tip" title="With an agent">
   Ask Claude Code or Codex to “start a new site with Trix”. The
