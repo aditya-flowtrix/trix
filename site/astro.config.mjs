@@ -5,6 +5,7 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import trix from "../astro.config.mjs";
 import { SITE_URL } from "./src/consts.ts";
+import { codeThemes } from "./src/code-theme.ts";
 
 /**
  * The Trix docs site. It is built with the framework it documents: every
@@ -80,7 +81,7 @@ export default defineConfig({
   fonts,
   markdown: {
     shikiConfig: {
-      themes: { light: "github-light-default", dark: "github-dark-default" },
+      themes: codeThemes,
       defaultColor: false,
     },
   },

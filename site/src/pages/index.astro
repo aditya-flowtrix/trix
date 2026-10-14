@@ -11,6 +11,7 @@ import Col from "@/components/wrapper/Col.astro";
 import Icon from "@/components/media/Icon.astro";
 import Aurora from "~/components/Aurora.astro";
 import { Code } from "astro:components";
+import { codeThemes } from "~/code-theme.ts";
 import { organization, website } from "@/utils/schema.ts";
 import { CREATE_COMMAND, REPO } from "@/consts.ts";
 import pkg from "../../../package.json";
@@ -70,7 +71,7 @@ const features = [
       <Code
         code={CREATE_COMMAND}
         lang="bash"
-        themes={{ light: "github-light-default", dark: "github-dark-default" }}
+        themes={codeThemes}
         defaultColor={false}
       />
     </div>
