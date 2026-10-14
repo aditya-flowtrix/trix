@@ -3,7 +3,8 @@
 ## 0.2.0 — 2026-10-14
 
 The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in
-`@layer components`, values from tokens. No Mast code is included.
+`@layer components`, values from tokens — no Mast code is included. Plus the
+SEO phase, fonts from any source and the design-change skill.
 
 ### Layout grid
 
@@ -35,6 +36,43 @@ The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in
 - `<hr>` styled as a theme-colored rule; rich-text tables (borders, padding,
   sideways scroll when wide).
 - Link prefetch on hover and focus.
+- `Video`: autoplaying videos get a pause button (WCAG 2.2.2), which starts
+  paused for visitors who prefer reduced motion; `pauseButton={false}` for a
+  clip of five seconds or less. Allowed inside `ContentWrapper` visuals.
+
+### Fonts and design changes
+
+- `trix-design-system` skill: change fonts, text styles, colors, themes,
+  spacing or the grid from a Figma style guide (Trix-named variables map
+  directly) or from the owner's answers to one round of questions.
+- Fonts from anywhere: uploaded files, or Google, Adobe, Fontshare, Bunny,
+  Fontsource or npm through Astro's providers — downloaded at build and
+  served from the site. `BaseHead` loads every configured family and
+  preloads the first; no per-font edits.
+- `scripts/fonts.ts` measures each family's leading trim from the metrics
+  the browser uses, writes it, and gives a different heading font its own
+  trim tokens.
+- Inter's trim corrected from Lumos's 0.4em / 0.38em to the measured
+  0.364em / 0.364em: text boxes now run exactly cap height to baseline, as
+  Figma's vertical trim does (an h1 was about 4px taller than its text).
+
+### SEO
+
+- `trix-seo` skill: per-page metadata, structured data, audit, migration
+  parity, launch handoff.
+- `src/utils/schema.ts`: Organization, WebSite, BreadcrumbList, Article,
+  FAQPage, LocalBusiness and Product builders; `JsonLd` component; `schema`
+  on `BaseLayout`. The home page carries Organization and WebSite.
+- `Breadcrumbs`: an accessible trail that emits its BreadcrumbList.
+- `scripts/seo/audit.ts` (`npm run seo`, in CI): crawls the build or a live
+  site in Chrome and checks status, title, description, canonical, `lang`,
+  h1 and heading order, alt text, Open Graph, structured data, broken links,
+  sitemap and robots.txt, layout shift and largest paint.
+- `scripts/seo/parity.ts`: every indexable URL of the old site checked on the
+  new one, through live or CSV redirects — lost, changed or same.
+- `og:locale` and the page `lang` come from `SITE_LOCALE`; `SITE_SOCIALS`
+  feeds the Organization's profiles. The demo links to a non-existent
+  `/about` (found by the audit) now point at real pages.
 
 ### Style guide and docs
 
@@ -62,6 +100,13 @@ The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in
   blocks become `span` and `offset`.
 - `trix-style-guide`: the layout grid in the proposal, the record and the
   overlay check.
+- Leading trim is measured on the source: `design.ts` reports whether
+  one-line text boxes are trimmed, `propose.ts` turns trim off for a source
+  that never trims (the Remsons export: 371 blocks, none trimmed), and
+  `verify.ts` checks every rebuilt text style against it.
+- End to end on the Remsons export (5 real pages): layout grid 19/19, spacing
+  and trim identical; the only differences are one stepped h1 — sizes that
+  jump at breakpoints — which the proposal puts to the owner.
 
 ## 0.1.0 — 2026-10-14
 

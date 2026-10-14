@@ -5,8 +5,10 @@ export const SITE_DESCRIPTION =
   "Trix is a design-ready Astro framework: one token system shared by designers in Figma and developers in code.";
 /** Canonical origin. Resolves canonical URLs, social images, and the sitemap. */
 export const SITE_URL = "https://trix.example.com";
-/** BCP 47 locale tag used to format dates and numbers. */
+/** BCP 47 locale tag: the page language, `og:locale`, and date and number formats. */
 export const SITE_LOCALE = "en-US";
+/** The organization's profiles elsewhere (LinkedIn, Instagram…), for structured data. */
+export const SITE_SOCIALS: string[] = [];
 /** Routes excluded from search and the sitemap. Surrounding slashes are ignored. */
 export const NOINDEX_ROUTES: string[] = ["/404", "/style-guide", "/components"];
 /**

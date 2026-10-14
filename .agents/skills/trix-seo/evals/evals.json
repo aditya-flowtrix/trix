@@ -1,0 +1,45 @@
+{
+  "skill_name": "trix-seo",
+  "evals": [
+    {
+      "id": 0,
+      "name": "pre-launch-audit",
+      "prompt": "We launch next week on remsons.com. Make sure the SEO is right.",
+      "expected_output": "SITE_URL set to the production origin, the production build audited with --production, every error fixed, warnings listed as questions, structured data in place for the page templates, and the launch handoff checklist reported.",
+      "files": [],
+      "assertions": [
+        "SITE_URL in src/consts.ts is https://remsons.com (or the owner's confirmed origin), not a placeholder",
+        "scripts/seo/audit.ts ran against the build with --production and reports 0 errors",
+        "The home page carries organization() and website() structured data",
+        "Pages below the home page that have a trail use <Breadcrumbs>, not hand-written BreadcrumbList JSON",
+        "The report includes the Search Console handoff steps"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "migration-parity",
+      "prompt": "The Webflow site is live at https://www.example.com and the Trix rebuild is on https://staging.example.pages.dev. Can we switch DNS?",
+      "expected_output": "parity.ts run old → staging, every lost URL resolved with a redirect or an owner decision before saying yes, changed titles and descriptions listed for confirmation.",
+      "files": [],
+      "assertions": [
+        "scripts/seo/parity.ts was run with --old https://www.example.com and --new the staging URL",
+        "The answer is not yes while any URL is reported lost",
+        "Each lost URL got a redirect in astro.config.mjs redirects or a decision recorded in PROJECT.md",
+        "Changed titles, descriptions and h1s are listed for the owner to confirm"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "blog-structured-data",
+      "prompt": "Add proper schema to the blog posts.",
+      "expected_output": "article({ type: 'BlogPosting', … }) built from each entry's fields in the blog's [slug].astro route and passed as schema; audit shows it parses.",
+      "files": [],
+      "assertions": [
+        "The schema is built in the dynamic route from collection fields, not written per post",
+        "It uses article() from src/utils/schema.ts with type BlogPosting, headline, datePublished and url",
+        "No JSON-LD string is concatenated by hand",
+        "The audit reports no structured data errors"
+      ]
+    }
+  ]
+}

@@ -71,6 +71,8 @@ type Raw = {
     ls: number;
     transform: string;
     color: string;
+    /** Box height ÷ line height, for a block of one line: 1 untrimmed. */
+    boxRatio?: number;
   }[];
   box: {
     i: number;
@@ -148,6 +150,27 @@ function measure(): Raw {
         ls: cs.letterSpacing === "normal" ? 0 : px(cs.letterSpacing),
         transform: cs.textTransform,
         color: cs.color,
+        // Leading trim: a one-line block's box is exactly one line tall
+        // unless the site trims it toward cap height and baseline.
+        boxRatio: (() => {
+          if (cs.display === "inline" || e.children.length) return undefined;
+          const range = document.createRange();
+          range.selectNodeContents(e);
+          const lines = new Set(
+            [...range.getClientRects()].map((r) => Math.round(r.top)),
+          );
+          const lh =
+            cs.lineHeight === "normal" ? size * 1.2 : px(cs.lineHeight);
+          const h =
+            e.getBoundingClientRect().height -
+            px(cs.paddingTop) -
+            px(cs.paddingBottom) -
+            px(cs.borderTopWidth) -
+            px(cs.borderBottomWidth);
+          return lines.size === 1 && lh > 0
+            ? Math.round((h / lh) * 100) / 100
+            : undefined;
+        })(),
       });
     }
     const rect = e.getBoundingClientRect();
@@ -490,6 +513,18 @@ for (const row of desktopRows) {
   }
 }
 
+// Leading trim, from one-line text blocks at desktop.
+let untrimmed = 0;
+let trimmed = 0;
+for (const { runs } of perPage) {
+  const desktop = runs[WIDTHS.indexOf(1440)];
+  for (const t of desktop?.text ?? []) {
+    if (t.boxRatio === undefined) continue;
+    if (Math.abs(t.boxRatio - 1) < 0.03) untrimmed++;
+    else if (t.boxRatio < 0.9) trimmed++;
+  }
+}
+
 const result = {
   source: opts.dir ?? opts.url,
   widths: WIDTHS,
@@ -541,6 +576,7 @@ const result = {
     })),
   },
   media: sorted(media).map((m) => ({ query: m.key, count: m.count })),
+  trim: { untrimmed, trimmed },
   grid: {
     margin,
     content: margin.map((m, i) => (m === null ? null : r(WIDTHS[i] - m * 2))),
@@ -605,6 +641,10 @@ const md = [
       .join(" · ")}`,
     "",
   ]),
+  "## Leading trim",
+  "",
+  `${untrimmed} one-line text blocks are exactly one line tall; ${trimmed} are trimmed toward cap height and baseline.`,
+  "",
   "## Layout grid",
   "",
   `| Width | ${WIDTHS.join(" | ")} |`,

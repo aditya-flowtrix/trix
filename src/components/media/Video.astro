@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import Button from "@/components/Button.astro";
 
 type VideoRatio = "2-1" | "16-9" | "3-2" | "5-4" | "1-1" | "4-5" | "2-3";
 
@@ -24,6 +25,13 @@ type Tail = {
   muted?: boolean;
   /** Fit without cropping and remove the skeleton tint. */
   transparent?: boolean;
+  /**
+   * Show a pause button over an autoplaying video. Defaults to `true` with
+   * `autoplay`: moving content that plays for more than five seconds must be
+   * pausable (WCAG 2.2.2). Turn it off only for a video of five seconds or
+   * less that does not loop.
+   */
+  pauseButton?: boolean;
 };
 
 type Props = Head &
@@ -61,6 +69,7 @@ const {
   autoplay = true,
   muted = true,
   transparent = false,
+  pauseButton = autoplay,
   class: className,
   ...rest
 } = Astro.props as AllProps;
@@ -106,3 +115,55 @@ const isCustom = variant === "custom";
     />
   )
 }
+{
+  render && src && autoplay && pauseButton && (
+    <Button
+      variant="play"
+      emphasis="secondary"
+      pressed={true}
+      class="video_toggle"
+      data-video-toggle
+    />
+  )
+}
+
+<script>
+  // The pause button sits right after its video. Visitors who prefer less
+  // motion get the video still, and can start it.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  for (const toggle of document.querySelectorAll<HTMLButtonElement>(
+    "[data-video-toggle]",
+  )) {
+    const video = toggle.previousElementSibling;
+    if (!(video instanceof HTMLVideoElement)) continue;
+    const show = (playing: boolean) => {
+      toggle.setAttribute("aria-pressed", String(playing));
+      toggle.setAttribute("aria-label", playing ? "Pause video" : "Play video");
+    };
+    const set = (playing: boolean) => {
+      if (playing) video.play().catch(() => show(false));
+      else video.pause();
+      show(playing);
+    };
+    if (reduced.matches) set(false);
+    video.addEventListener("pause", () => show(false));
+    video.addEventListener("play", () => show(true));
+    toggle.addEventListener("click", () => set(video.paused));
+  }
+</script>
+
+<style is:global>
+  @layer components {
+    /* Over the video's corner. Positioned by the video's container — a
+       Section background, a ContentWrapper or Card visual — so a standalone
+       video needs a positioned parent. */
+    .video_toggle {
+      position: absolute;
+      inset: auto var(--space-4) var(--space-4) auto;
+      width: auto;
+      height: auto;
+      z-index: 1;
+      pointer-events: auto;
+    }
+  }
+</style>

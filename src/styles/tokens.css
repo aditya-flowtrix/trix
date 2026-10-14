@@ -58,8 +58,8 @@
   --primary-bold: 700;
 
   /* Typography — leading trim (cap height to baseline, per font) */
-  --primary-trim-top: 0.4em;
-  --primary-trim-bottom: 0.38em;
+  --primary-trim-top: 0.364em;
+  --primary-trim-bottom: 0.364em;
 
   /* Typography — line height */
   --line-height-xsmall: 1;

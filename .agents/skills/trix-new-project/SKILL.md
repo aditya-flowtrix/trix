@@ -43,7 +43,8 @@ the framework) or replace them with the project's.
 - `SITE_DESCRIPTION` — the default meta description.
 - `SITE_URL` — the **production** origin. Canonicals, the sitemap and social
   images resolve against it; a placeholder here ships wrong canonicals.
-- `SITE_LOCALE`, `COLOR_MODE` (`light`, `dark`, or `auto` for a site that
+- `SITE_LOCALE` (the page language), `SITE_SOCIALS` (profile URLs for
+  structured data), `COLOR_MODE` (`light`, `dark`, or `auto` for a site that
   follows the visitor's system and offers `ThemeToggle`).
 
 `wrangler.jsonc` (or the host's config): the project's name and domain.
@@ -57,20 +58,19 @@ Then **Sources** for whatever this project starts from.
 
 Choose by what exists:
 
-| The project has                                                         | Run                                                                                             |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| a live site to migrate (Webflow, Framer, WordPress, anything)           | `/trix-migrate` — it starts with `/trix-style-guide`                                            |
-| a Figma design built on Trix's variables (`docs/design/figma-setup.md`) | `/trix-import-figma` — the fast path                                                            |
-| a Figma design built any other way                                      | `/trix-import-figma`                                                                            |
-| a site whose look must be matched but not migrated                      | `/trix-style-guide`                                                                             |
-| nothing yet                                                             | give the designer `docs/design/README.md`; meanwhile set fonts and brand colors in `tokens.css` |
+| The project has                                                         | Run                                                                        |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| a live site to migrate (Webflow, Framer, WordPress, anything)           | `/trix-migrate` — it starts with `/trix-style-guide`                       |
+| a Figma design built on Trix's variables (`docs/design/figma-setup.md`) | `/trix-import-figma` — the fast path                                       |
+| a Figma design built any other way                                      | `/trix-import-figma`                                                       |
+| a site whose look must be matched but not migrated                      | `/trix-style-guide`                                                        |
+| a design direction but no file or site yet (fonts, colors, type)        | `/trix-design-system` — it asks; give the designer `docs/design/README.md` |
 
 ## 6. Brand and fonts
 
-- **Fonts** — WOFF2 files in `src/assets/fonts/<family>/`, declared in
-  `astro.config.mjs` (`fonts`, local provider, `unicodeRange` per subset,
-  `fallbacks`), referenced by `--primary-family` / `--secondary-family`.
-  Update the preload in `BaseHead` if the family's CSS variable changes.
+- **Fonts** — `/trix-design-system` → fonts: it asks for the files or where
+  the font is hosted (Google, Adobe, Fontshare, any URL), configures
+  `astro.config.mjs`, and measures the font's leading trim.
 - **Logo** — `src/assets/logo/logo.svg` and `logo-icon.svg`, `currentColor`.
 - **Site icons** — `public/favicon.svg`, `favicon.ico` (32px),
   `apple-touch-icon.png` (180px PNG), `og-image.jpg` (1200×630).

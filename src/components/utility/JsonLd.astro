@@ -1,0 +1,17 @@
+---
+import type { Schema } from "@/utils/schema.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Structured data: one schema.org object, or several. Build it with `@/utils/schema.ts`. */
+  data: Schema | Schema[];
+}
+
+const { render = true, data } = Astro.props;
+
+// `<` is escaped so no string in the data can close the script element.
+const json = JSON.stringify(data).replace(/</g, "\\u003c");
+---
+
+{render && <script type="application/ld+json" is:inline set:html={json} />}

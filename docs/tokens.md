@@ -56,8 +56,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Value |
 | --- | --- |
-| `--primary-trim-top` | `0.4em` |
-| `--primary-trim-bottom` | `0.38em` |
+| `--primary-trim-top` | `0.364em` |
+| `--primary-trim-bottom` | `0.364em` |
 
 ## Typography — line height
 
@@ -93,8 +93,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--display-text-wrap` | `balance` | `balance` |
 | `--display-margin-top` | `var(--space-8)` | `var(--space-8)` |
 | `--display-margin-bottom` | `var(--space-7)` | `var(--space-7)` |
-| `--display-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--display-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--display-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--display-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h1
 
@@ -109,8 +109,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h1-text-wrap` | `balance` | `balance` |
 | `--h1-margin-top` | `var(--space-8)` | `var(--space-8)` |
 | `--h1-margin-bottom` | `var(--space-7)` | `var(--space-7)` |
-| `--h1-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h1-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h1-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h1-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h2
 
@@ -125,8 +125,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h2-text-wrap` | `balance` | `balance` |
 | `--h2-margin-top` | `var(--space-8)` | `var(--space-8)` |
 | `--h2-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
-| `--h2-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h2-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h2-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h2-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h3
 
@@ -141,8 +141,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h3-text-wrap` | `balance` | `balance` |
 | `--h3-margin-top` | `var(--space-7)` | `var(--space-7)` |
 | `--h3-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
-| `--h3-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h3-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h3-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h3-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h4
 
@@ -157,8 +157,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h4-text-wrap` | `balance` | `balance` |
 | `--h4-margin-top` | `var(--space-7)` | `var(--space-7)` |
 | `--h4-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--h4-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h4-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h4-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h4-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h5
 
@@ -173,8 +173,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h5-text-wrap` | `balance` | `balance` |
 | `--h5-margin-top` | `var(--space-6)` | `var(--space-6)` |
 | `--h5-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--h5-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h5-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h5-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h5-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — h6
 
@@ -189,8 +189,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h6-text-wrap` | `balance` | `balance` |
 | `--h6-margin-top` | `var(--space-6)` | `var(--space-6)` |
 | `--h6-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
-| `--h6-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--h6-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--h6-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--h6-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — text-xlarge
 
@@ -205,8 +205,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-xlarge-text-wrap` | `pretty` | `pretty` |
 | `--text-xlarge-margin-top` | `var(--space-5)` | `var(--space-5)` |
 | `--text-xlarge-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--text-xlarge-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--text-xlarge-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--text-xlarge-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--text-xlarge-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — text-large
 
@@ -221,8 +221,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-large-text-wrap` | `pretty` | `pretty` |
 | `--text-large-margin-top` | `var(--space-5)` | `var(--space-5)` |
 | `--text-large-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--text-large-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--text-large-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--text-large-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--text-large-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — text-main
 
@@ -237,8 +237,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-main-text-wrap` | `pretty` | `pretty` |
 | `--text-main-margin-top` | `var(--space-5)` | `var(--space-5)` |
 | `--text-main-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--text-main-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--text-main-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--text-main-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--text-main-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — text-small
 
@@ -253,8 +253,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-small-text-wrap` | `pretty` | `pretty` |
 | `--text-small-margin-top` | `var(--space-5)` | `var(--space-5)` |
 | `--text-small-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
-| `--text-small-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--text-small-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--text-small-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--text-small-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — text-xsmall
 
@@ -269,8 +269,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-xsmall-text-wrap` | `pretty` | `pretty` |
 | `--text-xsmall-margin-top` | `var(--space-4)` | `var(--space-4)` |
 | `--text-xsmall-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
-| `--text-xsmall-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--text-xsmall-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--text-xsmall-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--text-xsmall-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Text style — eyebrow
 
@@ -285,8 +285,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--eyebrow-text-wrap` | `balance` | `balance` |
 | `--eyebrow-margin-top` | `var(--space-4)` | `var(--space-4)` |
 | `--eyebrow-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
-| `--eyebrow-trim-top` | `var(--primary-trim-top) → 0.4em` | `var(--primary-trim-top) → 0.4em` |
-| `--eyebrow-trim-bottom` | `var(--primary-trim-bottom) → 0.38em` | `var(--primary-trim-bottom) → 0.38em` |
+| `--eyebrow-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
+| `--eyebrow-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
 ## Spacing — scale
 

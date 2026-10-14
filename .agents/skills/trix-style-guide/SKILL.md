@@ -164,7 +164,10 @@ group. The file's comment headings are the groups; keep them.
   for a second family).
 - **Text styles** — one group per style, all twelve properties. A source with
   no heading margins (most Webflow builds) gets `0rem` margin tokens. A source
-  without leading trim gets `--primary-trim-top/bottom: 0.5lh` (trim off).
+  without leading trim gets `--primary-trim-top/bottom: 0.5lh` (trim off). A
+  source that trims (Lumos for Webflow) keeps its own trim values; for a
+  font the source never trimmed but the project now should, measure it:
+  `node scripts/fonts.ts --url <dev>/style-guide --write`.
 - **Spacing** — the numbered scale in size order. If its length or values
   differ from Trix's default, the framework components' `var(--space-N)`
   references must be remapped **by value** to the nearest new step, and the

@@ -80,7 +80,9 @@ In [`.agents/skills/`](.agents/skills/), loaded by Claude Code as
 | `trix-new-project`     | start a new site from Trix                                                  |
 | `trix-style-guide`     | build the design system from any source — measured, never guessed, verified |
 | `trix-migrate`         | migrate from Webflow, Framer, WordPress, Wix, Squarespace or anything else  |
+| `trix-design-system`   | change fonts, type, colors or any token — from Figma or by asking           |
 | `trix-import-figma`    | build tokens and pages from a Figma file                                    |
+| `trix-seo`             | metadata, structured data, SEO audit, migration parity, launch handoff      |
 | `trix-audit-props`     | keep component props consistent                                             |
 | `trix-scaling-graphic` | build a graphic that scales as one piece                                    |
 | `trix-upgrade`         | upgrade a site to the latest Trix; sync Trix with Lumos                     |

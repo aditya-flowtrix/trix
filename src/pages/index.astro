@@ -8,9 +8,11 @@ import background from "@/assets/graphics/background.svg";
 import Icon from "@/components/media/Icon.astro";
 import logo_icon from "@/assets/logo/logo-icon.svg";
 import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
+import { organization, website } from "@/utils/schema.ts";
+import pkg from "../../package.json";
 ---
 
-<Layout theme="dark">
+<Layout theme="dark" schema={[organization(), website()]}>
   <Section
     paddingBottom="even"
     containerClass="flex-grow"
@@ -27,7 +29,7 @@ import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
       <Heading variant="display" tag="h1" class="margin-block-9"
         >Trix Framework</Heading
       >
-      <Eyebrow variant="tag">v0.1.0</Eyebrow>
+      <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
       <Img
         slot="column2"
         src={background}

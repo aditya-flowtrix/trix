@@ -1,0 +1,48 @@
+{
+  "skill_name": "trix-design-system",
+  "evals": [
+    {
+      "id": 0,
+      "name": "designer-changes-fonts-no-files",
+      "prompt": "Our designer wants headings in Instrument Serif and body text in DM Sans now.",
+      "expected_output": "Asks once which weights and italics, whether files exist or where the fonts are hosted, and the licence; configures both through Astro's Google provider; points --primary-family and --secondary-family at them; measures and writes the trims with scripts/fonts.ts; npm run check and build pass.",
+      "files": [],
+      "assertions": [
+        "The weights, styles and hosting were asked before anything was edited, in one message",
+        "No font file was downloaded by hand for a Google-hosted family — the google provider is configured in astro.config.mjs",
+        "The body family is the first entry in astro.config.mjs fonts",
+        "--primary-family points at the body font's cssVariable and --secondary-family at the heading font's",
+        "scripts/fonts.ts --write was run and the heading text styles reference --secondary-trim-top/-bottom",
+        "Weight tokens name only weights the configured fonts provide",
+        "npm run check and npm run build pass"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "figma-style-guide-trix-names",
+      "prompt": "The designer updated the style guide in Figma: https://www.figma.com/design/EXAMPLE/Brand?node-id=1-2 — apply it to the site.",
+      "expected_output": "Variables read with get_variable_defs; Trix-named variables mapped directly (Mobile → -min, Desktop → -max); tokens.css and themes.css updated; npm run tokens; /style-guide compared to the Figma screenshot; report of every changed token with its source node.",
+      "files": [],
+      "assertions": [
+        "get_variable_defs and get_screenshot were used on the style guide",
+        "Responsive Mobile values became -min and Desktop values -max — no clamp() written by hand",
+        "Every themed color change was made in every theme block of themes.css",
+        "No component file was edited to change a value",
+        "The report lists each changed token as old → new with its Figma source"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "commercial-font-no-licence",
+      "prompt": "Use the font from https://example-agency.com for our headings, it looks great.",
+      "expected_output": "Does not download the font. Asks whether the project holds a web licence and for the files; records the open question; keeps the current font.",
+      "files": [],
+      "assertions": [
+        "No font file was downloaded from the third-party site",
+        "The owner was asked about the licence and for the files",
+        "PROJECT.md → Still open records the font question",
+        "tokens.css and astro.config.mjs are unchanged"
+      ]
+    }
+  ]
+}

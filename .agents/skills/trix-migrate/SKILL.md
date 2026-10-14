@@ -166,7 +166,11 @@ it smoother: transform and opacity only, no layout thrash, and
 - [ ] Analytics, consent and tag manager carried over.
 - [ ] 404 page; robots.txt allows indexing (only) in production.
 - [ ] DNS switched; the old site unpublished only after the new one is verified live.
-- [ ] Search Console: new sitemap submitted, coverage watched for a week.
+- [ ] SEO: `/trix-seo` — `scripts/seo/parity.ts` from the live old site to
+      staging shows no **lost** URL, every **changed** title or description
+      confirmed; `npm run seo -- --production` passes.
+- [ ] Search Console: new sitemap submitted, coverage watched for four weeks
+      (`/trix-seo` → launch handoff).
 
 ## The report
 

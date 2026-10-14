@@ -143,8 +143,22 @@ in on Mobile.
 - **Images** — use the ratio set: 1:1, 16:9, 3:2, 2:3, 2:1, 5:4, 4:5. Deliver
   originals at the largest size they appear (at least 2× the 1440 frame size).
 - **Motion** — annotate entrance, scroll and hover animations: what moves,
-  from where, duration and easing. Keep motion on position, scale and opacity;
-  the site respects "reduce motion" and shows everything without animation.
+  from where, duration and easing. The standard scroll-in is Trix's reveal
+  (fade up, one block after another): say "reveal" and, if its timing should
+  differ, the duration and stagger. Keep motion on position, scale and
+  opacity; the site respects "reduce motion" and shows everything without
+  animation.
+- **Video** — a video that plays by itself gets a pause button in its
+  bottom-right corner (an accessibility requirement); leave room for it.
+
+## Fonts
+
+Use any font the project can license for the web. Tell the developer where
+it comes from: font files (WOFF2 best), or a host — Google Fonts, Adobe Fonts
+(with the web project), Fontshare, Bunny or Fontsource. Fonts are always
+served from the site itself, never from the host, so the licence must allow
+that. Name a body font (primary) and, if headings differ, a heading font
+(secondary); weights are the ones the font actually has.
 
 ## Naming, Figma ↔ code
 
@@ -172,3 +186,9 @@ in on Mobile.
    the other pages will ask.
 5. **Design the remaining pages**, reusing the homepage's patterns.
 6. **Hand off** with the [checklist](handoff.md).
+
+**Changing the system later** — a new font, a type size, a brand color —
+is a change to the style guide page, never to a single screen. Update it in
+Figma, then give the developer the link: `/trix-design-system` reads the
+style guide and updates the code, and every page follows. No Figma file? The
+same skill asks the questions instead.

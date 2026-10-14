@@ -49,7 +49,9 @@ any scripts they need. Measuring tools shared by several skills live in
 - `trix-new-project` — start a new site from Trix.
 - `trix-style-guide` — build the design system from any source, measured and verified.
 - `trix-migrate` — migrate a Webflow, Framer, WordPress or any other site.
+- `trix-design-system` — set or change fonts, type, colors and other tokens, from a Figma style guide or by asking.
 - `trix-import-figma` — build pages or tokens from a Figma file.
+- `trix-seo` — metadata, structured data, the SEO audit, migration parity and the launch handoff.
 - `trix-audit-props` — check prop order and tooltip consistency.
 - `trix-scaling-graphic` — build an editable graphic that scales as one piece.
 - `trix-upgrade` — upgrade a site to the latest Trix; sync Trix with Lumos.

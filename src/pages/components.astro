@@ -11,6 +11,7 @@ import Img from "@/components/media/Img.astro";
 import background from "@/assets/graphics/background.svg";
 import logo_icon from "@/assets/logo/logo-icon.svg";
 import Grid from "@/components/wrapper/Grid.astro";
+import Breadcrumbs from "@/components/global/Breadcrumbs.astro";
 import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
 import Card from "@/components/item/Card.astro";
@@ -50,6 +51,16 @@ const lorem =
   description="Every layout variant, side by side."
   theme="dark"
 >
+  <!-- breadcrumbs -->
+  <Section paddingTop="small" paddingBottom="none">
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "/" },
+        { label: "Framework", href: "/style-guide" },
+        { label: "Components" },
+      ]}
+    />
+  </Section>
   <!-- stack -->
   <Section paddingTop="small" paddingBottom="small">
     <ContentWrapper>
@@ -57,7 +68,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
         <Dropdown label="Dropdown">
           <Paragraph>Some text</Paragraph>
         </Dropdown>
@@ -72,7 +83,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
         <Button emphasis="secondary">Button Text</Button>
       </ButtonWrapper>
       <Img src={background} slot="column2" />
@@ -85,7 +96,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={28} slot="column2">{text}</Paragraph>
       <ButtonWrapper slot="column2" marginTop="5">
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
   </Section>
@@ -96,7 +107,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -108,7 +119,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -120,7 +131,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -132,7 +143,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -144,7 +155,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -156,7 +167,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -168,7 +179,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -207,7 +218,7 @@ const lorem =
         nostra inceptos himenaeos.</Paragraph
       >
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -219,7 +230,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
       <Img slot="column2" src={background} width={1920} height={1080} />
     </ContentWrapper>
@@ -231,20 +242,20 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={28} slot="column2">{text}</Paragraph>
       <ButtonWrapper slot="column2" marginTop="5">
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
     <Grid medium={3}>
       <Card
         heading="Heading"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Heading"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         image={background}
@@ -252,7 +263,7 @@ const lorem =
       <Card
         heading="Heading"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="stacked"
         image={background}
@@ -267,7 +278,7 @@ const lorem =
         <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
       </Col>
       <Col span={5} offset={1}>
@@ -398,7 +409,7 @@ const lorem =
       <Eyebrow>buttons</Eyebrow>
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
         <Button emphasis="secondary">Button Text</Button>
         <Button variant="link">Button Text</Button>
       </ButtonWrapper>
@@ -434,7 +445,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Strategy"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -442,7 +453,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Design"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -450,7 +461,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Development"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -471,7 +482,7 @@ const lorem =
       <Card
         heading="Strategy"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -480,7 +491,7 @@ const lorem =
       <Card
         heading="Design"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -489,7 +500,7 @@ const lorem =
       <Card
         heading="Development"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -513,7 +524,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Tab Content 1"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -521,7 +532,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Tab Content 2"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -529,7 +540,7 @@ const lorem =
         <Heading tag="h3" variant="h4" maxWidth={17}>"Tab Content 3"</Heading>
         <Paragraph maxWidth={36}>{text}</Paragraph>
         <ButtonWrapper>
-          <Button element="link" href="/about">Button Text</Button>
+          <Button element="link" href="/style-guide">Button Text</Button>
         </ButtonWrapper>
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
@@ -545,31 +556,31 @@ const lorem =
       <Card
         heading="Strategy"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Design"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Development"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Research"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Support"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
     </Slider>
@@ -590,7 +601,7 @@ const lorem =
       <Card
         heading="Strategy"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -599,7 +610,7 @@ const lorem =
       <Card
         heading="Design"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -608,7 +619,7 @@ const lorem =
       <Card
         heading="Development"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -617,7 +628,7 @@ const lorem =
       <Card
         heading="Research"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -626,7 +637,7 @@ const lorem =
       <Card
         heading="Support"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
         theme="dark"
@@ -644,31 +655,31 @@ const lorem =
       <Card
         heading="Strategy"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Design"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Development"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Research"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Support"
         text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
-        buttonHref="/about"
+        buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
     </Slider>
@@ -708,7 +719,7 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={36}>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
         <Dropdown label="Dropdown">
           <Paragraph />
         </Dropdown>
@@ -750,7 +761,9 @@ const lorem =
           </li>
         </ul>
         <blockquote>A pull quote, styled from the parent.</blockquote>
-        <p>A closing paragraph with <a href="/about">a link</a> inside it.</p>
+        <p>
+          A closing paragraph with <a href="/style-guide">a link</a> inside it.
+        </p>
       </RichText>
     </ContentWrapper>
   </Section>
@@ -815,7 +828,7 @@ const lorem =
       <Heading tag="h2" variant="h4">{heading}</Heading>
       <Paragraph>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
   </Modal>
@@ -826,7 +839,7 @@ const lorem =
       <Heading tag="h2" variant="h4">{heading}</Heading>
       <Paragraph>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
   </Modal>
@@ -837,7 +850,7 @@ const lorem =
       <Heading tag="h2" variant="h3">{heading}</Heading>
       <Paragraph>{text}</Paragraph>
       <ButtonWrapper>
-        <Button element="link" href="/about">Button Text</Button>
+        <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
   </Modal>

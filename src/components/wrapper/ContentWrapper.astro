@@ -180,7 +180,10 @@ const column2 = await slotContent(Astro.slots, "column2");
       }
 
       /* visual ratio lock */
-      & > :last-child:not(:has(> :not(.image, .video, .overlay))) {
+      &
+        > :last-child:not(
+          :has(> :not(.image, .video, .overlay, .video_toggle))
+        ) {
         position: relative;
         border-radius: var(--radius-small);
         aspect-ratio: var(--_visual-ratio);

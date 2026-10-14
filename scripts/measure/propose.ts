@@ -807,6 +807,31 @@ if (grid) {
       ),
   );
 }
+// Leading trim: reproduce a source that never trims (most sites) exactly;
+// a source that does keeps the trim measured from the font (fonts.ts).
+const trimGroup = tokens.find((t) => t.name === "primary-trim-top")?.group;
+if (design.trim && trimGroup) {
+  const { untrimmed, trimmed } = design.trim as {
+    untrimmed: number;
+    trimmed: number;
+  };
+  if (untrimmed > trimmed) {
+    group(
+      trimGroup,
+      tokens
+        .filter((t) => t.group === trimGroup)
+        .map(
+          (t) => `  --${t.name}: 0.5lh; /* the source does not trim text */`,
+        ),
+    );
+    notes.push(
+      `The source does not trim text boxes (${untrimmed} one-line blocks are exactly one line tall, ${trimmed} trimmed): trim set to 0.5lh, which turns it off.`,
+    );
+  } else
+    notes.push(
+      `The source trims text boxes (${trimmed} of ${untrimmed + trimmed} one-line blocks): keep Trix's trim, measured from the font with \`node scripts/fonts.ts --write\`.`,
+    );
+}
 group("Layout — fluid range (px)", [
   `  --viewport-min: ${viewportMin};`,
   `  --viewport-max: ${viewportMax};`,
@@ -1035,6 +1060,7 @@ output(
             },
           ]),
       ),
+      trim: design.trim,
       grid: grid && {
         margin: grid.margin,
         content: grid.content,

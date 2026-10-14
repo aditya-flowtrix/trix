@@ -16,6 +16,7 @@
     "tokens": "node scripts/tokens.ts",
     "check": "node scripts/tokens.ts --check && node scripts/conventions.ts && astro check",
     "build": "astro build",
+    "seo": "node scripts/seo/audit.ts --dir dist",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",

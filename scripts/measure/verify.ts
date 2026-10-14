@@ -27,6 +27,8 @@ const page = await browser.newPage();
 const rows: string[] = [];
 let failures = 0;
 const close = (a: number, b: number) => Math.abs(a - b) <= 0.5;
+const untrimmed =
+  proposal.trim && proposal.trim.untrimmed > proposal.trim.trimmed;
 
 for (const width of widths) {
   await open(page, opts.local, width);
@@ -48,6 +50,12 @@ for (const width of widths) {
               : +(parseFloat(cs.letterSpacing) / size).toFixed(3),
           weight: cs.fontWeight,
           transform: cs.textTransform,
+          // One line, so an untrimmed box is exactly one line tall.
+          boxRatio:
+            Math.round(
+              (el.getBoundingClientRect().height / parseFloat(cs.lineHeight)) *
+                100,
+            ) / 100,
         };
         el.remove();
         return out;
@@ -104,6 +112,10 @@ for (const width of widths) {
       got.weight !== src.weight && `weight ${got.weight} ≠ ${src.weight}`,
       got.transform !== src.transform &&
         `transform ${got.transform} ≠ ${src.transform}`,
+      // A source that never trims text: the rebuilt box must not trim either.
+      untrimmed &&
+        Math.abs(got.boxRatio - 1) > 0.03 &&
+        `trimmed (box ${got.boxRatio} lines tall), the source is not`,
     ].filter(Boolean);
     if (problems.length) failures++;
     rows.push(

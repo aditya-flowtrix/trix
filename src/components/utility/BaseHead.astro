@@ -1,6 +1,12 @@
 ---
 import { Font, fontData } from "astro:assets";
-import { SITE_NAME, SITE_DESCRIPTION, COLOR_MODE } from "@/consts.ts";
+import {
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  SITE_LOCALE,
+  COLOR_MODE,
+} from "@/consts.ts";
+import JsonLd from "@/components/utility/JsonLd.astro";
 import { isNoindexRoute } from "@/utils/seo.ts";
 import type { SeoProps } from "@/types.ts";
 
@@ -12,10 +18,19 @@ const {
   image = "/og-image.jpg",
   type = "website",
   noindex,
+  schema,
 } = Astro.props;
 
 const isNoindex = noindex ?? isNoindexRoute(Astro.url.pathname);
-const fontPreload = fontData["--font-inter"]?.[0]?.src[0]?.url;
+// Every family in astro.config.mjs `fonts`, whatever its provider. Only the
+// first family's latin, normal-style file is preloaded: the body text.
+const fonts = Object.keys(fontData) as (keyof typeof fontData)[];
+const firstFiles = fonts[0] ? fontData[fonts[0]] : [];
+const fontPreload = (
+  firstFiles.find(
+    (f) => f.style !== "italic" && (!f.subset || f.subset === "latin"),
+  ) ?? firstFiles[0]
+)?.src[0]?.url;
 
 /* Applies the saved or system color mode before first paint. */
 const colorModeScript = `(() => {
@@ -35,7 +50,7 @@ const socialImage = new URL(image, Astro.site);
   @layer base, patterns, components, utilities;
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<Font cssVariable="--font-inter" />
+{fonts.map((cssVariable) => <Font cssVariable={cssVariable} />)}
 {
   fontPreload && (
     <link
@@ -54,6 +69,7 @@ const socialImage = new URL(image, Astro.site);
 {isNoindex && <meta name="robots" content="noindex, nofollow" />}
 
 <meta property="og:type" content={type} />
+<meta property="og:locale" content={SITE_LOCALE.replace("-", "_")} />
 <meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={description} />
@@ -69,3 +85,4 @@ const socialImage = new URL(image, Astro.site);
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="generator" content={Astro.generator} />
+{schema && <JsonLd data={schema} />}

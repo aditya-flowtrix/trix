@@ -1,0 +1,103 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import JsonLd from "@/components/utility/JsonLd.astro";
+import { breadcrumbList } from "@/utils/schema.ts";
+
+interface Props extends HTMLAttributes<"nav"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /**
+   * The trail from the home page to this page. The last item is this page;
+   * it needs no `href`.
+   */
+  items: { label: string; href?: string }[];
+  /** Also emit the trail as BreadcrumbList structured data. Defaults to `true`. */
+  schema?: boolean;
+}
+
+const {
+  render = true,
+  items,
+  schema = true,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const last = items.length - 1;
+---
+
+{
+  render && items.length > 0 && (
+    <nav
+      aria-label="Breadcrumb"
+      class:list={["breadcrumbs_wrap", "text-style-small", className]}
+      {...rest}
+    >
+      <ol class="breadcrumbs_list">
+        {items.map((item, i) => (
+          <li class="breadcrumbs_item">
+            {i < last && item.href ? (
+              <a class="breadcrumbs_link" href={item.href}>
+                {item.label}
+              </a>
+            ) : (
+              <span class="breadcrumbs_current" aria-current="page">
+                {item.label}
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+{
+  render && schema && items.length > 0 && (
+    <JsonLd
+      data={breadcrumbList(
+        items.map((item) => ({
+          name: item.label,
+          url: item.href ?? Astro.url.pathname,
+        })),
+      )}
+    />
+  )
+}
+
+<style is:global>
+  @layer components {
+    .breadcrumbs_list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0;
+      list-style: none;
+    }
+    .breadcrumbs_item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      & + &::before {
+        /* Decorative: the empty alt keeps screen readers from reading it. */
+        content: "/" / "";
+        color: color-mix(in lab, currentcolor 40%, transparent);
+      }
+    }
+    .breadcrumbs_link {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--link-border);
+      text-underline-offset: 0.2em;
+      transition: text-decoration-color var(--hover-duration) var(--hover-ease);
+      @media (hover: hover) {
+        &:hover {
+          text-decoration-color: var(--link-border-hover);
+        }
+      }
+    }
+    .breadcrumbs_current {
+      color: color-mix(in lab, currentcolor 60%, transparent);
+    }
+  }
+</style>

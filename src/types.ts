@@ -1,3 +1,5 @@
+import type { Schema } from "./utils/schema.ts";
+
 /** Page metadata for `BaseHead` and layouts. */
 export interface SeoProps {
   /** Page title. The site name is appended. */
@@ -10,4 +12,6 @@ export interface SeoProps {
   type?: "website" | "article";
   /** Override `NOINDEX_ROUTES` for this page's robots tag. */
   noindex?: boolean;
+  /** Structured data for this page, from `@/utils/schema.ts`. */
+  schema?: Schema | Schema[];
 }

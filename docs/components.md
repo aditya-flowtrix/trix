@@ -15,6 +15,7 @@ other attributes to its root element. `class` accepts utility classes only.
 | `Wrapper/Row` + `Wrapper/Col` | any layout drawn on the 12-column grid — `8 + 4`, `6` + `5 offset 1`, a centered `8` | Row: `gap`, `rowGap` (0, 1–12; default the site gutter) · `align` · `animate`. Col: `span` 1–12 (desktop; tablet and mobile stack automatically) · `xsmall` / `small` / `medium` / `large` (exact spans, win over `span`) · `offset` (0–11, center) · `order` (first, last) · `align` · `animate` |
 | `Wrapper/ContentWrapper`      | a block of eyebrow, heading, text and buttons, alone or beside media                 | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `column2` slot                                                                                                                                                           |
 | `Wrapper/Grid`                | repeating, equal-width items: cards, logos, team                                     | `xsmall` / `small` / `medium` / `large` column counts, or `variant` autofit / autofill with `minColumnWidth`, `maxColumnCount` · `animate` · children may use `span-*` classes                                                                                                                    |
+| `Global/Breadcrumbs`          | the trail from the home page to this one, with its BreadcrumbList structured data    | `items` (label, href; the last item is this page) · `schema` (default true)                                                                                                                                                                                                                       |
 | `Wrapper/ButtonWrapper`       | a row of buttons                                                                     | `marginTop` (default, 0, 1–12, auto)                                                                                                                                                                                                                                                              |
 
 `Section`, `Row`, `Col` and `Grid` take `animate`: their children fade up
@@ -25,6 +26,11 @@ without JavaScript see the content immediately.
 `Utility/GridOverlay` draws the layout grid over the page — **Shift+G**, or a
 `data-grid-overlay-toggle` button. `BaseLayout` includes it in development, or
 anywhere with `gridOverlay`.
+
+`Utility/JsonLd` renders structured data from `@/utils/schema.ts`
+(`organization`, `website`, `breadcrumbList`, `article`, `faqPage`,
+`localBusiness`, `product`); pages usually pass it as `BaseLayout`'s
+`schema` prop instead.
 
 ## Typography
 
@@ -47,7 +53,7 @@ anywhere with `gridOverlay`.
 | Component       | Use it for                                 | Variants and key props                                                                                                                                    |
 | --------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Media/Img`     | every image (optimised, responsive srcset) | `variant`: full-width, constrained, densities · `width` / `height` · `transparent` · `loading`, `fetchPriority`                                           |
-| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto                                                                                                   |
+| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto · `pauseButton` (on with `autoplay`; WCAG 2.2.2)                                                  |
 | `Media/Icon`    | icons                                      | `name` (a Phosphor icon) + `weight` (thin, light, regular, bold, fill, duotone), or `src` (an imported SVG) · `variant`: small, medium, large, full-width |
 | `Media/Overlay` | a tint over media                          | `variant`: solid, gradient                                                                                                                                |
 

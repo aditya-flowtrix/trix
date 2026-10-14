@@ -66,6 +66,24 @@ icon at build time (`weight`: thin, light, regular, bold, fill, duotone) — no
 icon font, no request. `<Icon src={svg} />` for the project's own SVGs in
 `src/assets/icons/`.
 
+## Fonts
+
+Families are declared in `astro.config.mjs` → `fonts` (local files, or a
+provider — Google, Adobe, Fontshare, Bunny, Fontsource, npm — whose files
+Astro downloads at build and serves from the site). `--primary-family` and
+`--secondary-family` point at them; `BaseHead` loads every family and
+preloads the first. After any font change run
+`node scripts/fonts.ts --url <dev>/style-guide --write`: it measures the
+leading trim from the font's real metrics. `/trix-design-system` → fonts has
+the whole procedure.
+
+## SEO
+
+Pages set `title`, `description`, `image` and `schema` on `BaseLayout`;
+structured data comes from `src/utils/schema.ts`, breadcrumbs from
+`<Breadcrumbs>`. `npm run seo` audits the build (CI runs it). `/trix-seo` has
+the per-page rules, migration parity and the launch handoff.
+
 ## Color mode
 
 `COLOR_MODE` in `src/consts.ts`: `light` (default), `dark`, or `auto` — follow
