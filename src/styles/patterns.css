@@ -13,6 +13,10 @@
 }
 
 .section {
+  /* Full-bleed pieces inside size themselves to the section with 100cqw —
+     its real width. 100vw also counts a visible scrollbar, and overflows by
+     it on Windows and on Macs without a trackpad. */
+  container-type: inline-size;
   padding-top: var(--section-space-medium);
   padding-bottom: var(--section-space-medium);
   background-color: var(--background);

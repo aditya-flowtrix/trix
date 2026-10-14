@@ -1,11 +1,11 @@
 <svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_741_26)">
-<rect width="1920" height="1080" fill="#C6FB50"/>
+<rect width="1920" height="1080" fill="#0FD375"/>
 <g filter="url(#filter0_f_741_26)">
-<ellipse cx="1778.53" cy="-119.65" rx="1245.38" ry="514.779" transform="rotate(24.7166 1778.53 -119.65)" fill="#D2C2BC"/>
+<ellipse cx="1778.53" cy="-119.65" rx="1245.38" ry="514.779" transform="rotate(24.7166 1778.53 -119.65)" fill="#EFFFF3"/>
 </g>
 <g filter="url(#filter1_f_741_26)">
-<ellipse cx="377.794" cy="1355.59" rx="1287.11" ry="744.07" transform="rotate(17.9536 377.794 1355.59)" fill="#D2ADE7"/>
+<ellipse cx="377.794" cy="1355.59" rx="1287.11" ry="744.07" transform="rotate(17.9536 377.794 1355.59)" fill="#00220E"/>
 </g>
 </g>
 <defs>

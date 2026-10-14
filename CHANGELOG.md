@@ -115,6 +115,27 @@ SEO phase, fonts from any source and the design-change skill.
 - CI runs it once per browser: Chrome, Edge, Brave, Firefox and WebKit on
   Linux, Safari on macOS.
 
+### Flowtrix brand
+
+- The palette is Flowtrix's: brand green `#0fd375` (`--brand-300`, the
+  buttons and the brand theme) on an OKLCH scale that keeps its hue at every
+  step — `--brand-600` is the green for text on white — with true neutral
+  greys, black and white. Light theme: white page, black text. Dark theme:
+  black page, white text. Every pair passes the contrast check.
+- The favicon, app icon, social image and placeholder background are redrawn
+  in green, black and white.
+- The website's hero has a moving, grainy glow in the brand green — its own
+  WebGL shader, with a CSS fallback and a still frame for reduced motion.
+
+### Full-bleed without the scrollbar
+
+- `Section` is a size container, and ContentWrapper's `breakout` and the
+  Slider's bleed size themselves with `100cqw` — the section's real width —
+  instead of `100vw`, which also counts a visible scrollbar and overflowed by
+  it on Windows and on Macs without a trackpad (found by the real-Safari CI
+  job). The browser test now shows Chromium's scrollbars, so CI on Linux
+  catches it too.
+
 ### Documentation site
 
 - `site/` — the framework's docs, built with Trix itself and rendering the

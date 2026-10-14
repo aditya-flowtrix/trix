@@ -9,6 +9,7 @@ import Button from "@/components/Button.astro";
 import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
 import Icon from "@/components/media/Icon.astro";
+import Aurora from "~/components/Aurora.astro";
 import { Code } from "astro:components";
 import { organization, website } from "@/utils/schema.ts";
 import { CREATE_COMMAND, REPO } from "@/consts.ts";
@@ -49,7 +50,14 @@ const features = [
 ---
 
 <Layout schema={[organization(), website()]}>
-  <Section paddingTop="large" paddingBottom="medium" align="center" gap="7">
+  <Section
+    paddingTop="large"
+    paddingBottom="large"
+    align="center"
+    gap="7"
+    class="home-hero_wrap"
+  >
+    <Aurora slot="background" />
     <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
     <Heading tag="h1" variant="display" maxWidth={14} class="alignment-center">
       A design-ready framework for Astro
@@ -94,6 +102,10 @@ const features = [
 
 <style is:global>
   @layer components {
+    /* The hero fills the screen under the header, like the glow behind it. */
+    .home-hero_wrap {
+      min-height: calc(100svh - 3.5rem);
+    }
     .home-install_wrap {
       width: min(100%, 36rem);
 

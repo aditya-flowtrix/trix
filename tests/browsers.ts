@@ -72,14 +72,19 @@ const brave = exists([
   "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
 ]);
 
+// Playwright hides Chromium's scrollbars. Shown, they take room as they do on
+// Windows and on Linux — so a width of 100vw, which counts the scrollbar,
+// overflows here as it would for those visitors.
+const scrollbars = { ignoreDefaultArgs: ["--hide-scrollbars"] };
+
 async function playwright(name: string): Promise<Driver | string> {
   const launchers: Record<string, () => Promise<Browser>> = {
-    chrome: () => chromium.launch({ channel: "chrome" }),
-    chromium: () => chromium.launch(),
-    edge: () => chromium.launch({ channel: "msedge" }),
+    chrome: () => chromium.launch({ channel: "chrome", ...scrollbars }),
+    chromium: () => chromium.launch(scrollbars),
+    edge: () => chromium.launch({ channel: "msedge", ...scrollbars }),
     brave: () =>
       brave
-        ? chromium.launch({ executablePath: brave })
+        ? chromium.launch({ executablePath: brave, ...scrollbars })
         : Promise.reject(new Error("Brave is not installed")),
     firefox: () => firefox.launch(),
     webkit: () => webkit.launch(),

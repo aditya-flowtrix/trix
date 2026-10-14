@@ -1,7 +1,7 @@
 {
   "background": {
     "$type": "color",
-    "$value": "{color.neutral.200}"
+    "$value": "{color.white}"
   },
   "background-2": {
     "$type": "color",
@@ -9,37 +9,37 @@
   },
   "background-3": {
     "$type": "color",
-    "$value": "{color.white}"
+    "$value": "{color.neutral.200}"
   },
   "background-skeleton": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
       "components": [
-        0.1215,
-        0.1137,
-        0.1176
+        0,
+        0,
+        0
       ],
       "alpha": 0.1,
-      "hex": "#1f1d1e"
+      "hex": "#000000"
     },
     "$description": "color-mix(in lab, currentcolor 10%, transparent)"
   },
   "text": {
     "$type": "color",
-    "$value": "{color.neutral.900}"
+    "$value": "{color.black}"
   },
   "text-2": {
     "$type": "color",
     "$value": {
       "colorSpace": "srgb",
       "components": [
-        0.1215,
-        0.1137,
-        0.1176
+        0,
+        0,
+        0
       ],
       "alpha": 0.7,
-      "hex": "#1f1d1e"
+      "hex": "#000000"
     },
     "$description": "color-mix(in lab, currentcolor 70%, transparent)"
   },
@@ -48,18 +48,18 @@
     "$value": {
       "colorSpace": "srgb",
       "components": [
-        0.1215,
-        0.1137,
-        0.1176
+        0,
+        0,
+        0
       ],
-      "alpha": 0.2,
-      "hex": "#1f1d1e"
+      "alpha": 0.15,
+      "hex": "#000000"
     },
-    "$description": "color-mix(in lab, var(--text) 20%, transparent)"
+    "$description": "color-mix(in lab, var(--text) 15%, transparent)"
   },
   "heading-accent": {
     "$type": "color",
-    "$value": "{color.brand.700}"
+    "$value": "{color.brand.600}"
   },
   "selection-background": {
     "$type": "color",

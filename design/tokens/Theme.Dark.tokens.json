@@ -1,15 +1,15 @@
 {
   "background": {
     "$type": "color",
-    "$value": "{color.neutral.900}"
+    "$value": "{color.black}"
   },
   "background-2": {
     "$type": "color",
-    "$value": "{color.neutral.800}"
+    "$value": "{color.neutral.900}"
   },
   "background-3": {
     "$type": "color",
-    "$value": "{color.neutral.700}"
+    "$value": "{color.neutral.800}"
   },
   "background-skeleton": {
     "$type": "color",

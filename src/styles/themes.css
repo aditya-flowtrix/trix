@@ -22,14 +22,14 @@
 :where(:root[data-mode="dark"]) .theme-invert {
   color-scheme: light;
 
-  --background: var(--neutral-200);
+  --background: var(--white);
   --background-2: var(--neutral-100);
-  --background-3: var(--white);
+  --background-3: var(--neutral-200);
   --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
-  --text: var(--neutral-900);
+  --text: var(--black);
   --text-2: color-mix(in lab, currentcolor 70%, transparent);
-  --border: color-mix(in lab, var(--text) 20%, transparent);
-  --heading-accent: var(--brand-700);
+  --border: color-mix(in lab, var(--text) 15%, transparent);
+  --heading-accent: var(--brand-600);
 
   --selection-background: var(--text);
   --selection-text: var(--background);
@@ -59,9 +59,9 @@
 :root[data-mode="dark"] {
   color-scheme: dark;
 
-  --background: var(--neutral-900);
-  --background-2: var(--neutral-800);
-  --background-3: var(--neutral-700);
+  --background: var(--black);
+  --background-2: var(--neutral-900);
+  --background-3: var(--neutral-800);
   --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
   --text: var(--white);
   --text-2: color-mix(in lab, currentcolor 70%, transparent);
@@ -111,14 +111,14 @@
   --button-text: var(--background);
   --button-background-hover: var(--white);
   --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--neutral-900);
+  --button-text-hover: var(--black);
 
   --button-2-background: transparent;
   --button-2-border: var(--border);
   --button-2-text: var(--text);
   --button-2-background-hover: var(--white);
   --button-2-border-hover: var(--button-2-background-hover);
-  --button-2-text-hover: var(--neutral-900);
+  --button-2-text-hover: var(--black);
 
   --link-text: var(--text);
   --link-border: var(--border);
