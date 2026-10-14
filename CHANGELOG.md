@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.2.0 — 2026-10-14
+
+The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in
+`@layer components`, values from tokens. No Mast code is included.
+
+### Layout grid
+
+- `Row` and `Col`: the 12-column grid. `span` sets the desktop span and
+  tablet and mobile stack automatically (Mast's table, mobile-first);
+  `xsmall`–`large` set exact spans; `offset` (0–11 or `center`) and `order`
+  (`first`, `last`) apply on desktop and work anywhere in a row. Built on CSS
+  Grid with the gutter as `gap`, so a column's box is its content and the
+  columns are exactly the designer's.
+- `--grid-columns: 12` token; the layout grid per frame (margin, gutter,
+  column, content width) in `docs/tokens.md`, on `/style-guide` and as the
+  `grid.columns` Figma variable.
+- `GridOverlay`: Shift+G draws the layout grid over any page in development
+  (or wherever `gridOverlay` is set), remembered across pages.
+- Verified in Chrome: every column of every style-guide example lands on the
+  grid lines at 15 widths from 320 to 1920 (531 checks).
+
+### Motion
+
+- `animate` on `Section`, `Row`, `Col` and `Grid`: children fade up one after
+  another the first time they scroll into view. `--reveal-duration`,
+  `--reveal-ease`, `--reveal-distance`, `--reveal-stagger`. Hidden only on
+  screen with scripting on and motion allowed — reduced motion, print and
+  no-JS visitors see the content at once. Runs as a CSS animation, so it never
+  overrides a component's own transitions.
+
+### Elements
+
+- `<hr>` styled as a theme-colored rule; rich-text tables (borders, padding,
+  sideways scroll when wide).
+- Link prefetch on hover and focus.
+
+### Style guide and docs
+
+- `/style-guide`: section navigation, a Layout grid group (overlay toggle,
+  live columns, per-frame Figma table), Row and Col examples, Motion.
+- `/components`: four Row/Col layouts — media and text with an offset, a
+  centered 8, a sidebar reordered on desktop, a revealed feature row.
+- Designer guide: the layout grid per frame, how spans stack, what to
+  annotate. `TRIX.md`: which layout component a design calls for.
+
+### Measuring and skills
+
+- `design.ts` measures the layout grid: the content edge most text sits on
+  (site margin), where content stops growing (max width), the gutter between
+  columns side by side (gap or padding gutters), equal-column lists, and how
+  many unequal layouts sit on 12 columns. Rows with negative margins (Mast,
+  Bootstrap) are seen through.
+- `propose.ts` writes `--site-margin`, `--site-gutter` and `--max-width-main`
+  from it and asks about layouts off the grid. On the Remsons export it
+  recovers the site's own 16→40 margin, 12→16 gutter and 1280 max width.
+- `trix-migrate`: Mast rows and columns to `Row`/`Col` (desktop-first to
+  mobile-first), stagger animations to `animate`, IX2 fades to `animate` with
+  `--reveal-*` set from the source. New eval for a Mast site.
+- `trix-import-figma`: frame layout grids give the site margin and gutter;
+  blocks become `span` and `offset`.
+- `trix-style-guide`: the layout grid in the proposal, the record and the
+  overlay check.
+
 ## 0.1.0 — 2026-10-14
 
 First release of Trix, forked from Lumos for Astro 0.0.5 (`0e32ded`).

@@ -353,3 +353,43 @@ export function fluidAt(
   const t = Math.min(1, Math.max(0, (viewport - vmin!) / (vmax! - vmin!)));
   return min! + (max! - min!) * t;
 }
+
+/**
+ * A fixed length token in px: follows var() references and evaluates simple
+ * calc() arithmetic in px and rem (`calc(var(--viewport-max) / 16 * 1rem)`).
+ */
+export function lengthPx(model: Model, name: string): number | undefined {
+  let value = model.byName.get(name) ?? "";
+  for (let i = 0; i < 20 && value.includes("var("); i++)
+    value = value.replace(
+      /var\(--([\w-]+)\)/g,
+      (m, n: string) => model.byName.get(n) ?? m,
+    );
+  const expr = value
+    .replace(/^calc\(([\s\S]*)\)$/, "$1")
+    .replace(/(-?[\d.]+)rem\b/g, (_, n: string) => `${Number(n) * 16}`)
+    .replace(/(-?[\d.]+)px\b/g, "$1");
+  // Only digits and arithmetic reach Function — never a token's raw text.
+  if (!/^[\d.\s+\-*/()]+$/.test(expr)) return undefined;
+  const n = Function(`return (${expr})`)() as number;
+  return Number.isFinite(n) ? n : undefined;
+}
+
+/**
+ * The layout grid at a viewport width, in px: what a Figma frame of that
+ * width should carry, and what `<Row>` renders inside a Section.
+ */
+export function layoutGrid(model: Model, viewport: number) {
+  const columns = Number(model.byName.get("grid-columns") ?? 12);
+  const margin = fluidAt(model, "site-margin", viewport) ?? 0;
+  const gutter = fluidAt(model, "site-gutter", viewport) ?? 0;
+  const maxWidth = lengthPx(model, "max-width-main") ?? Infinity;
+  const container = Math.min(viewport - margin * 2, maxWidth);
+  return {
+    columns,
+    gutter,
+    margin: (viewport - container) / 2,
+    container,
+    column: (container - gutter * (columns - 1)) / columns,
+  };
+}

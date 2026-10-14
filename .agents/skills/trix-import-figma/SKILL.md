@@ -84,6 +84,11 @@ the report has to say which is which.
 2. **Inventory before converting.** List every distinct spacing value, type
    size with its line height, and color with its opacity. Distinct _values_,
    not distinct layers — the same 24px appearing eleven times is one value.
+   Add each frame's **layout grid** (count, margin, gutter): the desktop and
+   mobile margins are `--site-margin-max`/`-min`, the gutters
+   `--site-gutter-max`/`-min`. A frame with no layout grid, or one that is not
+   12 columns on desktop, is a question for the designer, not a value to
+   invent.
 
 3. **Convert and match.** Write the inventory to JSON and run the script:
 
@@ -164,7 +169,9 @@ the report has to say which is which.
 
 7. **Build with what exists, then build what doesn't.** Compose from the
    library first — `Wrapper/Section` and `Wrapper/ContentWrapper` for layout,
-   `Wrapper/Grid` for columns, `Item/Card` for repeated blocks,
+   `Wrapper/Row` + `Wrapper/Col` for blocks laid on the frame's layout grid
+   (read each block's start and end column: that is `span` and `offset`),
+   `Wrapper/Grid` for equal repeated items, `Item/Card` for repeated blocks,
    `Typography/*` for text. A design that "needs" a new class usually needs an
    existing variant, and a one-off class is how a system stops being one.
 

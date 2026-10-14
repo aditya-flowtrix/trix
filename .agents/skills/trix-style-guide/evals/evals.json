@@ -11,6 +11,7 @@
         "inventory.ts and design.ts were run against the export before any token was written",
         "No Webflow variable name (--_spacing---, --_typography---, --_color---, --_theme---) appears anywhere under src/",
         "--viewport-max equals the width at which the measured series stop growing, not Trix's default, when they differ",
+        "--site-margin, --site-gutter and --max-width-main come from proposal.md's Layout grid measurement, not Trix's defaults",
         "Translucent colors were expressed as color-mix of an existing swatch or currentcolor, not as new swatches",
         "The owner was asked every item on proposal.md's ask list in a single message before tokens were written",
         "verify.ts exits 0 against /style-guide",

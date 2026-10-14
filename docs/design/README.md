@@ -53,10 +53,36 @@ frame when something changes at one.
 
 ### 4. Twelve columns
 
-Desktop: 12 columns, margin `site-margin` (48), gutter `site-gutter` (32),
-content max width 1440. Mobile: 4 columns, margin 16, gutter 16. Layouts that
-span columns (`8 + 4`, `6 + 6`, `4 + 4 + 4`) are built directly in code with
-`Grid` and `span-*` classes.
+Every page sits on one 12-column grid. The numbers per frame are in
+[the token reference](../tokens.md#layout-grid) and on `/style-guide` →
+Layout, and **Shift+G** draws the grid over any page while it is developed —
+put the browser next to the Figma frame and the columns line up.
+
+| Frame          | Layout grid in Figma                                                                    |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Desktop (1440) | 12 columns, stretch, margin `site-margin` (48), gutter `site-gutter` (32)               |
+| Tablet (768)   | 12 columns — only where the layout differs from the automatic stacking below            |
+| Mobile (375)   | 4 columns, margin 16, gutter 16 — each is exactly 3 of the 12, so nothing is translated |
+
+Content stops growing at `max-width-main` (1440) and centers.
+
+Draw layouts as column spans: text over 6 columns and an image over 5 with
+one column of air is `span 6` + `span 5, offset 1`; a centered 8-column
+block is `span 8, offset center`. Tablet and mobile follow automatically, so
+design them only where they should differ:
+
+| Desktop span | Tablet (768)                      | Mobile landscape (480) | Mobile (375) |
+| ------------ | --------------------------------- | ---------------------- | ------------ |
+| 1            | 1                                 | 1                      | 1            |
+| 2            | half                              | half                   | half         |
+| 3            | half                              | half                   | full         |
+| 4, 5, 6      | half                              | full                   | full         |
+| 7, 8         | half — full when alone in its row | full                   | full         |
+| 9–12         | full                              | full                   | full         |
+
+Offsets and reordering (`order first`) apply on desktop. Equal-width lists —
+cards, logos, team members — are a **Grid** with a column count per
+breakpoint instead of spans.
 
 ### 5. Type comes from the ramp, and size is not level
 

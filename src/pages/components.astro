@@ -11,6 +11,8 @@ import Img from "@/components/media/Img.astro";
 import background from "@/assets/graphics/background.svg";
 import logo_icon from "@/assets/logo/logo-icon.svg";
 import Grid from "@/components/wrapper/Grid.astro";
+import Row from "@/components/wrapper/Row.astro";
+import Col from "@/components/wrapper/Col.astro";
 import Card from "@/components/item/Card.astro";
 import Form from "@/components/form/Form.astro";
 import Fieldset from "@/components/form/Fieldset.astro";
@@ -256,6 +258,74 @@ const lorem =
         image={background}
       />
     </Grid>
+  </Section>
+  <!-- row: media and text, 6 + 5 with a column of air -->
+  <Section paddingTop="small" paddingBottom="small">
+    <Row align="center" rowGap="9">
+      <Col span={6}>
+        <Eyebrow>row · span 6 + span 5 offset 1</Eyebrow>
+        <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
+        <Paragraph maxWidth={36}>{text}</Paragraph>
+        <ButtonWrapper>
+          <Button element="link" href="/about">Button Text</Button>
+        </ButtonWrapper>
+      </Col>
+      <Col span={5} offset={1}>
+        <Img
+          src={background}
+          width={1920}
+          height={1080}
+          class="ratio-4-5 radius-small"
+        />
+      </Col>
+    </Row>
+  </Section>
+  <!-- row: centered 8 -->
+  <Section paddingTop="small" paddingBottom="small">
+    <Row>
+      <Col span={8} offset="center" class="alignment-center">
+        <Eyebrow>row · span 8 offset center</Eyebrow>
+        <Heading tag="h2" variant="h3">{heading}</Heading>
+        <Paragraph>{lorem}</Paragraph>
+      </Col>
+    </Row>
+  </Section>
+  <!-- row: sidebar 4 + 8, image first on desktop -->
+  <Section paddingTop="small" paddingBottom="small">
+    <Row rowGap="9">
+      <Col span={8}>
+        <RichText>
+          <h3>Body copy on 8 columns</h3>
+          <p>{lorem}</p>
+          <p>{lorem}</p>
+        </RichText>
+      </Col>
+      <Col span={4} order="first">
+        <Eyebrow>row · span 4 order first + span 8</Eyebrow>
+        <Heading tag="h2" variant="h4"
+          >Second in the markup, first on desktop</Heading
+        >
+      </Col>
+    </Row>
+  </Section>
+  <!-- row: 4 features, revealed in turn -->
+  <Section paddingTop="small" paddingBottom="small">
+    <Eyebrow>row animate · span 3 × 4</Eyebrow>
+    <Row animate rowGap="9">
+      {
+        ["squares-four", "lightning", "shield-check", "chart-line-up"].map(
+          (icon) => (
+            <Col span={3}>
+              <Icon name={icon} variant="large" />
+              <Heading tag="h3" variant="h6">
+                Feature heading
+              </Heading>
+              <Paragraph variant="small">{text}</Paragraph>
+            </Col>
+          ),
+        )
+      }
+    </Row>
   </Section>
   <!-- form -->
   <Section paddingTop="small" paddingBottom="small">

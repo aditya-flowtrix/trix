@@ -50,7 +50,23 @@ const content = await slotContent(Astro.slots);
 <style is:global>
   @layer components {
     .rich-text {
-      & :is(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, figure, pre, table) {
+      &
+        :is(
+          h1,
+          h2,
+          h3,
+          h4,
+          h5,
+          h6,
+          p,
+          ul,
+          ol,
+          blockquote,
+          figure,
+          pre,
+          table,
+          hr
+        ) {
         margin-top: var(--_margin-top);
         margin-bottom: var(--_margin-bottom);
       }
@@ -93,6 +109,23 @@ const content = await slotContent(Astro.slots);
       & blockquote {
         padding-left: var(--space-5);
         border-left: var(--border-width) solid var(--border);
+      }
+
+      /* Wide tables scroll sideways instead of widening the page. */
+      & table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        border-collapse: collapse;
+      }
+      & :is(th, td) {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: var(--border-width) solid var(--border);
+        text-align: start;
+        vertical-align: top;
+      }
+      & th {
+        font-weight: var(--primary-semibold);
       }
     }
   }

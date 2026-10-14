@@ -592,6 +592,89 @@ if (bps.size > 3)
   );
 const maxWidth = design.maxWidths.find((m: { px: number }) => m.px >= 900);
 
+/* ---------------- layout grid ---------------- */
+
+type GridMeasure = {
+  margin: (number | null)[];
+  content: (number | null)[];
+  gutter: (number | null)[];
+  columns: number;
+  onTwelve: number;
+  offGrid: { width: string; count: number }[];
+  equalRows: { columns: number; count: number }[];
+};
+const grid: GridMeasure | undefined = design.grid;
+const gridNotes: string[] = [];
+/**
+ * Min and max of a fluid token through measured points: the straight line
+ * between the first and last point inside the fluid range, read at its ends.
+ * Undefined unless the points in between sit on that line.
+ */
+function line(points: [number, number][]) {
+  const inside = points.filter(([w]) => w <= viewportMax);
+  if (inside.length < 2) return undefined;
+  const [[w1, v1], [w2, v2]] = [inside[0], inside.at(-1)!];
+  const b = (v2 - v1) / (w2 - w1);
+  const value = (w: number) => Math.round((v1 + b * (w - w1)) * 2) / 2;
+  if (inside.some(([w, v]) => Math.abs(v1 + b * (w - w1) - v) > 0.75))
+    return undefined;
+  return {
+    min: value(viewportMin),
+    max: value(viewportMax),
+    extrapolated: w1 > viewportMin || w2 < viewportMax,
+  };
+}
+let siteMargin: ReturnType<typeof line>;
+let siteGutter: ReturnType<typeof line>;
+let contentMax: number | undefined;
+const tablet = breakpoints[1]?.[0] ?? 768;
+if (grid) {
+  const n = W.length;
+  const [c1, c2] = [grid.content[n - 2], grid.content[n - 1]];
+  if (c1 !== null && c2 !== null && Math.abs(c1 - c2) < 1) contentMax = c2;
+  siteMargin = line(
+    W.flatMap((w, i) =>
+      grid.margin[i] !== null &&
+      (contentMax === undefined || grid.content[i]! < contentMax - 1)
+        ? [[w, grid.margin[i]!] as [number, number]]
+        : [],
+    ),
+  );
+  // Layout rows stack on phones, so the gutter is read from tablet up.
+  siteGutter = line(
+    W.flatMap((w, i) =>
+      w >= tablet && grid.gutter[i] !== null
+        ? [[w, grid.gutter[i]!] as [number, number]]
+        : [],
+    ),
+  );
+  gridNotes.push(
+    `Margin ${grid.margin.map((m) => m ?? "—").join(" / ")} · content ${grid.content.map((m) => m ?? "—").join(" / ")} · gutter ${grid.gutter.map((m) => m ?? "—").join(" / ")} (px at ${W.join(", ")}).`,
+    siteMargin
+      ? `Site margin ${siteMargin.min} → ${siteMargin.max}px${siteMargin.extrapolated ? " (extrapolated past the measured widths)" : ""}.`
+      : "Site margin does not scale on a straight line — it changes at breakpoints; Trix default kept.",
+    siteGutter
+      ? `Site gutter ${siteGutter.min} → ${siteGutter.max}px, from rows of columns at ${tablet}px and up${siteGutter.extrapolated ? " (the phone value is extrapolated — columns stack there)" : ""}.`
+      : "No consistent gutter between columns; Trix default kept.",
+    contentMax
+      ? `Content stops growing at ${contentMax}px — \`--max-width-main\`.`
+      : "Content never stops growing — the source has no maximum width.",
+  );
+  if (grid.equalRows.length)
+    gridNotes.push(
+      `Equal-column lists (→ \`<Grid>\`): ${grid.equalRows.map((e) => `${e.columns} columns ×${e.count}`).join(", ")}.`,
+    );
+  if (grid.columns) {
+    gridNotes.push(
+      `${grid.onTwelve} of ${grid.columns} columns in unequal layouts sit on 12 columns at 1440px.`,
+    );
+    if (grid.onTwelve / grid.columns < 0.9)
+      ask.push(
+        `Columns off the 12-column grid at 1440px: ${grid.offGrid.map((o) => `${o.width} ×${o.count}`).join(", ")}. Snap each to the nearest span (a visible change), or keep its width in that component?`,
+      );
+  }
+}
+
 /* ---------------- write ---------------- */
 
 const fmt = (n: number) => String(Math.round(n * 100) / 100);
@@ -700,6 +783,30 @@ group("Radius", [
     }),
   `  --radius-round: 100vw;`,
 ]);
+if (grid) {
+  const measured: Record<string, string | undefined> = {
+    "site-margin-min": siteMargin && fmt(siteMargin.min),
+    "site-margin-max": siteMargin && fmt(siteMargin.max),
+    "site-gutter-min": siteGutter && fmt(siteGutter.min),
+    "site-gutter-max": siteGutter && fmt(siteGutter.max),
+    "max-width-main": contentMax
+      ? contentMax === viewportMax
+        ? "calc(var(--viewport-max) / 16 * 1rem)"
+        : `${fmt(contentMax / 16)}rem`
+      : "none",
+  };
+  const structural = /^(site-width|grid-columns|max-width-full)$/;
+  group(
+    "Layout — site",
+    tokens
+      .filter((t) => t.group === "Layout — site")
+      .map((t) =>
+        measured[t.name] !== undefined
+          ? `  --${t.name}: ${measured[t.name]};`
+          : `  --${t.name}: ${t.value};${structural.test(t.name) ? "" : " /* Trix default, not measured */"}`,
+      ),
+  );
+}
 group("Layout — fluid range (px)", [
   `  --viewport-min: ${viewportMin};`,
   `  --viewport-max: ${viewportMax};`,
@@ -898,6 +1005,10 @@ const report = [
   "",
   maxWidth ? `Container max width: ${maxWidth.px}px (×${maxWidth.count}).` : "",
   "",
+  ...(gridNotes.length
+    ? ["## Layout grid", "", ...gridNotes.map((n) => `- ${n}`)]
+    : []),
+  "",
   Object.keys(design.variables).length
     ? `## The site's own variables\n\n${Object.keys(design.variables).length} custom properties on :root. Where the source has named variables (Webflow Variables, Framer tokens, theme.json), prefer their structure and verify their values against the measurements above.`
     : "",
@@ -924,6 +1035,12 @@ output(
             },
           ]),
       ),
+      grid: grid && {
+        margin: grid.margin,
+        content: grid.content,
+        gutter: grid.gutter,
+        gutterFrom: tablet,
+      },
       spaces: spaces.map((s, i) => ({
         token: `space-${i + 1}`,
         min: s.min,

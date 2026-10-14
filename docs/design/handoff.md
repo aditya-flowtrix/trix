@@ -17,6 +17,11 @@ cannot be ticked goes on the Handoff page as an open question.
 
 - [ ] Every page has a Desktop (1440) and a Mobile (375) frame.
 - [ ] Sections use section-space padding and a container with a space-scale gap.
+- [ ] Layouts sit on the layout grid: every block spans whole columns (span,
+      offset), and tablet or mobile frames exist only where the layout differs
+      from the automatic stacking.
+- [ ] Elements that animate in on scroll are marked (Trix's reveal: fade up,
+      one after another).
 - [ ] Layout changes at breakpoints are annotated (small 480, medium 768,
       large 992).
 - [ ] Themes are set as variable modes on section frames, not hand-colored.

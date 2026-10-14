@@ -1,0 +1,203 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /**
+   * Columns spanned on desktop, out of 12. Smaller screens follow
+   * automatically: 2–8 become half width on tablet (a lone 7 or 8 goes full),
+   * 4 and up stack on mobile. `xsmall`–`large` override any of it.
+   *
+   * @min 1
+   * @max 12
+   * @int
+   */
+  span?: number;
+  /**
+   * Columns below 30rem. Defaults to `12`.
+   *
+   * @min 1
+   * @max 12
+   * @int
+   */
+  xsmall?: number;
+  /**
+   * Columns from 30rem. Inherits `xsmall`.
+   *
+   * @min 1
+   * @max 12
+   * @int
+   */
+  small?: number;
+  /**
+   * Columns from 48rem. Inherits `small`.
+   *
+   * @min 1
+   * @max 12
+   * @int
+   */
+  medium?: number;
+  /**
+   * Columns from 62rem. Inherits `medium`.
+   *
+   * @min 1
+   * @max 12
+   * @int
+   */
+  large?: number;
+  /** Columns to skip before this one, from 62rem. `center` centers it. */
+  offset?: number | "center";
+  /** Place the column first or last in its row, from 62rem. */
+  order?: "first" | "last";
+  /** This column's vertical alignment, overriding the row's. */
+  align?: "stretch" | "start" | "center" | "end";
+  /** Reveal the column's children one after another as it scrolls into view. */
+  animate?: boolean;
+};
+
+const {
+  render = true,
+  span,
+  xsmall,
+  small,
+  medium,
+  large,
+  offset,
+  order,
+  align,
+  animate = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const valid = (n?: number) =>
+  n !== undefined && Number.isInteger(n) && n >= 1 && n <= 12;
+
+// ponytail: the automatic stacking assumes a 12-column grid (Mast's table, mobile-first).
+const smart = valid(span)
+  ? {
+      xs: span === 1 ? 1 : span === 2 ? 6 : 12,
+      sm: span === 1 ? 1 : span! <= 3 ? 6 : 12,
+      md: span === 1 ? 1 : span! <= 8 ? 6 : 12,
+      lg: span,
+    }
+  : {};
+const spans = {
+  xs: valid(xsmall) ? xsmall : smart.xs,
+  sm: valid(small) ? small : smart.sm,
+  md: valid(medium) ? medium : smart.md,
+  lg: valid(large) ? large : smart.lg,
+};
+const desktop = spans.lg ?? spans.md ?? spans.sm ?? spans.xs ?? 12;
+const alone = !valid(medium) && (span === 7 || span === 8) ? 12 : undefined;
+
+let skip = 0;
+if (offset === "center") {
+  skip = Math.floor((12 - desktop) / 2);
+  if (import.meta.env.DEV && desktop % 2)
+    console.warn(
+      `[trix] <Col offset="center"> spans ${desktop} columns, which cannot sit centered on 12; it is placed half a column left of center.`,
+    );
+} else if (offset !== undefined) {
+  skip = offset;
+  if (
+    import.meta.env.DEV &&
+    (!Number.isInteger(offset) || offset < 0 || offset + desktop > 12)
+  )
+    console.warn(
+      `[trix] <Col offset={${offset}}> plus its ${desktop}-column span does not fit in 12 columns.`,
+    );
+}
+
+if (import.meta.env.DEV) {
+  for (const [name, n] of Object.entries({
+    span,
+    xsmall,
+    small,
+    medium,
+    large,
+  }))
+    if (n !== undefined && !valid(n))
+      console.warn(
+        `[trix] <Col ${name}={${n}}> must be a whole number from 1 to 12; it was ignored.`,
+      );
+}
+
+// An offset widens the desktop span by the skipped columns (see the CSS).
+if (skip > 0) spans.lg = desktop + skip;
+
+// Only the values that differ from the breakpoint below — CSS inherits the rest.
+let below = 12;
+const changes = (["xs", "sm", "md", "lg"] as const).flatMap((bp) => {
+  const n = spans[bp];
+  if (n === undefined || n === below) return [];
+  below = n;
+  return [`--_span-${bp}: ${n}`];
+});
+const style =
+  [
+    ...changes,
+    alone && `--_span-md-alone: ${alone}`,
+    skip > 0 && `--_offset-lg: ${skip}`,
+    order && `--_order-lg: ${order === "first" ? -1 : 1}`,
+  ]
+    .filter(Boolean)
+    .join("; ") || undefined;
+
+const content = await slotContent(Astro.slots);
+---
+
+{
+  render && (
+    <div
+      class:list={["col", align && `align-self-${align}`, className]}
+      style={style}
+      data-animate={animate ? "" : undefined}
+      {...rest}
+    >
+      {content && <Fragment set:html={content} />}
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .col {
+      --_span-xs: var(--grid-columns);
+      --_span-sm: var(--_span-xs);
+      --_span-md: var(--_span-sm);
+      --_span-lg: var(--_span-md);
+      --_span: var(--_span-xs);
+      grid-column: auto / span var(--_span);
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: var(--_alignment, start);
+      text-align: var(--_alignment, start);
+      @media (width >= 30rem) {
+        --_span: var(--_span-sm);
+      }
+      @media (width >= 48rem) {
+        --_span: var(--_span-md);
+      }
+      @media (width >= 48rem) and (width < 62rem) {
+        &:only-child {
+          --_span: var(--_span-md-alone, var(--_span-md));
+        }
+      }
+      @media (width >= 62rem) {
+        /* An offset spans the skipped columns too and gives them back as
+           margin. Grid-area percentages make it exact anywhere in the row:
+           offset × (column + gutter). */
+        --_span: var(--_span-lg);
+        margin-inline-start: calc(
+          var(--_offset-lg, 0) * (100% + var(--_gap-size, 0rem)) /
+            var(--_span-lg)
+        );
+        order: var(--_order-lg, 0);
+      }
+    }
+  }
+</style>

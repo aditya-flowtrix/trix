@@ -477,5 +477,12 @@
         "unit": "px"
       }
     }
+  },
+  "grid": {
+    "columns": {
+      "$type": "number",
+      "$value": 12,
+      "$description": "Layout grid columns on desktop and tablet frames (phone frames use 4: one is 3 of these). Margin and gutter bind to Responsive site-margin and site-gutter."
+    }
   }
 }

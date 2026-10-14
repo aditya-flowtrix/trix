@@ -48,7 +48,8 @@ licenses ship in `node_modules/` with each package.
 
 ## Acknowledgements
 
-Some ideas in Trix — the token file organised like a variables panel with
-generated fluid formulas, build-time icons, site-wide color mode and skill
-evals — come from [Mast for Astro](https://github.com/CoreyMoen/mast-astro) by
+Some ideas in Trix — the 12-column grid with automatic stacking, the token
+file organised like a variables panel with generated fluid formulas,
+build-time icons, site-wide color mode, scroll-in reveals and skill evals —
+come from [Mast for Astro](https://github.com/CoreyMoen/mast-astro) by
 Corey Moen / No-Code Supply Co. (MIT). No Mast code is included.

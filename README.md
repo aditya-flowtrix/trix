@@ -20,7 +20,10 @@ value by value against the original.
   files, the token docs) is generated from it and kept in sync by CI.
 - **A style guide that cannot drift.** [`/style-guide`](src/pages/style-guide.astro)
   renders straight from the tokens: brand, type, color, themes, spacing,
-  radius, layout, icons.
+  radius, the 12-column layout grid, motion, icons.
+- **One 12-column grid, in Figma and in code.** `Row` and `Col` lay blocks
+  across the columns a designer draws (`span={8}`, `offset="center"`); tablet
+  and mobile stack automatically. Shift+G overlays the grid on any page.
 - **Migrations without guesswork.** The measuring toolkit reads what a site
   renders at seven widths and maps it to Trix by value, never by name — then
   proves the rebuild matches.
@@ -95,9 +98,10 @@ Trix is built on **[Lumos for Astro](https://github.com/lumosframework/lumos-for
 by Timothy Ricks (MIT) — its component library, cascade layers, conventions and
 skills are the foundation, and its history is preserved in this repository.
 Ideas from **[Mast for Astro](https://github.com/CoreyMoen/mast-astro)** by
-Corey Moen / No-Code Supply Co. (MIT) — the token file organised like a
-variables panel with generated fluid formulas, build-time icons, site-wide
-color mode, and skill evals. Icons by [Phosphor](https://phosphoricons.com)
+Corey Moen / No-Code Supply Co. (MIT) — the 12-column grid with automatic
+stacking, the token file organised like a variables panel with generated
+fluid formulas, build-time icons, site-wide color mode, scroll-in reveals,
+and skill evals. Icons by [Phosphor](https://phosphoricons.com)
 (MIT). Typeface [Inter](https://rsms.me/inter/) by Rasmus Andersson (OFL).
 
 ## License

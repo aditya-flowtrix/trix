@@ -83,6 +83,8 @@ const latinExt = [
 
 export default defineConfig({
   site: SITE_URL,
+  // Prefetch internal links on hover or focus, so the next page is ready on click.
+  prefetch: true,
   integrations: [
     tokens,
     sitemap({

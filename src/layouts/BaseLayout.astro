@@ -4,6 +4,7 @@ import BaseHead from "@/components/utility/BaseHead.astro";
 import SkipLink from "@/components/global/SkipLink.astro";
 import Nav from "@/components/global/Nav.astro";
 import Footer from "@/components/global/Footer.astro";
+import GridOverlay from "@/components/utility/GridOverlay.astro";
 import type { SeoProps } from "@/types.ts";
 import { COLOR_MODE } from "@/consts.ts";
 import type { Theme } from "@/styles/generated/tokens.ts";
@@ -17,9 +18,16 @@ type Props = SeoProps & {
    * `paddingTop="navoverlap"` to clear the bar.
    */
   overlap?: boolean;
+  /** Include the layout-grid overlay (Shift+G). On by default in development. */
+  gridOverlay?: boolean;
 };
 
-const { theme = "inherit", overlap = false, ...seo } = Astro.props;
+const {
+  theme = "inherit",
+  overlap = false,
+  gridOverlay = import.meta.env.DEV,
+  ...seo
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -39,5 +47,33 @@ const { theme = "inherit", overlap = false, ...seo } = Astro.props;
       <slot />
     </main>
     <Footer />
+    {gridOverlay && <GridOverlay />}
+    <script>
+      // Reveal: number each [data-animate] element's children for the
+      // stagger, then mark it revealed the first time it scrolls into view.
+      // The CSS that hides and animates them is in patterns.css.
+      const targets = document.querySelectorAll<HTMLElement>("[data-animate]");
+      if (
+        targets.length &&
+        matchMedia("(prefers-reduced-motion: no-preference)").matches
+      ) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add("is-revealed");
+              observer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: "0px 0px -5% 0px" },
+        );
+        for (const target of targets) {
+          [...target.children].forEach((child, i) =>
+            (child as HTMLElement).style.setProperty("--_reveal-index", `${i}`),
+          );
+          observer.observe(target);
+        }
+      }
+    </script>
   </body>
 </html>

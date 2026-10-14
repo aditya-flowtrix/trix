@@ -5,6 +5,8 @@ import { slotContent } from "@/utils/slots.ts";
 type Base = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
+  /** Reveal the items one after another as the grid scrolls into view. */
+  animate?: boolean;
 };
 
 type Props = Base &
@@ -87,6 +89,7 @@ const {
   large,
   maxColumnCount,
   minColumnWidth,
+  animate = false,
   class: className,
   ...rest
 } = Astro.props as AllProps;
@@ -130,6 +133,7 @@ const columns =
     <div
       class:list={["grid", variant !== "columns" && variant, className]}
       style={columns}
+      data-animate={animate ? "" : undefined}
       {...rest}
     >
       <Fragment set:html={content} />

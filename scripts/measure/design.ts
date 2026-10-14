@@ -95,6 +95,10 @@ type Raw = {
   }[];
   vars: Record<string, string>;
   media: string[];
+  /** Site margin candidates: content-edge px → characters of text inside. */
+  margins: Record<string, number>;
+  /** Flex and grid rows with columns side by side. */
+  rows: { gap: number; width: number; widths: number[] }[];
 };
 
 function measure(): Raw {
@@ -222,7 +226,89 @@ function measure(): Raw {
       walk(sheet.cssRules);
     } catch {}
   }
-  return { text, box, vars, media: [...media] };
+  // Layout grid. Each text element credits its characters to its innermost
+  // wide (at least half the page), horizontally symmetric ancestor; that
+  // block's content edge is the site margin, and where the content stops
+  // growing is the maximum width.
+  const vw = document.documentElement.clientWidth;
+  const edges = new Map<Element, number | null>();
+  const edgeOf = (e: Element): number | null => {
+    if (edges.has(e)) return edges.get(e)!;
+    const r = e.getBoundingClientRect();
+    const cs = getComputedStyle(e);
+    const left = r.left + px(cs.paddingLeft) + px(cs.borderLeftWidth);
+    const right =
+      vw - (r.right - px(cs.paddingRight) - px(cs.borderRightWidth));
+    const v =
+      r.width >= vw / 2 &&
+      left > 0.5 &&
+      Math.abs(left - right) < 1 &&
+      // Rows with negative margins (Bootstrap, Mast) reach past the container.
+      px(cs.marginLeft) >= 0 &&
+      px(cs.marginRight) >= 0
+        ? Math.round(left * 100) / 100
+        : null;
+    edges.set(e, v);
+    return v;
+  };
+  const margins: Record<string, number> = {};
+  for (const t of text) {
+    let e: Element | null = all[t.i];
+    while (e && e !== document.body && edgeOf(e) === null) e = e.parentElement;
+    if (e && e !== document.body) {
+      const m = String(edgeOf(e));
+      margins[m] = (margins[m] ?? 0) + t.chars;
+    }
+  }
+  // Rows: two or more children side by side, evenly spaced, filling the row.
+  // The space between them is the gutter; columns that touch use padding
+  // gutters (Bootstrap, Mast), where the gutter is their inner padding.
+  const rows: Raw["rows"] = [];
+  for (const e of all) {
+    if (skip.has(e.tagName)) continue;
+    const cs = getComputedStyle(e);
+    if (!/flex|grid/.test(cs.display) || /space-/.test(cs.justifyContent))
+      continue;
+    // Navigation is chrome, repeated on every page; its rows are not the grid.
+    if (e.closest("nav, header")) continue;
+    const kids = [...e.children].filter((k) => {
+      const b = k.getBoundingClientRect();
+      return (
+        b.width > 0 &&
+        b.height > 0 &&
+        !/absolute|fixed/.test(getComputedStyle(k).position)
+      );
+    });
+    if (kids.length < 2) continue;
+    const top = kids[0].getBoundingClientRect().top;
+    const line = kids
+      .filter((k) => Math.abs(k.getBoundingClientRect().top - top) < 1)
+      .sort(
+        (a, b) =>
+          a.getBoundingClientRect().left - b.getBoundingClientRect().left,
+      );
+    if (line.length < 2) continue;
+    const boxes = line.map((k) => k.getBoundingClientRect());
+    const gaps = boxes.slice(1).map((b, i) => b.left - boxes[i].right);
+    if (gaps.some((g) => g < -0.5 || Math.abs(g - gaps[0]) > 1)) continue;
+    const r = e.getBoundingClientRect();
+    let gap = gaps[0];
+    let width = r.width - px(cs.paddingLeft) - px(cs.paddingRight);
+    let widths = boxes.map((b) => b.width);
+    if (gap < 0.5) {
+      const a = getComputedStyle(line[0]);
+      const b = getComputedStyle(line[1]);
+      gap = px(a.paddingRight) + px(b.paddingLeft);
+      if (gap < 0.5) continue;
+      width -= gap;
+      widths = widths.map((w) => w - gap);
+    }
+    const filled =
+      widths.reduce((x, y) => x + y, 0) + gap * (widths.length - 1);
+    if (width < vw / 2 || filled < width * 0.85) continue;
+    rows.push({ gap: Math.round(gap * 100) / 100, width, widths });
+  }
+  return { text, box, vars, media: [...media], margins, rows };
 }
 
 const browser = await launch();
@@ -282,6 +368,8 @@ const colors = {
 };
 const media = new Map<string, { count: number }>();
 const vars: Record<string, string[]> = {};
+const marginsAt = WIDTHS.map(() => new Map<string, { count: number }>());
+const rowsAt: Raw["rows"][] = WIDTHS.map(() => []);
 
 for (const { path, runs } of perPage) {
   if (runs.length !== WIDTHS.length) continue;
@@ -351,6 +439,11 @@ for (const { path, runs } of perPage) {
       bump(colors.background, b.bg, {}, Math.max(1, b.area));
     if (b.border) bump(colors.border, b.border);
   }
+  runs.forEach((run, i) => {
+    for (const [m, chars] of Object.entries(run.margins))
+      bump(marginsAt[i], m, {}, chars);
+    rowsAt[i].push(...run.rows);
+  });
   for (const m of first.media) bump(media, m);
   for (const [k, v] of Object.entries(desktop.vars)) (vars[k] ??= []).push(v);
 }
@@ -359,6 +452,43 @@ const sorted = <T extends { count: number }>(map: Map<string, T>) =>
   [...map.entries()]
     .sort((a, b) => b[1].count - a[1].count)
     .map(([key, v]) => ({ key, ...v }));
+
+const top = (map: Map<string, { count: number }>) => sorted(map)[0]?.key;
+const margin = marginsAt.map((m) => {
+  const k = top(m);
+  return k === undefined ? null : Number(k);
+});
+const gutter = rowsAt.map((rows) => {
+  const counts = new Map<string, { count: number }>();
+  for (const row of rows) bump(counts, String(Math.round(row.gap * 10) / 10));
+  const k = top(counts);
+  return k === undefined ? null : Number(k);
+});
+// At desktop: rows of equal columns are lists (Trix's Grid, any count);
+// rows of unequal columns are layouts, and should sit on 12 columns.
+const desktopRows = rowsAt[WIDTHS.indexOf(1440)];
+const equalRows = new Map<string, { count: number }>();
+let onTwelve = 0;
+let columns = 0;
+const offGrid = new Map<string, { count: number }>();
+for (const row of desktopRows) {
+  if (row.widths.every((w) => Math.abs(w - row.widths[0]) < 1)) {
+    bump(equalRows, String(row.widths.length));
+    continue;
+  }
+  // A row may use its own gap (a second grid system) or the site gutter
+  // with a wider gap that is really an offset — on 12 if either fits.
+  const site = gutter[WIDTHS.indexOf(1440)] ?? row.gap;
+  const fits = (w: number, g: number) => {
+    const k = (w + g) / ((row.width - 11 * g) / 12 + g);
+    return Math.abs(k - Math.round(k)) < 0.08 && Math.round(k) >= 1;
+  };
+  for (const w of row.widths) {
+    columns++;
+    if (fits(w, row.gap) || fits(w, site)) onTwelve++;
+    else bump(offGrid, `${Math.round((w / row.width) * 1000) / 10}%`);
+  }
+}
 
 const result = {
   source: opts.dir ?? opts.url,
@@ -411,6 +541,19 @@ const result = {
     })),
   },
   media: sorted(media).map((m) => ({ query: m.key, count: m.count })),
+  grid: {
+    margin,
+    content: margin.map((m, i) => (m === null ? null : r(WIDTHS[i] - m * 2))),
+    gutter,
+    rows: desktopRows.length,
+    equalRows: sorted(equalRows).map((e) => ({
+      columns: Number(e.key),
+      count: e.count,
+    })),
+    columns,
+    onTwelve,
+    offGrid: sorted(offGrid).map((o) => ({ width: o.key, count: o.count })),
+  },
   variables: Object.fromEntries(
     Object.entries(vars).map(([k, v]) => [k, v[0]]),
   ),
@@ -462,6 +605,20 @@ const md = [
       .join(" · ")}`,
     "",
   ]),
+  "## Layout grid",
+  "",
+  `| Width | ${WIDTHS.join(" | ")} |`,
+  `| --- | ${WIDTHS.map(() => "---").join(" | ")} |`,
+  `| Margin | ${result.grid.margin.map((m) => m ?? "—").join(" | ")} |`,
+  `| Content | ${result.grid.content.map((m) => m ?? "—").join(" | ")} |`,
+  `| Gutter | ${result.grid.gutter.map((m) => m ?? "—").join(" | ")} |`,
+  "",
+  `Equal-column rows (lists — Trix's Grid): ${result.grid.equalRows.map((e) => `${e.columns} columns ×${e.count}`).join(", ") || "none"}.`,
+  "",
+  result.grid.columns
+    ? `Unequal-column layouts: ${result.grid.onTwelve} of ${result.grid.columns} columns sit on 12 columns at 1440px.${result.grid.offGrid.length ? ` Off the grid: ${result.grid.offGrid.map((o) => `${o.width} ×${o.count}`).join(", ")}.` : ""}`
+    : "No unequal-column layouts found.",
+  "",
   "## Media queries",
   "",
   ...result.media.map((m) => `- \`${m.query}\` ×${m.count}`),

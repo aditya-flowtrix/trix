@@ -30,6 +30,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildModel,
   fluidAt,
+  layoutGrid,
   resolveColor,
   resolveVar,
   toHex,
@@ -375,6 +376,14 @@ function figmaFiles(model: Model): Record<string, Tree> {
       $value: px(toPx(b.value) ?? 0),
     });
   }
+  const columns = Number(model.byName.get("grid-columns"));
+  if (columns)
+    set(prim, ["grid", "columns"], {
+      $type: "number",
+      $value: columns,
+      $description:
+        "Layout grid columns on desktop and tablet frames (phone frames use 4: one is 3 of these). Margin and gutter bind to Responsive site-margin and site-gutter.",
+    });
   files["Primitives.Value"] = prim;
 
   // Responsive — every fluid token, at both ends of the range
@@ -526,6 +535,30 @@ function docs(model: Model): string {
         isFluid
           ? `| \`--${t.name}\` | ${cell} | ${cell} |`
           : `| \`--${t.name}\` | ${cell} |`,
+      );
+    }
+    lines.push("");
+  }
+  if (model.byName.has("grid-columns")) {
+    const r = (n: number) => `${Math.round(n * 100) / 100}px`;
+    lines.push(
+      "## Layout grid",
+      "",
+      "What `<Row>` renders inside a Section, and what each Figma frame's layout grid",
+      "should be: `--grid-columns` columns, gutter `--site-gutter`, margin `--site-margin`,",
+      "content capped at `--max-width-main` and centered. Phone frames are drawn on",
+      "4 columns: every line of the 4-column grid is a line of the 12, one phone",
+      "column is exactly `span 3`.",
+      "",
+      "| Frame | Design on | Margin | Gutter | Column (of 12) | Content |",
+      "| --- | --- | --- | --- | --- | --- |",
+    );
+    const phone = toPx(model.breakpoints[0]?.value ?? "30rem") ?? 480;
+    for (const w of [375, 768, 992, DESIGN_MAX, 1920]) {
+      const g = layoutGrid(model, w);
+      const on = w < phone ? `4 (= ${g.columns} / 3)` : `${g.columns}`;
+      lines.push(
+        `| ${w} | ${on} | ${r(g.margin)} | ${r(g.gutter)} | ${r(g.column)} | ${r(g.container)} |`,
       );
     }
     lines.push("");

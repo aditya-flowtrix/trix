@@ -348,6 +348,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--site-margin` | 16px | 48px |
 | `--site-gutter` | 16px | 32px |
 | `--site-width` | `calc(100% - var(--site-margin) * 2)` | `calc(100% - var(--site-margin) * 2)` |
+| `--grid-columns` | `12` | `12` |
 | `--max-width-small` | `70rem` | `70rem` |
 | `--max-width-main` | `calc(var(--viewport-max) / 16 * 1rem)` | `calc(var(--viewport-max) / 16 * 1rem)` |
 | `--max-width-full` | `100%` | `100%` |
@@ -370,6 +371,10 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--hover-ease` | `ease` |
 | `--open-duration` | `var(--hover-duration) → 200ms` |
 | `--open-ease` | `var(--hover-ease) → ease` |
+| `--reveal-duration` | `700ms` |
+| `--reveal-ease` | `cubic-bezier(0.33, 1, 0.68, 1)` |
+| `--reveal-distance` | `1.5rem` |
+| `--reveal-stagger` | `100ms` |
 
 ## Components — button
 
@@ -395,6 +400,22 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | Token | Value |
 | --- | --- |
 | `--card-radius` | `var(--radius-medium) → 1rem` |
+
+## Layout grid
+
+What `<Row>` renders inside a Section, and what each Figma frame's layout grid
+should be: `--grid-columns` columns, gutter `--site-gutter`, margin `--site-margin`,
+content capped at `--max-width-main` and centered. Phone frames are drawn on
+4 columns: every line of the 4-column grid is a line of the 12, one phone
+column is exactly `span 3`.
+
+| Frame | Design on | Margin | Gutter | Column (of 12) | Content |
+| --- | --- | --- | --- | --- | --- |
+| 375 | 4 (= 12 / 3) | 17.57px | 16.79px | 12.93px | 339.86px |
+| 768 | 12 | 28.8px | 22.4px | 38.67px | 710.4px |
+| 992 | 12 | 35.2px | 25.6px | 53.33px | 921.6px |
+| 1440 | 12 | 48px | 32px | 82.67px | 1344px |
+| 1920 | 12 | 240px | 32px | 90.67px | 1440px |
 
 ## Themes
 

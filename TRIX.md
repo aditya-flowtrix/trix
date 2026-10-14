@@ -36,8 +36,28 @@ these by hand:
 `--breakpoint-large` (62rem) — Webflow's 480 / 768 / 992. A media query cannot
 read a custom property, so components write the values literally:
 `@media (width >= 48rem)`. `npm run check` fails on any other value. `Grid`'s
-`small` / `medium` / `large` props and the `span-{breakpoint}-N` classes use
-the same three.
+and `Col`'s `small` / `medium` / `large` props and the `span-{breakpoint}-N`
+classes use the same three.
+
+## Layout grid
+
+Twelve columns (`--grid-columns`), gutter `--site-gutter`, margin
+`--site-margin`, content capped at `--max-width-main` — the same grid the
+designer draws on, with the numbers per frame in
+[docs/tokens.md](docs/tokens.md#layout-grid). Shift+G shows it in development.
+
+Pick the layout by what the design is:
+
+| The design shows                                                     | Use                                                             |
+| -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| blocks spanning columns: `8 + 4`, `5` + `6 offset 1`, a centered `8` | `Row` + `Col span` (tablet and mobile stack automatically)      |
+| equal items repeated: cards, logos, CMS lists                        | `Grid` with a column count per breakpoint                       |
+| a text block beside media, with a standard look                      | `ContentWrapper` (`columns`, `breakout`, `contain`, `sticky-*`) |
+| a row of buttons or tags sized to their content                      | `ButtonWrapper`                                                 |
+
+Set `Col`'s breakpoint props only where the design differs from the automatic
+stacking. Never fake columns with widths or `calc()` in a component — if a
+block does not sit on the grid, that is a design question first.
 
 ## Icons
 
@@ -61,8 +81,8 @@ undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
 
 ## Building a page
 
-- Compose the page directly from existing components. Use `Section`, `Grid`,
-  `Slider` and the other layout components instead of hiding an ordinary layout
+- Compose the page directly from existing components. Use `Section`, `Row` and
+  `Col`, `Grid`, `Slider` and the other layout components instead of hiding an ordinary layout
   inside a custom component.
 - Most sections can be built without creating new components: a `Section`, a `ContentWrapper` inside it, the `Eyebrow`, `Heading`, `Paragraph` and `ButtonWrapper` inside that. Prefer `ContentWrapper` to a plain `div` for holding content: it ties text and flex alignment to one `--_alignment` variable that `ButtonWrapper` and everything else inside reads, so `centered` on the default `stack` variant moves the whole block together.
 - Do not create a `<Fragment>` just to group or extract markup. Use one only

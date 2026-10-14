@@ -26,6 +26,8 @@ interface Props extends HTMLAttributes<"section"> {
   align?: "start" | "center" | "end";
   /** Fill the viewport height. */
   fullHeight?: boolean;
+  /** Reveal the content one block after another as it scrolls into view. */
+  animate?: boolean;
   /** Inner container classes. */
   containerClass?: string;
   /** Inner container attributes. */
@@ -40,6 +42,7 @@ const {
   gap = "9",
   align,
   fullHeight = false,
+  animate = false,
   containerClass,
   containerAttrs = {},
   class: className,
@@ -85,6 +88,7 @@ const background = await slotContent(Astro.slots, "background");
             containerClass,
             containerAttrsClass,
           ]}
+          data-animate={animate ? "" : undefined}
           {...containerRest}
         >
           <Fragment set:html={content} />

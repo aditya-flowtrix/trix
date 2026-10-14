@@ -75,11 +75,16 @@ measured between text boxes in Figma is the spacing in the browser.
 ## 4. Frames and grids
 
 **Desktop frame** — 1440 wide, Responsive mode **Desktop**, Theme mode
-**Light** (or the page's theme). Layout grid: 12 columns, stretch, margin
-`site-margin` (48), gutter `site-gutter` (32).
+**Light** (or the page's theme). Layout grid: columns, stretch, count bound to
+`grid/columns` (12), margin bound to `site-margin` (48), gutter bound to
+`site-gutter` (32).
 
 **Mobile frame** — 375 wide, Responsive mode **Mobile**. Layout grid: 4
-columns, margin 16, gutter 16.
+columns, stretch, margin bound to `site-margin` (16), gutter bound to
+`site-gutter` (16). One mobile column is exactly three of the twelve.
+
+**Tablet frame** (only where the layout differs from the automatic stacking)
+— 768 wide, 12 columns, margin 28.8, gutter 22.4.
 
 **Sections** — each section is a full-width frame with vertical auto layout,
 padding top and bottom bound to `section-space/*`, theme mode set on the frame,
@@ -95,6 +100,7 @@ variants that match the code's props:
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Section**                         | Theme: inherit, light, dark, brand · Padding top/bottom: none, even, xsmall, small, medium, large, xlarge, navoverlap · Align: start, center, end  |
 | **Content wrapper**                 | Variant: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · Reverse · Centered                                   |
+| **Row / Col**                       | Col: span 1–12 (desktop) · offset 0–11 or center · order first, last · per-breakpoint spans only where they differ from the automatic stacking     |
 | **Grid**                            | Columns per breakpoint (xsmall, small, medium, large), or autofit / autofill with a minimum column width                                           |
 | **Button**                          | Variant: main, link, arrow, play, close · Emphasis: primary, secondary · Direction (arrow): forward, back · State: default, hover, focus, disabled |
 | **Card**                            | Variant: default, cover, stacked · Theme: inherit, light, dark, brand, invert                                                                      |

@@ -1,12 +1,14 @@
 # Roadmap
 
-## Phase 1 — Framework and migration (v0.1, now)
+## Phase 1 — Framework and migration (v0.1–0.2, now)
 
 - Trix framework on Lumos for Astro: token generator, style guide, components,
   designer guide, Figma variable files.
 - Skills: new project, style guide, migrate (Webflow, Framer, WordPress,
   other), Figma import, prop audit, scaling graphic, upgrade.
 - Measuring toolkit: inventory, design, propose, variables, classes, verify.
+- v0.2: the 12-column grid (`Row`/`Col`, overlay, measured margin and
+  gutter), scroll-in reveals, tables and dividers, prefetch — from Mast.
 
 ## Phase 2 — SEO
 
@@ -22,6 +24,10 @@
   monitoring after cutover.
 
 ## Later
+
+- `Video` pause control: background videos that autoplay for more than five
+  seconds need a pause button (WCAG 2.2.2). Needs a wrapper element, which
+  changes how `ContentWrapper` detects its visual — do with care.
 
 - `create-trix` CLI that copies, stamps and names a project in one command.
 - A published Figma community file mirroring the component library.

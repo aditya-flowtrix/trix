@@ -9,12 +9,22 @@ other attributes to its root element. `class` accepts utility classes only.
 
 ## Layout
 
-| Component                | Use it for                                                                      | Variants and key props                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Wrapper/Section`        | every full-width band of a page; owns padding, theme and the centered container | `theme` (inherit, light, dark, brand) · `paddingTop` / `paddingBottom` (none, even, xsmall, small, medium, large, xlarge, navoverlap) · `gap` (0, 1–12, xsmall–xlarge) · `align` · `fullHeight` · `background` slot |
-| `Wrapper/ContentWrapper` | a block of eyebrow, heading, text and buttons, alone or beside media            | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `column2` slot                                                                             |
-| `Wrapper/Grid`           | repeating items in columns                                                      | `xsmall` / `small` / `medium` / `large` column counts, or `variant` autofit / autofill with `minColumnWidth`, `maxColumnCount` · children may use `span-*` classes                                                  |
-| `Wrapper/ButtonWrapper`  | a row of buttons                                                                | `marginTop` (default, 0, 1–12, auto)                                                                                                                                                                                |
+| Component                     | Use it for                                                                           | Variants and key props                                                                                                                                                                                                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Wrapper/Section`             | every full-width band of a page; owns padding, theme and the centered container      | `theme` (inherit, light, dark, brand) · `paddingTop` / `paddingBottom` (none, even, xsmall, small, medium, large, xlarge, navoverlap) · `gap` (0, 1–12, xsmall–xlarge) · `align` · `fullHeight` · `background` slot                                                                               |
+| `Wrapper/Row` + `Wrapper/Col` | any layout drawn on the 12-column grid — `8 + 4`, `6` + `5 offset 1`, a centered `8` | Row: `gap`, `rowGap` (0, 1–12; default the site gutter) · `align` · `animate`. Col: `span` 1–12 (desktop; tablet and mobile stack automatically) · `xsmall` / `small` / `medium` / `large` (exact spans, win over `span`) · `offset` (0–11, center) · `order` (first, last) · `align` · `animate` |
+| `Wrapper/ContentWrapper`      | a block of eyebrow, heading, text and buttons, alone or beside media                 | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `column2` slot                                                                                                                                                           |
+| `Wrapper/Grid`                | repeating, equal-width items: cards, logos, team                                     | `xsmall` / `small` / `medium` / `large` column counts, or `variant` autofit / autofill with `minColumnWidth`, `maxColumnCount` · `animate` · children may use `span-*` classes                                                                                                                    |
+| `Wrapper/ButtonWrapper`       | a row of buttons                                                                     | `marginTop` (default, 0, 1–12, auto)                                                                                                                                                                                                                                                              |
+
+`Section`, `Row`, `Col` and `Grid` take `animate`: their children fade up
+one after another the first time they scroll into view. Timing is the
+`--reveal-*` tokens; visitors who prefer reduced motion, print, and browsers
+without JavaScript see the content immediately.
+
+`Utility/GridOverlay` draws the layout grid over the page — **Shift+G**, or a
+`data-grid-overlay-toggle` button. `BaseLayout` includes it in development, or
+anywhere with `gridOverlay`.
 
 ## Typography
 

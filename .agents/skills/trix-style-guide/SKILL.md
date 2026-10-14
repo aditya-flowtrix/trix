@@ -121,6 +121,11 @@ Read `.trix/proposal.md` top to bottom. It contains:
 - **Spacing** — measured min/max pairs, spacer heights included, as one
   numbered scale `--space-1…N`. Series that change at breakpoints instead of
   scaling are listed separately: they belong to a component's media query.
+- **Layout grid** — the site margin and gutter (measured at every width:
+  the content edge most text sits on, the space between columns side by
+  side), the maximum content width, and how many of the site's unequal
+  layouts land on 12 columns. Equal-column lists are listed separately: they
+  become `<Grid>`, whatever their count.
 - **Section space, radius, palette ramps, theme starting point, breakpoints.**
 - **Ask before writing** — the list for step 4.
 
@@ -140,6 +145,8 @@ and the option to consolidate. Typical ones:
 - Translucent colors: almost always an existing swatch mixed with
   transparent, never a new swatch.
 - Breakpoints beyond three.
+- Layouts off the 12-column grid: snap to the nearest span (a visible change)
+  or keep the width in that component.
 
 Write each answer into `PROJECT.md` **the moment it is given**.
 
@@ -165,6 +172,9 @@ group. The file's comment headings are the groups; keep them.
 - **Colors** — palette ramps, then each theme in `themes.css` with the full
   set of semantic tokens. Alpha variants are `color-mix(in lab, … N%,
 transparent)` of a swatch or `currentcolor`.
+- **Layout grid** — `--site-margin`, `--site-gutter` and `--max-width-main`
+  from the proposal's _Layout grid_. Check with the overlay: Shift+G on the
+  rebuilt `/style-guide` and on the source side by side, at 375, 768 and 1440. Layouts that do not sit on 12 columns are a step 4 question.
 - **Breakpoints** — the three source breakpoints as `--breakpoint-*` tokens,
   and the same literal values in every component media query
   (`npm run check` enforces it).

@@ -201,6 +201,30 @@ edit that brings the page across.
 | `u-rich-text`                                                          | `Typography/RichText`                                          |
 | `u-svg`                                                                | `Media/Icon`                                                   |
 
+**Mast rows and columns are the 12-column grid**, also by name: `row` →
+`Wrapper/Row`, `col` → `Wrapper/Col`. Mast is desktop-first and Trix is
+mobile-first, so translate the classes, do not copy them:
+
+| Mast                                                                                 | Trix                                                                          |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `col-N` (smart column)                                                               | `span={N}` — the automatic stacking is the same table                         |
+| `col-lg-N`                                                                           | `large={N}`                                                                   |
+| `col-md-N` / `col-sm-N` / `col-xs-N` (apply _below_ 992 / 768 / 480)                 | `medium` / `small` / `xsmall` (apply _from_ 768 / 480 / 0)                    |
+| `col-lg-offset-N`                                                                    | `offset={N}`; `row-justify-center` around one column → `offset="center"`      |
+| `col-lg-first` / `col-lg-last`                                                       | `order="first"` / `"last"`                                                    |
+| `col-shrink`, `row-gap-button`                                                       | `Wrapper/ButtonWrapper` (content-sized items are not grid columns)            |
+| `row-align-*`                                                                        | `Row` `align`                                                                 |
+| `row-gap-0` / `-sm` / `-md`                                                          | `Row` `gap` — the step whose measured value matches (`variables.ts`)          |
+| `col-lg-contain-left` / `-right`                                                     | `Wrapper/ContentWrapper variant="breakout"` (`reverse` for right)             |
+| `data-animate="stagger-children"`                                                    | `animate` on the same element — `Section`, `Row`, `Col` or `Grid`             |
+| `spacer-component`, `u-border` dividers                                              | the receiving element's gap or margin; a divider is an `<hr>`                 |
+
+Then check the result with the grid overlay (Shift+G) against the live site:
+Mast's gutter is padding inside each column, Trix's is the row's `gap`, so the
+column _boxes_ differ by half a gutter on each side while the content lines
+up. A column with a background or border shows the difference; give that
+background to an element inside the `Col`, which is where Trix wants it.
+
 **Nothing is being guessed at here.** These are the same components under the
 other convention, and the scanner's provenance line already said so. Carrying
 them in as divs means editing the same markup twice to reach a state one edit
@@ -723,8 +747,10 @@ site-wide, in the layout.
 
 The single exception is Webflow's own IX2, which is compiled into `webflow.js`
 against `data-w-id` attributes and cannot be lifted out. Only that gets
-rebuilt: hovers, fades and scroll reveals in CSS or with an
-`IntersectionObserver`; timelines and scrub-linked animation watched on the
+rebuilt: hovers in CSS; fades and staggered scroll reveals with the
+framework's `animate` prop (timing in the `--reveal-*` tokens — set them to
+the IX2 duration and easing the live site measures); anything else with an
+`IntersectionObserver` in the owning component; timelines and scrub-linked animation watched on the
 live site, described, and confirmed as worth the effort before anyone starts.
 When the last Webflow widget is gone, so is `webflow.js` — and nothing else
 about the site's behaviour should have changed.

@@ -1,7 +1,7 @@
 {
   "name": "trix",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Trix — a design-ready Astro framework. One token system for designers (Figma) and developers (Astro), plus skills that migrate Webflow, Framer, WordPress and other sites.",
   "license": "MIT",
   "repository": {
@@ -35,7 +35,7 @@
     "wrangler": "^4.123.0"
   },
   "trix": {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "basedOn": {
       "name": "Lumos for Astro",
       "version": "0.0.5",

@@ -149,7 +149,8 @@ once, record it, and apply it everywhere.
 ## Animations
 
 Rebuild motion with the lightest tool that holds it: CSS transitions and
-scroll-driven animations first, `IntersectionObserver` for reveals, GSAP only
+scroll-driven animations first, the `animate` prop for fade-up reveals (one
+or staggered; `--reveal-*` tokens carry the source's timing), GSAP only
 for timelines, pinning and scrubbing the platform engine did. Platform engines
 (Webflow IX, Framer Motion appear effects) become components' own scripts,
 targeting data attributes. Match the original's timing and easing, then make

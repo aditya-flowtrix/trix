@@ -320,6 +320,7 @@
   --site-gutter-min: 16;
   --site-gutter-max: 32;
   --site-width: calc(100% - var(--site-margin) * 2);
+  --grid-columns: 12;
   --max-width-small: 70rem;
   --max-width-main: calc(var(--viewport-max) / 16 * 1rem);
   --max-width-full: 100%;
@@ -336,6 +337,10 @@
   --hover-ease: ease;
   --open-duration: var(--hover-duration);
   --open-ease: var(--hover-ease);
+  --reveal-duration: 700ms;
+  --reveal-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --reveal-distance: 1.5rem;
+  --reveal-stagger: 100ms;
 
   /* Components — button */
   --button-padding-block: 0.75em;
