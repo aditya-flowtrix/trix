@@ -18,7 +18,7 @@
  * Writes .trix/tokens.proposed.css and .trix/proposal.md.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { args, output } from "./browser.ts";
 import {
   parseTokens,
@@ -244,38 +244,107 @@ const weightNames: Record<string, string> = {
   "800": "extrabold",
   "900": "black",
 };
-const weights = [
+const current = readFileSync("src/styles/tokens.css", "utf8");
+const tokens = parseTokens(current);
+
+/** Existing Trix scale entries (`--line-height-*`), sorted by value. */
+const scale = (prefix: string) =>
+  tokens
+    .filter((t) => t.name.startsWith(prefix))
+    .map(
+      (t) =>
+        [t.name.slice(prefix.length), parseFloat(t.value)] as [string, number],
+    )
+    .filter(([, v]) => Number.isFinite(v))
+    .sort((a, b) => a[1] - b[1]);
+
+/**
+ * Puts measured values onto the scale's existing names — in order, nearest
+ * value first — so every component and kept style that reads a name still
+ * resolves. A value with no name left gets one and goes on the ask list.
+ */
+function assign(
+  values: number[],
+  names: [string, number][],
+  label: string,
+): Map<number, string> {
+  const v = [...values].sort((a, b) => a - b);
+  const [n, m] = [v.length, names.length];
+  const out = new Map<number, string>();
+  const fit = Math.min(n, m);
+  // f[i][j]: cheapest way to give the first i values increasing names among the first j.
+  const f = Array.from({ length: fit + 1 }, () =>
+    new Array(m + 1).fill(Infinity),
+  );
+  for (let j = 0; j <= m; j++) f[0][j] = 0;
+  for (let i = 1; i <= fit; i++)
+    for (let j = i; j <= m; j++)
+      f[i][j] = Math.min(
+        f[i][j - 1],
+        f[i - 1][j - 1] + Math.abs(v[i - 1] - names[j - 1][1]),
+      );
+  for (let i = fit, j = m; i > 0; j--) {
+    if (f[i][j] !== f[i][j - 1]) {
+      out.set(v[i - 1], names[j - 1][0]);
+      i--;
+    }
+  }
+  for (const extra of v.slice(fit)) {
+    const name = `${names.at(-1)?.[0] ?? label}-${out.size + 1}`;
+    out.set(extra, name);
+    ask.push(
+      `${label}: ${n} values measured, ${m} names exist — ${extra} was named \`${name}\`. Rename it, or consolidate with a neighbour?`,
+    );
+  }
+  return out;
+}
+
+const measuredWeights = [
   ...new Set(slots.flatMap(([, t]) => (t ? [t.weight] : []))),
+];
+const weights = [
+  ...new Set([
+    ...measuredWeights,
+    ...scale("primary-").map(([, w]) => String(w)),
+  ]),
 ].sort();
 
-const lhValues = [
-  ...new Set(slots.flatMap(([, t]) => (t ? [t.lineHeight] : []))),
-].sort((a, b) => a - b);
-const lhNames = [
-  "xsmall",
-  "small",
-  "medium",
-  "large",
-  "xlarge",
-  "huge",
-  "xhuge",
-].slice(0, lhValues.length);
-const lsValues = [
-  ...new Set(slots.flatMap(([, t]) => (t ? [t.letterSpacingEm] : []))),
-].sort((a, b) => a - b);
-const lsNames = (() => {
-  const neg = lsValues.filter((v) => v < 0);
-  const pos = lsValues.filter((v) => v > 0);
-  const negNames = ["tightest", "tighter", "tight"].slice(-neg.length);
-  const posNames = ["wide", "wider", "widest"].slice(0, pos.length);
-  return [
-    ...negNames,
-    ...(lsValues.includes(0) ? ["normal"] : []),
-    ...posNames,
-  ];
-})();
-const lhName = (v: number) => lhNames[lhValues.indexOf(v)];
-const lsName = (v: number) => lsNames[lsValues.indexOf(v)];
+const lineHeights = scale("line-height-");
+const lhMap = assign(
+  [...new Set(slots.flatMap(([, t]) => (t ? [t.lineHeight] : [])))],
+  lineHeights,
+  "line-height",
+);
+const letterSpacings = scale("letter-spacing-");
+const lsMap = assign(
+  [...new Set(slots.flatMap(([, t]) => (t ? [t.letterSpacingEm] : [])))],
+  letterSpacings,
+  "letter-spacing",
+);
+const lhName = (v: number) => lhMap.get(v)!;
+const lsName = (v: number) => lsMap.get(v)!;
+const scaleLines = (
+  prefix: string,
+  defaults: [string, number][],
+  map: Map<number, string>,
+  unit: string,
+) => {
+  const measured = new Map([...map].map(([value, name]) => [name, value]));
+  const names = [...new Set([...defaults.map(([n]) => n), ...measured.keys()])];
+  return names
+    .map(
+      (n) =>
+        [n, measured.get(n) ?? defaults.find(([d]) => d === n)![1]] as [
+          string,
+          number,
+        ],
+    )
+    .sort((a, b) => a[1] - b[1])
+    .map(
+      ([n, value]) =>
+        `  --${prefix}${n}: ${value}${unit};${measured.has(n) ? "" : " /* Trix default, not measured */"}`,
+    );
+};
 
 /* ---------------- spacing, sections, radius ---------------- */
 
@@ -502,11 +571,11 @@ group(
 );
 group(
   "Typography — line height",
-  lhValues.map((v, i) => `  --line-height-${lhNames[i]}: ${v};`),
+  scaleLines("line-height-", lineHeights, lhMap, ""),
 );
 group(
   "Typography — letter spacing",
-  lsValues.map((v, i) => `  --letter-spacing-${lsNames[i]}: ${v}em;`),
+  scaleLines("letter-spacing-", letterSpacings, lsMap, "em"),
 );
 for (const [slot, t] of slots) {
   if (!t) continue;
@@ -571,8 +640,6 @@ if (breakpoints.length)
     ),
   );
 
-const current = readFileSync("src/styles/tokens.css", "utf8");
-const tokens = parseTokens(current);
 const order = [...new Set(tokens.map((t) => t.group))];
 for (const name of Object.keys(lines))
   if (!order.includes(name))
@@ -598,7 +665,91 @@ const body2 = order
       .join("\n")}`;
   })
   .join("\n\n");
-const proposed = `/* Proposed by scripts/measure/propose.ts from ${design.source}. Review .trix/proposal.md before copying into src/styles/tokens.css. */\n\n:root {\n${body2}\n}\n`;
+// Anything the framework still reads (components, themes.css, kept styles)
+// must stay defined: carry the Trix default and say so, never leave a hole.
+const sourceRefs = readdirSync("src", { recursive: true, withFileTypes: true })
+  .filter(
+    (d) =>
+      d.isFile() &&
+      /\.(css|astro)$/.test(d.name) &&
+      !`${d.parentPath}/${d.name}`.includes("generated") &&
+      d.name !== "tokens.css",
+  )
+  .map((d) => readFileSync(`${d.parentPath}/${d.name}`, "utf8"))
+  .join("\n");
+const carried: string[] = [];
+let proposedBody = body2;
+for (let round = 0; round < 5; round++) {
+  const defined = new Set(
+    parseTokens(`:root {${proposedBody}}`).map((t) => t.name),
+  );
+  for (const name of [...defined])
+    if (name.endsWith("-min") && defined.has(`${name.slice(0, -4)}-max`))
+      defined.add(name.slice(0, -4));
+  const refs = new Set(
+    [...`${sourceRefs}\n${proposedBody}`.matchAll(/var\(--([\w-]+)/g)].map(
+      (m) => m[1],
+    ),
+  );
+  const missing = [...refs].filter(
+    (r) => !defined.has(r) && !r.startsWith("_") && !r.startsWith("font-"),
+  );
+  const add = missing.flatMap((r) => {
+    const own = tokens.filter(
+      (t) => t.name === r || t.name === `${r}-min` || t.name === `${r}-max`,
+    );
+    return own.length ? own : [];
+  });
+  if (!add.length) break;
+  carried.push(...add.map((t) => t.name));
+  proposedBody += `\n\n  /* Kept from Trix defaults — still referenced, not measured on the source */\n${add.map((t) => `  --${t.name}: ${t.value};`).join("\n")}`;
+}
+if (carried.length)
+  notes.push(
+    `Kept ${carried.length} Trix default token(s) the framework still references (${carried.join(", ")}). Replace them with the source's values or remap their users.`,
+  );
+
+// Framework components reference spacing steps by number; move each Trix
+// default step to the proposed step with the nearest values.
+const defaultSpaces = tokens
+  .filter((t) => /^space-\d+-min$/.test(t.name))
+  .map((t) => ({
+    step: Number(t.name.split("-")[1]),
+    min: Number(t.value),
+    max: Number(
+      tokens.find((x) => x.name === `space-${t.name.split("-")[1]}-max`)?.value,
+    ),
+  }));
+const remap = defaultSpaces.map((d) => {
+  let best = 0;
+  spaces.forEach((s, i) => {
+    if (
+      Math.abs(s.min - d.min) + Math.abs(s.max - d.max) <
+      Math.abs(spaces[best].min - d.min) + Math.abs(spaces[best].max - d.max)
+    )
+      best = i;
+  });
+  return {
+    from: d.step,
+    to: best + 1,
+    delta:
+      Math.abs(spaces[best].min - d.min) + Math.abs(spaces[best].max - d.max),
+  };
+});
+if (spaces.length && remap.some((r) => r.from !== r.to)) {
+  output(
+    "remap-components.sed",
+    [
+      ...remap.map((r) => `s/var(--space-${r.from})/var(--space-${r.to}__)/g`),
+      "s/__)/)/g",
+    ].join("\n") + "\n",
+  );
+  notes.push(
+    `Framework components reference Trix's default spacing steps. \`.trix/remap-components.sed\` moves each to the nearest proposed step (${remap.map((r) => `${r.from}→${r.to}${r.delta ? ` ±${r.delta}px` : ""}`).join(", ")}). Apply it to src/components and src/styles/patterns.css, then review the ± ones.`,
+  );
+}
+
+const proposed = `/* Proposed by scripts/measure/propose.ts from ${design.source}. Review .trix/proposal.md before copying into src/styles/tokens.css. */\n\n:root {\n${proposedBody}\n}\n`;
 output("tokens.proposed.css", proposed);
 
 const theme = [
