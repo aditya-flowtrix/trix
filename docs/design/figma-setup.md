@@ -101,6 +101,7 @@ variants that match the code's props:
 | **Section**                         | Theme: inherit, light, dark, brand · Padding top/bottom: none, even, xsmall, small, medium, large, xlarge, navoverlap · Align: start, center, end  |
 | **Content wrapper**                 | Variant: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · Reverse · Centered                                   |
 | **Row / Col**                       | Col: span 1–12 (desktop) · offset 0–11 or center · order first, last · per-breakpoint spans only where they differ from the automatic stacking     |
+| **Spacer**                          | Size: 1–12, xsmall–xlarge (an empty frame of that height between two blocks, in place of the gap there)                                            |
 | **Grid**                            | Columns per breakpoint (xsmall, small, medium, large), or autofit / autofill with a minimum column width                                           |
 | **Button**                          | Variant: main, link, arrow, play, close · Emphasis: primary, secondary · Direction (arrow): forward, back · State: default, hover, focus, disabled |
 | **Card**                            | Variant: default, cover, stacked · Theme: inherit, light, dark, brand, invert                                                                      |

@@ -1,0 +1,42 @@
+{
+  "skill_name": "trix-build",
+  "evals": [
+    {
+      "id": 0,
+      "name": "hero-two-columns",
+      "prompt": "Build a hero: heading and text on the left, an image on the right, two columns on desktop and stacked on mobile.",
+      "expected_output": "A Section with Row + Col span={6} (or ContentWrapper variant=\"columns\"), Heading/Paragraph/ButtonWrapper/Img components, no custom CSS, no px, checked at 390 and 1440.",
+      "files": [],
+      "assertions": [
+        "Uses Section and Row/Col or ContentWrapper — no hand-written flex or grid CSS for the columns",
+        "Text uses Heading, Paragraph and ButtonWrapper components, with Heading tag chosen for the outline",
+        "No px values, hex colors or clamp() in the new markup or CSS",
+        "No @media query other than the breakpoint values 30rem, 48rem or 62rem",
+        "npm run check passes"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "more-space-above",
+      "prompt": "There's not enough space above the testimonials block on the about page — add more.",
+      "expected_output": "A <Spacer size> (or the Section's gap) from the spacing scale at that spot; no margin hack fighting the container's zeroed margins, no new px value.",
+      "files": [],
+      "assertions": [
+        "The extra space is a Spacer with a token size, a Section gap change, or a margin-top-N utility — not a custom CSS rule",
+        "No `!important` and no px value was added",
+        "The space between the neighbours equals the chosen token at 390 and 1440"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "dark-variant",
+      "prompt": "Make the pricing section dark.",
+      "expected_output": "theme=\"dark\" on the Section; no color overrides in component CSS.",
+      "files": [],
+      "assertions": [
+        "The section uses theme=\"dark\" (or the theme-dark class)",
+        "No component CSS branches on a theme class or sets palette colors directly"
+      ]
+    }
+  ]
+}

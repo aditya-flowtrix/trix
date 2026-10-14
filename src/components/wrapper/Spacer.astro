@@ -1,0 +1,43 @@
+---
+import type { SectionSpace, SpaceStep } from "@/styles/generated/tokens.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /**
+   * The space, from the spacing scale or a section size. In a Section it
+   * replaces the gap at this spot: the blocks either side end up exactly
+   * this far apart.
+   */
+  size: SpaceStep | Exclude<SectionSpace, "navoverlap">;
+}
+
+const { render = true, size } = Astro.props;
+
+const token = /^\d+$/.test(size) ? `space-${size}` : `section-space-${size}`;
+---
+
+{
+  render && (
+    <div class="spacer" aria-hidden="true" style={`--_size: var(--${token})`} />
+  )
+}
+
+<style is:global>
+  @layer components {
+    .spacer {
+      flex: none;
+      width: 100%;
+      height: var(--_size);
+    }
+    /* A container spaces its children with gap, which would land on both
+       sides of the spacer too: take both back. */
+    .container > .spacer {
+      margin-block: calc(var(--_gap-size) * -1);
+    }
+    /* In a Row or Grid it is a full-width row of its own. Prefer `rowGap`. */
+    :is(.row, .grid) > .spacer {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

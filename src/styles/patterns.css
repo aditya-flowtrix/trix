@@ -31,7 +31,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: var(--_alignment, start);
-  gap: var(--space-9);
+  --_gap-size: var(--space-9);
+  gap: var(--_gap-size);
   position: relative;
   margin-inline: auto;
   & > [class] {

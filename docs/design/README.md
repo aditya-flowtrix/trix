@@ -100,6 +100,11 @@ above and below sections. Use auto layout everywhere, with gaps and padding
 bound to these variables. Elements inside a section are spaced by the
 container's gap, not by individual margins.
 
+Between the blocks of a section, the space is the section's gap (one value
+for the whole section). Where one spot needs more — or less — put a
+**Spacer** there, sized from the scale: in code the blocks either side end up
+exactly that far apart.
+
 ### 7. Themes are modes, not recolors
 
 Every section is designed in a theme: **Light**, **Dark** or **Brand** (and

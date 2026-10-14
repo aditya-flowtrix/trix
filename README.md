@@ -77,6 +77,7 @@ In [`.agents/skills/`](.agents/skills/), loaded by Claude Code as
 
 | Skill                  | Does                                                                        |
 | ---------------------- | --------------------------------------------------------------------------- |
+| `trix-build`           | build pages, sections and styles the Trix way                               |
 | `trix-new-project`     | start a new site from Trix                                                  |
 | `trix-style-guide`     | build the design system from any source — measured, never guessed, verified |
 | `trix-migrate`         | migrate from Webflow, Framer, WordPress, Wix, Squarespace or anything else  |

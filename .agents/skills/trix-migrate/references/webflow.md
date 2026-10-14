@@ -217,7 +217,16 @@ mobile-first, so translate the classes, do not copy them:
 | `row-gap-0` / `-sm` / `-md`                                                          | `Row` `gap` — the step whose measured value matches (`variables.ts`)          |
 | `col-lg-contain-left` / `-right`                                                     | `Wrapper/ContentWrapper variant="breakout"` (`reverse` for right)             |
 | `data-animate="stagger-children"`                                                    | `animate` on the same element — `Section`, `Row`, `Col` or `Grid`             |
-| `spacer-component`, `u-border` dividers                                              | the receiving element's gap or margin; a divider is an `<hr>`                 |
+| `spacer-component` (`cc-sm`, `cc-md`, `cc-lg`)                                       | `<Spacer size>` — the step whose measured height matches                      |
+| `u-border` dividers                                                                  | `<hr>` — spaced by the container's gap                                        |
+
+**Spacer elements from any framework** — Mast's `spacer-component`,
+Client-First's `spacer-small` … `spacer-huge` (or `padding-bottom` on an
+empty div), Relume's spacers — become `<Spacer size>` with the step whose
+value matches the measured height at every width (`design.json` lists
+spacer heights with the spacing series). Lumos for Webflow's
+`u-section-spacer` is not one of them: it is section padding, so it becomes
+`Section`'s `paddingTop` / `paddingBottom`.
 
 Then check the result with the grid overlay (Shift+G) against the live site:
 Mast's gutter is padding inside each column, Trix's is the row's `gap`, so the

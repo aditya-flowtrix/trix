@@ -129,6 +129,13 @@ One page at a time through the same steps, each signed off in `PROJECT.md` →
 **Pages**. When a page needs something the slice did not establish, decide it
 once, record it, and apply it everywhere.
 
+Exports are div soup; fix the semantics while translating, since nobody will
+come back for it: one `<h1>` per page and heading levels that step down
+without skips (the look comes from `variant`, the level from `tag`),
+`<article>` and `<time datetime>` on CMS detail pages, `<th scope="col">` in
+table headers, `rel="noopener"` on `target="_blank"` links, and no
+`noindex` meta the export or staging left behind.
+
 ## Phase 5 — Data
 
 - **CMS → content collections.** One collection per source collection in
@@ -137,14 +144,18 @@ once, record it, and apply it everywhere.
   Markdown/MDX or sanitized HTML. Counts must match the source exactly. A
   headless CMS later only changes the loader.
 - **Lists** — every filter, sort and limit, read from the platform (they are
-  not in exports), written into `PROJECT.md`.
+  not in exports), written into `PROJECT.md`. Empty states, pagination and
+  filter controls have no runtime in a static site: build them (`.filter()`
+  and `.slice()` at build time, `paginate()` routes, or a small script in
+  the list's component) or note them as follow-ups — never ship a control
+  that does nothing.
 - **Forms** — every form, its fields, validation and destination. Pick the
   provider with the owner; test each form end to end.
 - **Redirects** — the platform's existing list plus every URL this migration
   changes, in `astro.config.mjs` `redirects` or the host's rules. Test each.
 - **SEO parity** — title, description, canonical, OG/Twitter, JSON-LD,
-  `noindex`, sitemap and robots per page match the inventory. (Deeper SEO work
-  is the separate SEO skill set.)
+  `noindex`, sitemap and robots per page match the inventory — checked with
+  `/trix-seo`'s parity script, not by eye.
 
 ## Animations
 

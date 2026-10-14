@@ -46,6 +46,7 @@ Task-specific procedures live in `.agents/skills/<name>/SKILL.md`, alongside
 any scripts they need. Measuring tools shared by several skills live in
 `scripts/measure/`.
 
+- `trix-build` — build pages, sections, components and styles the Trix way.
 - `trix-new-project` — start a new site from Trix.
 - `trix-style-guide` — build the design system from any source, measured and verified.
 - `trix-migrate` — migrate a Webflow, Framer, WordPress or any other site.

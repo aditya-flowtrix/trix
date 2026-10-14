@@ -99,6 +99,9 @@ undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
 
 ## Building a page
 
+- Space between a section's blocks is its container's `gap`; change it with
+  `Section`'s `gap`, or at one spot with `<Spacer size>` (exact: it takes the
+  gap back on both sides). Never a margin fighting the container.
 - Compose the page directly from existing components. Use `Section`, `Row` and
   `Col`, `Grid`, `Slider` and the other layout components instead of hiding an ordinary layout
   inside a custom component.

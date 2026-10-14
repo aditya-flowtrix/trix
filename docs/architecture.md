@@ -17,13 +17,11 @@ rebuilt the Lumos way: a typed component, CSS co-located in
 | Spacing owned by the receiving element; containers space children with `gap` | Skill evals (prompts with assertions)                                                                                                                          | Webflow breakpoints as defaults (30 / 48 / 62rem)                                                                                                                               |
 | `_wrap` naming, variants as bare classes                                     | 12-column grid with automatic stacking — `Row` / `Col` (`span`, `offset`, `order`); on CSS Grid, mobile-first, with the gutter and margin from the site tokens | 12-step spacing scale, 13 text styles, palette ramps, component tokens                                                                                                          |
 | Themes as classes with semantic tokens, `theme-invert`                       | Scroll-in reveal with stagger — an `animate` prop, timed by `--reveal-*` tokens, CSS-only hiding (no `html.js` class)                                          | Conventions check in CI; `PROJECT.md` outside the framework                                                                                                                     |
-| Agent skills with Node scripts                                               | Link prefetch; rich-text tables and dividers                                                                                                                   | Platform adapters for Framer, WordPress and others · SEO toolkit: audit, migration parity, structured data, breadcrumbs · fonts from any source, leading trim measured per font |
+| Agent skills with Node scripts                                               | Link prefetch; rich-text tables and dividers; `Spacer` — rebuilt to take back the container's gap, so the space at that spot is exactly its size               | Platform adapters for Framer, WordPress and others · SEO toolkit: audit, migration parity, structured data, breadcrumbs · fonts from any source, leading trim measured per font |
 
 What Trix deliberately did **not** take from Mast: one global
 `components.css` (Trix keeps CSS with its component), `em`-based spacing
-utilities (they drift with font size), the `Spacer` and `Divider` margin
-components (in Lumos the receiving element owns its space and containers use
-`gap`; an `<hr>` is styled instead), negative-margin rows with padding gutters
+utilities (they drift with font size), a `Divider` component (an `<hr>` is styled instead, and the container's `gap` spaces it), negative-margin rows with padding gutters
 (CSS Grid's `gap` is the gutter, so a column's box is its content), `cc-` combo classes and `u-` prefixes
 (Webflow-era naming), and `light-dark()` as the only theming mechanism (Trix
 themes are N classes — light, dark, brand, any number more — which maps to

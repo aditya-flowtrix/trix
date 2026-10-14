@@ -38,7 +38,12 @@ SEO phase, fonts from any source and the design-change skill.
 - Link prefetch on hover and focus.
 - `Video`: autoplaying videos get a pause button (WCAG 2.2.2), which starts
   paused for visitors who prefer reduced motion; `pauseButton={false}` for a
-  clip of five seconds or less. Allowed inside `ContentWrapper` visuals.
+  clip of five seconds or less; `pausePosition` puts it in any of nine
+  places (corners, edges, center). Allowed inside `ContentWrapper` visuals.
+- `Spacer` (from Mast, rebuilt): space from the scale at one spot. In a
+  Section it takes the container's gap back on both sides, so the blocks
+  either side are exactly `size` apart — more or less than the gap; in a Col
+  it adds `size`. Lumos's own "spacer" was already `Section` padding.
 
 ### Fonts and design changes
 
@@ -93,8 +98,12 @@ SEO phase, fonts from any source and the design-change skill.
 - `propose.ts` writes `--site-margin`, `--site-gutter` and `--max-width-main`
   from it and asks about layouts off the grid. On the Remsons export it
   recovers the site's own 16→40 margin, 12→16 gutter and 1280 max width.
-- `trix-migrate`: Mast rows and columns to `Row`/`Col` (desktop-first to
-  mobile-first), stagger animations to `animate`, IX2 fades to `animate` with
+- `trix-build` (from Mast's `mast-build`): the ten places Trix differs from
+  ordinary web practice, loaded whenever markup or CSS is written.
+- `trix-migrate`: from Mast's `mast-migrate`, the semantics to fix while
+  translating, and no dead pagination or filter controls; spacers from any
+  framework become `<Spacer>`; Mast rows and columns to `Row`/`Col`
+  (desktop-first to mobile-first), stagger animations to `animate`, IX2 fades to `animate` with
   `--reveal-*` set from the source. New eval for a Mast site.
 - `trix-import-figma`: frame layout grids give the site margin and gutter;
   blocks become `span` and `offset`.

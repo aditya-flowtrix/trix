@@ -12,6 +12,7 @@ import background from "@/assets/graphics/background.svg";
 import logo_icon from "@/assets/logo/logo-icon.svg";
 import Grid from "@/components/wrapper/Grid.astro";
 import Breadcrumbs from "@/components/global/Breadcrumbs.astro";
+import Spacer from "@/components/wrapper/Spacer.astro";
 import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
 import Card from "@/components/item/Card.astro";
@@ -269,6 +270,13 @@ const lorem =
         image={background}
       />
     </Grid>
+  </Section>
+  <!-- spacer -->
+  <Section paddingTop="small" paddingBottom="small">
+    <Eyebrow>spacer · size="xlarge" in place of the gap</Eyebrow>
+    <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
+    <Spacer size="xlarge" />
+    <Paragraph maxWidth={36}>{text}</Paragraph>
   </Section>
   <!-- row: media and text, 6 + 5 with a column of air -->
   <Section paddingTop="small" paddingBottom="small">

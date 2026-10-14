@@ -16,6 +16,7 @@ other attributes to its root element. `class` accepts utility classes only.
 | `Wrapper/ContentWrapper`      | a block of eyebrow, heading, text and buttons, alone or beside media                 | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `column2` slot                                                                                                                                                           |
 | `Wrapper/Grid`                | repeating, equal-width items: cards, logos, team                                     | `xsmall` / `small` / `medium` / `large` column counts, or `variant` autofit / autofill with `minColumnWidth`, `maxColumnCount` · `animate` · children may use `span-*` classes                                                                                                                    |
 | `Global/Breadcrumbs`          | the trail from the home page to this one, with its BreadcrumbList structured data    | `items` (label, href; the last item is this page) · `schema` (default true)                                                                                                                                                                                                                       |
+| `Wrapper/Spacer`              | one spot that needs more (or less) space than the container's gap                    | `size` (1–12, xsmall–xlarge): in a Section the blocks either side end up exactly this far apart; in a Col it adds this much                                                                                                                                                                       |
 | `Wrapper/ButtonWrapper`       | a row of buttons                                                                     | `marginTop` (default, 0, 1–12, auto)                                                                                                                                                                                                                                                              |
 
 `Section`, `Row`, `Col` and `Grid` take `animate`: their children fade up
@@ -50,12 +51,12 @@ anywhere with `gridOverlay`.
 
 ## Media
 
-| Component       | Use it for                                 | Variants and key props                                                                                                                                    |
-| --------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Media/Img`     | every image (optimised, responsive srcset) | `variant`: full-width, constrained, densities · `width` / `height` · `transparent` · `loading`, `fetchPriority`                                           |
-| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto · `pauseButton` (on with `autoplay`; WCAG 2.2.2)                                                  |
-| `Media/Icon`    | icons                                      | `name` (a Phosphor icon) + `weight` (thin, light, regular, bold, fill, duotone), or `src` (an imported SVG) · `variant`: small, medium, large, full-width |
-| `Media/Overlay` | a tint over media                          | `variant`: solid, gradient                                                                                                                                |
+| Component       | Use it for                                 | Variants and key props                                                                                                                                                                                        |
+| --------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Media/Img`     | every image (optimised, responsive srcset) | `variant`: full-width, constrained, densities · `width` / `height` · `transparent` · `loading`, `fetchPriority`                                                                                               |
+| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto · `pauseButton` (on with `autoplay`; WCAG 2.2.2) · `pausePosition` (top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right) |
+| `Media/Icon`    | icons                                      | `name` (a Phosphor icon) + `weight` (thin, light, regular, bold, fill, duotone), or `src` (an imported SVG) · `variant`: small, medium, large, full-width                                                     |
+| `Media/Overlay` | a tint over media                          | `variant`: solid, gradient                                                                                                                                                                                    |
 
 ## Interactive
 
