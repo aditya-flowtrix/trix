@@ -102,4 +102,5 @@ color mode, and skill evals. Icons by [Phosphor](https://phosphoricons.com)
 
 ## License
 
-[MIT](LICENSE).
+[MIT](LICENSE), © Flowtrix. Third-party notices, including Lumos for Astro's
+license, are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
