@@ -1,0 +1,47 @@
+{
+  "skill_name": "trix-style-guide",
+  "evals": [
+    {
+      "id": 0,
+      "name": "webflow-export-with-variables",
+      "prompt": "Set up the style guide for this project from our Webflow site. The code export is at {INPUTS}/webflow-export. Match it exactly.",
+      "expected_output": "tokens.css and themes.css filled with the export's measured values under Trix names, the fluid range taken from the source, `npm run tokens` run, verify.ts reporting every check identical, decisions in PROJECT.md.",
+      "files": ["webflow-export/"],
+      "assertions": [
+        "inventory.ts and design.ts were run against the export before any token was written",
+        "No Webflow variable name (--_spacing---, --_typography---, --_color---, --_theme---) appears anywhere under src/",
+        "--viewport-max equals the width at which the measured series stop growing, not Trix's default, when they differ",
+        "Translucent colors were expressed as color-mix of an existing swatch or currentcolor, not as new swatches",
+        "The owner was asked every item on proposal.md's ask list in a single message before tokens were written",
+        "verify.ts exits 0 against /style-guide",
+        "PROJECT.md → Design system lists the text-style map, spacing map, fluid range and quirks kept"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "site-without-style-guide",
+      "prompt": "This client's site was hand-built years ago and has no style guide at all: https://example.com. Build a proper Trix design system from it without changing how it looks.",
+      "expected_output": "A complete tokens.css derived from measurement alone, with an ask list of consolidation decisions put to the user before writing, and every consolidated value reported with its delta.",
+      "files": [],
+      "assertions": [
+        "Values come from design.ts measurements, not from reading CSS by name",
+        "No value differing by more than 0.5px from the measurement was written without the user's explicit approval",
+        "Every consolidated value is listed in the report with the original and new value",
+        "Text styles use Trix slot names (display, h1–h6, text-*, eyebrow), not the site's class names",
+        "npm run check passes"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "framer-stepped-type",
+      "prompt": "Match the type and spacing of our Framer site https://example.framer.website in Trix.",
+      "expected_output": "Breakpoint tokens set to the Framer site's measured breakpoints; stepped series reported and resolved with the user (kept stepped in component media queries, or made fluid between the breakpoint values).",
+      "files": [],
+      "assertions": [
+        "--breakpoint-* tokens equal the site's measured media query widths",
+        "Stepped series were listed to the user rather than silently made fluid",
+        "No framer- class or --token- variable name appears under src/"
+      ]
+    }
+  ]
+}

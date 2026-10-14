@@ -1,0 +1,77 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Button from "@/components/Button.astro";
+import type { Theme } from "@/styles/generated/tokens.ts";
+
+interface Props extends HTMLAttributes<"div"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Color theme of element and its children. */
+  theme: Theme;
+}
+
+const { render = true, theme, class: className, ...rest } = Astro.props;
+---
+
+{
+  render && theme && (
+    <div
+      class:list={["style-guide-theme_wrap", `theme-${theme}`, className]}
+      {...rest}
+    >
+      <code class="style-guide-theme_name text-style-small">theme-{theme}</code>
+      <p class="text-style-h4">Aa</p>
+      <p class="text-style-main">Text on the theme background.</p>
+      <p class="text-style-small style-guide-theme_muted">
+        Secondary text — --text-2
+      </p>
+      <a href="#colors">Text link</a>
+      <div class="style-guide-theme_buttons">
+        <Button>Button</Button>
+        <Button emphasis="secondary">Secondary</Button>
+      </div>
+      <div class="style-guide-theme_surface text-style-small">
+        --background-2
+        <div class="style-guide-theme_surface text-style-small">
+          --background-3
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-theme_wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-medium);
+
+      .style-guide-theme_muted {
+        color: var(--text-2);
+      }
+      .style-guide-theme_buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+      .style-guide-theme_surface {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        align-self: stretch;
+        padding: var(--space-3) var(--space-4);
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-small);
+        background-color: var(--background-2);
+        & .style-guide-theme_surface {
+          background-color: var(--background-3);
+        }
+      }
+    }
+  }
+</style>

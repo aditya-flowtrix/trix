@@ -11,7 +11,7 @@ jobs:
     name: Merge safe Astro updates
     if: >-
       github.event.pull_request.user.login == 'dependabot[bot]' &&
-      github.repository == 'lumosframework/lumos-for-astro'
+      github.repository == 'aditya-flowtrix/trix'
     runs-on: ubuntu-latest
     steps:
       - name: Read update details

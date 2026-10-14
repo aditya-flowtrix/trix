@@ -1,8 +1,15 @@
-# Lumos for Astro
+# Trix
 
-This is **Lumos for Astro**, an Astro component framework styled with plain CSS
-and custom properties. Do not apply conventions from **Lumos for Webflow**.
-Project conventions live in `LUMOS.md` and `.agents/skills/`.
+This is **Trix**, a design-ready Astro framework built on Lumos for Astro,
+styled with plain CSS and custom properties. Do not apply conventions from
+Lumos for Webflow, Mast, Client-First or Tailwind.
+
+Read in this order before changing anything:
+
+1. [`PROJECT.md`](PROJECT.md) — this project's record: sources, decisions,
+   what is still open. Write each decision into it the moment it is made.
+2. [`TRIX.md`](TRIX.md) — how to build pages, components, styles and tokens.
+3. The skill for the task, in `.agents/skills/`.
 
 ## Development
 
@@ -13,6 +20,13 @@ astro dev --background
 ```
 
 Use `astro dev stop`, `astro dev status`, and `astro dev logs` to manage it.
+
+- `npm run tokens` — regenerate everything derived from `src/styles/tokens.css`
+  and `themes.css` (also runs on save while `astro dev` is running).
+- `npm run check` — tokens in sync, conventions, `astro check`. Must pass.
+- `npm run build` — must pass.
+
+Never edit `src/styles/generated/`, `design/tokens/` or `docs/tokens.md`.
 
 ## Astro documentation
 
@@ -26,27 +40,26 @@ on these areas:
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
 
-## Building
-
-Read [LUMOS.md](LUMOS.md) before adding pages, components, or styles.
-
 ## Skills
 
 Task-specific procedures live in `.agents/skills/<name>/SKILL.md`, alongside
-any scripts they need.
+any scripts they need. Measuring tools shared by several skills live in
+`scripts/measure/`.
 
-- `lumos-import-figma` — build pages or variables from a Figma file.
-- `lumos-audit-props` — check prop order and tooltip consistency.
-- `lumos-scaling-graphic` — build an editable graphic that scales as one piece.
-- `lumos-import-webflow` — migrate a Webflow export and connect its CMS.
-- `lumos-upgrade-version` — upgrade Lumos without losing customizations.
+- `trix-new-project` — start a new site from Trix.
+- `trix-style-guide` — build the design system from any source, measured and verified.
+- `trix-migrate` — migrate a Webflow, Framer, WordPress or any other site.
+- `trix-import-figma` — build pages or tokens from a Figma file.
+- `trix-audit-props` — check prop order and tooltip consistency.
+- `trix-scaling-graphic` — build an editable graphic that scales as one piece.
+- `trix-upgrade` — upgrade a site to the latest Trix; sync Trix with Lumos.
 
 `.agents/skills/` is the source of truth. Claude Code loads the same skills from
 relative symlinks in `.claude/skills/`. For each new skill, add
 `.claude/skills/<name>` pointing to `../../.agents/skills/<name>`.
 
-- Codex: use `$lumos-import-figma` or ask for the skill by name. Restart Codex
+- Codex: use `$trix-style-guide` or ask for the skill by name. Restart Codex
   if a new skill does not appear.
-- Claude Code: use `/lumos-import-figma` or let it load the skill when relevant.
+- Claude Code: use `/trix-style-guide` or let it load the skill when relevant.
 - Other assistants: read `SKILL.md` directly. Instructions are Markdown and
   scripts are Node.

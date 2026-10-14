@@ -1,0 +1,72 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { slotContent } from "@/utils/slots.ts";
+
+interface Props extends HTMLAttributes<"div"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Class name shown above the sample. */
+  label: string;
+  /** Item style. */
+  variant?: "plain" | "card" | "dark";
+}
+
+const {
+  render = true,
+  label,
+  variant = "plain",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const content = await slotContent(Astro.slots);
+---
+
+{
+  render && label && content && (
+    <div
+      class:list={[
+        "style-guide-item_wrap",
+        variant !== "plain" && variant,
+        variant === "dark" && "theme-dark",
+        className,
+      ]}
+      {...rest}
+    >
+      <code class="style-guide-item_label text-style-small">{label}</code>
+      <Fragment set:html={content} />
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-item_wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-6);
+      min-width: 0;
+
+      &.card,
+      &.dark {
+        justify-content: space-between;
+        height: 100%;
+        padding: var(--space-5) var(--space-4);
+        border-radius: var(--radius-medium);
+        background-color: var(--background-2);
+      }
+      &.dark {
+        background-color: var(--background);
+      }
+      .style-guide-item_label {
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--radius-xsmall);
+        background-color: var(--background-3);
+        color: var(--text);
+        font-family: var(--primary-family);
+        letter-spacing: 0.01em;
+      }
+    }
+  }
+</style>

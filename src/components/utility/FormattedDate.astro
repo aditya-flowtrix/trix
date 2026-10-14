@@ -26,7 +26,7 @@ const isValid = date instanceof Date && !Number.isNaN(date.getTime());
 
 if (import.meta.env.DEV && !isValid) {
   console.warn(
-    "[lumos] <FormattedDate> rendered without a valid `date`; nothing was output.",
+    "[trix] <FormattedDate> rendered without a valid `date`; nothing was output.",
   );
 }
 

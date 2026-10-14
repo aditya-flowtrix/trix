@@ -1,29 +1,21 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slotContent } from "@/utils/slots.ts";
+import type {
+  SectionSpace as SectionSize,
+  SpaceStep,
+  Theme,
+} from "@/styles/generated/tokens.ts";
 
-type SectionSpace =
-  "none" | "even" | "small" | "medium" | "large" | "navoverlap";
+type SectionSpace = "none" | "even" | SectionSize;
 
-type ContainerGap =
-  | "0"
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "small"
-  | "medium"
-  | "large";
+type ContainerGap = "0" | SpaceStep | Exclude<SectionSize, "navoverlap">;
 
 interface Props extends HTMLAttributes<"section"> {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /** Color theme of element and its children. */
-  theme?: "inherit" | "light" | "dark" | "brand";
+  theme?: "inherit" | Theme;
   /** Top padding. */
   paddingTop?: SectionSpace;
   /** Bottom padding. */
@@ -45,7 +37,7 @@ const {
   theme = "inherit",
   paddingTop = "medium",
   paddingBottom = "medium",
-  gap = "8",
+  gap = "9",
   align,
   fullHeight = false,
   containerClass,
@@ -89,7 +81,7 @@ const background = await slotContent(Astro.slots, "background");
         <div
           class:list={[
             "container",
-            gap !== "8" && `gap-${gap}`,
+            gap !== "9" && `gap-${gap}`,
             containerClass,
             containerAttrsClass,
           ]}

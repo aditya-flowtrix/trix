@@ -1,19 +1,9 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slotContent } from "@/utils/slots.ts";
+import type { TextStyle } from "@/styles/generated/tokens.ts";
 
-type HeadingStyle =
-  | "inherit"
-  | "display"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "large"
-  | "main"
-  | "small";
+type HeadingStyle = "inherit" | TextStyle;
 
 interface Props extends HTMLAttributes<"div"> {
   /** Set to `false` to omit the component. */

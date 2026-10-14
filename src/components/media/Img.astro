@@ -79,7 +79,7 @@ const {
 const alt = altProp ?? "";
 
 if (import.meta.env.DEV && !src) {
-  console.warn("[lumos] <Img> rendered without a `src`; nothing was output.");
+  console.warn("[trix] <Img> rendered without a `src`; nothing was output.");
 }
 
 const isSvg =
@@ -106,7 +106,7 @@ if (import.meta.env.DEV && src && (isPublicPath || isSvg)) {
     const why = isPublicPath
       ? `files in public/ are served as-is — import from src/assets to optimize`
       : `SVG sources are passed through unoptimized`;
-    console.warn(`[lumos] <Img> ignores ${inert.join(", ")}: ${why}.`);
+    console.warn(`[trix] <Img> ignores ${inert.join(", ")}: ${why}.`);
   }
 }
 
@@ -119,7 +119,7 @@ if (
   !hasEitherDimension
 ) {
   console.warn(
-    `[lumos] <Img variant="densities"> has no width or height, so both densities resolve to the source's own size and each srcset entry points at the same file. Set the size it displays at.`,
+    `[trix] <Img variant="densities"> has no width or height, so both densities resolve to the source's own size and each srcset entry points at the same file. Set the size it displays at.`,
   );
 }
 
@@ -128,7 +128,7 @@ const unoptimizedRemote = isFetchable && !variantSpecified;
 
 if (import.meta.env.DEV && isFetchable && variantSpecified && !remoteAllowed) {
   console.warn(
-    `[lumos] <Img src="${src}"> generates a srcset for a remote host. Every entry repeats the original URL unless the host is listed in image.remotePatterns or image.domains.`,
+    `[trix] <Img src="${src}"> generates a srcset for a remote host. Every entry repeats the original URL unless the host is listed in image.remotePatterns or image.domains.`,
   );
 }
 
@@ -162,7 +162,7 @@ if (import.meta.env.DEV && cropsToRatio) {
   );
   if (variant === "full-width" && dropped.length) {
     console.warn(
-      `[lumos] <Img> crops to ${width}×${height}, which a ${source!.width}×${source!.height} source can only hold up to ${widthLimit}px wide. Widths ${dropped.join(", ")} were dropped rather than enlarged; a source that tall is needed to serve them.`,
+      `[trix] <Img> crops to ${width}×${height}, which a ${source!.width}×${source!.height} source can only hold up to ${widthLimit}px wide. Widths ${dropped.join(", ")} were dropped rather than enlarged; a source that tall is needed to serve them.`,
     );
   }
 }

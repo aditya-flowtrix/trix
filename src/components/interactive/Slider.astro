@@ -25,7 +25,7 @@ type Props = HTMLAttributes<"div"> & {
    * @min 1
    * @max 12 */
   medium?: number;
-  /** Slides shown from 64rem. Inherits `medium`.
+  /** Slides shown from 62rem. Inherits `medium`.
    *
    * @min 1
    * @max 12 */
@@ -52,7 +52,7 @@ const invalid = Object.entries(counts).filter(
 
 if (import.meta.env.DEV && invalid.length) {
   console.warn(
-    `[lumos] <Slider> ignores ${invalid.map(([size]) => size).join(", ")}: slides in view must be greater than 0.`,
+    `[trix] <Slider> ignores ${invalid.map(([size]) => size).join(", ")}: slides in view must be greater than 0.`,
   );
 }
 
@@ -293,7 +293,7 @@ const slides = await slotContent(Astro.slots);
       --_visible-md: var(--_visible-sm);
       --_visible-lg: var(--_visible-md);
       display: grid;
-      gap: var(--space-6);
+      gap: var(--space-7);
       width: 100%;
 
       @media (width >= 30rem) {
@@ -302,7 +302,7 @@ const slides = await slotContent(Astro.slots);
       @media (width >= 48rem) {
         --_visible: var(--_visible-md);
       }
-      @media (width >= 64rem) {
+      @media (width >= 62rem) {
         --_visible: var(--_visible-lg);
       }
     }
@@ -365,7 +365,7 @@ const slides = await slotContent(Astro.slots);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-4);
+      gap: var(--space-5);
 
       .slider_wrap:not(.is-ready) &,
       &.is-empty {
@@ -376,7 +376,7 @@ const slides = await slotContent(Astro.slots);
     .slider_markers {
       display: flex;
       align-items: center;
-      gap: var(--space-2);
+      gap: var(--space-3);
     }
 
     .slider_marker {
@@ -400,7 +400,7 @@ const slides = await slotContent(Astro.slots);
 
     .slider_steps {
       display: flex;
-      gap: var(--space-2);
+      gap: var(--space-3);
     }
   }
 </style>

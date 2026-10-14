@@ -1,28 +1,46 @@
 {
-  "name": "lumos-for-astro",
+  "name": "trix",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.1.0",
+  "description": "Trix — a design-ready Astro framework. One token system for designers (Figma) and developers (Astro), plus skills that migrate Webflow, Framer, WordPress and other sites.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aditya-flowtrix/trix.git"
+  },
   "engines": {
     "node": ">=22.19.0"
   },
   "scripts": {
     "dev": "astro dev",
-    "check": "astro check",
+    "tokens": "node scripts/tokens.ts",
+    "check": "node scripts/tokens.ts --check && node scripts/conventions.ts && astro check",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
     "@astrojs/sitemap": "^3.7.4",
+    "@phosphor-icons/core": "^2.1.1",
     "astro": "^7.3.8",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "playwright-core": "^1.64.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "wrangler": "^4.123.0"
+  },
+  "trix": {
+    "version": "0.1.0",
+    "basedOn": {
+      "name": "Lumos for Astro",
+      "version": "0.0.5",
+      "commit": "0e32ded964de80d62636346c2e0e3fb3a701beda",
+      "repository": "https://github.com/lumosframework/lumos-for-astro"
+    }
   }
 }

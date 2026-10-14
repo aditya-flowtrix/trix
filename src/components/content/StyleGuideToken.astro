@@ -1,0 +1,99 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Token name without the leading dashes. */
+  token: string;
+  /** Value shown under the token name. */
+  value?: string;
+  /** Token kind. */
+  variant?: "color" | "space" | "radius";
+}
+
+const {
+  render = true,
+  token,
+  value,
+  variant = "color",
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+{
+  render && token && (
+    <div
+      class:list={[
+        "style-guide-token_wrap",
+        variant !== "color" && variant,
+        className,
+      ]}
+      style={`--_token: var(--${token});`}
+      {...rest}
+    >
+      <div class="style-guide-token_visual" aria-hidden="true" />
+      <div class="style-guide-token_info">
+        <code class="style-guide-token_name text-style-small">--{token}</code>
+        {value && (
+          <span class="style-guide-token_value text-style-xsmall">{value}</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-token_wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      min-width: 0;
+
+      .style-guide-token_visual {
+        aspect-ratio: 3 / 2;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-medium);
+        background-color: var(--_token);
+      }
+      .style-guide-token_info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .style-guide-token_value {
+        color: var(--text-2);
+      }
+
+      &.space {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-5);
+        .style-guide-token_info {
+          flex: none;
+          order: -1;
+          width: min(20rem, 60%);
+        }
+        .style-guide-token_visual {
+          flex: 0 1 var(--_token);
+          min-width: 0;
+          height: 1.5rem;
+          aspect-ratio: auto;
+          border: 0;
+          border-radius: 0;
+          background-color: var(--button-background);
+        }
+      }
+
+      &.radius .style-guide-token_visual {
+        width: 5rem;
+        aspect-ratio: 1;
+        border-color: var(--text);
+        border-radius: var(--_token);
+        background-color: var(--background-2);
+      }
+    }
+  }
+</style>

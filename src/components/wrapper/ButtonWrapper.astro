@@ -1,9 +1,9 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slotContent } from "@/utils/slots.ts";
+import type { SpaceStep } from "@/styles/generated/tokens.ts";
 
-type WrapperMargin =
-  "default" | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "auto";
+type WrapperMargin = "default" | "0" | SpaceStep | "auto";
 
 interface Props extends HTMLAttributes<"div"> {
   /** Set to `false` to omit the component. */

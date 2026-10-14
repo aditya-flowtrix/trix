@@ -1,0 +1,489 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Grid from "@/components/wrapper/Grid.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import RichText from "@/components/typography/RichText.astro";
+import Icon from "@/components/media/Icon.astro";
+import Img from "@/components/media/Img.astro";
+import Button from "@/components/Button.astro";
+import StyleGuideTitle from "@/components/content/StyleGuideTitle.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
+import StyleGuideTheme from "@/components/content/StyleGuideTheme.astro";
+import logo from "@/assets/logo/logo.svg";
+import logoIcon from "@/assets/logo/logo-icon.svg";
+import tokensCss from "@/styles/tokens.css?raw";
+import themesCss from "@/styles/themes.css?raw";
+import {
+  buildModel,
+  fluidAt,
+  resolveColor,
+  resolveVar,
+  toHex,
+  toPx,
+} from "@/utils/tokens.ts";
+import type { Theme, TextStyle } from "@/styles/generated/tokens.ts";
+import type { SvgComponent } from "astro/types";
+
+const model = buildModel(tokensCss, themesCss);
+const value = (name: string) => resolveVar(`var(--${name})`, model.byName);
+const px = (n?: number) =>
+  n === undefined ? "" : `${Math.round(n * 10) / 10}px`;
+const range = (name: string) => {
+  const [a, b] = [fluidAt(model, name, 320), fluidAt(model, name, 1440)];
+  return a === b ? px(a) : `${px(a)} → ${px(b)}`;
+};
+const lengthLabel = (name: string) => {
+  const raw = value(name);
+  const n = toPx(raw);
+  return n === undefined || raw.endsWith("px") ? raw : `${raw} · ${px(n)}`;
+};
+
+const typeStyles = model.textStyles.map((name) => {
+  const cls = name.replace(/^text-/, "");
+  const parts = [
+    range(name),
+    `line-height ${value(`${name}-line-height`)}`,
+    `letter-spacing ${value(`${name}-letter-spacing`)}`,
+    `weight ${value(`${name}-font-weight`)}`,
+  ];
+  const transform = value(`${name}-text-transform`);
+  if (transform && transform !== "none") parts.push(transform);
+  return {
+    cls,
+    heading: /^(display|h\d)$/.test(name),
+    note: parts.join(" · "),
+  };
+});
+
+const paletteGroups = Object.entries(
+  Object.groupBy(model.palette, (t) => t.name.replace(/-\d+$/, "")),
+).map(([name, tokens]) => ({
+  name,
+  tokens: (tokens ?? []).map((t) => ({
+    name: t.name,
+    hex: toHex(resolveColor(t.value, [model.byName]) ?? [0, 0, 0, 0]),
+  })),
+}));
+const singles = paletteGroups.filter((g) => g.tokens.length === 1);
+const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
+
+const breakpointNote: Record<string, string> = {
+  small: "Webflow mobile landscape",
+  medium: "Webflow tablet",
+  large: "Webflow desktop",
+};
+const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
+const phosphor = [
+  "arrow-right",
+  "check",
+  "x",
+  "list",
+  "magnifying-glass",
+  "envelope-simple",
+  "phone",
+  "map-pin",
+  "download-simple",
+  "play",
+];
+const weights = [
+  "thin",
+  "light",
+  "regular",
+  "bold",
+  "fill",
+  "duotone",
+] as const;
+const customIcons = Object.entries(
+  import.meta.glob<{ default: SvgComponent }>("@/assets/icons/*.svg", {
+    eager: true,
+  }),
+).map(([path, mod]) => ({
+  name: path.split("/").pop()!,
+  src: mod.default,
+}));
+
+const lorem =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.";
+---
+
+<Layout
+  title="Style Guide"
+  description="Every token in the design system, rendered live from src/styles/tokens.css."
+>
+  <!-- Intro -->
+  <Section paddingBottom="none">
+    <Heading tag="h1">Style Guide</Heading>
+    <Paragraph variant="large" maxWidth={60}>
+      Rendered from <code>src/styles/tokens.css</code> and
+      <code>src/styles/themes.css</code>. Change a token and this page, the
+      utilities, the Figma variables and the docs follow.
+    </Paragraph>
+  </Section>
+
+  <!-- Brand -->
+  <Section id="brand" gap="9">
+    <StyleGuideTitle>Brand</StyleGuideTitle>
+
+    <StyleGuideGroup title="Logo" variant="grid">
+      <StyleGuideItem label="assets/logo/logo.svg" variant="card">
+        <Icon src={logo} variant="full-width" aria-label="Logo" />
+      </StyleGuideItem>
+      <StyleGuideItem label="assets/logo/logo.svg" variant="dark">
+        <Icon src={logo} variant="full-width" aria-label="Logo" />
+      </StyleGuideItem>
+      <StyleGuideItem label="assets/logo/logo-icon.svg" variant="card">
+        <Icon src={logoIcon} variant="large" aria-label="Logo mark" />
+      </StyleGuideItem>
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Site icons" variant="grid">
+      <StyleGuideItem label="favicon.svg" variant="card">
+        <Img
+          src="/favicon.svg"
+          alt="Favicon"
+          width={32}
+          height={32}
+          variant="densities"
+          transparent
+        />
+      </StyleGuideItem>
+      <StyleGuideItem label="favicon.ico · 32 × 32" variant="card">
+        <Img
+          src="/favicon.ico"
+          alt="Legacy favicon"
+          width={32}
+          height={32}
+          variant="densities"
+          transparent
+        />
+      </StyleGuideItem>
+      <StyleGuideItem label="apple-touch-icon.png · 180 × 180" variant="card">
+        <Img
+          src="/apple-touch-icon.png"
+          alt="Webclip"
+          width={180}
+          height={180}
+          variant="densities"
+          transparent
+          class="radius-large"
+        />
+      </StyleGuideItem>
+      <StyleGuideItem label="og-image.jpg · 1200 × 630" variant="card">
+        <Img
+          src="/og-image.jpg"
+          alt="Social sharing image"
+          width={1200}
+          height={630}
+          class="radius-small"
+        />
+      </StyleGuideItem>
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Typography -->
+  <Section id="typography" gap="9" paddingTop="none">
+    <StyleGuideTitle>Typography</StyleGuideTitle>
+
+    <StyleGuideGroup title="Text styles">
+      {
+        typeStyles.map((style) => (
+          <StyleGuideItem label={`text-style-${style.cls} · ${style.note}`}>
+            <Paragraph tag="div" variant={style.cls as TextStyle} maxWidth={70}>
+              {style.heading ? "Design once, ship everywhere" : lorem}
+            </Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+      <StyleGuideItem label="RichText">
+        <RichText>
+          <h2>Heading 2</h2>
+          <p>
+            A paragraph with <strong>bold</strong>, <em>emphasis</em>,
+            <a href="#typography">a link</a> and <code>inline code</code>.
+          </p>
+          <blockquote>Block quote</blockquote>
+          <ul>
+            <li>Unordered item</li>
+            <li>Unordered item</li>
+          </ul>
+          <ol>
+            <li>Ordered item</li>
+            <li>Ordered item</li>
+          </ol>
+        </RichText>
+      </StyleGuideItem>
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Weights" variant="scroll">
+      {
+        model.weights.map((weight) => (
+          <StyleGuideItem
+            label={`weight-${weight} · ${value(`primary-${weight}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`weight-${weight}`}>Lorem ipsum dolor</Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Line height" variant="scroll">
+      {
+        model.lineHeights.map((name) => (
+          <StyleGuideItem
+            label={`line-height-${name} · ${value(`line-height-${name}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`line-height-${name}`}>{lorem}</Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Letter spacing" variant="scroll">
+      {
+        model.letterSpacings.map((name) => (
+          <StyleGuideItem
+            label={`letter-spacing-${name} · ${value(`letter-spacing-${name}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`letter-spacing-${name}`}>
+              Lorem ipsum dolor
+            </Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Text transform, wrap and clamp" variant="scroll">
+      {
+        [
+          "text-transform-uppercase",
+          "text-transform-capitalize",
+          "text-wrap-balance",
+          "text-wrap-pretty",
+          "line-clamp-1",
+          "line-clamp-2",
+          "line-clamp-3",
+          "line-clamp-4",
+        ].map((cls) => (
+          <StyleGuideItem label={cls} variant="card">
+            <Paragraph class={cls}>{lorem}</Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Colors -->
+  <Section id="colors" gap="9" paddingTop="none">
+    <StyleGuideTitle>Colors</StyleGuideTitle>
+
+    {
+      ramps.map((group) => (
+        <StyleGuideGroup title={group.name} variant="grid">
+          {group.tokens.map((t) => (
+            <StyleGuideToken token={t.name} value={t.hex} />
+          ))}
+        </StyleGuideGroup>
+      ))
+    }
+
+    <StyleGuideGroup title="Base" variant="grid">
+      {
+        singles.flatMap((g) =>
+          g.tokens.map((t) => <StyleGuideToken token={t.name} value={t.hex} />),
+        )
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Themes" variant="scroll">
+      {
+        model.themes.map((theme) => (
+          <StyleGuideTheme theme={theme.name as Theme} />
+        ))
+      }
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Spacing -->
+  <Section id="spacing" gap="9" paddingTop="none">
+    <StyleGuideTitle>Spacing</StyleGuideTitle>
+
+    <StyleGuideGroup title="Space scale" variant="rows">
+      {
+        model.spaces.map((space) => {
+          const n = space.slice(6);
+          return (
+            <StyleGuideToken
+              token={space}
+              value={`${range(space)} · gap-${n}, padding-${n}, margin-top-${n}`}
+              variant="space"
+            />
+          );
+        })
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Section space" variant="rows">
+      {
+        model.sectionSpaces.map((name) => (
+          <StyleGuideToken
+            token={`section-space-${name}`}
+            value={`${range(`section-space-${name}`)} · Section padding "${name.replace(/-/g, "")}"`}
+            variant="space"
+          />
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Site" variant="rows">
+      <StyleGuideToken
+        token="site-margin"
+        value={`${range("site-margin")} · padding-sitemargin`}
+        variant="space"
+      />
+      <StyleGuideToken
+        token="site-gutter"
+        value={`${range("site-gutter")} · gap-gutter, Grid gap`}
+        variant="space"
+      />
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Radius" variant="grid">
+      {
+        model.radii.map((name) => (
+          <StyleGuideToken
+            token={`radius-${name}`}
+            value={`${lengthLabel(`radius-${name}`)} · radius-${name}`}
+            variant="radius"
+          />
+        ))
+      }
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Layout -->
+  <Section id="layout" gap="9" paddingTop="none">
+    <StyleGuideTitle>Layout</StyleGuideTitle>
+
+    <StyleGuideGroup title="Breakpoints" variant="rows">
+      <StyleGuideItem label="xsmall">
+        <Paragraph variant="small">
+          Below {model.breakpoints[0]?.value} — Webflow mobile portrait. The default;
+          write it unqualified.
+        </Paragraph>
+      </StyleGuideItem>
+      {
+        model.breakpoints.map((b) => (
+          <StyleGuideItem label={b.name}>
+            <Paragraph variant="small">
+              <code>@media (width &gt;= {b.value})</code> — {px(toPx(b.value))}{" "}
+              and up · {breakpointNote[b.name] ?? ""}
+            </Paragraph>
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Grid">
+      <StyleGuideItem label="Grid xsmall={1} small={2} medium={3} large={4}">
+        <Grid xsmall={1} small={2} medium={3} large={4} class="width-full">
+          {
+            [1, 2, 3, 4, 5, 6, 7, 8].map((cell) => (
+              <div class="background-skeleton radius-small padding-4 text-style-small">
+                {cell}
+              </div>
+            ))
+          }
+        </Grid>
+      </StyleGuideItem>
+      <StyleGuideItem label="Grid large={12} · span-large-8 + span-large-4">
+        <Grid large={12} class="width-full">
+          <div
+            class="span-large-8 background-skeleton radius-small padding-4 text-style-small"
+          >
+            span-large-8
+          </div>
+          <div
+            class="span-large-4 background-skeleton radius-small padding-4 text-style-small"
+          >
+            span-large-4
+          </div>
+        </Grid>
+      </StyleGuideItem>
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Containers" variant="rows">
+      {
+        ["max-width-main", "max-width-small"].map((token) => (
+          <StyleGuideToken
+            token={token}
+            value={lengthLabel(token)}
+            variant="space"
+          />
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Aspect ratio" variant="grid">
+      {
+        ratios.map((ratio) => (
+          <StyleGuideItem label={`ratio-${ratio}`} variant="card">
+            <div
+              class={`ratio-${ratio} width-full radius-small background-skeleton`}
+            />
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Icons -->
+  <Section id="icons" gap="9" paddingTop="none">
+    <StyleGuideTitle>Icons</StyleGuideTitle>
+
+    <StyleGuideGroup title="Phosphor — <Icon name>" variant="grid">
+      {
+        phosphor.map((name) => (
+          <StyleGuideItem label={name} variant="card">
+            <Icon name={name} variant="large" />
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Phosphor weights" variant="grid">
+      {
+        weights.map((weight) => (
+          <StyleGuideItem label={`weight="${weight}"`} variant="card">
+            <Icon name="star" weight={weight} variant="large" />
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+
+    <StyleGuideGroup title="Custom — <Icon src>" variant="grid">
+      {
+        customIcons.map((icon) => (
+          <StyleGuideItem label={`assets/icons/${icon.name}`} variant="card">
+            <Icon src={icon.src} variant="large" />
+          </StyleGuideItem>
+        ))
+      }
+    </StyleGuideGroup>
+  </Section>
+
+  <!-- Components -->
+  <Section id="components" paddingTop="none">
+    <StyleGuideTitle>Components</StyleGuideTitle>
+    <Paragraph maxWidth={60}>
+      Every component and variant, with live examples.
+    </Paragraph>
+    <Button element="link" href="/components">Open components</Button>
+  </Section>
+</Layout>
