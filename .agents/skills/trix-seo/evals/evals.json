@@ -4,11 +4,11 @@
     {
       "id": 0,
       "name": "pre-launch-audit",
-      "prompt": "We launch next week on remsons.com. Make sure the SEO is right.",
+      "prompt": "We launch next week on www.acme.example. Make sure the SEO is right.",
       "expected_output": "SITE_URL set to the production origin, the production build audited with --production, every error fixed, warnings listed as questions, structured data in place for the page templates, and the launch handoff checklist reported.",
       "files": [],
       "assertions": [
-        "SITE_URL in src/consts.ts is https://remsons.com (or the owner's confirmed origin), not a placeholder",
+        "SITE_URL in src/consts.ts is https://www.acme.example (or the owner's confirmed origin), not a placeholder",
         "scripts/seo/audit.ts ran against the build with --production and reports 0 errors",
         "The home page carries organization() and website() structured data",
         "Pages below the home page that have a trail use <Breadcrumbs>, not hand-written BreadcrumbList JSON",

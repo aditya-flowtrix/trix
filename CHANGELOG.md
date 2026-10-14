@@ -99,7 +99,7 @@ SEO phase, fonts from any source and the design-change skill.
 - `verify.ts`: item counts, schemas (`astro sync`), nothing left on the old
   CMS or site, a page per item. `npm run test:cms` (in CI) covers every
   field type and the pipeline on a fixture.
-- Tested on real data: the Remsons Webflow CMS (8 collections, every field
+- Tested on real data: a client's Webflow CMS (8 collections, every field
   type, drafts, circular references) and a public WordPress site (posts,
   22 categories, 269 tags, Jetpack images, dated permalinks → 301s), as
   files and headless; and Framer-style CSVs with quoted newlines.
@@ -162,7 +162,7 @@ source so every project gets them:
   many unequal layouts sit on 12 columns. Rows with negative margins (Mast,
   Bootstrap) are seen through.
 - `propose.ts` writes `--site-margin`, `--site-gutter` and `--max-width-main`
-  from it and asks about layouts off the grid. On the Remsons export it
+  from it and asks about layouts off the grid. On the reference project's export it
   recovers the site's own 16→40 margin, 12→16 gutter and 1280 max width.
 - `trix-build` (from Mast's `mast-build`): the ten places Trix differs from
   ordinary web practice, loaded whenever markup or CSS is written.
@@ -177,9 +177,9 @@ source so every project gets them:
   overlay check.
 - Leading trim is measured on the source: `design.ts` reports whether
   one-line text boxes are trimmed, `propose.ts` turns trim off for a source
-  that never trims (the Remsons export: 371 blocks, none trimmed), and
+  that never trims (the reference export: 371 blocks, none trimmed), and
   `verify.ts` checks every rebuilt text style against it.
-- End to end on the Remsons export (5 real pages): layout grid 19/19, spacing
+- End to end on the reference export (5 real pages): layout grid 19/19, spacing
   and trim identical; the only differences are one stepped h1 — sizes that
   jump at breakpoints — which the proposal puts to the owner.
 
