@@ -85,6 +85,12 @@ export default defineConfig({
   site: SITE_URL,
   // Prefetch internal links on hover or focus, so the next page is ready on click.
   prefetch: true,
+  // One URL per page, no trailing slash — Webflow's and Framer's style, so
+  // migrated URLs answer directly instead of through a redirect. Pages build
+  // to `about.html`, which hosts serve at `/about`. A site whose old URLs end
+  // in a slash (WordPress) sets "always" and format "directory" instead.
+  trailingSlash: "never",
+  build: { format: "file" },
   integrations: [
     tokens,
     sitemap({

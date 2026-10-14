@@ -48,6 +48,9 @@ the framework) or replace them with the project's.
   follows the visitor's system and offers `ThemeToggle`).
 
 `wrangler.jsonc` (or the host's config): the project's name and domain.
+`public/_headers` already sets security headers and a year's caching for
+fingerprinted assets; `public/_redirects` holds permanent redirects. Both work
+on Cloudflare and Netlify; on another host, move them into its config.
 
 ## 4. Record
 

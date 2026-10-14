@@ -43,8 +43,9 @@ Record each in `PROJECT.md` → **Sources**:
   `.htaccess` / nginx config. Collect every source.
 - **Permalinks** — Settings → Permalinks (`/%postname%/`,
   `/%category%/%postname%/`, `/blog/%year%/%monthnum%/…`). Astro routes must
-  reproduce them exactly, trailing slash included (set `trailingSlash` in
-  `astro.config.mjs` to match).
+  reproduce them exactly, trailing slash included: set `trailingSlash:
+"always"` and `build: { format: "directory" }` in `astro.config.mjs` (Trix's
+  default is no slash, which would put every old URL behind a redirect).
 - **Forms** — Contact Form 7, Gravity Forms, WPForms, Elementor forms: fields,
   validation, notifications, where entries go.
 - **Media** — originals from `/wp-content/uploads/` (not the `-300x200` sizes;

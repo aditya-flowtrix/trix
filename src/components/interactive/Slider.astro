@@ -376,23 +376,30 @@ const slides = await slotContent(Astro.slots);
     .slider_markers {
       display: flex;
       align-items: center;
-      gap: var(--space-3);
     }
 
+    /* A 24px target (WCAG 2.2 target size) around the 12px dot it draws. */
     .slider_marker {
-      width: 0.75rem;
-      height: 0.75rem;
+      display: grid;
+      place-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
       padding: 0;
-      border: var(--border-width) solid var(--text);
-      border-radius: var(--radius-round);
+      border: 0;
       background: none;
-      transition: background-color var(--hover-duration) var(--hover-ease);
-
-      &.is-active {
+      &::before {
+        content: "";
+        width: 0.75rem;
+        height: 0.75rem;
+        border: var(--border-width) solid var(--text);
+        border-radius: var(--radius-round);
+        transition: background-color var(--hover-duration) var(--hover-ease);
+      }
+      &.is-active::before {
         background-color: var(--text);
       }
       @media (hover: hover) {
-        &:hover {
+        &:hover::before {
           background-color: var(--text);
         }
       }

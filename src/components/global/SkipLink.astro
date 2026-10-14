@@ -25,6 +25,21 @@ const {
   )
 }
 
+<script>
+  // Following the link scrolls to the target; Safari leaves keyboard focus
+  // behind. Move it, so the next Tab continues from the content.
+  for (const link of document.querySelectorAll<HTMLAnchorElement>(
+    ".skip-link",
+  )) {
+    link.addEventListener("click", () => {
+      const target = document.getElementById(link.hash.slice(1));
+      if (!target) return;
+      if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+      target.focus();
+    });
+  }
+</script>
+
 <style is:global>
   @layer components {
     .skip-link {

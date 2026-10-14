@@ -60,6 +60,8 @@ const content = await slotContent(Astro.slots);
         background-color: var(--background);
       }
       .style-guide-item_label {
+        max-width: 100%;
+        overflow-wrap: anywhere;
         padding: 0.125rem 0.5rem;
         border-radius: var(--radius-xsmall);
         background-color: var(--background-3);

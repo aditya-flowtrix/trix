@@ -70,17 +70,28 @@ if (import.meta.env.DEV && render && content && !id) {
     ".modal_wrap",
   )) {
     const scroll = modal.querySelector<HTMLElement>("[data-modal-scroll]");
+    // Where focus goes back to on close. Safari does not focus a clicked
+    // button, so remember the trigger itself, not the active element.
+    let returnTo: HTMLElement | null = null;
 
-    const open = () => {
+    const open = (trigger?: Element) => {
       if (modal.open) return;
+      returnTo =
+        trigger instanceof HTMLElement
+          ? trigger
+          : document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
       if (scroll) scroll.scrollTop = 0;
       modal.showModal();
       modal.dispatchEvent(new CustomEvent("modal-open", { bubbles: true }));
     };
 
-    modal.addEventListener("close", () =>
-      modal.dispatchEvent(new CustomEvent("modal-close", { bubbles: true })),
-    );
+    modal.addEventListener("close", () => {
+      if (returnTo?.isConnected) returnTo.focus();
+      returnTo = null;
+      modal.dispatchEvent(new CustomEvent("modal-close", { bubbles: true }));
+    });
 
     let fromBackdrop = false;
 
@@ -104,7 +115,7 @@ if (import.meta.env.DEV && render && content && !id) {
       );
       if (!trigger) return;
       event.preventDefault();
-      open();
+      open(trigger);
     });
 
     const url = new URL(location.href);

@@ -98,6 +98,15 @@ h6 {
   overflow-wrap: break-word;
 }
 
+/* Headings and text sit in flex containers, where `break-word` still lets
+   the longest word set the minimum width: a long word in a display heading
+   would push past a phone screen. `anywhere` breaks it only when it cannot
+   fit, and lets the box shrink. */
+.heading,
+.text {
+  overflow-wrap: anywhere;
+}
+
 p {
   text-wrap: pretty;
 }
@@ -107,7 +116,7 @@ label {
 }
 
 select:has(option[value=""]:checked) {
-  color: color-mix(in lab, currentcolor 60%, transparent);
+  color: var(--text-2);
 }
 
 :target {

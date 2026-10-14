@@ -1,6 +1,7 @@
 ---
 import Icon from "@/components/media/Icon.astro";
 import NavLink from "@/components/global/NavLink.astro";
+import ThemeToggle from "@/components/interactive/ThemeToggle.astro";
 import logo from "@/assets/logo/logo.svg";
 import { SITE_NAME } from "@/consts.ts";
 
@@ -37,6 +38,8 @@ const { render = true, overlap = false } = Astro.props;
               <NavLink href="/style-guide">Style Guide</NavLink>
               <NavLink href="/components">Components</NavLink>
             </ul>
+            {/* Renders only when COLOR_MODE is "auto". */}
+            <ThemeToggle class="nav_theme" />
           </div>
         </nav>
       </div>
@@ -242,7 +245,7 @@ const { render = true, overlap = false } = Astro.props;
     .nav_link {
       display: block;
       padding-block: var(--space-4);
-      color: color-mix(in lab, currentcolor 60%, transparent);
+      color: var(--text-2);
       text-decoration: none;
       text-underline-offset: 0.4em;
       text-decoration-thickness: var(--border-width);
@@ -257,9 +260,23 @@ const { render = true, overlap = false } = Astro.props;
       }
     }
 
+    .nav_theme {
+      margin: 0 var(--site-margin) var(--space-5);
+    }
+
     @media (width >= 48rem) {
       .nav_toggle {
         display: none;
+      }
+
+      .nav_menu_inner {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5);
+      }
+
+      .nav_theme {
+        margin: 0;
       }
 
       .nav_menu {

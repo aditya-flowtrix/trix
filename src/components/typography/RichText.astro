@@ -27,7 +27,12 @@ const {
   ...rest
 } = Astro.props;
 
-const content = await slotContent(Astro.slots);
+// A wide table scrolls sideways inside the text, so it must be reachable by
+// keyboard to scroll. Added here, so CMS content needs nothing.
+const content = (await slotContent(Astro.slots)).replace(
+  /<table(?![^>]*\btabindex=)/g,
+  '<table tabindex="0"',
+);
 ---
 
 {
@@ -96,7 +101,7 @@ const content = await slotContent(Astro.slots);
         list-style-type: decimal;
       }
       & li::marker {
-        color: color-mix(in lab, currentcolor 60%, transparent);
+        color: var(--text-2);
       }
       & li + li {
         margin-top: var(--space-3);
@@ -116,6 +121,10 @@ const content = await slotContent(Astro.slots);
         display: block;
         max-width: 100%;
         overflow-x: auto;
+        overflow-wrap: normal;
+        /* Its width must not size the text block around it, or the table
+           widens the page instead of scrolling inside it. */
+        contain: inline-size;
         border-collapse: collapse;
       }
       & :is(th, td) {

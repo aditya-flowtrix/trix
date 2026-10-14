@@ -274,6 +274,11 @@ for (const p of pages.values()) {
   if (!p.canonical) error(p.path, "no canonical link");
   else if (!/^https?:\/\//.test(p.canonical))
     error(p.path, `canonical is not absolute: ${p.canonical}`);
+  else if (/(\.html|\/index)$/.test(new URL(p.canonical).pathname))
+    error(
+      p.path,
+      `canonical is a file name, not the page's URL: ${p.canonical}`,
+    );
   else if (pathOf(p.canonical) !== p.path)
     warn(p.path, `canonical points elsewhere: ${p.canonical}`);
   if (p.h1 === 0) error(p.path, "no h1");
@@ -294,6 +299,25 @@ for (const p of pages.values()) {
       `largest paint ${Math.round(p.lcp)}ms at 390px (good is 2.5s or less)`,
     );
 }
+// Internal links should use the exact URL a page declares as canonical;
+// any other form (a trailing slash, `.html`) costs a redirect on most hosts.
+const linkForms = new Map<string, string>();
+for (const p of pages.values())
+  for (const href of p.links ?? []) {
+    const target = pathOf(href);
+    const canonical = target && pages.get(target)?.canonical;
+    if (!canonical || !/^https?:/.test(canonical)) continue;
+    const raw = new URL(href).pathname;
+    const want = new URL(canonical).pathname;
+    if (raw !== want && !linkForms.has(raw))
+      linkForms.set(raw, `${want} (from ${p.path})`);
+  }
+for (const [raw, want] of linkForms)
+  warn(
+    raw,
+    `linked as ${raw}, but the page's canonical is ${want} — a redirect on most hosts`,
+  );
+
 for (const field of ["title", "description"] as const) {
   const groups = Object.groupBy(indexable, (p) => p[field]);
   for (const [value, list] of Object.entries(groups))

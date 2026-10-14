@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from "astro/types";
 import JsonLd from "@/components/utility/JsonLd.astro";
 import { breadcrumbList } from "@/utils/schema.ts";
+import { pagePath } from "@/utils/seo.ts";
 
 interface Props extends HTMLAttributes<"nav"> {
   /** Set to `false` to omit the component. */
@@ -57,7 +58,7 @@ const last = items.length - 1;
       data={breadcrumbList(
         items.map((item) => ({
           name: item.label,
-          url: item.href ?? Astro.url.pathname,
+          url: item.href ?? pagePath(Astro.url),
         })),
       )}
     />
@@ -97,7 +98,7 @@ const last = items.length - 1;
       }
     }
     .breadcrumbs_current {
-      color: color-mix(in lab, currentcolor 60%, transparent);
+      color: var(--text-2);
     }
   }
 </style>

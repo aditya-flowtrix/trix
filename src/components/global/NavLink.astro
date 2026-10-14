@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slotContent } from "@/utils/slots.ts";
+import { pagePath } from "@/utils/seo.ts";
 
 type Props = HTMLAttributes<"a"> & {
   /** Set to `false` to omit the component. */
@@ -11,9 +12,9 @@ type Props = HTMLAttributes<"a"> & {
 
 const { render = true, href, class: className, ...rest } = Astro.props;
 
-/** Marks the link for the page being viewed. Trailing slashes are ignored. */
+/** Marks the link for the page being viewed, whatever the URL style. */
 const current =
-  Astro.url.pathname.replace(/\/+$/, "") === href.replace(/\/+$/, "")
+  pagePath(Astro.url) === pagePath(new URL(href, Astro.url))
     ? "page"
     : undefined;
 

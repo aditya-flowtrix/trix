@@ -33,7 +33,12 @@ const content = await slotContent(Astro.slots);
       {...rest}
     >
       <h3 class="style-guide-group_title text-style-h6">{title}</h3>
-      <div class="style-guide-group_list">
+      <div
+        class="style-guide-group_list"
+        {...(variant === "scroll"
+          ? { tabindex: 0, role: "region", "aria-label": title }
+          : {})}
+      >
         <Fragment set:html={content} />
       </div>
     </div>

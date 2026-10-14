@@ -38,10 +38,10 @@
         0.1137,
         0.1176
       ],
-      "alpha": 0.6,
+      "alpha": 0.7,
       "hex": "#1f1d1e"
     },
-    "$description": "color-mix(in lab, currentcolor 60%, transparent)"
+    "$description": "color-mix(in lab, currentcolor 70%, transparent)"
   },
   "border": {
     "$type": "color",
@@ -59,17 +59,7 @@
   },
   "heading-accent": {
     "$type": "color",
-    "$value": {
-      "colorSpace": "srgb",
-      "components": [
-        0.6212,
-        0.7875,
-        0.251
-      ],
-      "alpha": 1,
-      "hex": "#9ec940"
-    },
-    "$description": "color-mix(in srgb, var(--brand-300), black 20%)"
+    "$value": "{color.brand.700}"
   },
   "selection-background": {
     "$type": "color",

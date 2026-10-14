@@ -152,7 +152,9 @@ table headers, `rel="noopener"` on `target="_blank"` links, and no
 - **Forms** — every form, its fields, validation and destination. Pick the
   provider with the owner; test each form end to end.
 - **Redirects** — the platform's existing list plus every URL this migration
-  changes, in `astro.config.mjs` `redirects` or the host's rules. Test each.
+  changes, in `public/_redirects` (real 301s on Cloudflare and Netlify). Keep
+  the old URL style: Trix answers `/about`; a source whose URLs end in `/`
+  switches `trailingSlash` and `build.format` (`/trix-seo`). Test each.
 - **SEO parity** — title, description, canonical, OG/Twitter, JSON-LD,
   `noindex`, sitemap and robots per page match the inventory — checked with
   `/trix-seo`'s parity script, not by eye.

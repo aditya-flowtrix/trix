@@ -38,10 +38,10 @@
         1,
         1
       ],
-      "alpha": 0.6,
+      "alpha": 0.7,
       "hex": "#ffffff"
     },
-    "$description": "color-mix(in lab, currentcolor 60%, transparent)"
+    "$description": "color-mix(in lab, currentcolor 70%, transparent)"
   },
   "border": {
     "$type": "color",

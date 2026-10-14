@@ -7,12 +7,20 @@
  *   2. Every `var(--token)` refers to a token that exists somewhere.
  *   3. Lengths are not written in px (1px hairlines in visually-hidden
  *      patterns excepted).
+ *   4. Every theme's text roles meet WCAG AA contrast against what they sit
+ *      on — 4.5:1, or 3:1 for the heading accent, which is only used in
+ *      headings (large text).
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildModel, toPx } from "../src/utils/tokens.ts";
+import {
+  buildModel,
+  resolveColor,
+  toPx,
+  type Rgba,
+} from "../src/utils/tokens.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const files = (dir: string): string[] =>
@@ -78,16 +86,64 @@ for (const { path, text } of sources) {
 // 3. px lengths
 for (const { path, text } of sources) {
   if (!/\.(css|astro)$/.test(path) || path.includes("generated")) continue;
-  const css = path.endsWith(".astro")
-    ? [...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
-        .map((m) => m[1])
-        .join("\n")
-    : text.replace(/\/\*[\s\S]*?\*\//g, "");
+  // Comments may mention px (a WCAG target size, a design note): skip them.
+  const css = (
+    path.endsWith(".astro")
+      ? [...text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
+          .map((m) => m[1])
+          .join("\n")
+      : text
+  ).replace(/\/\*[\s\S]*?\*\//g, "");
   for (const m of css.matchAll(/(?<![\w-])(\d*\.?\d+)px\b/g)) {
     if (m[1] === "1" || m[1] === "0") continue;
     problems.push(
       `${path}  ${m[0]} — use rem (or em for text-relative lengths)`,
     );
+  }
+}
+
+// 4. Contrast
+const channel = (c: number) =>
+  c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+const luminance = ([r, g, b]: Rgba) =>
+  0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+/** A translucent color as it renders over an opaque one. */
+const over = (top: Rgba, under: Rgba): Rgba => [
+  ...([0, 1, 2].map((i) => top[i] * top[3] + under[i] * (1 - top[3])) as [
+    number,
+    number,
+    number,
+  ]),
+  1,
+];
+const ratio = (a: Rgba, b: Rgba) => {
+  const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+};
+const pairs: [text: string, surface: string, min: number][] = [
+  ["text", "background", 4.5],
+  ["text-2", "background", 4.5],
+  ["link-text", "background", 4.5],
+  ["heading-accent", "background", 3],
+  ["button-text", "button-background", 4.5],
+  ["button-text-hover", "button-background-hover", 4.5],
+  ["button-2-text", "button-2-background", 4.5],
+  ["button-2-text-hover", "button-2-background-hover", 4.5],
+];
+for (const theme of model.themes) {
+  const scope = [theme.tokens, model.byName];
+  const page = resolveColor("var(--background)", scope);
+  if (!page) continue;
+  for (const [text, surface, min] of pairs) {
+    const fg = resolveColor(`var(--${text})`, scope);
+    const bg = resolveColor(`var(--${surface})`, scope);
+    if (!fg || !bg) continue;
+    const base = over(bg, over(page, [1, 1, 1, 1]));
+    const r = ratio(over(fg, base), base);
+    if (r < min)
+      problems.push(
+        `src/styles/themes.css  theme-${theme.name}: --${text} on --${surface} is ${r.toFixed(2)}:1, needs ${min}:1`,
+      );
   }
 }
 

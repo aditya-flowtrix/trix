@@ -126,8 +126,14 @@ the new one, following redirects, and reported in `.trix/seo-parity.md`:
   intended; confirm each one.
 - **same**.
 
-Redirects live in `astro.config.mjs` → `redirects` (or the host's
-`_redirects`), old path → new path, permanent. Keep the old platform's own
+Redirects live in `public/_redirects` — `/old-path /new-path 301`, one per
+line — which Cloudflare and Netlify answer with a real 301. (Astro's own
+`redirects` setting, in a static build, only writes a page that refreshes to
+the target.) Every URL has one form: Trix builds without a trailing slash
+(`/about`), Webflow's and Framer's style; a site whose old URLs end in `/`
+(WordPress) sets `trailingSlash: "always"` and `build.format: "directory"` in
+`astro.config.mjs` so they keep answering directly. The audit warns when an
+internal link uses a different form from its page's canonical. Keep the old platform's own
 301 list too — those links still exist out there.
 
 After DNS moves, run parity again with `--old` set to the old URLs on the new

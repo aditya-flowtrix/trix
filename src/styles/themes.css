@@ -27,9 +27,9 @@
   --background-3: var(--white);
   --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
   --text: var(--neutral-900);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
+  --text-2: color-mix(in lab, currentcolor 70%, transparent);
   --border: color-mix(in lab, var(--text) 20%, transparent);
-  --heading-accent: color-mix(in srgb, var(--brand-300), black 20%);
+  --heading-accent: var(--brand-700);
 
   --selection-background: var(--text);
   --selection-text: var(--background);
@@ -64,7 +64,7 @@
   --background-3: var(--neutral-700);
   --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
   --text: var(--white);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
+  --text-2: color-mix(in lab, currentcolor 70%, transparent);
   --border: color-mix(in lab, var(--text) 20%, transparent);
   --heading-accent: var(--brand-300);
 
@@ -99,7 +99,7 @@
   --background-3: color-mix(in lab, var(--background) 80%, var(--text));
   --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
   --text: var(--brand-text);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
+  --text-2: color-mix(in lab, currentcolor 70%, transparent);
   --border: color-mix(in lab, var(--text) 20%, transparent);
   --heading-accent: color-mix(in srgb, var(--text), white 20%);
 
