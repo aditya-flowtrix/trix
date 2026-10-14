@@ -304,12 +304,14 @@ function assign(
 const measuredWeights = [
   ...new Set(slots.flatMap(([, t]) => (t ? [t.weight] : []))),
 ];
-const weights = [
-  ...new Set([
-    ...measuredWeights,
-    ...scale("primary-").map(([, w]) => String(w)),
-  ]),
-].sort();
+const defaultWeights = tokens
+  .filter((t) =>
+    /^primary-(thin|extralight|light|regular|medium|semibold|bold|extrabold|black)$/.test(
+      t.name,
+    ),
+  )
+  .map((t) => String(Number(t.value)));
+const weights = [...new Set([...measuredWeights, ...defaultWeights])].sort();
 
 const lineHeights = scale("line-height-");
 const lhMap = assign(

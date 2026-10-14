@@ -64,6 +64,13 @@ export function parseTokens(css: string): Token[] {
   const body = block(css, /:root\s*\{/);
   const tokens: Token[] = [];
   let group = "";
+  for (const m of body.matchAll(/(?:^|[;{\s])(--[^\s:;{}]+)\s*:/g)) {
+    if (!/^--[\w-]+$/.test(m[1])) {
+      throw new Error(
+        `Invalid token name "${m[1]}" — use letters, digits and dashes only.`,
+      );
+    }
+  }
   for (const m of body.matchAll(DECLARATION)) {
     if (m[1] !== undefined) {
       group = m[1].trim().split("\n")[0].trim();
