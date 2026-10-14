@@ -41,6 +41,60 @@ jobs:
       # one h1, alt text, structured data, broken links, sitemap.
       - run: npm run seo
 
+  browsers:
+    name: Browser (${{ matrix.browser }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { browser: chrome, os: ubuntu-latest }
+          - { browser: edge, os: ubuntu-latest }
+          - { browser: brave, os: ubuntu-latest }
+          - { browser: firefox, os: ubuntu-latest }
+          - { browser: webkit, os: ubuntu-latest }
+          # The real Safari, which only runs on macOS.
+          - { browser: safari, os: macos-latest }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.19.0
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # Chrome and Edge come with the Ubuntu image; the rest are installed.
+      - name: Install Firefox or WebKit
+        if: matrix.browser == 'firefox' || matrix.browser == 'webkit'
+        run: npx playwright-core install --with-deps ${{ matrix.browser }}
+
+      - name: Install Edge if missing
+        if: matrix.browser == 'edge'
+        run: command -v microsoft-edge || npx playwright-core install --with-deps msedge
+
+      - name: Install Brave
+        if: matrix.browser == 'brave'
+        run: |
+          sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+          sudo apt-get update && sudo apt-get install -y brave-browser
+
+      - name: Allow Safari to be automated
+        if: matrix.browser == 'safari'
+        run: sudo safaridriver --enable
+
+      - run: node tests/browsers.ts --browser ${{ matrix.browser }}
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browsers-${{ matrix.browser }}
+          path: .trix/browsers.md
+
   astro-latest:
     name: Astro latest (advisory)
     runs-on: ubuntu-latest
