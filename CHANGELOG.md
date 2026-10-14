@@ -3,6 +3,8 @@
 ## 0.1.0 — 2026-10-14
 
 First release of Trix, forked from Lumos for Astro 0.0.5 (`0e32ded`).
+Licensed MIT, © Flowtrix; Lumos for Astro's notice is kept in
+`THIRD-PARTY-NOTICES.md`.
 
 ### Design system
 
@@ -42,6 +44,11 @@ First release of Trix, forked from Lumos for Astro 0.0.5 (`0e32ded`).
 - `scripts/tokens.ts`, `scripts/conventions.ts` (breakpoints, undefined
   tokens, px lengths) in `npm run check`.
 - `scripts/measure/`: inventory, design, propose, variables, classes, verify.
+  `propose` keeps Trix's scale names stable (measured values are matched onto
+  existing names by nearest value), carries any token the framework still
+  references, and writes a component spacing remap. Verified end to end on a
+  fresh clone converted from a Webflow export: 152 of 152 checks identical.
+- The token parser rejects invalid token names instead of skipping them.
 
 ### Skills
 
