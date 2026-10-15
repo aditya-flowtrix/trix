@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // The skill names it after the site: <site>-consent.
+  "name": "site-consent",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-13",
+  // c15t's Postgres driver opens its connection through Node's net and tls.
+  "compatibility_flags": ["nodejs_compat"],
+  // c15t imports every driver it supports and only Postgres runs here. The
+  // others resolve to a stub, which is what lets the Worker bundle at all.
+  "alias": {
+    "@effect/sql-sqlite-node": "./src/unused-driver.ts",
+    "@effect/sql-mysql2": "./src/unused-driver.ts",
+    "@upstash/redis": "./src/unused-driver.ts",
+  },
+  // Pooled connections to the database. The id comes from
+  // `npx wrangler hyperdrive create`; the connection string stays in Cloudflare.
+  "hyperdrive": [
+    { "binding": "HYPERDRIVE", "id": "00000000000000000000000000000000" },
+  ],
+  // The site's consent subdomain, on the same Cloudflare account as the site.
+  "routes": [{ "pattern": "consent.example.com", "custom_domain": true }],
+  "observability": {
+    "enabled": true,
+  },
+}

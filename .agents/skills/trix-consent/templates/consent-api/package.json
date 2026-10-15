@@ -1,0 +1,20 @@
+{
+  "name": "consent-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "migrate:plan": "c15t self-host migrate --config ./c15t-backend.config.ts --plan",
+    "migrate": "c15t self-host migrate --config ./c15t-backend.config.ts --apply",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@c15t/backend": "3.0.0",
+    "@effect/sql-pg": "4.0.0",
+    "effect": "4.0.0"
+  },
+  "devDependencies": {
+    "@c15t/cli": "3.0.0",
+    "wrangler": "^4.149.0"
+  }
+}

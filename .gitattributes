@@ -15,4 +15,5 @@
 /packages export-ignore
 /site export-ignore
 /tests/create.ts export-ignore
+/tests/consent.ts export-ignore
 /wrangler.jsonc export-ignore

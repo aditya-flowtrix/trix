@@ -60,6 +60,7 @@ try {
       "site",
       "packages",
       "tests/create.ts",
+      "tests/consent.ts",
       ".github/dependabot.yml",
       ".github/workflows/dependabot-automerge.yml",
       ".gitattributes",
@@ -77,7 +78,9 @@ try {
   });
   it("nothing points at what stayed behind", () => {
     assert.ok(
-      !Object.keys(pkg.scripts).some((s) => /^(docs:|test:create)/.test(s)),
+      !Object.keys(pkg.scripts).some((s) =>
+        /^(docs:|test:(create|consent))/.test(s),
+      ),
     );
     assert.equal(pkg.devDependencies["@astrojs/mdx"], undefined);
   });
