@@ -1,14 +1,21 @@
 # Roadmap
 
-## Phase 1 — Framework and migration (v0.1–0.2, now)
+## Phase 1 — Framework and migration (v0.1–0.4)
 
 - Trix framework: token generator, style guide, components,
   designer guide, Figma variable files.
-- Skills: new project, style guide, migrate (Webflow, Framer, WordPress,
-  other), Figma import, prop audit, scaling graphic, upgrade.
-- Measuring toolkit: inventory, design, propose, variables, classes, verify.
+- Skills: build, new project, style guide, design system, migrate (Webflow,
+  Framer, WordPress, other), Figma import, CMS, consent, prop audit, scaling
+  graphic, upgrade.
+- `npm create trix-astro` copies, stamps and names a project in one command.
+- Measuring toolkit: inventory, design, propose, variables, classes, verify,
+  sections.
 - v0.2: the 12-column grid (`Row`/`Col`, overlay, measured margin and
   gutter), scroll-in reveals, tables and dividers, prefetch.
+- v0.3: the framework follows the names a project adds to `tokens.css`; more
+  components and options.
+- v0.4: cookie consent (`trix-consent`), `Compare`, and a Figma import that
+  asks what moves.
 
 ## Phase 2 — SEO (v0.2, done)
 
@@ -29,7 +36,6 @@ Core Web Vitals field data pulled from the CrUX API instead of lab values.
 
 ## Later
 
-- `create-trix` CLI that copies, stamps and names a project in one command.
 - A published Figma community file mirroring the component library.
 - More headless sources for `cmsLoader`: Sanity, Contentful, Ghost (files
   already work for them through the common JSON shape).

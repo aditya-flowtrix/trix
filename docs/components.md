@@ -11,9 +11,9 @@ other attributes to its root element. `class` accepts utility classes only.
 
 | Component                     | Use it for                                                                                  | Variants and key props                                                                                                                                                                                                                                                                            |
 | ----------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Wrapper/Section`             | every full-width band of a page; owns padding, theme and the centered container             | `theme` (inherit, light, dark, brand) · `paddingTop` / `paddingBottom` (none, even, xsmall, small, medium, large, xlarge, navoverlap) · `gap` (0, 1–12, xsmall–xlarge) · `align` · `fullHeight` · `background` slot                                                                               |
+| `Wrapper/Section`             | every full-width band of a page; owns padding, theme and the centered container             | `theme` (inherit, light, dark, brand) · `paddingTop` / `paddingBottom` (none, even, xsmall, small, medium, large, xlarge, navoverlap) · `gap` (0, 1–12, xsmall–xlarge) · `align` · `fullHeight` · `background` slot (by hand: `.section_background`)                                              |
 | `Wrapper/Row` + `Wrapper/Col` | any layout drawn on the 12-column grid — `8 + 4`, `6` + `5 offset 1`, a centered `8`        | Row: `gap`, `rowGap` (0, 1–12; default the site gutter) · `align` · `animate`. Col: `span` 1–12 (desktop; tablet and mobile stack automatically) · `xsmall` / `small` / `medium` / `large` (exact spans, win over `span`) · `offset` (0–11, center) · `order` (first, last) · `align` · `animate` |
-| `Wrapper/ContentWrapper`      | a block of eyebrow, heading, text and buttons, alone or beside media                        | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `column2` slot                                                                                                                                                           |
+| `Wrapper/ContentWrapper`      | a block of eyebrow, heading, text and buttons, alone or beside media                        | `variant`: stack, auto-width, columns, breakout, contain, sticky-content, sticky-visual, card · `reverse` · `centered` · `distribute` · `column2` slot                                                                                                                                            |
 | `Wrapper/Grid`                | repeating, equal-width items: cards, logos, team                                            | `xsmall` / `small` / `medium` / `large` column counts, or `variant` autofit / autofill with `minColumnWidth`, `maxColumnCount` · `animate` · children may use `span-*` classes                                                                                                                    |
 | `Global/Breadcrumbs`          | the trail from the home page to this one, with its BreadcrumbList structured data           | `items` (label, href; the last item is this page) · `schema` (default true)                                                                                                                                                                                                                       |
 | `Global/NavBanner`            | a one-line announcement above the nav, in the brand theme; before `<Nav />` in `BaseLayout` | `href` (omit for plain text)                                                                                                                                                                                                                                                                      |
@@ -45,10 +45,10 @@ anywhere with `gridOverlay`.
 
 ## Actions and items
 
-| Component   | Use it for              | Variants and key props                                                                                                                     |
-| ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Button`    | links and buttons       | `variant`: main, link, arrow, play, close · `emphasis`: primary, secondary · `element`: button, link (with `href`) · `direction` for arrow |
-| `Item/Card` | a repeated content item | `variant`: default, cover, stacked · `theme` (inherit, a theme, invert) · `image`                                                          |
+| Component   | Use it for              | Variants and key props                                                                                                                                                  |
+| ----------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`    | links and buttons       | `variant`: main, link, arrow, play, close · `emphasis`: primary, secondary · `element`: button, link (with `href`) · `size`: small, main, large · `direction` for arrow |
+| `Item/Card` | a repeated content item | `variant`: default, cover, stacked · `theme` (inherit, a theme, invert) · `image`                                                                                       |
 
 ## Media
 
@@ -61,16 +61,16 @@ anywhere with `gridOverlay`.
 
 ## Interactive
 
-| Component                                 | Use it for               | Variants and key props                                                                                             |
-| ----------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `Interactive/Accordion` + `AccordionItem` | FAQs, expandable details | native `<details>`                                                                                                 |
-| `Interactive/Tabs` + `TabLink`            | switching between panels | `variant`: horizontal, side                                                                                        |
-| `Interactive/Slider`                      | carousels                | `variant`: bleed, crop-start, contained · slides per breakpoint · `loop` · `playback`: manual, auto (pause button) |
-| `Interactive/Modal`                       | dialogs                  | `variant`: small, side-panel, full-screen · native `<dialog>` · `openOnLoad`, `cooldownDays`                       |
-| `Interactive/Dropdown`                    | menus                    | native `<details>`, keyboard support · `variant`: default, menu, mega                                              |
-| `Interactive/Marquee`                     | logo strips, tickers     | `direction`: forwards, backwards · `pauseOnHover`                                                                  |
-| `Interactive/Compare`                     | before/after, two views  | `before` and `after` slots · `start` · native range input                                                          |
-| `Interactive/ThemeToggle`                 | light/dark switch        | renders only when `COLOR_MODE` is `auto`                                                                           |
+| Component                                 | Use it for               | Variants and key props                                                                                                                                                            |
+| ----------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Interactive/Accordion` + `AccordionItem` | FAQs, expandable details | native `<details>`                                                                                                                                                                |
+| `Interactive/Tabs` + `TabLink`            | switching between panels | `variant`: horizontal, side                                                                                                                                                       |
+| `Interactive/Slider`                      | carousels                | `variant`: bleed, crop-start, contained · slides per breakpoint · `loop` · `playback`: manual, auto (pause button) · `controls`: bottom, top (beside a `header` slot) · `markers` |
+| `Interactive/Modal`                       | dialogs                  | `variant`: small, side-panel, full-screen · native `<dialog>` · `openOnLoad`, `cooldownDays`                                                                                      |
+| `Interactive/Dropdown`                    | menus                    | native `<details>`, keyboard support · `variant`: default, menu, mega                                                                                                             |
+| `Interactive/Marquee`                     | logo strips, tickers     | `direction`: forwards, backwards · `pauseOnHover`                                                                                                                                 |
+| `Interactive/Compare`                     | before/after, two views  | `before` and `after` slots · `start` · native range input                                                                                                                         |
+| `Interactive/ThemeToggle`                 | light/dark switch        | renders only when `COLOR_MODE` is `auto`                                                                                                                                          |
 
 ## Forms
 

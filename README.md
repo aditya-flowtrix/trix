@@ -67,8 +67,8 @@ the framework's own docs site and installer behind. The project keeps the CI
 workflow, so its pushes are checked the way the framework's are.
 
 Then run the `trix-new-project` skill (or follow
-[its steps](.agents/skills/trix-new-project/SKILL.md)) to stamp, name and brand
-the project. Open `/style-guide` and `/components`.
+[its steps](.agents/skills/trix-new-project/SKILL.md)) to check the stamp, then
+name and brand the project. Open `/style-guide` and `/components`.
 
 ## For designers
 
@@ -87,12 +87,14 @@ import the variables and build the file, and the
 | [`docs/architecture.md`](docs/architecture.md) | how Trix works and why                            |
 | [`PROJECT.md`](PROJECT.md)                     | the project's own record                          |
 
-| Command          | Does                                                           |
-| ---------------- | -------------------------------------------------------------- |
-| `npm run dev`    | dev server; regenerates tokens on save                         |
-| `npm run tokens` | regenerate everything derived from `tokens.css` / `themes.css` |
-| `npm run check`  | tokens in sync, conventions, type-check                        |
-| `npm run build`  | static build to `dist/`                                        |
+| Command                 | Does                                                               |
+| ----------------------- | ------------------------------------------------------------------ |
+| `npm run dev`           | dev server; regenerates tokens on save                             |
+| `npm run tokens`        | regenerate everything derived from `tokens.css` / `themes.css`     |
+| `npm run check`         | tokens in sync, conventions, type-check                            |
+| `npm run build`         | static build to `dist/`                                            |
+| `npm run seo`           | SEO audit of the build: titles, canonicals, links, structured data |
+| `npm run test:browsers` | every page in real browsers: layout, accessibility, interactions   |
 
 ## Skills
 
@@ -109,16 +111,18 @@ In [`.agents/skills/`](.agents/skills/), loaded by Claude Code as
 | `trix-import-figma`    | build tokens and pages from a Figma file                                                    |
 | `trix-cms`             | move a CMS into content collections — Webflow, WordPress, Framer, CSV — or keep it headless |
 | `trix-seo`             | metadata, structured data, SEO audit, migration parity, launch handoff                      |
+| `trix-consent`         | add or change cookie consent — the banner, gated scripts, where consent is recorded         |
 | `trix-audit-props`     | keep component props consistent                                                             |
 | `trix-scaling-graphic` | build a graphic that scales as one piece                                                    |
 | `trix-upgrade`         | upgrade a site to the latest Trix                                                           |
 
 The measuring toolkit they share is in [`scripts/measure/`](scripts/measure/):
-`inventory`, `design`, `propose`, `variables`, `classes`, `verify`.
+`inventory`, `design`, `propose`, `variables`, `classes`, `verify`, `sections`.
 
 ## Roadmap
 
-[ROADMAP.md](ROADMAP.md) — phase 2 adds the SEO skills.
+[ROADMAP.md](ROADMAP.md) — next: hreflang for multilingual sites, Core Web Vitals
+field data, and more headless CMS sources.
 
 ## Credits
 
