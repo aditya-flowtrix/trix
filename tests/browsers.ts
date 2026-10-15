@@ -322,6 +322,19 @@ const until = (page: Page, cond: string) =>
     }
     return !!ok();
   }`);
+/** What a click on `selector` would have hit, for a check that failed. */
+const hit = (page: Page, selector: string) =>
+  page.evaluate<string>(`() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) return "not found";
+    const r = el.getBoundingClientRect();
+    const at = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    const name = (n) => n ? n.tagName.toLowerCase() + (n.className ? "." + String(n.className).trim().split(/\\s+/).join(".") : "") : "nothing";
+    return "centre " + Math.round(r.x + r.width / 2) + "," + Math.round(r.y + r.height / 2) +
+      " in " + innerWidth + "x" + innerHeight + " at scroll " + Math.round(scrollY) +
+      " hits " + (el.contains(at) ? "it" : name(at)) + "; focus " + name(document.activeElement) +
+      "; url " + location.pathname + location.search;
+  }`);
 
 const PAGE_FACTS = `async () => {
   for (let y = 0; y < document.body.scrollHeight; y += 600) {
@@ -545,19 +558,22 @@ async function testPage(driver: Driver, page: Page, path: string) {
   }
   if (has.tabs) {
     await fresh();
-    await page.click('[role="tablist"] [role="tab"]:nth-child(2)');
-    check(
-      where,
-      "tabs: a click selects the tab and shows its panel",
-      await until(
-        page,
-        `() => {
+    const second = '[role="tablist"] [role="tab"]:nth-child(2)';
+    await page.click(second);
+    const selected = await until(
+      page,
+      `() => {
       const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
       const t = tabs[1];
       const panel = document.getElementById(t.getAttribute("aria-controls"));
       return t.getAttribute("aria-selected") === "true" && tabs.filter((x) => x.getAttribute("aria-selected") === "true").length === 1 && panel && !panel.hidden && panel.checkVisibility();
     }`,
-      ),
+    );
+    check(
+      where,
+      "tabs: a click selects the tab and shows its panel",
+      selected,
+      selected ? "" : await hit(page, second),
     );
     await page.evaluate(
       `() => document.querySelector('[role="tablist"] [role="tab"][aria-selected="true"]').focus()`,
