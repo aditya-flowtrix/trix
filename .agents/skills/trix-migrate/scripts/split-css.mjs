@@ -71,7 +71,7 @@ const classesOf = (selector) =>
 
 /* Four kinds of class, and only one of them names a component:
      w-*   Webflow's own widget classes — framework
-     u-*   utilities, the convention Lumos for Webflow uses
+     u-*   utilities, a Webflow utility convention
      is-*  a state or variant of whatever it sits on, not a thing itself
      rest  the component */
 const isFramework = (c) => c.startsWith("w-");
@@ -135,7 +135,7 @@ if (!wanted) {
       `utilities: ${counts.size} distinct — ${top.map(([c, n]) => `${c} ×${n}`).join(", ")}`,
     );
     console.log(
-      "  (u-* is Lumos for Webflow's convention — these usually map to a Lumos component or utility, not to CSS worth keeping)",
+      "  (u-* is a Webflow utility convention — these usually map to a Trix component or utility, not to CSS worth keeping)",
     );
   }
   console.log("");

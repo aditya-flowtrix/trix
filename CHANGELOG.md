@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+### Trix is Flowtrix's own
+
+Trix stands on its own: no upstream framework to track, and the docs, skills
+and installer describe Trix alone.
+
+- `/trix-upgrade` upgrades projects only. `package.json` → `trix.basedOn` is
+  gone, and the 0.2 → 0.3 token rename script is now
+  `rename-scale-names.mjs`.
+- The migration skills name Webflow sites by their class system — a `u-`
+  utility system, a `cc-` combo-class system, Client-First — and the
+  inventory's _Built with_ line follows.
+- The demo video on `/components` and in the Video docs is Trix's own
+  (`public/video/demo.webm`, 40 KB), no longer loaded from a third-party
+  server.
+- `THIRD-PARTY-NOTICES.md` keeps only the license notices that copies must
+  carry.
+
+### Cookie consent
+
+`/trix-consent` adds cookie consent to a site:
+
+- It asks where the visitors are, where consent is recorded, what the site
+  loads and how the banner looks.
+- It builds a banner and settings panel from Trix components on
+  [c15t](https://c15t.com) v3, headless, with every tracker held until its
+  category is allowed.
+- Self-hosting it scaffolds `consent-api/`, a Cloudflare Worker on Postgres,
+  and sets it up end to end.
+- `verify.ts` proves the gating, fairness and accessibility in a browser, and
+  `live-check.ts` proves a deployed backend.
+
+Nothing is added to a project that doesn't run it. `npm run test:consent`
+keeps the templates working in CI (framework only).
+
 ### From importing a homepage from Figma
 
 Building one client page from a Figma file found places where Trix failed
@@ -77,53 +111,49 @@ about 14:
 
 ## 0.3.0 — 2026-10-15
 
-From building a client design on Trix. Lumos stays the base and the defaults
-keep its look; every design brings its own type, colours and components, so
+From building a client design on Trix. The defaults keep their look; every design brings its own type, colours and components, so
 the framework now follows what a project adds to `tokens.css` instead of a
 fixed set of names.
 
-### More from Mast, under Lumos's names
+### More components and options
 
-The rest of what Mast for Astro does better, each rebuilt the Lumos way (typed
-props in Lumos's order and wording, CSS in the component, a script only on
-pages that use it):
+Each built the Trix way (typed props in the library's order and wording, CSS
+in the component, a script only on pages that use it):
 
 - `Video autoplay` downloads nothing until the video scrolls into view, plays
   only while it is on screen and pauses when it leaves; `desktopOnly` keeps
   it off phones and tablets (poster only, nothing downloaded).
-- `Slider`: `loop` wraps the arrows; `playback="auto"` — Lumos's name, from
-  `Tabs` — moves a slide every six seconds with a pause button, holding
+- `Slider`: `loop` wraps the arrows; `playback="auto"` — the name `Tabs`
+  uses — moves a slide every six seconds with a pause button, holding
   while focused, off screen or for reduced motion.
 - `Marquee pauseOnHover`, beside the pause button.
 - `Modal openOnLoad` and `cooldownDays`, for a newsletter or announcement.
 - `NavBanner`: a one-line announcement above the nav, in the brand theme.
 - `Dropdown variant="mega"`: the nav's full width from `medium` up.
-- `GridOverlay`'s root is `grid-overlay_wrap`, as Lumos names a root.
+- `GridOverlay`'s root is `grid-overlay_wrap`, as every root is named.
 
-Left out on purpose: the slider's fade (Lumos's `Tabs playback="auto"` is the
+Left out on purpose: the slider's fade (`Tabs playback="auto"` is the
 rotating panel), a vertical marquee, and a tabs-to-dropdown menu on phones.
 
-### Lumos's names for the scales (breaking for 0.2 projects)
+### New names for the scales (breaking for 0.2 projects)
 
-Trix's values were always Lumos's, but some names pointed elsewhere: Trix's
-`--space-4` was Lumos's `--space-3`. Now the names match Lumos for Astro,
-so Lumos's docs, examples and components mean the same thing here. Nothing
-looks different — every page renders to the same pixels.
+The scales were renamed so the names run evenly: `--space-4` became
+`--space-3`, and the others follow. Nothing looks different — every page renders to the same pixels.
 
-| 0.2                                        | 0.3                                      |
-| ------------------------------------------ | ---------------------------------------- |
-| `--space-2…12`                             | `--space-1…11` (1–8 are Lumos's exactly) |
-| `--space-1` (4px, unused)                  | removed                                  |
-| `--line-height-xsmall` / `-small`          | `--line-height-small` / `-medium`        |
-| `--line-height-medium` (1.2, unused)       | removed                                  |
-| `--letter-spacing-tighter`                 | `--letter-spacing-tight`                 |
-| `--letter-spacing-tight` (-0.02em, unused) | removed                                  |
-| `--radius-medium`                          | `--radius-main`                          |
+| 0.2                                        | 0.3                               |
+| ------------------------------------------ | --------------------------------- |
+| `--space-2…12`                             | `--space-1…11`                    |
+| `--space-1` (4px, unused)                  | removed                           |
+| `--line-height-xsmall` / `-small`          | `--line-height-small` / `-medium` |
+| `--line-height-medium` (1.2, unused)       | removed                           |
+| `--letter-spacing-tighter`                 | `--letter-spacing-tight`          |
+| `--letter-spacing-tight` (-0.02em, unused) | removed                           |
+| `--radius-medium`                          | `--radius-main`                   |
 
 Utilities (`gap-N`, `padding-*-N`, `margin-*-N`, `radius-main`), the
 `SpaceStep` type, `Section`'s default `gap` (`"8"`) and the Figma
 variables follow. `/trix-upgrade` renames a 0.2 site in one pass with
-`rename-lumos-names.mjs`. The `62rem` breakpoint stays (Webflow's 992px).
+`rename-scale-names.mjs`. The `62rem` breakpoint stays (Webflow's 992px).
 
 ### Tokens
 
@@ -150,7 +180,7 @@ content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
 ### Components
 
 - `Button` with an icon: write an `Icon` into the label, before or after the
-  text (Mast's way) — it now stays on the text's line instead of breaking it.
+  text — it now stays on the text's line instead of breaking it.
   No new prop.
 - `Button`: the label's font, size, tracking and case come from
   `--button-label-family`, `--button-label-size`,
@@ -159,14 +189,14 @@ content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
   `--button-icon-radius` (default `var(--radius-round)`).
 - `Eyebrow`: set in the `eyebrow` text style (was `text-small`, which ignored
   the eyebrow tokens). The style's defaults are now `text-small`'s, so an
-  eyebrow looks as it did — as in Lumos — until a design changes that group.
+  eyebrow looks as it did until a design changes that group.
   `variant="tag"` reads the `--tag-background` and `--tag-text` theme
   roles and `--tag-radius`.
 - `Dropdown variant="menu"`: opens in the flow of a mobile menu, floats from
   `medium` up. `Nav` no longer clips a dropdown's panel on desktop; the Nav and
-  Dropdown docs show one in a nav. The template's Nav keeps Lumos's plain links.
+  Dropdown docs show one in a nav. The template's Nav keeps plain links.
 
-### Fixed — found comparing Trix with Lumos, page by page
+### Fixed — found in a page-by-page audit
 
 - A `COLOR_MODE: "light"` (or `"dark"`) site turned dark (or light)
   mid-visit when the visitor's OS switched theme: `ThemeToggle`'s script
@@ -218,7 +248,7 @@ content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
 ### Housekeeping
 
 - `npx astro dev --background` in `AGENTS.md` and the skills — `astro` alone
-  is not on an agent's PATH (the same line is in Lumos's `AGENTS.md`).
+  is not on an agent's PATH.
 - A new project's first `npm run check` no longer shows a hint (an unused
   import in `scripts/cms/write.ts`).
 - Changing fonts says to remove the `latin` / `latinExt` ranges in
@@ -226,14 +256,14 @@ content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
 
 ## 0.2.0 — 2026-10-14
 
-The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in
-`@layer components`, values from tokens — no Mast code is included. Plus the
+The layout grid and more components, built the Trix way: typed components,
+CSS in `@layer components`, values from tokens. Plus the
 SEO phase, fonts from any source and the design-change skill.
 
 ### Layout grid
 
 - `Row` and `Col`: the 12-column grid. `span` sets the desktop span and
-  tablet and mobile stack automatically (Mast's table, mobile-first);
+  tablet and mobile stack automatically (mobile-first);
   `xsmall`–`large` set exact spans; `offset` (0–11 or `center`) and `order`
   (`first`, `last`) apply on desktop and work anywhere in a row. Built on CSS
   Grid with the gutter as `gap`, so a column's box is its content and the
@@ -264,10 +294,10 @@ SEO phase, fonts from any source and the design-change skill.
   paused for visitors who prefer reduced motion; `pauseButton={false}` for a
   clip of five seconds or less; `pausePosition` puts it in any of nine
   places (corners, edges, center). Allowed inside `ContentWrapper` visuals.
-- `Spacer` (from Mast, rebuilt): space from the scale at one spot. In a
+- `Spacer`: space from the scale at one spot. In a
   Section it takes the container's gap back on both sides, so the blocks
   either side are exactly `size` apart — more or less than the gap; in a Col
-  it adds `size`. Lumos's own "spacer" was already `Section` padding.
+  it adds `size`. Space around a section is still `Section` padding.
 
 ### Fonts and design changes
 
@@ -281,7 +311,7 @@ SEO phase, fonts from any source and the design-change skill.
 - `scripts/fonts.ts` measures each family's leading trim from the metrics
   the browser uses, writes it, and gives a different heading font its own
   trim tokens.
-- Inter's trim corrected from Lumos's 0.4em / 0.38em to the measured
+- Inter's trim corrected from 0.4em / 0.38em to the measured
   0.364em / 0.364em: text boxes now run exactly cap height to baseline, as
   Figma's vertical trim does (an h1 was about 4px taller than its text).
 
@@ -366,7 +396,7 @@ SEO phase, fonts from any source and the design-change skill.
   components in `src/` directly: Start here, The system (cascade, tokens,
   fluid sizing, theming, typography and fonts, layout, components, utilities
   or props, motion, accessibility), a page per component, Classes, and Guides
-  (Lumos, Mast and Trix; agent skills; designers and Figma; migrating a site;
+  (agent skills; designers and Figma; migrating a site;
   moving a CMS; SEO; testing; deploying; upgrading).
 - Live examples: a fence marked `astro live` renders the component and shows
   its code. Props tables are read from each component's source with
@@ -386,7 +416,7 @@ SEO phase, fonts from any source and the design-change skill.
 ### Installer
 
 - `npm create trix-astro@latest my-site` — `packages/create-trix-astro`,
-  modelled on `create-lumos`. It downloads Trix at one exact commit, leaves
+  It downloads Trix at one exact commit, leaves
   out the framework's own parts (`site/`, `packages/`, the dependency bots,
   its installer test), names the project after its folder, stamps `package.json` → `trix`
   with `version`, `commit` and `created`, writes the project's own README and
@@ -427,8 +457,7 @@ SEO phase, fonts from any source and the design-change skill.
 
 ### Found by the end-to-end audit (Chrome and WebKit, axe WCAG 2.2 AA)
 
-Most of these were inherited from Lumos for Astro, and are fixed at the
-source so every project gets them:
+Each is fixed at the source, so every project gets it:
 
 - Contrast: secondary text (`--text-2`) 60% → 70% and the light heading
   accent now pass AA in every theme; components use the token instead of
@@ -451,27 +480,25 @@ source so every project gets them:
 - Measurement is deterministic: elements are matched across widths by
   their place among their siblings and their text, not their index in the
   page; one text slot per size, with other weights put to the owner.
-- Same checks on the three demo sites: Lumos 15 elements failing
-  (target size), Mast 80 (contrast, target size) and a script error, Trix
-  none.
+- Same checks on the demo site: no element fails.
 
 ### Measuring and skills
 
 - `design.ts` measures the layout grid: the content edge most text sits on
   (site margin), where content stops growing (max width), the gutter between
   columns side by side (gap or padding gutters), equal-column lists, and how
-  many unequal layouts sit on 12 columns. Rows with negative margins (Mast,
-  Bootstrap) are seen through.
+  many unequal layouts sit on 12 columns. Rows with negative margins (Bootstrap
+  and similar grids) are seen through.
 - `propose.ts` writes `--site-margin`, `--site-gutter` and `--max-width-main`
   from it and asks about layouts off the grid. On the reference project's export it
   recovers the site's own 16→40 margin, 12→16 gutter and 1280 max width.
-- `trix-build` (from Mast's `mast-build`): the ten places Trix differs from
+- `trix-build`: the ten places Trix differs from
   ordinary web practice, loaded whenever markup or CSS is written.
-- `trix-migrate`: from Mast's `mast-migrate`, the semantics to fix while
+- `trix-migrate`: the semantics to fix while
   translating, and no dead pagination or filter controls; spacers from any
-  framework become `<Spacer>`; Mast rows and columns to `Row`/`Col`
+  framework become `<Spacer>`; row-and-column grids to `Row`/`Col`
   (desktop-first to mobile-first), stagger animations to `animate`, IX2 fades to `animate` with
-  `--reveal-*` set from the source. New eval for a Mast site.
+  `--reveal-*` set from the source. New eval for a site on a row/column grid.
 - `trix-import-figma`: frame layout grids give the site margin and gutter;
   blocks become `span` and `offset`.
 - `trix-style-guide`: the layout grid in the proposal, the record and the
@@ -486,20 +513,18 @@ source so every project gets them:
 
 ## 0.1.0 — 2026-10-14
 
-First release of Trix, forked from Lumos for Astro 0.0.5 (`0e32ded`).
-Licensed MIT, © Flowtrix; Lumos for Astro's notice is kept in
+First release of Trix. Licensed MIT, © Flowtrix; third-party notices are in
 `THIRD-PARTY-NOTICES.md`.
 
 ### Design system
 
 - `src/styles/tokens.css` and `themes.css` replace the token, theme and text
-  style sections of Lumos's `base.css`. Fluid values are `-min`/`-max` pairs;
+  style sections of `base.css`. Fluid values are `-min`/`-max` pairs;
   everything else is generated by `npm run tokens`.
 - Generated: fluid clamps, text-style classes, spacing/section/radius/type/
   grid-span utilities, prop types, Figma DTCG files (`design/tokens/`), token
   docs (`docs/tokens.md`).
-- 12-step spacing scale (Lumos step N = Trix step N+1, same values; new 4px
-  first step and three larger steps), section sizes xsmall–xlarge, radius
+- 12-step spacing scale (a 4px first step and three larger steps), section sizes xsmall–xlarge, radius
   xsmall–large, line heights xsmall–huge, letter spacing tighter–wider.
 - 13 text styles: display, h1–h6, text-xlarge, text-large, text-main,
   text-small, text-xsmall, eyebrow; primary and secondary font families.
@@ -518,7 +543,7 @@ Licensed MIT, © Flowtrix; Lumos for Astro's notice is kept in
   script.
 - Section, ButtonWrapper, Heading, Paragraph, RichText, Card and BaseLayout
   props typed from the generated scales.
-- `line-clamp-2/3/4` utilities (Lumos shipped the one-line base only).
+- `line-clamp-2/3/4` utilities, beside the one-line base.
 - Style guide page and components (`/style-guide`), rendered from the tokens;
   `/example-components` renamed `/components`.
 - Favicon, ICO, apple-touch-icon and OG image; `BaseHead` links all three icons.
@@ -538,9 +563,9 @@ Licensed MIT, © Flowtrix; Lumos for Astro's notice is kept in
 
 - New: `trix-new-project`, `trix-style-guide`, `trix-migrate` (Webflow,
   Framer, WordPress, other).
-- Renamed and updated from Lumos: `trix-import-figma` (reads `tokens.css`, fast
+- Updated: `trix-import-figma` (reads `tokens.css`, fast
   path for files built on Trix variables), `trix-audit-props`,
-  `trix-scaling-graphic`, `trix-upgrade` (plus upstream Lumos sync).
+  `trix-scaling-graphic`, `trix-upgrade`.
 - Removed the name-based `map-classes` and `map-variables` scripts — replaced by
   value-based `classes.ts` and `variables.ts`.
 - Project records move out of skills into `PROJECT.md`.

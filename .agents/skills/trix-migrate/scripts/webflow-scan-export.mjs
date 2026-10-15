@@ -123,8 +123,8 @@ const report = {
   components: {},
   variantInstances: {},
   componentMarkers: {},
-  lumosClasses: {},
-  lumosAttrs: {},
+  utilityClasses: {},
+  utilityAttrs: {},
   libraries: {},
   chrome: {},
   breakpoints: {},
@@ -244,16 +244,16 @@ for (const file of files) {
       (report.componentMarkers[key][m[2]] ?? 0) + 1;
   }
 
-  /* A site built with Lumos for Webflow carries its own class and attribute
+  /* A site built on a u- utility system carries its own class and attribute
      vocabulary, and that maps far more directly onto this framework than a
      hand-built Webflow site does. */
   for (const m of html.matchAll(/\b(u-[a-z0-9-]+)/g)) {
-    report.lumosClasses[m[1]] = (report.lumosClasses[m[1]] ?? 0) + 1;
+    report.utilityClasses[m[1]] = (report.utilityClasses[m[1]] ?? 0) + 1;
   }
   for (const m of html.matchAll(
     /\b(data-(?:xsmall|small|medium|large)-columns|data-trigger|data-button|data-hide-from|data-code-move|data-number)="?/g,
   )) {
-    report.lumosAttrs[m[1]] = (report.lumosAttrs[m[1]] ?? 0) + 1;
+    report.utilityAttrs[m[1]] = (report.utilityAttrs[m[1]] ?? 0) + 1;
   }
 
   /* Libraries the site depends on. Webflow serves these as .txt from its CDN,
@@ -341,7 +341,7 @@ for (const p of report.pages) {
   );
 }
 
-console.log("\nWIDGETS — Webflow markup with a Lumos equivalent");
+console.log("\nWIDGETS — Webflow markup with a Trix equivalent");
 if (!Object.keys(report.widgets).length) console.log("  none");
 for (const [name, { pages, target }] of Object.entries(report.widgets)) {
   console.log(
@@ -467,17 +467,19 @@ if (variantTotal) {
   );
 }
 
-const lumos = Object.entries(report.lumosClasses).sort((a, b) => b[1] - a[1]);
-if (lumos.length) {
+const utility = Object.entries(report.utilityClasses).sort(
+  (a, b) => b[1] - a[1],
+);
+if (utility.length) {
   console.log(
-    "\nBUILT WITH LUMOS FOR WEBFLOW — its classes map onto this framework",
+    "\nBUILT WITH A u- UTILITY SYSTEM — its classes map onto this framework",
   );
   console.log(
-    `  ${lumos.length} u-* classes, ${lumos.reduce((a, [, n]) => a + n, 0)} uses. Most common:`,
+    `  ${utility.length} u-* classes, ${utility.reduce((a, [, n]) => a + n, 0)} uses. Most common:`,
   );
-  for (const [cls, n] of lumos.slice(0, 8))
+  for (const [cls, n] of utility.slice(0, 8))
     console.log(`      ${cls.padEnd(26)} ×${n}`);
-  const attrs = Object.entries(report.lumosAttrs).sort((a, b) => b[1] - a[1]);
+  const attrs = Object.entries(report.utilityAttrs).sort((a, b) => b[1] - a[1]);
   if (attrs.length) {
     console.log("  attribute APIs, which usually become props here:");
     for (const [a, n] of attrs) console.log(`      ${a.padEnd(26)} ×${n}`);

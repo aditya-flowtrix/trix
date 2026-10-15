@@ -64,6 +64,12 @@ jobs:
         if: hashFiles('packages/create-trix-astro/package.json') != ''
         run: npm run test:create
 
+      # The consent skill's templates: the Worker bundles, and a scratch site
+      # built from them passes the skill's own browser check.
+      - name: The consent templates (framework only)
+        if: hashFiles('tests/consent.ts') != ''
+        run: npm run test:consent
+
       - run: npm run build
 
       # What search engines read, page by page, in Chrome: titles, canonicals,

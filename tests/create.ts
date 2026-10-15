@@ -60,6 +60,7 @@ try {
       "site",
       "packages",
       "tests/create.ts",
+      "tests/consent.ts",
       ".github/dependabot.yml",
       ".github/workflows/dependabot-automerge.yml",
       ".gitattributes",
@@ -72,12 +73,14 @@ try {
     assert.equal(pkg.version, "0.1.0");
     assert.equal(pkg.trix.commit, "abc123");
     assert.match(pkg.trix.created, /^\d{4}-\d{2}-\d{2}$/);
-    assert.ok(pkg.trix.version && pkg.trix.basedOn);
+    assert.ok(pkg.trix.version);
     assert.equal(pkg.repository, undefined);
   });
   it("nothing points at what stayed behind", () => {
     assert.ok(
-      !Object.keys(pkg.scripts).some((s) => /^(docs:|test:create)/.test(s)),
+      !Object.keys(pkg.scripts).some((s) =>
+        /^(docs:|test:(create|consent))/.test(s),
+      ),
     );
     assert.equal(pkg.devDependencies["@astrojs/mdx"], undefined);
   });

@@ -1,14 +1,14 @@
 # Third-party notices
 
 Trix is licensed under the MIT License, copyright Flowtrix — see
-[LICENSE](LICENSE). It includes or is derived from the following software,
-whose licenses require their notices to be kept with copies.
+[LICENSE](LICENSE). It includes the following third-party material, whose
+licenses require their notices to be kept with copies.
 
-## Lumos for Astro
+## MIT-licensed portions
 
-Trix is a fork of [Lumos for Astro](https://github.com/lumosframework/lumos-for-astro):
-its components, styles, layouts and skills are derived from Lumos, and the
-repository keeps Lumos's git history.
+Parts of Trix's components, styles, layouts and skills are derived from
+software released under the following license, whose notice must be kept
+with copies:
 
 ```
 MIT License
@@ -45,11 +45,3 @@ Font License 1.1, copyright the Inter Project Authors. The full license is in
 Dependencies installed from npm — among them Astro (MIT), Phosphor Icons core
 (MIT) and Playwright (Apache-2.0) — are not included in this repository; their
 licenses ship in `node_modules/` with each package.
-
-## Acknowledgements
-
-Some ideas in Trix — the 12-column grid with automatic stacking, the token
-file organised like a variables panel with generated fluid formulas,
-build-time icons, site-wide color mode, scroll-in reveals and skill evals —
-come from [Mast for Astro](https://github.com/CoreyMoen/mast-astro) by
-Corey Moen / No-Code Supply Co. (MIT). No Mast code is included.

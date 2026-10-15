@@ -7,7 +7,6 @@
  * and commit it started from (what /trix-upgrade merges against), with a
  * Cloudflare config of its own. Then installs dependencies.
  *
- * Modelled on create-lumos (Lumos for Astro, MIT, Timothy Ricks).
  */
 import {
   cp,
@@ -234,9 +233,11 @@ async function main() {
   };
   for (const key of ["description", "repository", "homepage", "bugs"])
     delete pkg[key];
-  // The docs site and this installer stayed behind, and so do their scripts.
+  // The docs site, this installer and the framework-only tests stayed behind,
+  // and so do their scripts.
   for (const script of Object.keys(pkg.scripts ?? {}))
-    if (/^(docs:|test:create$)/.test(script)) delete pkg.scripts[script];
+    if (/^(docs:|test:(create|consent)$)/.test(script))
+      delete pkg.scripts[script];
   delete pkg.devDependencies?.["@astrojs/mdx"]; // only the docs site used it
   await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 

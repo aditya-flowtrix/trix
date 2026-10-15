@@ -14,9 +14,10 @@ file assumes its phases, its record (`PROJECT.md`) and its tools.
   returns these.
 
 **Which Webflow framework built it** decides how much is a lookup. The
-inventory's *Built with* line says: Lumos for Webflow (`u-` utilities,
+inventory's *Built with* line says: a `u-` utility system (`u-` utilities,
 `data-*-columns`), Finsweet Client-First (`padding-global`, `text-size-*`,
-`heading-style-*`), Mast (`cc-` combos, `row`/`col-*`), Relume, or hand-built.
+`heading-style-*`), a `cc-` combo-class system (`cc-` combos, `row`/`col-*`),
+Relume, or hand-built.
 Whatever it is, **values are measured** (`/trix-style-guide`, `classes.ts`,
 `variables.ts`) — the framework only tells you which classes are components.
 
@@ -30,7 +31,7 @@ Trix equivalents, and move what Webflow kept in global files into the
 component that uses it. Markup you re-author is markup you have to re-verify,
 and the export is the only record of what the site actually was.
 
-Trix is built on Trix, so a **Lumos for Webflow** site maps onto it
+A **`u-` utility** site maps onto Trix
 structurally — `u-section` is `Section`, `u-heading` is `Heading` — but **not
 by value**: Trix's spacing scale, type ramp and palette are its own, and the
 site's are the site's. `--_spacing---space--8` is *not* `--space-8`. Measure
@@ -120,7 +121,7 @@ call addresses things), the component inventory, collection templates, widgets,
 lists, forms, libraries and embeds.
 
 **Read the provenance line first.** `u-*` classes and `data-*-columns`
-attributes mean the site was built with **Lumos for Webflow**, and pass 2
+attributes mean the site was built on a **`u-` utility system**, and pass 2
 becomes a lookup rather than a search.
 
 **The export did not lose the components.** Webflow writes each instance as
@@ -184,7 +185,7 @@ groundwork below is shared, but converted pages are not.
 
 ### Except the classes that already name a component
 
-**On a Lumos for Webflow site, a `u-` class that names a component is not a
+**On a `u-` utility site, a `u-` class that names a component is not a
 class to keep and convert later — it is the component, spelled differently.**
 Those come in as the component on the way in, on the first pass, in the same
 edit that brings the page across.
@@ -224,7 +225,7 @@ mobile-first, so translate the classes, do not copy them:
 Client-First's `spacer-small` … `spacer-huge` (or `padding-bottom` on an
 empty div), Relume's spacers — become `<Spacer size>` with the step whose
 value matches the measured height at every width (`design.json` lists
-spacer heights with the spacing series). Lumos for Webflow's
+spacer heights with the spacing series). The `u-` system's
 `u-section-spacer` is not one of them: it is section padding, so it becomes
 `Section`'s `paddingTop` / `paddingBottom`.
 
@@ -454,7 +455,7 @@ node .agents/skills/trix-migrate/scripts/compare-pages.mjs \
 Content parity must be exact — headings, links, images, fields, counted not
 merely matched. Screenshots should overlay. **This is the baseline.**
 
-And on a Lumos for Webflow site, the table's classes are already gone:
+And on a `u-` utility site, the table's classes are already gone:
 
 ```bash
 grep -rn "u-section\|u-heading\|u-text\|u-eyebrow\|u-button-wrapper\|u-content-wrapper\|u-rich-text\|u-svg\|button_main_wrap\|clickable" src/pages src/components
@@ -568,8 +569,8 @@ eyebrow` prints their rules.
 
 ### Variables that stand in for selectors
 
-Webflow's UI cannot author a `:hover` rule on a nested element, so Lumos for
-Webflow encodes state as numbers that cascade. Three systems do this, and none
+Webflow's UI cannot author a `:hover` rule on a nested element, so a `u-`
+utility system encodes state as numbers that cascade. Three systems do this, and none
 of them is needed here.
 
 **Trigger** — `--_trigger---on` / `---off`, a 1/0 pair flipped by real
@@ -608,7 +609,7 @@ by arithmetic. Replace the arithmetic with a media query.
 **Move the framework's breakpoints to the site's, not the other way round.**
 Trix ships Webflow's own defaults — `30rem / 48rem / 62rem`, the inverses of
 479px, 767px and 991px — so a site on Webflow's standard breakpoints needs no
-change. A site with custom breakpoints (Lumos for Webflow's container-based
+change. A site with custom breakpoints (the `u-` system's container-based
 `20em / 35em / 50em`, or added 1280/1440/1920 breakpoints) does: keep Trix's
 and the design reflows at widths it never reflowed at before — `35em` is 560px
 against 480px — a visible difference the diffs will report and no token will
@@ -697,7 +698,7 @@ add.
 If a Webflow variant has no matching prop, add the prop — it is the framework's
 own component and the site needs it. Say so in the report.
 
-For a Lumos for Webflow site this is mostly a table. The variants are already
+For a `u-` utility site this is mostly a table. The variants are already
 the prop values:
 
 | Webflow                                                                        | Becomes                                                      |
@@ -728,7 +729,7 @@ button's own label, a video URL passed as a property.
 
 **Widgets, where Webflow's own were used.** `w-slider` → `Interactive/Slider`,
 `w-tabs` → `Interactive/Tabs`, `w-dropdown`, `w-nav`, `w-form`, `w-richtext`.
-Do not expect to find them: a Lumos for Webflow site builds its own, so the
+Do not expect to find them: a `u-` utility site builds its own, so the
 carousel is Swiper and the nav is custom markup.
 
 **Third-party libraries come across as they are.** Swiper, GSAP, Three.js and
@@ -881,7 +882,7 @@ new site answers.
 
 ## Versions
 
-Webflow reference 1.0.0 (from Lumos for Astro's import skill 4.5.0, tested against a
-59-page Lumos for Webflow export: 13 collections, 147 variables, a 363 KB
+Webflow reference 1.0.0 (tested against a 59-page Webflow export on a `u-`
+utility system: 13 collections, 147 variables, a 363 KB
 stylesheet). All scripts read only; `variables.ts` writes a rename script for
 you to run and review.

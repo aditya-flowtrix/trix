@@ -1,6 +1,6 @@
 ---
 name: trix-upgrade
-description: Upgrade a site built on Trix to the latest Trix, or pull upstream Lumos for Astro changes into the Trix framework itself. Use when the user asks to upgrade Trix, update the framework, pull in the newest components, or sync Trix with Lumos. Moves the site onto the latest names, placements and props while keeping every customization the user made.
+description: Upgrade a site built on Trix to the latest Trix. Use when the user asks to upgrade Trix, update the framework, or pull in the newest components. Moves the site onto the latest names, placements and props while keeping every customization the user made.
 ---
 
 # Upgrading a Trix site
@@ -105,20 +105,20 @@ merged: they are regenerated from the merged tokens with `npm run tokens`.
 **`.agents/skills` upgrades wholesale.** In Trix no skill holds project data —
 the migration and design-system record lives in `PROJECT.md`, which is the
 project's. If an older site still has a filled-in **This project** section
-inside a skill (a Lumos-era habit), move it into `PROJECT.md` verbatim before
+inside a skill (an older habit), move it into `PROJECT.md` verbatim before
 taking the new skill, and say so in the report.
 
 ### 5. Merge `tokens.css` and `themes.css` rather than replacing them
 
-**From Trix 0.2 to 0.3, rename the tokens first.** 0.3 took Lumos for Astro's
-names for the scales (values unchanged): `--space-N` became `--space-(N-1)`
+**From Trix 0.2 to 0.3, rename the tokens first.** 0.3 renamed the scales
+(values unchanged): `--space-N` became `--space-(N-1)`
 with every `gap-N`, `padding-*-N`, `margin-*-N` and spacing prop; the
 line heights, letter spacing and `--radius-medium` → `--radius-main` moved
 too. One script does all of it in one pass, before the three-way merge below:
 
 ```bash
-node .agents/skills/trix-upgrade/rename-lumos-names.mjs          # what it would change
-node .agents/skills/trix-upgrade/rename-lumos-names.mjs --write
+node .agents/skills/trix-upgrade/rename-scale-names.mjs          # what it would change
+node .agents/skills/trix-upgrade/rename-scale-names.mjs --write
 ```
 
 It refuses when the site uses one of the three 0.2 tokens with no 0.3 name
@@ -229,30 +229,3 @@ upgrade has an exact base. Then delete `.trix-upgrade/`.
 The steps are plain git and node. `visual-check.mjs` needs headless Chrome and
 sharp, both of which an Astro project on a Mac already has. Only the automatic
 triggering and `/trix-upgrade` are Claude Code features.
-
-## Maintaining Trix: pulling from upstream Lumos
-
-Trix is a fork of [Lumos for Astro](https://github.com/lumosframework/lumos-for-astro)
-with its history intact, so upstream work arrives by merge, not by copy.
-
-```bash
-git fetch upstream
-git log --oneline <trix.basedOn.commit>..upstream/main   # what Lumos changed since
-git merge upstream/main
-```
-
-Expect conflicts where Trix diverged on purpose, and resolve them toward
-Trix's conventions:
-
-| Lumos                                           | Trix                                                      |
-| ----------------------------------------------- | --------------------------------------------------------- |
-| tokens, themes and text styles in `base.css`    | `tokens.css`, `themes.css`, generated `text-styles.css`   |
-| `--space-1…8`                                   | the same names and values, then `--space-9…11` above them |
-| breakpoint `64rem`                              | `62rem` (Webflow's 992px)                                 |
-| `--light-*`, `--dark-*`, `--brand-500` swatches | `--neutral-*`, `--brand-*` ramps                          |
-| `[lumos]` dev warnings, `lumos-*` skills        | `[trix]`, `trix-*`                                        |
-| project record inside the Webflow skill         | `PROJECT.md`                                              |
-
-After the merge: `npm run tokens && npm run check && npm run build`, then
-update `trix.basedOn` in `package.json` to the merged upstream commit and add
-a CHANGELOG entry.

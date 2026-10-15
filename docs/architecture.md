@@ -1,36 +1,31 @@
 # How Trix works
 
-## Lineage
+## What it is made of
 
-Trix is a fork of [Lumos for Astro](https://github.com/lumosframework/lumos-for-astro)
-v0.0.5 (commit `0e32ded`), with its git history, so upstream improvements
-arrive by merge (`/trix-upgrade` → _Maintaining Trix_). It takes ideas, not
-code, from [Mast for Astro](https://github.com/CoreyMoen/mast-astro), each
-rebuilt the Lumos way: a typed component, CSS co-located in
+Every part is built the same way: a typed component, CSS co-located in
 `@layer components`, values from tokens.
 
-| From Lumos for Astro                                                         | From Mast for Astro                                                                                                                                            | New in Trix                                                                                                                                                                     |
+| Conventions                                                                  | Features                                                                                                                                                       | Tooling                                                                                                                                                                         |
 | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Cascade layers: base → patterns → components → utilities                     | Token file laid out like a variables panel; edit the min/max pair, never the formula                                                                           | Generator: fluid CSS, text styles, utilities, prop types, Figma DTCG files and docs from one file                                                                               |
 | Components with co-located `<style is:global>` in `@layer components`        | Icons inlined by name at build time (Phosphor)                                                                                                                 | Style guide rendered from the tokens — no copied values                                                                                                                         |
 | Typed props, `render`, discriminated unions on `variant`                     | Site-wide light/dark mode with a pre-paint script and a toggle                                                                                                 | Measuring toolkit: inventory, design extraction, token proposal, value-based class and variable maps, verification                                                              |
 | Spacing owned by the receiving element; containers space children with `gap` | Skill evals (prompts with assertions)                                                                                                                          | Webflow breakpoints as defaults (30 / 48 / 62rem)                                                                                                                               |
-| `_wrap` naming, variants as bare classes                                     | 12-column grid with automatic stacking — `Row` / `Col` (`span`, `offset`, `order`); on CSS Grid, mobile-first, with the gutter and margin from the site tokens | Lumos's spacing names plus three larger steps, 13 text styles, palette ramps, component tokens                                                                                  |
+| `_wrap` naming, variants as bare classes                                     | 12-column grid with automatic stacking — `Row` / `Col` (`span`, `offset`, `order`); on CSS Grid, mobile-first, with the gutter and margin from the site tokens | A spacing scale with three larger steps, 13 text styles, palette ramps, component tokens                                                                                        |
 | Themes as classes with semantic tokens, `theme-invert`                       | Scroll-in reveal with stagger — an `animate` prop, timed by `--reveal-*` tokens, CSS-only hiding (no `html.js` class)                                          | Conventions check in CI; `PROJECT.md` outside the framework                                                                                                                     |
 | Agent skills with Node scripts                                               | Link prefetch; rich-text tables and dividers; `Spacer` — rebuilt to take back the container's gap, so the space at that spot is exactly its size               | Platform adapters for Framer, WordPress and others · SEO toolkit: audit, migration parity, structured data, breadcrumbs · fonts from any source, leading trim measured per font |
 
-Also from Mast, each under the name Lumos uses for the same idea: `Video`
+Also: `Video`
 that loads nothing until it is on screen and plays only while seen
 (`desktopOnly` keeps it off phones), `Slider playback="auto"` and `loop`,
 `Marquee pauseOnHover`, `Modal openOnLoad` with `cooldownDays`, `NavBanner`
 and `Dropdown variant="mega"`.
 
-**Names are Lumos's, always.** A token, utility, prop, theme role or class that
-Lumos for Astro has keeps Lumos's name and value; Trix's additions follow the
-same patterns beside them.
+**Names are stable.** A token, utility, prop, theme role or class keeps its
+name and value once released; additions follow the same patterns beside them.
 
-What Trix deliberately did **not** take from Mast: the slider's fade effect
-(Lumos's `Tabs playback="auto"` is the rotating panel), a vertical marquee, a
+What Trix deliberately leaves out: a slider fade effect
+(`Tabs playback="auto"` is the rotating panel), a vertical marquee, a
 tabs-to-dropdown menu on phones, one global
 `components.css` (Trix keeps CSS with its component), `em`-based spacing
 utilities (they drift with font size), a `Divider` component (an `<hr>` is styled instead, and the container's `gap` spaces it), negative-margin rows with padding gutters
@@ -61,7 +56,7 @@ src/styles/themes.css ─┴─► src/utils/tokens.ts (parse + model) ─► sc
 - The generator is deterministic: `npm run tokens -- --check` fails CI when a
   generated file is stale. An Astro integration in `astro.config.mjs` runs it
   at startup and whenever `tokens.css` or `themes.css` is saved.
-- The fluid formula is Lumos's, unchanged:
+- The fluid formula:
   `clamp(min, (min − slope·vmin)/16 rem + slope·100vw, max)`, with
   `slope = (max − min)/(vmax − vmin)`. A token may override its own range with
   `--<name>-viewport-min/max`, and a decreasing pair (min > max) is handled.
@@ -91,7 +86,7 @@ always reads **computed styles**, never class or variable names:
 | `classes.ts`   | each class applied to a bare element at 4 widths, both stylesheets | same / renamed / dead / contextual / no match                                                                                                                          |
 | `verify.ts`    | the rebuilt text styles and spacing at every width                 | identical or not, per value                                                                                                                                            |
 
-On the reference project (a Lumos-for-Webflow + Mast site), measure →
+On the reference project (a Webflow site on a `u-` utility system), measure →
 propose → generate → verify reproduced the source's type and spacing with all
 108 checks identical, and the class map caught four same-name/different-value
 classes and two classes with no CSS at all.

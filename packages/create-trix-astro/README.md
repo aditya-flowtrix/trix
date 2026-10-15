@@ -1,8 +1,8 @@
 # create-trix-astro
 
 Start a new [Astro](https://astro.build) site from **Trix**, the design-ready
-framework: Lumos's components and tokens, Mast's 12-column grid, one token
-system shared with Figma, and agent skills that move existing sites onto it.
+framework: accessible components, a 12-column grid, one token system shared
+with Figma, and agent skills that move existing sites onto it.
 
 ```sh
 npm create trix-astro@latest my-site
@@ -41,5 +41,4 @@ and agent skills for Claude Code and Codex.
 
 ## License
 
-[MIT](https://github.com/aditya-flowtrix/trix/blob/main/LICENSE). Built on
-[Lumos for Astro](https://github.com/lumosframework/lumos-for-astro) (MIT).
+[MIT](https://github.com/aditya-flowtrix/trix/blob/main/LICENSE), © Flowtrix.

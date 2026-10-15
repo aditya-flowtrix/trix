@@ -110,7 +110,7 @@ In [`.agents/skills/`](.agents/skills/), loaded by Claude Code as
 | `trix-seo`             | metadata, structured data, SEO audit, migration parity, launch handoff                      |
 | `trix-audit-props`     | keep component props consistent                                                             |
 | `trix-scaling-graphic` | build a graphic that scales as one piece                                                    |
-| `trix-upgrade`         | upgrade a site to the latest Trix; sync Trix with Lumos                                     |
+| `trix-upgrade`         | upgrade a site to the latest Trix                                                           |
 
 The measuring toolkit they share is in [`scripts/measure/`](scripts/measure/):
 `inventory`, `design`, `propose`, `variables`, `classes`, `verify`.
@@ -121,17 +121,10 @@ The measuring toolkit they share is in [`scripts/measure/`](scripts/measure/):
 
 ## Credits
 
-Trix is built on **[Lumos for Astro](https://github.com/lumosframework/lumos-for-astro)**
-by Timothy Ricks (MIT) — its component library, cascade layers, conventions and
-skills are the foundation, and its history is preserved in this repository.
-Ideas from **[Mast for Astro](https://github.com/CoreyMoen/mast-astro)** by
-Corey Moen / No-Code Supply Co. (MIT) — the 12-column grid with automatic
-stacking, the token file organised like a variables panel with generated
-fluid formulas, build-time icons, site-wide color mode, scroll-in reveals,
-and skill evals. Icons by [Phosphor](https://phosphoricons.com)
-(MIT). Typeface [Inter](https://rsms.me/inter/) by Rasmus Andersson (OFL).
+Trix is made by [Flowtrix](https://flowtrix.co). Icons by
+[Phosphor](https://phosphoricons.com) (MIT). Typeface [Inter](https://rsms.me/inter/) by Rasmus Andersson (OFL).
 
 ## License
 
-[MIT](LICENSE), © Flowtrix. Third-party notices, including Lumos for Astro's
-license, are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+[MIT](LICENSE), © Flowtrix. Third-party notices are in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

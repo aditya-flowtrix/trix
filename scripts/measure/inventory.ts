@@ -109,9 +109,8 @@ const platform = await page.evaluate(() => {
                   : "unknown";
   const frameworks = [
     anyClass(/^u-(section|heading|text|container)$/) &&
-      "Lumos for Webflow (u- utilities)",
-    (has("nocodesupplyco/mast") || anyClass(/^cc-/)) &&
-      "Mast (cc- combo classes / Mast scripts)",
+      "a u- utility system (u- utilities, data-*-columns)",
+    anyClass(/^cc-/) && "a cc- combo-class system (cc- combos, row/col grid)",
     anyClass(/^(padding-global|text-size-|heading-style-)/) &&
       "Finsweet Client-First",
     anyClass(/^relume/) && "Relume",

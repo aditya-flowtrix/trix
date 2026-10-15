@@ -46,13 +46,13 @@
     },
     {
       "id": 3,
-      "name": "mast-webflow-grid",
-      "prompt": "Migrate this Mast-built Webflow site to Trix. The export is at {INPUTS}/mast-export and it is live at https://example.webflow.io.",
-      "expected_output": "Mast rows and columns rebuilt as Row and Col with mobile-first props, stagger animations as the animate prop, spacers as <Spacer> with the measured size, dividers as <hr>, and the layout checked against the live site with the grid overlay.",
-      "files": ["mast-export/"],
+      "name": "row-col-webflow-grid",
+      "prompt": "Migrate this Webflow site, built on a row/column grid system with cc- combo classes, to Trix. The export is at {INPUTS}/grid-export and it is live at https://example.webflow.io.",
+      "expected_output": "Grid rows and columns rebuilt as Row and Col with mobile-first props, stagger animations as the animate prop, spacers as <Spacer> with the measured size, dividers as <hr>, and the layout checked against the live site with the grid overlay.",
+      "files": ["grid-export/"],
       "assertions": [
         "No `row`, `col-`, `cc-`, `u-` or `spacer-component` class remains under src/pages or src/components",
-        "Every Mast `col-N` became `<Col span={N}>`; every `col-md-N`, `col-sm-N` or `col-xs-N` became a mobile-first `medium`, `small` or `xsmall` prop with the breakpoint direction translated",
+        "Every `col-N` became `<Col span={N}>`; every `col-md-N`, `col-sm-N` or `col-xs-N` became a mobile-first `medium`, `small` or `xsmall` prop with the breakpoint direction translated",
         "`row-justify-center` around a single column became `offset=\"center\"`, not a hand-written margin",
         "`data-animate=\"stagger-children\"` became `animate` on the same element, and no IntersectionObserver was hand-written for it",
         "Content-sized button rows (`col-shrink`, `row-gap-button`) became ButtonWrapper, not Col",

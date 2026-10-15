@@ -113,7 +113,7 @@ function fingerprint(html) {
 
 const get = async (url) => {
   const res = await fetch(url, {
-    headers: { "user-agent": "lumos-import-webflow" },
+    headers: { "user-agent": "trix-migrate" },
   });
   if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
   return res.text();
@@ -251,7 +251,7 @@ if (process.argv.includes("--shots")) {
     const slug =
       new URL(local).pathname.replace(/\//g, "-").replace(/^-|-$/g, "") ||
       "index";
-    const dir = join(".lumos-webflow", slug);
+    const dir = join(".trix", "compare", slug);
     mkdirSync(dir, { recursive: true });
     for (const [label, url] of [
       ["live", live],
