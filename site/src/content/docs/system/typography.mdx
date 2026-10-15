@@ -1,0 +1,100 @@
+---
+title: Typography and fonts
+description: Text styles from the tokens, headings whose level and look are separate, leading trim measured from the font, and fonts from any provider — self-hosted.
+order: 5
+---
+
+## Text styles
+
+Every `/* Text style — name */` group in `tokens.css` is a text style, and
+becomes a `.text-style-*` class — the same names as the Figma text styles. A
+design adds its own by adding a group; a `-font-family` token anywhere else
+(`--button-label-family`) is a component setting, not a style:
+
+```astro live stage="stack"
+<Heading tag="h2" variant="display">Display</Heading>
+<Heading tag="h2" variant="h2">Heading 2</Heading>
+<Heading tag="h2" variant="h5">Heading 5</Heading>
+<Paragraph variant="large">Text large — for introductions.</Paragraph>
+<Paragraph>Text main — the body.</Paragraph>
+<Paragraph variant="small">Text small — captions and notes.</Paragraph>
+```
+
+`display`, `h1` … `h6`, `xlarge`, `large`, `main`, `small`, `xsmall` and
+`eyebrow`. Each sets family, size (fluid), weight, line height, letter spacing,
+transform and wrap. `h1` … `h6` and `body` get their style by default.
+
+## Level and look are separate
+
+`Heading`'s `tag` is the level in the document outline — what a screen reader
+and a search engine read. `variant` is how it looks. A section heading that is
+the third level but designed small is `<Heading tag="h3" variant="h5">`.
+`variant` defaults to the tag.
+
+## Spacing around text
+
+A heading carries the space above it, and the space below only when text
+follows — so the rhythm is right whatever comes next, without a margin on
+every element:
+
+| Rule                                      | Does                                                     |
+| ----------------------------------------- | -------------------------------------------------------- |
+| `.heading, .text { margin-top }`          | the space above, per text style (`--h2-margin-top`…)     |
+| `.heading:has(+ .text) { margin-bottom }` | the space under a heading, only when text follows        |
+| `.heading + .text { margin-top: 0 }`      | the heading's bottom margin wins                         |
+| `.container > [class] { margin: 0 }`      | inside a Section, the container's `gap` does the spacing |
+
+## Leading trim
+
+Text has empty space above the capitals and below the baseline, set by the
+font's line height. Trix removes it, so a heading's top edge is its cap height
+and spacing measured in Figma is spacing in the browser. The amount depends on
+the font, so it is **measured**, not guessed:
+
+```bash
+node scripts/fonts.ts --url http://localhost:4321/style-guide --write
+```
+
+It opens the style guide, measures each family's cap height and line metrics
+in a real browser, and writes `--primary-trim-top` and `--primary-trim-bottom`
+(and `--<family>-trim-*` for every other family in a different font). Run it
+after any font change.
+
+## Fonts
+
+Families are declared in `astro.config.mjs` → `fonts`. Every provider is
+**self-hosted**: Astro downloads the files at build and serves them from the
+site, so visitors never connect to a font CDN.
+
+| The font is                            | Provider                           |
+| -------------------------------------- | ---------------------------------- |
+| files you have (WOFF2, WOFF, TTF, OTF) | `local`, in `src/assets/fonts/`    |
+| on Google Fonts                        | `google`                           |
+| on Adobe Fonts                         | `adobe`, with the kit ID           |
+| on Fontshare, Bunny Fonts, Fontsource  | `fontshare`, `bunny`, `fontsource` |
+| an npm package                         | `npm`                              |
+
+```js
+// astro.config.mjs
+fonts: [
+  {
+    name: "Inter",
+    cssVariable: "--font-inter",
+    provider: fontProviders.google(),
+    weights: ["400 700"],
+    fallbacks: ["Arial", "sans-serif"],
+  },
+],
+```
+
+Then point `--primary-family` (body) and `--secondary-family` (headings) at
+the variable in `tokens.css`. Another role is one more token — `--mono-family`
+— measured, exported to Figma and available to every text style. `BaseHead` loads every family and preloads the
+first.
+
+<Aside type="tip" title="Changing fonts or type with an agent">
+  `/trix-design-system` asks which fonts the design uses — upload the files, or
+  say where they are hosted — and whether the licence covers web use. Given a
+  Figma link, it reads the style guide's text styles instead. Either way it
+  updates the config and tokens, measures the trim, and checks the result.
+</Aside>

@@ -1,0 +1,39 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Eyebrow from "@/components/typography/Eyebrow.astro";
+import Img from "@/components/media/Img.astro";
+import background from "@/assets/graphics/background.svg";
+import Icon from "@/components/media/Icon.astro";
+import logo_icon from "@/assets/logo/logo-icon.svg";
+import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
+import { organization, website } from "@/utils/schema.ts";
+import pkg from "../../package.json";
+---
+
+<Layout theme="dark" schema={[organization(), website()]}>
+  <Section
+    paddingBottom="even"
+    containerClass="flex-grow"
+    paddingTop="even"
+    class="flex-grow"
+    style="min-height: calc(100svh - var(--nav-height));"
+  >
+    <ContentWrapper class="flex-grow" variant="card" mediaOpacity={100}>
+      <Icon src={logo_icon} variant="large" />
+      <Heading variant="display" tag="h1" class="margin-block-8"
+        >Trix Framework</Heading
+      >
+      <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
+      <Img
+        slot="column2"
+        src={background}
+        width={1920}
+        height={1080}
+        loading="eager"
+        fetchPriority="high"
+      />
+    </ContentWrapper>
+  </Section>
+</Layout>

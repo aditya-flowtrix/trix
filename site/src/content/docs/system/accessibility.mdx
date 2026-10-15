@@ -1,0 +1,38 @@
+---
+title: Accessibility
+description: What every Trix site gets without anyone remembering to add it, and how it is checked.
+order: 10
+---
+
+## Built in
+
+- **The right element.** Links are `<a>`, buttons are `<button>`, disclosures
+  are `<details>`, dialogs are `<dialog>`. Keyboard and screen-reader behaviour
+  come from the browser, and work without JavaScript.
+- **Skip link** to the main content, first in the page.
+- **Visible focus** on everything focusable, from `--focus-width` and
+  `--focus-offset`.
+- **Text scales with the reader's font size** — every length is `rem`
+  ([Fluid sizing](/docs/system/fluid-sizing)).
+- **Contrast** — every text pair in every theme is measured against WCAG AA by
+  `npm run check`.
+- **Motion** — reveals, video and marquees respect reduced motion; moving
+  content can be paused ([Motion](/docs/system/motion)).
+- **Targets** — interactive controls are at least 24 by 24 px.
+- **Headings** — `Heading`'s `tag` keeps the outline right whatever the size.
+- **Images** — `Img` without `alt` is decorative (`alt=""`); with it, described.
+- **Forms** — every field has a label (visible or not), `required` is marked,
+  and inputs carry the right `type` and `autocomplete`.
+
+## Checked
+
+`npm run test:browsers` runs [axe](https://github.com/dequelabs/axe-core)
+against WCAG 2.2 AA on every page, at phone, tablet and desktop widths, in
+every installed browser — then drives the skip link, accordion, dropdown,
+tabs, modal, slider, marquee and video with the keyboard. CI runs it in
+every browser engine — Chromium, Firefox and WebKit — on every push. See
+[Testing](/docs/guides/testing).
+
+Automated checks find about half of accessibility problems. The rest — reading
+order that makes sense, alt text that says the right thing, a flow a screen
+reader user can follow — still needs a person.

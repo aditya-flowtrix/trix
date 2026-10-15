@@ -1,0 +1,53 @@
+---
+title: Introduction
+description: What Trix is, what is in it, the rules it follows, and how to read these docs.
+order: 1
+---
+
+Trix is a design-ready framework for [Astro](https://astro.build). It gives you
+a set of design tokens shared with Figma, a predictable cascade, a 12-column
+layout grid, utility classes, and components that already know how to be
+accessible — plus agent skills that build with it, and move existing sites onto
+it.
+
+It is free, MIT licensed and open source. You copy it into your project and it
+is yours: no account, no runtime, no lock-in.
+
+## What is in it
+
+| Part       | What                                                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Foundation | the cascade, fluid tokens, themes, `render` and variants as props, the style guide                                                   |
+| Layout     | the 12-column grid — `Row` and `Col`, automatic stacking, the grid overlay; `Spacer`; reveal on scroll                               |
+| Components | every component, accessible by default; build-time icons; site-wide color mode                                                       |
+| Tooling    | tokens exported to Figma variables, leading trim, fonts from any provider, SEO, CMS migration, cookie consent, every-browser testing |
+
+## The philosophy
+
+Everything else in these docs is one of these rules applied to a case.
+
+1. **Everything scales with the reader's font size.** Lengths are `rem`, so
+   when a visitor enlarges their text the whole site responds, the way it does
+   to browser zoom.
+2. **Define it once, use it everywhere.** A size is two numbers, phone and
+   desktop, and scales smoothly between them. A color is a token a theme
+   redefines. A component's look is a variant, not a stack of classes.
+3. **Design and code share every name.** `--space-7` in CSS is `space/7` in
+   Figma; a `Button` variant in Figma is the `variant` prop here.
+4. **The element is right before it is styled.** A link is an `<a>`, a
+   disclosure is a `<details>`, a dialog is a `<dialog>`. Keyboard, screen
+   reader and no-JavaScript behaviour come from the platform.
+5. **Prove it.** `npm run check`, the SEO audit and the browser tests run on
+   every push. A rule that is not checked drifts.
+
+## How these docs are organised
+
+- **Start here** — install it, and know your way around a project.
+- **The system** — the ideas the components are built on: cascade, tokens,
+  theming, type, layout, motion, accessibility.
+- **Components** — every component, live, with its props read from the source.
+- **Classes** — the token reference, utilities and patterns.
+- **Guides** — designers and Figma, agent skills, migrating a site, moving a
+  CMS, SEO, testing, deploying and upgrading.
+
+Press <kbd>⌘</kbd> <kbd>K</kbd> (or <kbd>/</kbd>) anywhere to search.

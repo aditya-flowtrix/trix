@@ -1,0 +1,126 @@
+---
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import type { HTMLAttributes, SvgComponent } from "astro/types";
+
+type Base = HTMLAttributes<"svg"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Icon size. */
+  variant?: "small" | "medium" | "large" | "full-width";
+};
+
+type Props = Base &
+  (
+    | {
+        /** Imported SVG. Omit to render nothing. */
+        src?: SvgComponent;
+        name?: never;
+        weight?: never;
+      }
+    | {
+        /** Phosphor icon name, as on phosphoricons.com — `arrow-right`. Inlined at build time. */
+        name: string;
+        /** Phosphor weight. */
+        weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
+        src?: never;
+      }
+  );
+
+type AllProps = Base & {
+  src?: SvgComponent;
+  name?: string;
+  weight?: "thin" | "light" | "regular" | "bold" | "fill" | "duotone";
+};
+
+const {
+  render = true,
+  src: Svg,
+  name,
+  weight = "regular",
+  variant = "medium",
+  class: className,
+  ...rest
+} = Astro.props as AllProps;
+
+const labelled = Boolean(rest["aria-label"] ?? rest["aria-labelledby"]);
+
+function phosphor(icon: string) {
+  const file = weight === "regular" ? icon : `${icon}-${weight}`;
+  let svg: string;
+  try {
+    svg = readFileSync(
+      createRequire(import.meta.url).resolve(
+        `@phosphor-icons/core/assets/${weight}/${file}.svg`,
+      ),
+      "utf8",
+    );
+  } catch {
+    throw new Error(
+      `[trix] <Icon name="${icon}" weight="${weight}"> is not a Phosphor icon. Names are listed on phosphoricons.com.`,
+    );
+  }
+  return {
+    viewBox: svg.match(/viewBox="([^"]+)"/)?.[1],
+    inner: svg.replace(/^<svg[^>]*>|<\/svg>\s*$/g, ""),
+  };
+}
+
+const named = render && name ? phosphor(name) : undefined;
+
+if (import.meta.env.DEV && render && !Svg && !name) {
+  console.warn(
+    "[trix] <Icon> rendered without a `src` or `name`; nothing was output.",
+  );
+}
+---
+
+{
+  render && Svg && (
+    <Svg
+      class:list={["icon", variant, className]}
+      aria-hidden={labelled ? undefined : "true"}
+      {...rest}
+    />
+  )
+}
+{
+  named && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={named.viewBox}
+      fill="currentColor"
+      class:list={["icon", variant, className]}
+      aria-hidden={labelled ? undefined : "true"}
+      {...rest}
+      set:html={named.inner}
+    />
+  )
+}
+
+<style is:global>
+  @layer components {
+    .icon {
+      --_size: 1.5em;
+      flex: none;
+      display: block;
+      width: var(--_size);
+      height: auto;
+      aspect-ratio: 1 / 1;
+      max-width: 100%;
+
+      &.small {
+        --_size: 1em;
+      }
+
+      &.large {
+        --_size: 2em;
+      }
+
+      &.full-width {
+        width: 100%;
+        aspect-ratio: unset;
+      }
+    }
+  }
+</style>

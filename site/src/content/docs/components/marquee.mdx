@@ -1,0 +1,29 @@
+---
+title: Marquee
+description: A strip that scrolls continuously — logos, a ticker — and stops for anyone who needs it to.
+order: 55
+component: interactive/Marquee
+---
+
+```astro live stage="block"
+<Marquee label="What we do">
+  <Paragraph variant="large">Strategy</Paragraph>
+  <Icon name="asterisk" />
+  <Paragraph variant="large">Design</Paragraph>
+  <Icon name="asterisk" />
+  <Paragraph variant="large">Development</Paragraph>
+  <Icon name="asterisk" />
+</Marquee>
+```
+
+The content is repeated to fill the strip, and the copies are hidden from
+screen readers. It has a pause control, holds still while anything inside has
+focus, and doesn't move at all with reduced motion.
+
+`pauseOnHover` holds it still while the pointer is over it, as well as while
+anything inside has focus. The pause button stays either way: hover is not
+something everyone can do.
+
+## Props
+
+<Props of="interactive/Marquee" />

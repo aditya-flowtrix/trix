@@ -1,0 +1,28 @@
+---
+title: Fieldset
+description: A group of fields with its legend, laid out in a stack, columns, thirds or a row.
+order: 61
+component: form/Fieldset
+---
+
+```astro live stage="stack"
+<Fieldset legend="Date of birth" variant="thirds" legendStyle="label">
+  <Select variant="month" labelHidden />
+  <Select variant="day" labelHidden />
+  <Select variant="year" from={1940} labelHidden />
+</Fieldset>
+```
+
+| Variant   | Layout                                 |
+| --------- | -------------------------------------- |
+| `stack`   | one field per line (default)           |
+| `columns` | two columns from 48rem                 |
+| `thirds`  | three columns from 48rem               |
+| `inline`  | a wrapping row — radios and checkboxes |
+
+`legendStyle` shows the legend as a heading, as a field label, or only to
+screen readers. Fieldsets nest.
+
+## Props
+
+<Props of="form/Fieldset" />

@@ -1,0 +1,145 @@
+---
+import Icon from "@/components/media/Icon.astro";
+import ThemeToggle from "@/components/interactive/ThemeToggle.astro";
+import logo from "@/assets/logo/logo.svg";
+import { REPO, SITE_NAME } from "@/consts.ts";
+import { pagePath } from "@/utils/seo.ts";
+
+const path = pagePath(Astro.url);
+const links = [
+  {
+    label: "Docs",
+    href: "/docs",
+    active: path.startsWith("/docs") && !path.startsWith("/docs/components"),
+  },
+  {
+    label: "Components",
+    href: "/docs/components/section",
+    active: path.startsWith("/docs/components"),
+  },
+];
+---
+
+<header class="site-header_wrap">
+  <div class="site-header_inner">
+    <a class="site-header_logo" href="/" aria-label={`${SITE_NAME} home`}>
+      <Icon src={logo} variant="full-width" />
+    </a>
+    <nav class="site-header_links" aria-label="Main">
+      {
+        links.map((link) => (
+          <a href={link.href} aria-current={link.active ? "page" : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+    <button class="site-header_search" type="button" data-search-open>
+      <Icon name="magnifying-glass" variant="small" />
+      <span class="site-header_search_label">Search</span>
+      <kbd class="site-header_search_key" aria-hidden="true">⌘K</kbd>
+    </button>
+    <ThemeToggle />
+    <a class="site-header_icon" href={REPO} aria-label="Trix on GitHub">
+      <Icon name="github-logo" variant="small" />
+    </a>
+  </div>
+</header>
+
+<style is:global>
+  @layer components {
+    .site-header_wrap {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: var(--border-width) solid var(--border);
+      background-color: var(--background);
+    }
+    .site-header_inner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      height: 3.5rem;
+      padding-inline: var(--site-margin);
+    }
+    .site-header_logo {
+      display: block;
+      width: 3.5rem;
+      color: var(--text);
+    }
+    .site-header_links {
+      display: flex;
+      gap: 0.25rem;
+      padding-left: var(--space-3);
+      border-left: var(--border-width) solid var(--border);
+
+      a {
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius-small);
+        color: var(--text-2);
+        font-size: var(--text-small);
+        text-decoration: none;
+
+        &:hover,
+        &[aria-current] {
+          color: var(--text);
+          background-color: var(--background-2);
+        }
+      }
+    }
+    .site-header_search {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-left: auto;
+      padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-small);
+      background-color: var(--background-2);
+      color: var(--text-2);
+      font-size: var(--text-small);
+      cursor: pointer;
+
+      &:hover {
+        color: var(--text);
+      }
+    }
+    .site-header_search_label {
+      min-width: 8rem;
+      text-align: start;
+    }
+    .site-header_search_key {
+      padding: 0.0625rem 0.375rem;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-xsmall);
+      font-family: inherit;
+      font-size: var(--text-xsmall);
+    }
+    .site-header_icon {
+      display: flex;
+      color: var(--text-2);
+
+      &:hover {
+        color: var(--text);
+      }
+    }
+    @media (width < 48rem) {
+      .site-header_links,
+      .site-header_search_key {
+        display: none;
+      }
+      /* Out of sight, still the button's name. */
+      .site-header_search_label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      .site-header_search {
+        padding: 0.5rem;
+      }
+    }
+  }
+</style>

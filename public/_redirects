@@ -1,0 +1,7 @@
+# Permanent redirects, read by Cloudflare and Netlify: old path, new path,
+# status. These are real 301s; Astro's own `redirects` in a static build only
+# writes meta-refresh pages. Keep the old platform's list here too.
+# https://developers.cloudflare.com/workers/static-assets/redirects/
+#
+# /about-us   /about   301
+# /blog/*     /news/:splat   301

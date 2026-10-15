@@ -1,0 +1,478 @@
+{
+  "color": {
+    "white": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#ffffff"
+      }
+    },
+    "black": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0,
+          0,
+          0
+        ],
+        "alpha": 1,
+        "hex": "#000000"
+      }
+    },
+    "neutral": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9804,
+            0.9804,
+            0.9804
+          ],
+          "alpha": 1,
+          "hex": "#fafafa"
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9608,
+            0.9608,
+            0.9608
+          ],
+          "alpha": 1,
+          "hex": "#f5f5f5"
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.898,
+            0.898,
+            0.898
+          ],
+          "alpha": 1,
+          "hex": "#e5e5e5"
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8314,
+            0.8314,
+            0.8314
+          ],
+          "alpha": 1,
+          "hex": "#d4d4d4"
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6392,
+            0.6392,
+            0.6392
+          ],
+          "alpha": 1,
+          "hex": "#a3a3a3"
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.451,
+            0.451,
+            0.451
+          ],
+          "alpha": 1,
+          "hex": "#737373"
+        }
+      },
+      "600": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3216,
+            0.3216,
+            0.3216
+          ],
+          "alpha": 1,
+          "hex": "#525252"
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.251,
+            0.251,
+            0.251
+          ],
+          "alpha": 1,
+          "hex": "#404040"
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.149,
+            0.149,
+            0.149
+          ],
+          "alpha": 1,
+          "hex": "#262626"
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0902,
+            0.0902,
+            0.0902
+          ],
+          "alpha": 1,
+          "hex": "#171717"
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0392,
+            0.0392,
+            0.0392
+          ],
+          "alpha": 1,
+          "hex": "#0a0a0a"
+        }
+      }
+    },
+    "brand": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9373,
+            1,
+            0.9529
+          ],
+          "alpha": 1,
+          "hex": "#effff3"
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.851,
+            1,
+            0.8902
+          ],
+          "alpha": 1,
+          "hex": "#d9ffe3"
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6392,
+            0.9882,
+            0.749
+          ],
+          "alpha": 1,
+          "hex": "#a3fcbf"
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0588,
+            0.8275,
+            0.4588
+          ],
+          "alpha": 1,
+          "hex": "#0fd375"
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0157,
+            0.7412,
+            0.4039
+          ],
+          "alpha": 1,
+          "hex": "#04bd67"
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0078,
+            0.6275,
+            0.3412
+          ],
+          "alpha": 1,
+          "hex": "#02a057"
+        }
+      },
+      "600": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0039,
+            0.5216,
+            0.2784
+          ],
+          "alpha": 1,
+          "hex": "#018547"
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.4157,
+            0.2157
+          ],
+          "alpha": 1,
+          "hex": "#006a37"
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.3294,
+            0.1647
+          ],
+          "alpha": 1,
+          "hex": "#00542a"
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.2431,
+            0.1176
+          ],
+          "alpha": 1,
+          "hex": "#003e1e"
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.1333,
+            0.0549
+          ],
+          "alpha": 1,
+          "hex": "#00220e"
+        }
+      }
+    },
+    "brand-text": {
+      "$type": "color",
+      "$value": "{color.black}"
+    }
+  },
+  "font": {
+    "family": {
+      "primary": {
+        "$type": "fontFamily",
+        "$value": [
+          "Inter",
+          "Arial",
+          "sans-serif"
+        ]
+      },
+      "secondary": {
+        "$type": "fontFamily",
+        "$value": "{font.family.primary}"
+      }
+    },
+    "weight": {
+      "light": {
+        "$type": "fontWeight",
+        "$value": 300
+      },
+      "regular": {
+        "$type": "fontWeight",
+        "$value": 400
+      },
+      "medium": {
+        "$type": "fontWeight",
+        "$value": 500
+      },
+      "semibold": {
+        "$type": "fontWeight",
+        "$value": 600
+      },
+      "bold": {
+        "$type": "fontWeight",
+        "$value": 700
+      }
+    }
+  },
+  "line-height": {
+    "small": {
+      "$type": "number",
+      "$value": 100,
+      "$description": "Percent of font size (Figma line height %)."
+    },
+    "medium": {
+      "$type": "number",
+      "$value": 110,
+      "$description": "Percent of font size (Figma line height %)."
+    },
+    "large": {
+      "$type": "number",
+      "$value": 130,
+      "$description": "Percent of font size (Figma line height %)."
+    },
+    "xlarge": {
+      "$type": "number",
+      "$value": 140,
+      "$description": "Percent of font size (Figma line height %)."
+    },
+    "huge": {
+      "$type": "number",
+      "$value": 150,
+      "$description": "Percent of font size (Figma line height %)."
+    }
+  },
+  "letter-spacing": {
+    "tight": {
+      "$type": "number",
+      "$value": -3,
+      "$description": "Percent of font size (Figma letter spacing %)."
+    },
+    "normal": {
+      "$type": "number",
+      "$value": 0,
+      "$description": "Percent of font size (Figma letter spacing %)."
+    },
+    "wide": {
+      "$type": "number",
+      "$value": 5,
+      "$description": "Percent of font size (Figma letter spacing %)."
+    },
+    "wider": {
+      "$type": "number",
+      "$value": 10,
+      "$description": "Percent of font size (Figma letter spacing %)."
+    }
+  },
+  "radius": {
+    "xsmall": {
+      "$type": "dimension",
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      }
+    },
+    "small": {
+      "$type": "dimension",
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      }
+    },
+    "main": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      }
+    },
+    "large": {
+      "$type": "dimension",
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      }
+    },
+    "round": {
+      "$type": "dimension",
+      "$value": {
+        "value": 9999,
+        "unit": "px"
+      }
+    }
+  },
+  "breakpoint": {
+    "small": {
+      "$type": "dimension",
+      "$value": {
+        "value": 480,
+        "unit": "px"
+      }
+    },
+    "medium": {
+      "$type": "dimension",
+      "$value": {
+        "value": 768,
+        "unit": "px"
+      }
+    },
+    "large": {
+      "$type": "dimension",
+      "$value": {
+        "value": 992,
+        "unit": "px"
+      }
+    }
+  },
+  "grid": {
+    "columns": {
+      "$type": "number",
+      "$value": 12,
+      "$description": "Layout grid columns on desktop and tablet frames (phone frames use 4: one is 3 of these). Margin and gutter bind to Responsive site-margin and site-gutter."
+    }
+  }
+}

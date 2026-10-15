@@ -1,0 +1,68 @@
+---
+/**
+ * The layout grid drawn over the page — the same columns, gutter and margins
+ * a designer sets on a Figma frame. Shift+G, or any `[data-grid-overlay-toggle]`
+ * button, shows and hides it; the choice is remembered across pages.
+ * BaseLayout renders it in development, and wherever `gridOverlay` is set.
+ */
+---
+
+<div class="grid-overlay_wrap" aria-hidden="true" hidden>
+  <div class="grid-overlay_columns"></div>
+</div>
+
+<script>
+  const KEY = "trix-grid-overlay";
+  const overlay = document.querySelector<HTMLElement>(".grid-overlay_wrap")!;
+  const show = (on: boolean) => {
+    overlay.hidden = !on;
+    document
+      .querySelectorAll("[data-grid-overlay-toggle]")
+      .forEach((b) => b.setAttribute("aria-pressed", String(on)));
+    try {
+      if (on) localStorage.setItem(KEY, "1");
+      else localStorage.removeItem(KEY);
+    } catch {}
+  };
+  try {
+    show(!!localStorage.getItem(KEY));
+  } catch {}
+  addEventListener("keydown", (e) => {
+    if (e.key !== "G" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey)
+      return;
+    const t = e.target as HTMLElement | null;
+    if (t?.closest("input, textarea, select, [contenteditable]")) return;
+    show(!!overlay.hidden);
+  });
+  document.addEventListener("click", (e) => {
+    if ((e.target as Element).closest?.("[data-grid-overlay-toggle]"))
+      show(!!overlay.hidden);
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .grid-overlay_wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      pointer-events: none;
+    }
+    .grid-overlay_columns {
+      --_column: calc(
+        (100% - (var(--grid-columns) - 1) * var(--site-gutter)) /
+          var(--grid-columns)
+      );
+      width: var(--site-width);
+      max-width: var(--max-width-main);
+      height: 100%;
+      margin-inline: auto;
+      /* Figma's default layout grid color: red at 10%. */
+      background: repeating-linear-gradient(
+        to right,
+        rgb(255 0 0 / 0.1) 0 var(--_column),
+        transparent var(--_column) calc(var(--_column) + var(--site-gutter))
+      );
+    }
+  }
+</style>

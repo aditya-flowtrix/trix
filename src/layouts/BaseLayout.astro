@@ -1,0 +1,54 @@
+---
+import "@/styles/global.css";
+import BaseHead from "@/components/utility/BaseHead.astro";
+import SkipLink from "@/components/global/SkipLink.astro";
+import Nav from "@/components/global/Nav.astro";
+import Footer from "@/components/global/Footer.astro";
+import GridOverlay from "@/components/utility/GridOverlay.astro";
+import Reveal from "@/components/utility/Reveal.astro";
+import type { SeoProps } from "@/types.ts";
+import { COLOR_MODE, SITE_LOCALE } from "@/consts.ts";
+import type { Theme } from "@/styles/generated/tokens.ts";
+
+type Props = SeoProps & {
+  /** Theme for the whole page. `inherit` leaves the root defaults in place. */
+  theme?: "inherit" | Theme;
+  /**
+   * Fix the nav over the page rather than letting it stick in flow, so the
+   * first section starts underneath it. Give that section
+   * `paddingTop="navoverlap"` to clear the bar.
+   */
+  overlap?: boolean;
+  /** Include the layout-grid overlay (Shift+G). On by default in development. */
+  gridOverlay?: boolean;
+};
+
+const {
+  theme = "inherit",
+  overlap = false,
+  gridOverlay = import.meta.env.DEV,
+  ...seo
+} = Astro.props;
+---
+
+<!doctype html>
+<html
+  lang={SITE_LOCALE}
+  class:list={[theme !== "inherit" && `theme-${theme}`]}
+  data-mode={COLOR_MODE === "dark" ? "dark" : undefined}
+>
+  <head>
+    <BaseHead {...seo} />
+    <slot name="head" />
+  </head>
+  <body>
+    <SkipLink />
+    <Nav overlap={overlap} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    {gridOverlay && <GridOverlay />}
+    <Reveal />
+  </body>
+</html>

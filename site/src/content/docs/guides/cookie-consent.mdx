@@ -1,0 +1,55 @@
+---
+title: Cookie consent
+description: A consent banner in the site's own design, every tracker held until the visitor allows it, and choices recorded where the project decides.
+order: 7
+---
+
+`/trix-consent` adds cookie consent to a site. It asks where the visitors
+are, where consent should be recorded, what the site loads and how the banner
+should look, then builds it and proves nothing tracks before a choice.
+
+## What it builds
+
+- **`src/consent.ts`.** One [c15t](https://c15t.com) runtime holding every
+  third-party script and its category. Nothing in the list loads until its
+  category is allowed.
+- **`ConsentBanner.astro`.** The banner and the settings panel, as Trix
+  components in the project's tokens.
+  - The banner sits in the browser's top layer, so no widget can cover it.
+  - The settings panel is `Modal` with a `Choice` switch per category.
+  - "Reject all" always carries the same weight as "Accept all".
+- **A "Cookie settings" link in the footer**, so a visitor can change their
+  mind on any page.
+- **Embeds on `data-src`**, filled only once their category is allowed.
+
+## Where consent is recorded
+
+| Choice       | Proof of consent | What the skill sets up                                                       |
+| ------------ | ---------------- | ---------------------------------------------------------------------------- |
+| Browser only | None             | Nothing; not for production                                                  |
+| Inth         | On Inth          | The backend URL                                                              |
+| Self-hosted  | Your database    | `consent-api/`: a Cloudflare Worker, Postgres through Hyperdrive, migrations |
+
+Consent records are legal evidence: once the site is live, none is ever
+deleted. Development builds and `verify.ts` never write to them; the go-live
+check saves one, and `PROJECT.md` records which.
+
+## Checking it
+
+```bash
+node .agents/skills/trix-consent/verify.ts --vendor googletagmanager.com
+```
+
+It builds the site in offline mode and checks it in a real browser. The
+checks are:
+
+- Nothing third-party loads before a choice, and nothing loads with
+  JavaScript off.
+- Reject holds across a reload, and Accept loads every vendor.
+- Withdrawing consent reloads the page without the vendor.
+- The banner is uncovered, fits a phone, and is fair.
+- The banner and the settings panel pass axe.
+
+A self-hosted backend also gets a go-live check through its public URLs.
+`live-check.ts` saves one real consent and confirms it reads back at the time
+it was clicked.

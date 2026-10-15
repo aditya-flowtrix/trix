@@ -1,0 +1,69 @@
+---
+title: Building a layout
+description: Sections, the 12-column grid, equal grids, content blocks and spacing — which one to reach for, and why.
+order: 6
+---
+
+Every page is a stack of `Section`s. Inside one, pick the layout by what the
+design shows:
+
+| The design shows                                                     | Use                                                  |
+| -------------------------------------------------------------------- | ---------------------------------------------------- |
+| blocks spanning columns: `8 + 4`, `5` + `6 offset 1`, a centered `8` | [`Row` + `Col`](/docs/components/row-and-col)        |
+| equal items repeated: cards, logos, a CMS list                       | [`Grid`](/docs/components/grid)                      |
+| a text block, alone or beside media, in a standard arrangement       | [`ContentWrapper`](/docs/components/content-wrapper) |
+| a row of buttons or tags sized to their content                      | [`ButtonWrapper`](/docs/components/button-wrapper)   |
+| one spot that needs more or less space than the rest                 | [`Spacer`](/docs/components/spacer)                  |
+
+## The section
+
+`Section` is a full-width band: its theme, its top and bottom padding, an
+optional background slot, and a centered container at the site's width. The
+container stacks its children with a `gap` — so **the space between blocks
+belongs to the section, not to the blocks**.
+
+```astro
+<Section paddingTop="large" gap="6">
+  <Eyebrow>Services</Eyebrow>
+  <Heading tag="h2">What we do</Heading>
+  <Grid medium={3}>…</Grid>
+</Section>
+```
+
+## The 12-column grid
+
+Twelve columns (`--grid-columns`), gutter `--site-gutter`, margin
+`--site-margin`, content capped at `--max-width-main` — the grid the designer
+draws on in Figma. Press <kbd>Shift</kbd> <kbd>G</kbd> on any page in
+development to see it.
+
+```astro live stage="block"
+<Row>
+  <Col span={8} class="background-skeleton radius-small padding-4">span 8</Col>
+  <Col span={4} class="background-skeleton radius-small padding-4">span 4</Col>
+  <Col span={5} offset={1} class="background-skeleton radius-small padding-4"
+    >span 5, offset 1</Col
+  >
+  <Col span={6} class="background-skeleton radius-small padding-4">span 6</Col>
+</Row>
+```
+
+`span` is the desktop width. Smaller screens **follow automatically**: on a
+tablet, 2–8 columns become half width (a lone 7 or 8 goes full) and 9 and up go
+full; on a phone, 4 and up stack. Set `xsmall`, `small`, `medium` or `large`
+only where the design differs.
+
+Never fake columns with widths or `calc()` in a component. If a block does not
+sit on the grid, that is a design question first.
+
+## Spacing, in one place each
+
+- Between a section's blocks: the section's `gap`.
+- At one spot: `<Spacer size="xlarge" />` — exact, because it takes the gap
+  back on both sides.
+- Between a heading and its text: the text style's margins (see
+  [Typography](/docs/system/typography)).
+- Around a button row: `ButtonWrapper`'s `marginTop`.
+
+There is no margin fighting the container anywhere, so changing a section's
+`gap` changes the whole section.

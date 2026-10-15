@@ -1,0 +1,51 @@
+---
+title: The cascade
+description: Four cascade layers — base, patterns, components, utilities — decide which style wins, so specificity never has to.
+order: 1
+---
+
+Every style in Trix lives in one of four [cascade layers](https://developer.mozilla.org/docs/Web/CSS/@layer),
+declared once in `BaseHead`, before any stylesheet loads:
+
+```css
+@layer base, patterns, components, utilities;
+```
+
+A later layer always beats an earlier one, whatever the selectors. That is the
+whole system: you never raise specificity to win, and `!important` is never
+needed.
+
+| Layer        | Holds                                                                                           | File                                       |
+| ------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `base`       | element defaults: the reset, `body`, headings, links, focus, text styles                        | `base.css`, `generated/text-styles.css`    |
+| `patterns`   | classes many components share: `.container`, `.heading`, `.text`, flex and grid layouts, reveal | `patterns.css`                             |
+| `components` | each component's own CSS, in its own file's `<style is:global>`                                 | `src/components/**`                        |
+| `utilities`  | one-job classes: `padding-7`, `gap-3`, `radius-small`, `alignment-center`                       | `utilities.css`, `generated/utilities.css` |
+
+## Why this order
+
+- **Components beat patterns**, so a component can adjust a shared pattern
+  without fighting it.
+- **Utilities beat components**, so `class="margin-top-0"` on one instance
+  always works — the one override a page is allowed.
+- **Unlayered CSS beats everything.** Any style written outside a layer wins
+  over the whole framework. Trix's own CSS is always layered; a third-party
+  stylesheet you add is not, so wrap it in `@layer components { … }` when it
+  should behave.
+
+## Where your CSS goes
+
+A component's CSS belongs in that component, inside `@layer components`:
+
+```astro
+<style is:global>
+  @layer components {
+    .hero-home_wrap {
+      /* … */
+    }
+  }
+</style>
+```
+
+A page carries no CSS. [How components work](/docs/system/components) has the
+naming rules.

@@ -1,0 +1,20 @@
+---
+title: FormattedDate
+description: A date in the site's language, inside a machine-readable time element.
+order: 76
+component: utility/FormattedDate
+---
+
+```astro live
+<FormattedDate date={new Date("2026-10-14")} />
+<FormattedDate date={new Date("2026-10-14")} format={{ dateStyle: "medium" }} />
+<FormattedDate date={new Date("2026-10-14")} locale="de-DE" />
+```
+
+It renders `<time datetime="2026-10-14T00:00:00.000Z">`, formatted with
+`Intl.DateTimeFormat` in `SITE_LOCALE`. The time zone defaults to UTC, so a
+date reads the same wherever the site is built.
+
+## Props
+
+<Props of="utility/FormattedDate" />

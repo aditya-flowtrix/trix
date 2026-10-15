@@ -1,0 +1,53 @@
+---
+title: SEO
+description: Metadata, structured data and breadcrumbs on every page, an audit of what search engines read, and keeping a migrated site's rankings.
+order: 6
+---
+
+## On every page
+
+Pass the page's metadata to the layout; `BaseHead` writes the rest.
+
+```astro
+<BaseLayout
+  title="Pricing"
+  description="Plans for teams of every size, billed monthly or yearly."
+  image="/og/pricing.jpg"
+  schema={[organization(), faqPage(questions)]}
+/>
+```
+
+- **Title** — `Pricing | Site name`. Unique per page, under 60 characters.
+- **Description** — 70 to 160 characters, unique.
+- **Canonical** — the page's own URL, with no `.html` and no trailing slash.
+- **Social cards** — Open Graph and Twitter, from the same values.
+- **Structured data** — from [`@/utils/schema.ts`](/docs/components/json-ld).
+- **Breadcrumbs** — [`<Breadcrumbs>`](/docs/components/breadcrumbs) writes the
+  trail and its `BreadcrumbList`.
+- **Sitemap and robots** — generated; `NOINDEX_ROUTES` keeps pages out.
+
+## The audit
+
+```bash
+npm run build && npm run seo
+```
+
+Crawls the build like a search engine on a phone. Errors fail it — error
+statuses, missing titles or descriptions, wrong canonicals, no `lang`, not
+exactly one `h1`, images without alt text. Warnings are listed — long titles,
+descriptions outside 70–160 characters, duplicates, missing social or
+structured data, links that redirect, layout shift, slow largest paint. CI
+runs it on every push.
+
+## Keeping rankings through a migration
+
+```bash
+node scripts/seo/parity.ts --old https://old-site.com --new https://staging.example.com
+```
+
+Every URL the old site answered is checked on the new one: the same page, or a
+301 to the right one, with its title and description carried across. Lost and
+changed pages are listed before launch, not discovered in Search Console.
+
+`/trix-seo` has the per-page rules, the parity check, and the launch handoff:
+Search Console, the sitemap submission, and analytics.

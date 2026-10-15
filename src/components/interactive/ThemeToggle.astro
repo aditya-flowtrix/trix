@@ -1,0 +1,108 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { COLOR_MODE } from "@/consts.ts";
+
+interface Props extends HTMLAttributes<"button"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Accessible name. */
+  label?: string;
+}
+
+const {
+  render = true,
+  label = "Dark mode",
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+{
+  render && COLOR_MODE === "auto" && (
+    <button
+      type="button"
+      class:list={["theme-toggle_wrap", className]}
+      aria-label={label}
+      aria-pressed="false"
+      {...rest}
+    >
+      <span class="theme-toggle_thumb" aria-hidden="true" />
+    </button>
+  )
+}
+
+<script>
+  import { COLOR_MODE } from "@/consts.ts";
+
+  // Only a site that offers the choice follows the OS or a click. In "light"
+  // or "dark" this is false at build time, so the bundle drops it all.
+  if (COLOR_MODE === "auto") {
+    const KEY = "trix-mode";
+    const root = document.documentElement;
+    const media = matchMedia("(prefers-color-scheme: dark)");
+
+    const sync = () => {
+      for (const button of document.querySelectorAll(".theme-toggle_wrap")) {
+        button.setAttribute(
+          "aria-pressed",
+          String(root.dataset.mode === "dark"),
+        );
+      }
+    };
+
+    const saved = () => {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    };
+
+    document.addEventListener("click", (event) => {
+      if (!(event.target as Element).closest?.(".theme-toggle_wrap")) return;
+      const mode = root.dataset.mode === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem(KEY, mode);
+      } catch {}
+      root.dataset.mode = mode;
+      sync();
+    });
+
+    media.addEventListener("change", () => {
+      if (saved()) return;
+      root.dataset.mode = media.matches ? "dark" : "light";
+      sync();
+    });
+
+    sync();
+  }
+</script>
+
+<style is:global>
+  @layer components {
+    .theme-toggle_wrap {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      width: 2.75em;
+      height: 1.5em;
+      padding: 0.1875em;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-round);
+      background-color: var(--background-2);
+      transition: background-color var(--hover-duration) var(--hover-ease);
+
+      .theme-toggle_thumb {
+        width: 1.125em;
+        height: 1.125em;
+        border-radius: var(--radius-round);
+        background-color: var(--text);
+        transition: translate var(--open-duration) var(--open-ease);
+      }
+
+      &[aria-pressed="true"] .theme-toggle_thumb {
+        translate: 1.25em 0;
+      }
+    }
+  }
+</style>

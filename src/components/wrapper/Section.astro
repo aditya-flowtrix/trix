@@ -1,0 +1,103 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { slotContent } from "@/utils/slots.ts";
+import type {
+  SectionSpace as SectionSize,
+  SpaceStep,
+  Theme,
+} from "@/styles/generated/tokens.ts";
+
+type SectionSpace = "none" | "even" | SectionSize;
+
+type ContainerGap = "0" | SpaceStep | Exclude<SectionSize, "navoverlap">;
+
+interface Props extends HTMLAttributes<"section"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Color theme of element and its children. */
+  theme?: "inherit" | Theme;
+  /** Top padding. */
+  paddingTop?: SectionSpace;
+  /** Bottom padding. */
+  paddingBottom?: SectionSpace;
+  /** Child gap. */
+  gap?: ContainerGap;
+  /** Content alignment. */
+  align?: "start" | "center" | "end";
+  /** Fill the viewport height. */
+  fullHeight?: boolean;
+  /** Reveal the content one block after another as it scrolls into view. */
+  animate?: boolean;
+  /** Inner container classes. */
+  containerClass?: string;
+  /** Inner container attributes. */
+  containerAttrs?: HTMLAttributes<"div">;
+}
+
+const {
+  render = true,
+  theme = "inherit",
+  paddingTop = "medium",
+  paddingBottom = "medium",
+  gap = "8",
+  align,
+  fullHeight = false,
+  animate = false,
+  containerClass,
+  containerAttrs = {},
+  class: className,
+  ...rest
+} = Astro.props;
+
+const { class: containerAttrsClass, ...containerRest } = containerAttrs;
+
+const padSuffix: Partial<Record<SectionSpace, string>> = {
+  none: "0",
+  even: "sitemargin",
+};
+
+const padClass = (side: "top" | "bottom", value: SectionSpace) =>
+  !!value &&
+  value !== "medium" &&
+  `padding-${side}-${padSuffix[value] ?? value}`;
+
+const content = await slotContent(Astro.slots);
+const background = await slotContent(Astro.slots, "background");
+---
+
+{
+  render && (content || background) && (
+    <section
+      class:list={[
+        "section",
+        padClass("top", paddingTop),
+        padClass("bottom", paddingBottom),
+        fullHeight && "min-height-screen",
+        theme !== "inherit" && `theme-${theme}`,
+        align && `alignment-${align}`,
+        className,
+      ]}
+      {...rest}
+    >
+      {background && (
+        <div class="section_background">
+          <Fragment set:html={background} />
+        </div>
+      )}
+      {content && (
+        <div
+          class:list={[
+            "container",
+            gap !== "8" && `gap-${gap}`,
+            containerClass,
+            containerAttrsClass,
+          ]}
+          data-animate={animate ? "" : undefined}
+          {...containerRest}
+        >
+          <Fragment set:html={content} />
+        </div>
+      )}
+    </section>
+  )
+}

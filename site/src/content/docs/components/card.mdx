@@ -1,0 +1,48 @@
+---
+title: Card
+description: A self-contained item — eyebrow, heading, text, image and a button — in three arrangements.
+order: 31
+component: item/Card
+---
+
+import background from "@/assets/graphics/background.svg";
+
+## Usage
+
+```astro live stage="block"
+<Grid medium={3}>
+  <Card
+    heading="Default"
+    text="Heading, text and a button."
+    buttonLabel="Read more"
+    buttonHref="/docs"
+  />
+  <Card
+    variant="cover"
+    heading="Cover"
+    text="The image fills the card behind the text."
+    buttonLabel="Read more"
+    buttonHref="/docs"
+    image={background}
+  />
+  <Card
+    variant="stacked"
+    heading="Stacked"
+    text="The image sits above the text."
+    buttonLabel="Read more"
+    buttonHref="/docs"
+    image={background}
+  />
+</Grid>
+```
+
+`heading`, `eyebrow` and `text` accept inline markup. A card with a button is
+clickable anywhere: the button's target covers the card, while other links
+inside stay on top of it. With `buttonHref` the button is a link; without it, a
+`<button>`. A card with neither content nor an image renders nothing.
+
+`theme="invert"` sets a card apart from the section around it.
+
+## Props
+
+<Props of="item/Card" />

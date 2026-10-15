@@ -1,0 +1,232 @@
+{
+  "site": "000000000000000000000001",
+  "collections": [
+    {
+      "id": "c-posts",
+      "displayName": "Posts",
+      "slug": "posts",
+      "fields": [
+        {
+          "type": "PlainText",
+          "slug": "name",
+          "displayName": "Title",
+          "isRequired": true
+        },
+        {
+          "type": "PlainText",
+          "slug": "slug",
+          "displayName": "Slug",
+          "isRequired": true
+        },
+        { "type": "RichText", "slug": "post-body", "displayName": "Post Body" },
+        {
+          "type": "RichText",
+          "slug": "pull-quote",
+          "displayName": "Pull quote"
+        },
+        { "type": "PlainText", "slug": "summary", "displayName": "Summary" },
+        { "type": "Image", "slug": "main-image", "displayName": "Main image" },
+        { "type": "MultiImage", "slug": "gallery", "displayName": "Gallery" },
+        { "type": "Switch", "slug": "featured", "displayName": "Featured?" },
+        {
+          "type": "Number",
+          "slug": "reading-time",
+          "displayName": "Reading time"
+        },
+        { "type": "DateTime", "slug": "date", "displayName": "Date" },
+        {
+          "type": "Option",
+          "slug": "kind",
+          "displayName": "Kind",
+          "validations": {
+            "options": [
+              { "id": "o1", "name": "News" },
+              { "id": "o2", "name": "Guide" }
+            ]
+          }
+        },
+        {
+          "type": "Reference",
+          "slug": "author",
+          "displayName": "Author",
+          "validations": { "collectionId": "c-authors" }
+        },
+        {
+          "type": "MultiReference",
+          "slug": "topics",
+          "displayName": "Topics",
+          "validations": { "collectionId": "c-topics" }
+        },
+        { "type": "File", "slug": "download", "displayName": "Download" },
+        { "type": "Link", "slug": "source-link", "displayName": "Source link" },
+        { "type": "Color", "slug": "accent", "displayName": "Accent" },
+        { "type": "VideoLink", "slug": "video", "displayName": "Video" },
+        {
+          "type": "PlainText",
+          "slug": "meta-description",
+          "displayName": "Meta description"
+        },
+        {
+          "type": "Reference",
+          "slug": "legacy",
+          "displayName": "Legacy",
+          "validations": { "collectionId": "c-not-exported" }
+        }
+      ],
+      "items": [
+        {
+          "id": "p1",
+          "isDraft": false,
+          "isArchived": false,
+          "createdOn": "2024-01-02T00:00:00.000Z",
+          "lastPublished": "2024-02-01T00:00:00.000Z",
+          "lastUpdated": "2024-01-15T00:00:00.000Z",
+          "fieldData": {
+            "name": "Hello & welcome",
+            "slug": "hello-welcome",
+            "post-body": "<h1 class=\"w-richtext-h\">Hello</h1>\n\n<p>Read <a href=\"https://example.webflow.io/posts/second-post\">the next one</a>.</p>\n\n<figure class=\"w-richtext-figure-type-image w-richtext-align-center\" data-rt-type=\"image\"><div><img src=\"https://cdn.prod.website-files.com/aa/bb_photo%20one.jpg\" alt=\"A photo\"></div></figure><p>*not emphasis* _nor this_</p>",
+            "pull-quote": "<p>Quote <strong>here</strong></p>",
+            "summary": "A short summary.",
+            "main-image": {
+              "fileId": "f1",
+              "url": "https://cdn.prod.website-files.com/aa/cc_main.webp",
+              "alt": "Main"
+            },
+            "gallery": [
+              {
+                "fileId": "f2",
+                "url": "https://cdn.prod.website-files.com/aa/dd_g1.png",
+                "alt": null
+              },
+              {
+                "fileId": "f3",
+                "url": "https://cdn.prod.website-files.com/aa/ee_g2.png",
+                "alt": "Two"
+              }
+            ],
+            "featured": true,
+            "reading-time": 4,
+            "date": "2024-01-01T00:00:00.000Z",
+            "kind": "o2",
+            "author": "a1",
+            "topics": ["t1", "t2", "t-draft"],
+            "download": {
+              "fileId": "f4",
+              "url": "https://cdn.prod.website-files.com/aa/ff_guide.pdf",
+              "alt": null
+            },
+            "source-link": "https://example.org/source",
+            "accent": "#ff6600",
+            "video": "https://www.youtube.com/watch?v=abc",
+            "meta-description": "Meta for search.",
+            "legacy": "x9"
+          }
+        },
+        {
+          "id": "p2",
+          "isDraft": false,
+          "isArchived": false,
+          "lastPublished": "2024-03-01T00:00:00.000Z",
+          "fieldData": {
+            "name": "Second post",
+            "slug": "second-post",
+            "post-body": "Plain text body",
+            "kind": null,
+            "author": null,
+            "topics": []
+          }
+        },
+        {
+          "id": "p3",
+          "isDraft": true,
+          "isArchived": false,
+          "lastPublished": null,
+          "fieldData": { "name": "Draft post", "slug": "draft-post" }
+        },
+        {
+          "id": "p4",
+          "isDraft": false,
+          "isArchived": true,
+          "fieldData": { "name": "Archived post", "slug": "archived-post" }
+        }
+      ]
+    },
+    {
+      "id": "c-authors",
+      "displayName": "Authors",
+      "slug": "authors",
+      "fields": [
+        {
+          "type": "PlainText",
+          "slug": "name",
+          "displayName": "Name",
+          "isRequired": true
+        },
+        {
+          "type": "PlainText",
+          "slug": "slug",
+          "displayName": "Slug",
+          "isRequired": true
+        },
+        { "type": "Email", "slug": "email", "displayName": "Email" },
+        { "type": "Phone", "slug": "phone", "displayName": "Phone" },
+        {
+          "type": "MultiReference",
+          "slug": "posts",
+          "displayName": "Posts",
+          "validations": { "collectionId": "c-posts" }
+        }
+      ],
+      "items": [
+        {
+          "id": "a1",
+          "isDraft": false,
+          "fieldData": {
+            "name": "Ada",
+            "slug": "ada",
+            "email": "ada@example.org",
+            "phone": "+1 555 0100",
+            "posts": ["p1", "p2"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "c-topics",
+      "displayName": "Topics",
+      "slug": "topics",
+      "fields": [
+        {
+          "type": "PlainText",
+          "slug": "name",
+          "displayName": "Name",
+          "isRequired": true
+        },
+        {
+          "type": "PlainText",
+          "slug": "slug",
+          "displayName": "Slug",
+          "isRequired": true
+        }
+      ],
+      "items": [
+        {
+          "id": "t1",
+          "isDraft": false,
+          "fieldData": { "name": "Design", "slug": "design" }
+        },
+        {
+          "id": "t2",
+          "isDraft": false,
+          "fieldData": { "name": "Code", "slug": "code" }
+        },
+        {
+          "id": "t-draft",
+          "isDraft": true,
+          "lastPublished": null,
+          "fieldData": { "name": "Unreleased", "slug": "unreleased" }
+        }
+      ]
+    }
+  ]
+}

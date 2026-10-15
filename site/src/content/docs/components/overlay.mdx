@@ -1,0 +1,21 @@
+---
+title: Overlay
+description: A tint over an image or video, even or as a gradient, so the text on top of it stays readable.
+order: 43
+component: media/Overlay
+---
+
+```astro
+<Section theme="dark" fullHeight>
+  <Img src={hero} slot="background" />
+  <Overlay slot="background" strength={60} />
+  <Heading tag="h1">Readable over any image</Heading>
+</Section>
+```
+
+`solid` darkens evenly; `gradient` darkens more toward the bottom, where the
+text usually sits. `strength` is how dark, as a percentage.
+
+## Props
+
+<Props of="media/Overlay" />

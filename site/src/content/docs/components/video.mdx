@@ -1,0 +1,43 @@
+---
+title: Video
+description: Background and inline video at a fixed ratio, with a pause button wherever the design wants it.
+order: 41
+component: media/Video
+---
+
+```astro
+<Video src="/video/demo.webm" poster="/video/demo.jpg" />
+```
+
+By default a video autoplays, muted and looping, at 16:9 — the background
+video most sites use. `variant` sets the ratio: `2-1`, `16-9`, `3-2`, `5-4`,
+`1-1`, `4-5`, `2-3`, `custom` (with `ratio`), or `auto`.
+
+## Loading and playback
+
+An autoplaying video downloads nothing until it scrolls into view, plays while
+it is on screen and pauses when it leaves — a page of videos costs only the
+ones being watched. Give it a `poster`: that is what shows until then, and
+what shows without JavaScript.
+
+`desktopOnly` keeps a heavy background video off phones and tablets: below
+the `large` breakpoint the poster stands alone and nothing downloads.
+
+## The pause button
+
+Moving content that plays for more than five seconds must be pausable (WCAG
+2.2.2), so an autoplaying video shows a pause button. `pausePosition` puts it
+in any of nine places:
+
+```astro
+<Video src="/video/demo.webm" pausePosition="top-left" />
+```
+
+`top-left`, `top`, `top-right`, `left`, `center`, `right`, `bottom-left`,
+`bottom` and `bottom-right` (default). With reduced motion the video starts
+paused. `pauseButton={false}` removes the button — only for a video that stops
+within five seconds.
+
+## Props
+
+<Props of="media/Video" />

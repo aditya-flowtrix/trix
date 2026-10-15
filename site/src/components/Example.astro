@@ -1,0 +1,18 @@
+---
+import { Code } from "astro:components";
+import { codeThemes } from "~/code-theme.ts";
+
+interface Props {
+  /** The code shown under the example — the fence's own text. */
+  code: string;
+  /** How the stage lays the example out. */
+  stage?: "row" | "stack" | "block" | "full";
+}
+
+const { code, stage = "row" } = Astro.props;
+---
+
+<figure class="example_wrap">
+  <div class="example_stage" data-stage={stage}><slot /></div>
+  <Code code={code} lang="astro" themes={codeThemes} defaultColor={false} />
+</figure>

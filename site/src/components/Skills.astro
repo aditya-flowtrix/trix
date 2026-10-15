@@ -1,0 +1,51 @@
+---
+/**
+ * The framework's agent skills, read from .agents/skills/*\/SKILL.md at
+ * build: a new skill appears here with its own description.
+ */
+const files = import.meta.glob<string>("@/../.agents/skills/*/SKILL.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+const skills = Object.values(files)
+  .map((text) => {
+    const fm = text.split("---")[1] ?? "";
+    const name = fm.match(/^name:\s*(.+)$/m)?.[1].trim() ?? "";
+    const description = (
+      fm.match(
+        /^description:\s*(?:>-?)?\s*([\s\S]*?)(?=^\w+:|$(?![\s\S]))/m,
+      )?.[1] ?? ""
+    )
+      .replace(/\s+/g, " ")
+      .trim();
+    // The first sentence says what it does; the rest says when to use it.
+    const [what, ...when] = description.split(/(?<=\.)\s+(?=Use )/);
+    return { name, what, when: when.join(" ") };
+  })
+  .filter((s) => s.name)
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<div class="props_wrap" tabindex="0" role="region" aria-label="Agent skills">
+  <table class="props_table">
+    <thead>
+      <tr><th scope="col">Skill</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {
+        skills.map((s) => (
+          <tr>
+            <th scope="row">
+              <code>/{s.name}</code>
+            </th>
+            <td>
+              {s.what}
+              {s.when && <span class="props_required">{s.when}</span>}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

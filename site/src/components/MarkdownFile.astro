@@ -1,0 +1,18 @@
+---
+/**
+ * A Markdown file from the repository, shown inside a docs page without its
+ * own title — the page has one. Used for references the framework generates
+ * (docs/tokens.md), so the docs show them exactly as they are.
+ */
+interface Props {
+  /** The imported Markdown module: `import * as file from "…md"`. */
+  file: { compiledContent: () => string | Promise<string> };
+}
+
+const html = (await Astro.props.file.compiledContent())
+  .replace(/<h1[^>]*>[\s\S]*?<\/h1>\s*/, "")
+  // Tables that scroll take focus, like every table in the docs.
+  .replace(/<table(?![^>]*\btabindex=)/g, '<table tabindex="0"');
+---
+
+<Fragment set:html={html} />

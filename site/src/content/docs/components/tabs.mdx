@@ -1,0 +1,32 @@
+---
+title: Tabs
+description: Panels that switch in place — horizontal or down the side, optionally advancing on their own.
+order: 51
+component: interactive/Tabs
+---
+
+```astro live stage="stack"
+<Tabs id="docs-tabs">
+  <Fragment slot="links">
+    <TabLink>Strategy</TabLink>
+    <TabLink>Design</TabLink>
+    <TabLink>Development</TabLink>
+  </Fragment>
+  <Paragraph>Strategy: what to build, and why.</Paragraph>
+  <Paragraph>Design: how it looks and feels.</Paragraph>
+  <Paragraph>Development: building it, and proving it works.</Paragraph>
+</Tabs>
+```
+
+`TabLink`s go in the `links` slot; every other child is a panel, in the same
+order. Arrow keys move between tabs, and the selected tab is in the URL, so a
+link can open a page on the right panel.
+
+| Prop              | Does                                                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `variant="side"`  | the tab list runs down the side from 62rem                                                                        |
+| `playback="auto"` | advances on its own, with a pause control; holds while focused or off screen, and never moves with reduced motion |
+
+## Tabs props
+
+<Props of="interactive/Tabs" />

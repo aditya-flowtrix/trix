@@ -1,0 +1,24 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Flowtrix green rising from below, the way the website's hero glows. -->
+    <radialGradient id="glow" cx="0.5" cy="1" r="0.75" gradientTransform="translate(0.5 1) scale(1 0.62) translate(-0.5 -1)">
+      <stop offset="0" stop-color="#0FD375"/>
+      <stop offset="0.32" stop-color="#0FD375" stop-opacity="0.8"/>
+      <stop offset="0.7" stop-color="#00542A" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#00542A" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="side" cx="0.88" cy="0.78" r="0.42">
+      <stop offset="0" stop-color="#04BD67" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#04BD67" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Film grain: fine white specks over everything. -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 -0.32"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="#000000"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <rect width="1920" height="1080" fill="url(#side)"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.12"/>
+</svg>

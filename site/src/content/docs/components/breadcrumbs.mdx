@@ -1,0 +1,26 @@
+---
+title: Breadcrumbs
+description: The trail from the home page to this one — and the same trail as structured data for search results.
+order: 72
+component: global/Breadcrumbs
+---
+
+```astro live
+<Breadcrumbs
+  items={[
+    { label: "Home", href: "/" },
+    { label: "Docs", href: "/docs" },
+    { label: "Breadcrumbs" },
+  ]}
+  schema={false}
+/>
+```
+
+The last item is the current page and needs no `href`. By default it also
+writes a `BreadcrumbList` in JSON-LD, which search engines show in place of
+the URL in results. `schema={false}` turns that off — as above, since this
+page has its own.
+
+## Props
+
+<Props of="global/Breadcrumbs" />

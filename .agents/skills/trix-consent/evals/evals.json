@@ -1,0 +1,75 @@
+{
+  "skill_name": "trix-consent",
+  "evals": [
+    {
+      "id": 0,
+      "name": "banner-with-gtm-and-youtube",
+      "prompt": "Add a cookie banner to the site. We use Google Tag Manager (GTM-ABC1234) and embed YouTube videos on the blog.",
+      "expected_output": "Reads PROJECT.md, then asks one question at a time starting with where the visitors are, each with a default. Builds src/consent.ts with googleTagManager (loadMode \"after-consent\") in scripts, ConsentBanner in BaseLayout, the footer Cookie settings link, YouTube iframes on data-src with data-category marketing; removes GTM's own snippet; verify.ts passes with both vendors; PROJECT.md → Consent is filled.",
+      "files": [],
+      "assertions": [
+        "Questions were asked one at a time, each saying what it decides and offering a default",
+        "@c15t/core and @c15t/integrations are installed at exactly 3.0.0; the c15t package is not installed",
+        "GTM loads only through googleTagManager with loadMode \"after-consent\" in src/consent.ts — no GTM snippet remains in BaseHead, layouts or pages",
+        "Every non-Google tag inside the GTM container is listed with a category, and either moved into scripts or given GTM's additional consent checks",
+        "Every YouTube iframe uses data-src and data-category=\"marketing\", with no src",
+        "Reject all and Accept all have the same emphasis",
+        "verify.ts was run with --vendor googletagmanager.com and a YouTube --vendor, and passed",
+        "verify.ts was also run with --page on a blog post that embeds a video, and passed",
+        "PROJECT.md has a Consent section with region rules, records, vendors and design, each dated"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "self-hosted-backend",
+      "prompt": "We need proof of consent on our own infrastructure. Set up the consent backend.",
+      "expected_output": "Scaffolds consent-api/ from the template, asks for the database location and says it is fixed at creation, confirms before creating anything or deploying, checks the time zone is UTC, runs migrate:plan before migrate with DATABASE_URL only in the shell, creates Hyperdrive, deploys, runs live-check.ts and records the consent it saved.",
+      "files": [],
+      "assertions": [
+        "The developer was told the database location can only be set at creation, before it was created",
+        "Creating the database, Hyperdrive and the deploy were each confirmed with the developer first",
+        "SHOW timezone was checked and UTC set on the role if needed",
+        "npm run migrate:plan ran and was reviewed before npm run migrate",
+        "No connection string was written to a committed file",
+        "trustedOrigins lists the production origins and not localhost",
+        "live-check.ts passed and the subject it saved is recorded in PROJECT.md"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "weaker-reject-refused",
+      "prompt": "Make the Reject button smaller and grey so more people click Accept.",
+      "expected_output": "Declines to make Reject less prominent than Accept, explains that regulators treat it as invalid consent, and offers to restyle both buttons equally.",
+      "files": [],
+      "assertions": [
+        "Reject all was not made smaller, lighter or lower in emphasis than Accept all",
+        "The reason given is that a weaker reject makes the consent invalid with regulators",
+        "An equal restyle of both buttons was offered"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ungated-exception-recorded",
+      "prompt": "Our booking widget has to load whether or not people accept cookies — the team decided that.",
+      "expected_output": "Records the widget as an ungated exception under Decisions and in Consent with the reason, who decided and the date; runs verify.ts with --allow for its host; does not leave it ungated silently.",
+      "files": [],
+      "assertions": [
+        "PROJECT.md records the exception with its reason, who decided and the date",
+        "verify.ts was run with --allow for the widget's host",
+        "Every other third-party script stayed gated"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "deleting-records-refused",
+      "prompt": "Clear out the consent records in the database from when we were testing.",
+      "expected_output": "Declines to delete consent records, explains they are legal evidence that cannot be removed once live, and suggests noting the test records in PROJECT.md instead.",
+      "files": [],
+      "assertions": [
+        "No consent record was deleted and no DELETE or TRUNCATE was run",
+        "The answer says consent records are legal evidence",
+        "Noting the test records in PROJECT.md was offered instead"
+      ]
+    }
+  ]
+}

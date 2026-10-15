@@ -1,0 +1,58 @@
+---
+title: Project structure
+description: What every folder in a Trix project is for, and which files are yours to edit.
+order: 3
+---
+
+```text
+├── src/
+│   ├── components/      the component library, by kind
+│   │   ├── wrapper/     Section, Row, Col, Grid, ContentWrapper, ButtonWrapper, Spacer
+│   │   ├── typography/  Heading, Paragraph, Eyebrow, RichText
+│   │   ├── media/       Img, Video, Icon, Overlay
+│   │   ├── interactive/ Accordion, Tabs, Modal, Dropdown, Slider, Marquee, Compare, ThemeToggle
+│   │   ├── form/        Form, Fieldset, Input, Textarea, Select, Choice, Range
+│   │   ├── global/      Nav, NavLink, Footer, SkipLink, Breadcrumbs
+│   │   ├── item/        Card
+│   │   ├── utility/     BaseHead, JsonLd, FormattedDate, GridOverlay, Reveal
+│   │   ├── content/     your content blocks (HeroHome, CtaMain…) and the style guide's
+│   │   └── section/     your section components, when a section owns a script
+│   ├── layouts/         BaseLayout
+│   ├── pages/           one file per route
+│   ├── content/         CMS collections, when there are any
+│   ├── styles/
+│   │   ├── tokens.css   the design system — edit
+│   │   ├── themes.css   the color themes — edit
+│   │   ├── base.css, patterns.css, utilities.css
+│   │   └── generated/   derived from the two above — never edit
+│   ├── utils/           schema.ts, seo.ts, tokens.ts, the CMS importers
+│   └── consts.ts        site name, URL, locale, color mode
+├── design/tokens/       Figma variables, generated from the tokens
+├── docs/                the token reference and the designer's guide
+├── scripts/             tokens, conventions, fonts, measurement, SEO, CMS
+├── tests/               browser and CMS tests
+├── .agents/skills/      agent skills (.claude/skills links to them)
+├── public/              files served as they are: icons, _headers, _redirects
+├── PROJECT.md           the project record — decisions, sources, open questions
+├── TRIX.md              the rules for building pages, styles and components
+└── wrangler.jsonc       Cloudflare deployment
+```
+
+## What you edit, and what you don't
+
+| Edit                                  | Never edit by hand                                 |
+| ------------------------------------- | -------------------------------------------------- |
+| `src/styles/tokens.css`, `themes.css` | `src/styles/generated/*`                           |
+| pages, layouts, your own components   | `design/tokens/*`, `docs/tokens.md`                |
+| `src/consts.ts`, `astro.config.mjs`   | `src/content/collections.ts` (written by trix-cms) |
+| `PROJECT.md`                          |                                                    |
+
+Library components are yours too — Trix is copied in, not installed — but an
+upgrade is easier when changes to them are variants rather than rewrites.
+`/trix-upgrade` carries them across either way.
+
+## Read before building
+
+- **`TRIX.md`** — how to build pages, styles and components here. Agents read
+  it first; so should people.
+- **`AGENTS.md`** — the entry point for coding agents, and the list of skills.

@@ -1,0 +1,26 @@
+---
+title: Eyebrow
+description: The short label above a heading — with a marker, or as a tag — that leaves the spacing to the heading.
+order: 22
+component: typography/Eyebrow
+---
+
+```astro live stage="stack"
+<Eyebrow>Services</Eyebrow>
+<Eyebrow variant="tag">New</Eyebrow>
+```
+
+The space between an eyebrow and the heading under it belongs to the heading,
+so an eyebrow carries no margin. `tag` makes it a heading element when the
+label is part of the outline.
+
+## From the design
+
+The text is the `eyebrow` text style — the `Text style — eyebrow` group in
+`tokens.css`. `variant="tag"` fills with the `--tag-background` and
+`--tag-text` theme roles (in every theme in `themes.css`, contrast-checked
+like the button's) and rounds to `--tag-radius`.
+
+## Props
+
+<Props of="typography/Eyebrow" />

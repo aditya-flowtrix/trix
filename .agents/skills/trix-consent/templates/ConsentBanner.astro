@@ -1,0 +1,446 @@
+---
+import Button from "@/components/Button.astro";
+import Choice from "@/components/form/Choice.astro";
+import Modal from "@/components/interactive/Modal.astro";
+import type { Theme } from "@/styles/generated/tokens.ts";
+
+type Category =
+  "necessary" | "functionality" | "measurement" | "experience" | "marketing";
+
+type Props = {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Banner heading. */
+  heading?: string;
+  /** Banner text, in plain words. */
+  text?: string;
+  /** Privacy policy URL. */
+  policyHref?: string;
+  /** Each category's name and purpose, as the settings panel shows them. */
+  categories?: Partial<
+    Record<Category, { label: string; description: string }>
+  >;
+  /** Banner style. */
+  variant?: "card" | "bar";
+  /** Color theme of the banner and the settings panel. */
+  theme?: "inherit" | Theme;
+};
+
+// c15t's order, which the settings panel keeps.
+const ORDER: Category[] = [
+  "necessary",
+  "functionality",
+  "measurement",
+  "experience",
+  "marketing",
+];
+
+const DEFAULTS: Record<Category, { label: string; description: string }> = {
+  necessary: {
+    label: "Necessary",
+    description: "Keeps the site working and secure. Always on.",
+  },
+  functionality: {
+    label: "Functional",
+    description:
+      "Remembers your choices and runs features such as chat and booking.",
+  },
+  measurement: {
+    label: "Analytics",
+    description:
+      "Counts visits and how the site is used, so we can improve it.",
+  },
+  experience: {
+    label: "Experience",
+    description: "Tests and tailors what the site shows you.",
+  },
+  marketing: {
+    label: "Marketing",
+    description: "Measures ads and shows videos and posts from other sites.",
+  },
+};
+
+const {
+  render = true,
+  heading = "Cookies on this site",
+  text = "We use cookies to see how the site is used and to improve it. Nothing optional runs unless you allow it.",
+  policyHref,
+  categories = {},
+  variant = "card",
+  theme = "inherit",
+} = Astro.props;
+
+const themed = theme !== "inherit" ? `theme-${theme}` : undefined;
+---
+
+{
+  render && (
+    <>
+      <section
+        class:list={["consent_wrap", variant !== "card" && variant, themed]}
+        popover="manual"
+        aria-labelledby="consent-heading"
+        data-consent-banner
+      >
+        <div class="consent_content">
+          <p id="consent-heading" class="consent_heading text-style-large">
+            {heading}
+          </p>
+          <p class="consent_text text-style-small">
+            {text}
+            {policyHref && (
+              <>
+                {" "}
+                <a href={policyHref}>Privacy policy</a>
+              </>
+            )}
+          </p>
+        </div>
+        <div class="consent_actions" data-consent-actions>
+          <Button data-consent-action="reject" hidden>
+            Reject all
+          </Button>
+          <Button data-consent-action="accept" hidden>
+            Accept all
+          </Button>
+          <Button
+            variant="link"
+            data-consent-action="customize"
+            data-modal-open="consent-settings"
+            hidden
+          >
+            Choose cookies
+          </Button>
+          <Button data-consent-action="dismiss" hidden>
+            OK
+          </Button>
+          <Button
+            variant="link"
+            data-consent-right="opt-out"
+            data-modal-open="consent-settings"
+            hidden
+          >
+            Do not sell or share my data
+          </Button>
+          <Button
+            variant="link"
+            data-consent-right="preferences"
+            data-modal-open="consent-settings"
+            hidden
+          >
+            Privacy settings
+          </Button>
+        </div>
+      </section>
+      <Modal id="consent-settings" label="Cookie settings" class={themed}>
+        <p class="consent_heading text-style-large">Cookie settings</p>
+        <p class="consent_text text-style-small">
+          Choose what this site may use. You can change it at any time from
+          Cookie settings at the bottom of every page.
+        </p>
+        <ul class="consent_categories" role="list">
+          {ORDER.map((category) => {
+            const { label, description } = {
+              ...DEFAULTS[category],
+              ...categories[category],
+            };
+            return (
+              <li
+                class="consent_category"
+                data-consent-category={category}
+                hidden={category !== "necessary"}
+              >
+                <Choice
+                  label={label}
+                  name={category}
+                  variant="toggle"
+                  checked={category === "necessary"}
+                  disabled={category === "necessary"}
+                />
+                <p class="consent_description text-style-small">
+                  {description}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+        <p class="consent_text text-style-small" data-consent-stale hidden>
+          The options changed while this was open.{" "}
+          <Button variant="link" data-consent-review>
+            Review them
+          </Button>
+        </p>
+        <div class="consent_actions" data-consent-actions>
+          <Button data-consent-action="reject" hidden>
+            Reject all
+          </Button>
+          <Button data-consent-action="accept" hidden>
+            Accept all
+          </Button>
+          <Button emphasis="secondary" data-consent-action="save" hidden>
+            Save choices
+          </Button>
+        </div>
+        <p
+          class="consent_status text-style-small"
+          role="status"
+          data-consent-status
+        />
+      </Modal>
+    </>
+  )
+}
+
+<script>
+  import {
+    resolveConsentPresentation,
+    type AllConsentNames,
+    type ConsentSnapshot,
+    type PresentationAction,
+  } from "@c15t/core";
+  import { createPreferenceDraft } from "@c15t/core/preference-draft";
+  import {
+    hasConsentPreferences,
+    saveConsentBlanket,
+    saveConsentSurface,
+    showConsentSurface,
+  } from "@c15t/core/surface-actions";
+  import { runtime } from "@/consent.ts";
+
+  const { kernel } = runtime;
+  const banner = document.querySelector<HTMLElement>("[data-consent-banner]");
+  const dialog = document.querySelector<HTMLDialogElement>("#consent-settings");
+
+  if (banner && dialog) {
+    const draft = createPreferenceDraft(kernel);
+    const status = dialog.querySelector<HTMLElement>("[data-consent-status]")!;
+    const stale = dialog.querySelector<HTMLElement>("[data-consent-stale]")!;
+
+    /** Shows the buttons the policy asks for on a surface, in its order. */
+    const arrange = (surface: HTMLElement, kind: "prompt" | "preferences") => {
+      const container = surface.querySelector<HTMLElement>(
+        "[data-consent-actions]",
+      )!;
+      const { orderedActions, rights } = resolveConsentPresentation({
+        policy: kernel.getSnapshot().policyRule,
+        surface: kind,
+      });
+      const selectors = [
+        ...orderedActions.map((action) => `[data-consent-action="${action}"]`),
+        // Rights open the settings panel, after the actions.
+        ...(kind === "prompt"
+          ? rights.map(
+              (right) =>
+                `[data-consent-right="${right === "opt-out" ? "opt-out" : "preferences"}"]`,
+            )
+          : []),
+      ];
+      const shown = [
+        ...new Set(
+          selectors.map((s) => container.querySelector<HTMLElement>(s)),
+        ),
+      ].filter((el): el is HTMLElement => el !== null);
+      for (const button of container.querySelectorAll<HTMLElement>(
+        ":scope > *",
+      ))
+        button.hidden = !shown.includes(button);
+      // Reorder only when needed: moving the focused button drops focus.
+      if (shown.some((button, i) => container.children[i] !== button))
+        container.prepend(...shown);
+    };
+
+    const render = (snapshot: ConsentSnapshot) => {
+      const open =
+        snapshot.resolution.status === "matched" &&
+        snapshot.activeUI === "banner";
+      if (open) arrange(banner, "prompt");
+      // The top layer: no third-party widget's z-index can cover it.
+      if (open !== banner.matches(":popover-open")) banner.togglePopover(open);
+      // A save closes the panel through the kernel; Modal returns focus.
+      if (snapshot.activeUI !== "dialog" && dialog.open) dialog.close();
+      for (const opener of document.querySelectorAll<HTMLElement>(
+        "[data-consent-open]",
+      ))
+        opener.hidden = !hasConsentPreferences(snapshot);
+    };
+
+    const renderDraft = () => {
+      const { displayedCategories, values, isStale } = draft.getState();
+      for (const row of dialog.querySelectorAll<HTMLElement>(
+        "[data-consent-category]",
+      )) {
+        const category = row.dataset.consentCategory as AllConsentNames;
+        row.hidden = !displayedCategories.includes(category);
+        const input = row.querySelector("input")!;
+        if (!input.disabled) input.checked = values[category];
+      }
+      stale.hidden = !isStale;
+      arrange(dialog, "preferences");
+    };
+
+    /** Only a visitor's click records anything. */
+    const act = async (action: PresentationAction) => {
+      if (action === "customize") return; // Modal opens the panel
+      status.textContent = "";
+      if (action === "dismiss") {
+        await kernel.commands.dismissNotice();
+        return;
+      }
+      const result =
+        action === "save"
+          ? await saveConsentSurface(
+              kernel,
+              () => draft.save(),
+              () => !draft.getState().isDirty,
+            )
+          : await saveConsentBlanket(
+              kernel,
+              action === "accept" ? "all" : "none",
+            );
+      // Not delivered: the choice holds in this browser and is sent again.
+      if (!result.ok && !draft.getState().isStale)
+        status.textContent =
+          "Saved in this browser. It will be sent again shortly.";
+    };
+
+    for (const surface of [banner, dialog])
+      surface.addEventListener("click", (event) => {
+        const button = (event.target as Element).closest<HTMLElement>(
+          "[data-consent-action]",
+        );
+        if (button)
+          void act(button.dataset.consentAction as PresentationAction);
+      });
+
+    dialog
+      .querySelector("[data-consent-review]")
+      ?.addEventListener("click", () => draft.reset());
+
+    dialog.addEventListener("change", (event) => {
+      const input = event.target as HTMLInputElement;
+      if (input.name) draft.set(input.name as AllConsentNames, input.checked);
+    });
+
+    // Modal opens and closes the panel; the kernel follows it.
+    dialog.addEventListener("modal-open", () => {
+      draft.reset();
+      showConsentSurface(kernel, "dialog");
+      renderDraft();
+    });
+    dialog.addEventListener("modal-close", () => {
+      if (kernel.getSnapshot().activeUI !== "dialog") return;
+      showConsentSurface(kernel, "none");
+      // Opened from the banner, which is back: focus returns to it.
+      requestAnimationFrame(() => {
+        if (
+          banner.matches(":popover-open") &&
+          document.activeElement === document.body
+        )
+          banner
+            .querySelector<HTMLElement>('[data-consent-action="customize"]')
+            ?.focus();
+      });
+    });
+
+    kernel.events.on("command:error", ({ command }) => {
+      if (command === "init")
+        console.error(
+          "[consent] The policy did not load: check BACKEND_URL in src/consent.ts and that this site is in the backend's trustedOrigins.",
+        );
+    });
+
+    draft.subscribe(renderDraft);
+    kernel.subscribe(render);
+    render(kernel.getSnapshot());
+    runtime.start();
+  }
+</script>
+
+<style is:global>
+  @layer components {
+    .consent_wrap {
+      --_from: 0 1rem;
+      inset: auto var(--site-margin) var(--site-margin) auto;
+      width: min(28rem, 100% - var(--site-margin) * 2);
+      max-height: calc(100% - var(--site-margin) * 2);
+      margin: 0;
+      padding: var(--space-6);
+      flex-direction: column;
+      gap: var(--space-4);
+      background-color: var(--background);
+      color: var(--text);
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-main);
+      opacity: 0;
+      translate: var(--_from);
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        translate var(--open-duration) var(--open-ease),
+        display var(--open-duration) allow-discrete,
+        overlay var(--open-duration) allow-discrete;
+
+      &:popover-open {
+        display: flex;
+        opacity: 1;
+        translate: 0 0;
+      }
+
+      @starting-style {
+        &:popover-open {
+          opacity: 0;
+          translate: var(--_from);
+        }
+      }
+
+      &.bar {
+        inset: auto 0 0;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding-inline: var(--site-margin);
+        border-width: var(--border-width) 0 0;
+        border-radius: 0;
+      }
+    }
+
+    .consent_content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+
+      .consent_wrap.bar & {
+        flex: 1 1 24rem;
+      }
+    }
+
+    .consent_text,
+    .consent_description {
+      color: var(--text-2);
+    }
+
+    .consent_actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .consent_categories {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-block: var(--space-6);
+      list-style: none;
+    }
+
+    .consent_description {
+      margin-top: 0.5em;
+    }
+
+    .consent_status:empty {
+      display: none;
+    }
+  }
+</style>

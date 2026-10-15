@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = HTMLAttributes<"a"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Link destination. Omit for a banner that is not a link. */
+  href?: string;
+};
+
+const { render = true, href, class: className, ...rest } = Astro.props;
+
+const content = await slotContent(Astro.slots);
+const Tag = href ? "a" : "div";
+---
+
+{
+  render && content && (
+    <Tag
+      href={href}
+      class:list={["nav-banner_wrap", "theme-brand", className]}
+      {...rest}
+    >
+      <p class="nav-banner_text text-style-small">
+        <Fragment set:html={content} />
+      </p>
+    </Tag>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .nav-banner_wrap {
+      display: block;
+      padding: var(--space-2) var(--site-margin);
+      background-color: var(--background);
+      color: var(--text);
+      text-align: center;
+      text-decoration: none;
+      transition: background-color var(--hover-duration) var(--hover-ease);
+
+      @media (hover: hover) {
+        &:is(a):hover {
+          background-color: color-mix(
+            in lab,
+            var(--background),
+            var(--text) 12%
+          );
+        }
+      }
+    }
+
+    .nav-banner_text {
+      margin: 0;
+    }
+  }
+</style>

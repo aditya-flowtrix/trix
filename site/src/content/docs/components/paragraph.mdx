@@ -1,0 +1,24 @@
+---
+title: Paragraph
+description: Body text in any text style, with a measure in characters so lines stay comfortable to read.
+order: 21
+component: typography/Paragraph
+---
+
+```astro live stage="stack"
+<Paragraph variant="large" maxWidth={40}
+  >Large text for an introduction, capped at forty characters a line.</Paragraph
+>
+<Paragraph maxWidth={60}
+  >Main text — the default. A line of 60 to 75 characters is the most
+  comfortable to read, which is what maxWidth is for.</Paragraph
+>
+<Paragraph variant="small">Small text for captions and notes.</Paragraph>
+```
+
+`variant` defaults to `inherit`, so a paragraph takes the style of what it
+sits in. `tag` makes it a `span` or `div` where a `p` would be wrong.
+
+## Props
+
+<Props of="typography/Paragraph" />

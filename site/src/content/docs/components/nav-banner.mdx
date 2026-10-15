@@ -1,0 +1,23 @@
+---
+title: NavBanner
+description: A one-line announcement above the navigation — a launch, an event, a sale — in the brand theme.
+order: 70.5
+component: global/NavBanner
+---
+
+## Usage
+
+```astro live stage="block"
+<NavBanner href="/docs"
+  >New: the Trix docs, with every component live. Read more</NavBanner
+>
+```
+
+Put it in `BaseLayout`, just before `<Nav />`: it scrolls away with the page
+while the bar stays. With `href` the whole banner is the link; without one it
+is plain text. It takes the `brand` theme's colours, so its contrast is
+checked with the rest of the theme.
+
+## Props
+
+<Props of="global/NavBanner" />

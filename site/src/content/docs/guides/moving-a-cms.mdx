@@ -1,0 +1,65 @@
+---
+title: Moving a CMS
+description: Webflow, WordPress, Framer or any CSV into typed content collections, with every file downloaded and old URLs redirected — or headless.
+order: 5
+badge: New
+---
+
+A CMS move is finished when every published item is a page or entry on the new
+site, with the same content and the same URL (or a 301 to its new one), and
+nothing loads from the old platform. `/trix-cms` gets there with four commands
+and proves it with the last:
+
+```bash
+node scripts/cms/import.ts <source> …      # read the CMS → .trix/cms/<source>.json (nothing changes yet)
+node scripts/cms/write.ts --input …        # → content files, assets, schemas, redirects, pages
+npx astro sync && npm run build
+node scripts/cms/verify.ts --dist dist     # counts, schemas, no old URLs, a page per item
+```
+
+## Sources
+
+| Source                                     | Read through                                                                       |
+| ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Webflow                                    | its API with a site token, an export saved from the Webflow connector, or its CSVs |
+| WordPress                                  | its REST API: posts, pages, custom post types, taxonomies, ACF, Yoast SEO          |
+| Framer, Wix, Squarespace, Airtable, Notion | CSV — column types inferred from the values                                        |
+| Ghost, Contentful, Sanity, anything else   | a small script into the common JSON shape                                          |
+
+Tokens and passwords come only from environment variables — `WEBFLOW_TOKEN`,
+`WP_APP_PASSWORD` — never arguments.
+
+## Files or headless
+
+|            | **Files** (default)                          | **Headless**                         |
+| ---------- | -------------------------------------------- | ------------------------------------ |
+| Content    | `src/content/<collection>/<slug>.md`, in git | stays in Webflow or WordPress        |
+| Editors    | edit files                                   | keep their CMS                       |
+| Images     | downloaded, optimised at build               | on the CMS's CDN, optimised at build |
+| Publishing | a commit                                     | a CMS publish and a deploy hook      |
+| The CMS    | can be cancelled                             | stays                                |
+
+Both use the same importers and schemas, so a site can start headless and move
+to files later without touching a page.
+
+## What the writer does
+
+- One Markdown file per item, with JSON frontmatter — exact, quotes and all —
+  and the rich text kept as HTML, so Markdown never reinterprets a character.
+- A zod schema per collection: references are `reference()`, options are
+  enums, dates are dates, images are `image()`.
+- Every image and file downloaded from the CMS's own hosts; `--host old.com`
+  also brings the old site's own PDFs and documents.
+- A 301 for every item whose URL changes, and links in rich text rewritten to
+  the new paths.
+- Platform markup removed: Webflow's `w-` classes, WordPress block classes,
+  Jetpack's image hints.
+- Re-runnable: run it again at content freeze and items deleted in the CMS are
+  removed.
+
+## What verify proves
+
+Every imported item has its file; Astro accepts every file against its schema;
+nothing loads from the old CMS or site; every item of a routed collection has
+its page, with its title. Then `/trix-seo`'s parity check compares the live old
+site with staging, URL by URL.

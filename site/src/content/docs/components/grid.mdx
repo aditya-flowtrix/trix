@@ -1,0 +1,44 @@
+---
+title: Grid
+description: Equal columns for repeated items — a count per breakpoint, or as many as fit.
+order: 12
+component: wrapper/Grid
+---
+
+`Grid` is for repeated things of equal weight: cards, logos, team members, a
+CMS list. Give it a column count per breakpoint:
+
+```astro live stage="block"
+<Grid xsmall={2} medium={4}>
+  {
+    [1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+      <div class="background-skeleton radius-small padding-4">{n}</div>
+    ))
+  }
+</Grid>
+```
+
+Counts inherit upward: `medium={3}` holds at `large` unless that is set too.
+
+## As many as fit
+
+`variant="autofit"` fits as many columns of at least `minColumnWidth` rem as
+the space allows, up to `maxColumnCount`; `autofill` keeps empty tracks, so a
+short list keeps its column width.
+
+```astro live stage="block"
+<Grid variant="autofit" minColumnWidth={10}>
+  {
+    [1, 2, 3, 4, 5].map((n) => (
+      <div class="background-skeleton radius-small padding-4">{n}</div>
+    ))
+  }
+</Grid>
+```
+
+An item can span with the `span-N` and `span-{breakpoint}-N` classes.
+For layouts where blocks differ in width, use [Row and Col](/docs/components/row-and-col).
+
+## Props
+
+<Props of="wrapper/Grid" />

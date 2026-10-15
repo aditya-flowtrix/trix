@@ -1,0 +1,69 @@
+---
+title: Designers and Figma
+description: How a designer works so the developer translates nothing — the variables, the grid, text styles, components and handoff — and which Figma file to start from.
+order: 3
+---
+
+Trix is one design system with two surfaces: the variables, styles and
+components in Figma, and the tokens, classes and components in code. **They
+share every name.** A designer who uses `space/6`, `font-size/h2` and
+`Button / secondary` has already told the developer exactly what to build.
+
+## Which Figma file
+
+Start a project's file from the **Trix variables**, not from scratch and not
+from another framework's file.
+
+- **The variables** are generated from the code into `design/tokens/` — one
+  file per collection and mode, in the W3C design tokens format. Import them
+  with Figma's variable import or a DTCG import plugin, **Primitives first**
+  (the others alias it). When the code changes, import again.
+- **The Trix Figma file**, a component library bound to these variables, is
+  on its way. Until it ships, build components on the imported variables so
+  every value stays bound.
+
+## The rules
+
+1. **Every value is a variable.** A raw hex or a typed-in `27px` is a value
+   the system doesn't have.
+2. **Design two widths: Desktop 1440 and Mobile 375.** Each variable has a
+   Desktop and a Mobile mode; the site scales smoothly between them. Design
+   tablet only where the layout changes.
+3. **Breakpoints are where the layout changes** — 480, 768, 992 — not where
+   values change.
+4. **Twelve columns.** Desktop: 12, margin `site-margin` (48), gutter
+   `site-gutter` (32). Mobile: 4 columns, margin 16, gutter 16 — each is
+   exactly three of the twelve. Draw layouts as spans: `span 6` + `span 5,
+offset 1`. Tablet and mobile stack automatically
+   ([Row and Col](/docs/components/row-and-col#stacking-on-smaller-screens)).
+5. **Text styles, not text settings**: Display, H1–H6, Text XLarge … XSmall,
+   Eyebrow — each bound to the variables, with vertical trim set to cap height
+   to baseline.
+6. **Spacing between blocks is the section's gap**, and a Spacer where one spot
+   differs — never a block's own margin.
+7. **Components with the code's variants**: a Figma property per prop, named
+   the same.
+8. **Themes are modes**: Light, Dark, Brand on the Theme collection.
+9. **New tokens are decisions**: annotate why.
+
+## Changing fonts, type or colors
+
+Give the Figma link to an agent and ask for `/trix-design-system`: it reads
+the file's variables and text styles, updates `tokens.css`, `themes.css` and the
+fonts, measures the leading trim, and checks contrast. Without a file it asks
+— which fonts and where they're hosted, which colors, which sizes.
+
+No Figma connection on the agent's side? Export the variables instead: Local
+variables → right-click each collection → **Export modes**, and hand over the
+zip. A Mobile value left at `0` reads as "not drawn": the agent works out a
+mobile size from the scale and lists it for you to confirm.
+
+## Handoff
+
+"Ready for development" means: every value is a variable, every text a style,
+both frames exist, the grid is on, components are instances, and the Handoff
+page annotates heading levels, breakpoint changes, motion, links and forms,
+and any new token or component with its reason.
+
+Put the browser beside the Figma frame and press <kbd>Shift</kbd> <kbd>G</kbd>
+— the columns line up.

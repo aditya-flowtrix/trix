@@ -1,0 +1,53 @@
+---
+title: Nav and NavLink
+description: The site's navigation — a bar that becomes a menu on small screens, with the current page marked.
+order: 70
+component: global/Nav
+---
+
+`Nav` is the project's own: `BaseLayout` renders it on every page, and you
+replace its links with the site's. On small screens the links fold into a menu
+button; on large ones they sit in the bar.
+
+```astro
+<ul class="nav_links">
+  <NavLink href="/">Home</NavLink>
+  <NavLink href="/work">Work</NavLink>
+  <NavLink href="/about">About</NavLink>
+</ul>
+```
+
+A group of links is a `Dropdown variant="menu"` in its own `<li>`, its links
+a `nav_sub` list:
+
+```astro
+<li>
+  <Dropdown variant="menu" label="Design system">
+    <ul class="nav_sub">
+      <NavLink href="/style-guide">Style Guide</NavLink>
+      <NavLink href="/components">Components</NavLink>
+    </ul>
+  </Dropdown>
+</li>
+```
+
+On small screens it opens inside the menu; on large ones it floats under the
+bar, toward the middle of the page.
+
+An announcement above the bar is a [`NavBanner`](/docs/components/nav-banner),
+placed just before `<Nav />` in `BaseLayout`.
+
+`NavLink` marks itself with `aria-current="page"` when its `href` is the page
+being shown — whatever the URL's trailing slash or `.html`. A `#` link, a
+placeholder or an anchor on the page, is never marked.
+
+`overlap` (on `BaseLayout`) fixes the bar over the first section instead of
+above it — give that section `paddingTop="navoverlap"` to clear it.
+
+## Nav props
+
+<Props of="global/Nav" />
+
+## NavLink props
+
+<Props of="global/NavLink" />

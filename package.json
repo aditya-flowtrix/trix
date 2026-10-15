@@ -1,0 +1,53 @@
+{
+  "name": "trix",
+  "type": "module",
+  "version": "0.3.0",
+  "description": "Trix — a design-ready Astro framework. One token system for designers (Figma) and developers (Astro), plus skills that migrate Webflow, Framer, WordPress and other sites.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aditya-flowtrix/trix.git"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "tokens": "node scripts/tokens.ts",
+    "check": "node scripts/tokens.ts --check && node scripts/conventions.ts && astro check",
+    "build": "astro build",
+    "seo": "node scripts/seo/audit.ts --dir dist",
+    "test:browsers": "node tests/browsers.ts",
+    "test:cms": "node tests/cms.ts",
+    "test:create": "node tests/create.ts",
+    "test:consent": "node tests/consent.ts",
+    "test:import-figma": "node tests/import-figma.ts",
+    "test:tokens": "node tests/tokens.ts",
+    "preview": "astro preview",
+    "docs:dev": "cd site && astro dev",
+    "docs:build": "cd site && astro build",
+    "docs:preview": "cd site && astro preview",
+    "docs:deploy": "npm run docs:build && wrangler deploy",
+    "astro": "astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/sitemap": "^3.7.4",
+    "@phosphor-icons/core": "^2.1.1",
+    "astro": "^7.3.8",
+    "typescript": "^6.0.3"
+  },
+  "devDependencies": {
+    "@astrojs/mdx": "^8.0.3",
+    "axe-core": "^4.14.0",
+    "playwright-core": "^1.64.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "wrangler": "^4.123.0"
+  },
+  "trix": {
+    "version": "0.3.0"
+  }
+}

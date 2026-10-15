@@ -1,0 +1,34 @@
+{
+  "name": "create-trix-astro",
+  "version": "0.2.2",
+  "description": "Create a new Astro site from Trix, the design-ready framework.",
+  "license": "MIT",
+  "author": "Flowtrix (https://flowtrix.co)",
+  "type": "module",
+  "bin": {
+    "create-trix-astro": "bin/create-trix-astro.js"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "keywords": [
+    "astro",
+    "trix",
+    "template",
+    "starter",
+    "design-system",
+    "figma"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aditya-flowtrix/trix.git",
+    "directory": "packages/create-trix-astro"
+  },
+  "homepage": "https://github.com/aditya-flowtrix/trix",
+  "bugs": "https://github.com/aditya-flowtrix/trix/issues"
+}

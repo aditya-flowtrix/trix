@@ -1,0 +1,55 @@
+---
+title: Dropdown
+description: A button that opens a small panel — a menu, a filter, a language list.
+order: 53
+component: interactive/Dropdown
+---
+
+```astro live
+<Dropdown label="Resources">
+  <Paragraph><a href="/docs">Documentation</a></Paragraph>
+  <Paragraph><a href="/docs/guides/agent-skills">Agent skills</a></Paragraph>
+</Dropdown>
+```
+
+A native `<details>`, so it works without JavaScript. The script adds the
+rest: arrow keys move between its links, Escape closes it and returns focus to
+the button, and a click outside closes it.
+
+## In a nav
+
+`variant="menu"` is for a dropdown in `Nav`. Below the `medium` breakpoint it
+opens in the flow of the mobile menu, pushing the links under it down — a
+floating panel would be clipped by the menu's scroll box. From `medium` up it
+floats like the default.
+
+```astro
+<li>
+  <Dropdown variant="menu" label="Design system">
+    <ul class="nav_sub">
+      <NavLink href="/style-guide">Style Guide</NavLink>
+      <NavLink href="/components">Components</NavLink>
+    </ul>
+  </Dropdown>
+</li>
+```
+
+`variant="mega"` opens in the mobile menu the same way, and from `medium` up
+spans the nav's full width, its content as wide as the page — room for
+columns of links:
+
+```astro
+<li>
+  <Dropdown variant="mega" label="Products">
+    <Row>
+      <Col span={4}>…</Col>
+      <Col span={4}>…</Col>
+      <Col span={4}>…</Col>
+    </Row>
+  </Dropdown>
+</li>
+```
+
+## Props
+
+<Props of="interactive/Dropdown" />

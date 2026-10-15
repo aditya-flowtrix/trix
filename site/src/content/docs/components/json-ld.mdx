@@ -1,0 +1,44 @@
+---
+title: JsonLd
+description: Structured data for search engines — organization, website, breadcrumbs, articles, FAQs, local businesses, products.
+order: 75
+component: utility/JsonLd
+---
+
+Build the data with the helpers in `@/utils/schema.ts` and pass it to the
+layout — `BaseLayout`'s `schema` prop renders `JsonLd` for you:
+
+```astro
+---
+import { article, organization } from "@/utils/schema.ts";
+---
+
+<BaseLayout
+  title={post.title}
+  schema={[
+    organization(),
+    article({
+      headline: post.title,
+      url: Astro.url.href,
+      datePublished: post.date,
+    }),
+  ]}
+/>
+```
+
+| Helper             | For                                                        |
+| ------------------ | ---------------------------------------------------------- |
+| `organization()`   | the business, from `SITE_NAME`, `SITE_URL`, `SITE_SOCIALS` |
+| `website()`        | the site                                                   |
+| `breadcrumbList()` | a trail — `Breadcrumbs` writes it for you                  |
+| `article()`        | blog posts and news                                        |
+| `faqPage()`        | a page of questions and answers                            |
+| `localBusiness()`  | an address, hours, a phone number                          |
+| `product()`        | a product with a price                                     |
+
+Output is escaped, so a `</script>` in content can't break the page. Check it
+with Google's Rich Results Test; `npm run seo` checks every page has some.
+
+## Props
+
+<Props of="utility/JsonLd" />

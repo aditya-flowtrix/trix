@@ -1,0 +1,64 @@
+{
+  "skill_name": "trix-migrate",
+  "evals": [
+    {
+      "id": 0,
+      "name": "webflow-homepage-slice",
+      "prompt": "Migrate our Webflow site to this Trix project. Export at {INPUTS}/webflow-export, live at https://example.webflow.io. Start with the homepage.",
+      "expected_output": "Inventory run; style guide verified; nav and footer in the layout; homepage composed of Trix components with CSS in the components that own it; class and variable maps used for renames; content parity exact; stops for the owner's review before page two.",
+      "files": ["webflow-export/"],
+      "assertions": [
+        "PROJECT.md was read first and Sources filled as inputs arrived",
+        "Header and footer markup live in Global/Nav.astro and Global/Footer.astro, not in src/pages",
+        "No u- class, w- class, data-wf-*, data-w-id or webflow.js reference remains in src/",
+        "Class renames follow .trix/class-map.md (classes.ts), never a name-based rename",
+        "Moved CSS sits in <style is:global> inside @layer components in the component that owns it",
+        "compare-pages.mjs reports exact content parity for the homepage",
+        "Work stopped after the homepage with a request for the owner's review"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "wordpress-blog",
+      "prompt": "Move our WordPress blog (https://example.com, Yoast SEO, Redirection plugin) to Trix. Keep every URL and the SEO titles.",
+      "expected_output": "Posts, pages, categories and authors as content collections from the REST API; permalink structure reproduced; Yoast titles and descriptions carried per entry; Redirection export plus changed URLs as redirects.",
+      "files": [],
+      "assertions": [
+        "Content collection counts equal X-WP-Total for each post type",
+        "Routes reproduce the WordPress permalink structure, trailing slash included",
+        "Per-entry SEO title and description come from yoast_head_json, not regenerated",
+        "Shortcodes in post content were found and mapped to components",
+        "No /wp-content/ URL remains; images are local assets"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "framer-motion",
+      "prompt": "Rebuild our Framer landing page https://example.framer.website in Trix, including the scroll animations.",
+      "expected_output": "Sections rebuilt from measurement and data-framer-name layer names; appear and scroll effects reimplemented with IntersectionObserver / scroll-driven CSS (GSAP only if needed); reduced motion respected.",
+      "files": [],
+      "assertions": [
+        "Component names follow the data-framer-name layer names, not framer- hashes",
+        "Animations use transform and opacity only",
+        "prefers-reduced-motion disables or shortens every animation",
+        "No framerusercontent.com URL remains"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "row-col-webflow-grid",
+      "prompt": "Migrate this Webflow site, built on a row/column grid system with cc- combo classes, to Trix. The export is at {INPUTS}/grid-export and it is live at https://example.webflow.io.",
+      "expected_output": "Grid rows and columns rebuilt as Row and Col with mobile-first props, stagger animations as the animate prop, spacers as <Spacer> with the measured size, dividers as <hr>, and the layout checked against the live site with the grid overlay.",
+      "files": ["grid-export/"],
+      "assertions": [
+        "No `row`, `col-`, `cc-`, `u-` or `spacer-component` class remains under src/pages or src/components",
+        "Every `col-N` became `<Col span={N}>`; every `col-md-N`, `col-sm-N` or `col-xs-N` became a mobile-first `medium`, `small` or `xsmall` prop with the breakpoint direction translated",
+        "`row-justify-center` around a single column became `offset=\"center\"`, not a hand-written margin",
+        "`data-animate=\"stagger-children\"` became `animate` on the same element, and no IntersectionObserver was hand-written for it",
+        "Content-sized button rows (`col-shrink`, `row-gap-button`) became ButtonWrapper, not Col",
+        "The report states that the pages were compared with the grid overlay at 375, 768 and 1440",
+        "Every `spacer-component` became `<Spacer size>` whose token matches the measured height, not a hand-written margin or empty div"
+      ]
+    }
+  ]
+}

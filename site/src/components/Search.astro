@@ -1,0 +1,297 @@
+---
+import Icon from "@/components/media/Icon.astro";
+---
+
+<dialog class="search_wrap" aria-label="Search the docs">
+  <div class="search_bar">
+    <Icon name="magnifying-glass" variant="small" />
+    <input
+      class="search_input"
+      type="search"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="search-results"
+      aria-autocomplete="list"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder="Search the docs…"
+    />
+    <button class="search_close" type="button" aria-label="Close search">
+      <Icon name="x" variant="small" />
+    </button>
+  </div>
+  <ul
+    class="search_results"
+    id="search-results"
+    role="listbox"
+    aria-label="Results"
+  >
+  </ul>
+  <p class="search_empty" hidden>No results. Try a component name or a prop.</p>
+  <p class="search_hints" aria-hidden="true">
+    <span><kbd>↑</kbd> <kbd>↓</kbd> to move</span>
+    <span><kbd>↵</kbd> to open</span>
+    <span><kbd>esc</kbd> to close</span>
+  </p>
+</dialog>
+
+<style is:global>
+  @layer components {
+    .search_wrap {
+      width: min(40rem, 100% - 2 * var(--site-margin));
+      max-height: min(36rem, 100dvh - 6rem);
+      margin: 4rem auto auto;
+      padding: 0;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-main);
+      background-color: var(--background);
+      color: var(--text);
+      box-shadow: 0 1.5rem 4rem -1rem rgb(0 0 0 / 0.4);
+
+      &[open] {
+        display: flex;
+        flex-direction: column;
+      }
+      &::backdrop {
+        background-color: rgb(0 0 0 / 0.5);
+        backdrop-filter: blur(0.25rem);
+      }
+    }
+    .search_bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border-bottom: var(--border-width) solid var(--border);
+    }
+    .search_input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      font-size: var(--text-large);
+      outline: none;
+
+      &::-webkit-search-cancel-button {
+        display: none;
+      }
+    }
+    .search_close {
+      display: flex;
+      padding: 0.25rem;
+      border: 0;
+      border-radius: var(--radius-xsmall);
+      background: none;
+      color: var(--text-2);
+      cursor: pointer;
+    }
+    .search_results {
+      overflow-y: auto;
+      margin: 0;
+      padding: var(--space-1);
+      list-style: none;
+
+      &:empty {
+        display: none;
+      }
+    }
+    .search_group {
+      padding: var(--space-3) var(--space-2) var(--space-1);
+      color: var(--text-2);
+      font-size: var(--text-xsmall);
+      font-weight: var(--primary-semibold);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .search_result a {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0 var(--space-3);
+      padding: var(--space-2);
+      border-radius: var(--radius-small);
+      color: inherit;
+      text-decoration: none;
+    }
+    .search_result[aria-selected="true"] a {
+      background-color: var(--background-2);
+    }
+    .search_result_title {
+      font-weight: var(--primary-semibold);
+    }
+    .search_result_group {
+      color: var(--text-2);
+      font-size: var(--text-xsmall);
+    }
+    .search_result_text {
+      grid-column: 1 / -1;
+      overflow: hidden;
+      color: var(--text-2);
+      font-size: var(--text-small);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .search_empty {
+      padding: var(--space-5) var(--space-4);
+      color: var(--text-2);
+    }
+    .search_hints {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: auto;
+      padding: var(--space-2) var(--space-4);
+      border-top: var(--border-width) solid var(--border);
+      color: var(--text-2);
+      font-size: var(--text-xsmall);
+
+      kbd {
+        padding: 0 0.375rem;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-xsmall);
+        font-family: inherit;
+      }
+    }
+  }
+</style>
+
+<script>
+  type Entry = {
+    k: "page" | "heading";
+    t: string;
+    c: string;
+    p: string;
+    d: string;
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>(".search_wrap")!;
+  const input = dialog.querySelector<HTMLInputElement>(".search_input")!;
+  const list = dialog.querySelector<HTMLUListElement>(".search_results")!;
+  const empty = dialog.querySelector<HTMLElement>(".search_empty")!;
+  let index: Promise<Entry[]> | undefined;
+  let active = 0;
+
+  const open = () => {
+    index ??= fetch("/search.json").then((r) => r.json());
+    if (!dialog.open) dialog.showModal();
+    input.select();
+    void render();
+  };
+
+  // Every word has to match somewhere; the title counts most.
+  const score = (e: Entry, words: string[]) => {
+    const title = e.t.toLowerCase();
+    const rest = `${e.c} ${e.d}`.toLowerCase();
+    let total = e.k === "page" ? 2 : 0;
+    for (const w of words) {
+      if (title.startsWith(w)) total += 20;
+      else if (title.includes(w)) total += 10;
+      else if (rest.includes(w)) total += 1;
+      else return 0;
+    }
+    return total;
+  };
+
+  const option = (e: Entry, i: number) => {
+    const li = document.createElement("li");
+    li.className = "search_result";
+    li.id = `search-result-${i}`;
+    li.setAttribute("role", "option");
+    const a = document.createElement("a");
+    a.href = e.p;
+    a.tabIndex = -1;
+    const parts: [string, string][] = [
+      ["search_result_title", e.t],
+      ["search_result_group", e.c],
+      ["search_result_text", e.d],
+    ];
+    for (const [cls, text] of parts) {
+      const span = document.createElement("span");
+      span.className = cls;
+      span.textContent = text;
+      a.append(span);
+    }
+    li.append(a);
+    return li;
+  };
+
+  const select = (i: number) => {
+    const options = [...list.querySelectorAll<HTMLElement>('[role="option"]')];
+    if (!options.length) return input.removeAttribute("aria-activedescendant");
+    active = (i + options.length) % options.length;
+    options.forEach((o, n) =>
+      o.setAttribute("aria-selected", String(n === active)),
+    );
+    input.setAttribute("aria-activedescendant", options[active].id);
+    options[active].scrollIntoView({ block: "nearest" });
+  };
+
+  async function render() {
+    const entries = await index!;
+    const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const found = words.length
+      ? entries
+          .map((e) => [e, score(e, words)] as const)
+          .filter(([, s]) => s > 0)
+          .sort((a, b) => b[1] - a[1])
+          .map(([e]) => e)
+          .slice(0, 12)
+      : entries.filter((e) => e.k === "page").slice(0, 6);
+    list.replaceChildren();
+    let i = 0;
+    for (const [kind, label] of [
+      ["page", "Pages"],
+      ["heading", "Sections"],
+    ] as const) {
+      const group = found.filter((e) => e.k === kind);
+      if (!group.length) continue;
+      const li = document.createElement("li");
+      li.className = "search_group";
+      li.setAttribute("role", "presentation");
+      li.textContent = label;
+      list.append(li, ...group.map((e) => option(e, i++)));
+    }
+    empty.hidden = found.length > 0;
+    select(0);
+  }
+
+  input.addEventListener("input", () => void render());
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      select(active + (event.key === "ArrowDown" ? 1 : -1));
+    } else if (event.key === "Enter") {
+      const link = list.querySelector<HTMLAnchorElement>(
+        '[aria-selected="true"] a',
+      );
+      if (link) location.href = link.href;
+    }
+  });
+  list.addEventListener("mousemove", (event) => {
+    const li = (event.target as Element).closest<HTMLElement>(
+      '[role="option"]',
+    );
+    if (li) select([...list.querySelectorAll('[role="option"]')].indexOf(li));
+  });
+  dialog
+    .querySelector(".search_close")!
+    .addEventListener("click", () => dialog.close());
+  // A click on the backdrop lands on the dialog itself.
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  for (const button of document.querySelectorAll("[data-search-open]"))
+    button.addEventListener("click", open);
+  document.addEventListener("keydown", (event) => {
+    const typing = (event.target as Element).closest(
+      "input, textarea, select, [contenteditable]",
+    );
+    if (
+      (event.key === "k" && (event.metaKey || event.ctrlKey)) ||
+      (event.key === "/" && !typing)
+    ) {
+      event.preventDefault();
+      open();
+    }
+  });
+</script>

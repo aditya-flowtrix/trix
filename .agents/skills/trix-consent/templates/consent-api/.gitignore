@@ -1,0 +1,4 @@
+node_modules/
+.wrangler/
+# The local database's connection string, for `npm run dev`.
+.dev.vars

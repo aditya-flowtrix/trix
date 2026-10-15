@@ -1,0 +1,42 @@
+---
+title: Accordion
+description: Questions and details that open in place — native disclosure elements, one open at a time if you like.
+order: 50
+component: interactive/Accordion
+---
+
+## Usage
+
+```astro live stage="stack"
+<Accordion openFirst>
+  <AccordionItem heading="What is Trix?">
+    <Paragraph>A design-ready framework for Astro.</Paragraph>
+  </AccordionItem>
+  <AccordionItem heading="Is it free?">
+    <Paragraph>Yes — MIT licensed and open source.</Paragraph>
+  </AccordionItem>
+  <AccordionItem heading="Does it work without JavaScript?">
+    <Paragraph
+      >Yes. Each item is a native details element; the script only adds the
+      animation and one-at-a-time behaviour.</Paragraph
+    >
+  </AccordionItem>
+</Accordion>
+```
+
+Each `AccordionItem` is a `<details>`, so it opens with the keyboard and
+without JavaScript, and the browser's find-in-page opens the item that holds
+the match. `single` (the default) closes the others when one opens.
+
+A page of questions also wants FAQ structured data — `faqPage()` from
+`@/utils/schema.ts` (see [SEO](/docs/guides/seo)).
+
+`preview` keeps every item open for designing in a visual editor.
+
+## Accordion props
+
+<Props of="interactive/Accordion" />
+
+## AccordionItem props
+
+<Props of="interactive/AccordionItem" />

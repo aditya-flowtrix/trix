@@ -1,0 +1,102 @@
+---
+title: Testing
+description: What every push is checked against — tokens, conventions, contrast, types, SEO, and every page in every browser.
+order: 8
+---
+
+## On your machine
+
+| Command                     | Checks                                                                                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run check`             | generated files in sync with the tokens; conventions (breakpoints, no `px`, no undefined `var()`); colour contrast in every theme; types |
+| `npm run seo`               | every page of the build, as a search engine reads it                                                                                     |
+| `npm run test:browsers`     | every page in every installed browser                                                                                                    |
+| `npm run test:cms`          | the CMS importers and the whole import pipeline                                                                                          |
+| `npm run test:import-figma` | the Figma converter: a variables export read, a Mobile `0` as not drawn, a new project's type and palette by name                        |
+| `npm run test:tokens`       | the token generator follows new text styles, font families and components, and refuses colliding names                                   |
+
+## Every page, every browser
+
+```bash
+npm run build
+npm run test:browsers                         # every browser installed on this machine
+npm run test:browsers -- --browser firefox    # one, or a list: chrome,firefox,webkit
+```
+
+A link to a page that isn't built is reported once, with the page that
+links to it, and not tested further. A Playwright browser that doesn't match
+`playwright-core`'s version says the command that installs it.
+It refuses to run on a `dist/` older than `src/`, `public/` or
+`astro.config.mjs` — build first, or the result is about code that is gone.
+It finds every page by following links from the home page, and checks each at
+375, 768 and 1440 wide:
+
+- no script errors or failed requests;
+- no sideways scrolling, no text or table squeezed to nothing;
+- unique ids, images with width and height;
+- WCAG 2.2 AA with axe;
+- the 12-column grid and Spacer measure what they should;
+- every component on the page, driven by mouse and keyboard — the skip link,
+  nav, accordion, dropdown, tabs, modal, slider, marquee, video and reveal.
+
+The report is `.trix/browsers.md`. Options: `--widths 375,1440`,
+`--pages /,/about`, and `--sample 5` — at most five pages per section
+(`/blog/a`, `/blog/b` …), every top-level page always; the report lists what
+it left out. Locally it tests every page.
+
+| Browser                       | How it runs                                                        |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Chrome, Edge, Brave, Chromium | your installed copy, through Playwright                            |
+| Firefox, WebKit               | Playwright's builds — `npx playwright-core install firefox webkit` |
+| Safari                        | the real one, on a Mac, through `safaridriver`                     |
+
+Safari needs one setting first: Safari → Settings → Developer → **Allow remote
+automation**.
+
+## In CI
+
+Every Trix project has `.github/workflows/ci.yml`, the same workflow the
+framework runs. Once the project is on GitHub, it runs on every push and pull
+request:
+
+- **Check, build and test**, one job — dependency audit, formatting,
+  `npm run check`, the unit tests, the build, the SEO audit of every page,
+  then every page in the three engines every browser is built on: Chromium
+  (Chrome, Edge, Brave, Opera, Samsung Internet), Firefox, and WebKit
+  (Safari, and every browser on an iPhone). A failure uploads the report.
+- **Safari**, the real one on macOS — public repositories, or by choice.
+
+Every Monday it audits the dependencies for new advisories and builds the site
+with the newest Astro, as a warning that never fails a commit. The browsers
+are not run again: the code is the one already tested.
+
+A commit that fails is marked red on GitHub.
+
+## A private repository's minutes
+
+GitHub bills a private repository's Actions by the minute, each job rounded
+up: the Free plan includes 2,000 minutes a month, Pro and Team 3,000. The
+workflow is built for that budget — one job that installs and builds once, a
+newer push cancelling the run before it, Safari only on request, and the
+browsers sampled.
+
+| A site of                             | Each push, about | Pushes in 2,000 minutes |
+| ------------------------------------- | ---------------- | ----------------------- |
+| a dozen pages                         | 5 minutes        | 400                     |
+| 60 pages in a few sections            | 9 minutes        | 220                     |
+| 500 CMS posts, sampled 5 to a section | 11 minutes       | 180                     |
+
+Estimated from timed runs of this documentation site, rounded up. Sampling
+is what keeps the last row close to the middle one: five posts of
+`/blog/…` are tested, not five hundred, because they share one template. Every
+top-level page is always tested, and the SEO audit still reads every page and
+follows every link. Usage is under the account's Settings → Billing → Usage.
+
+Three repository variables tune it — Settings → Secrets and variables →
+Actions → Variables:
+
+| Variable           | Default                 | Set it to                                                                        |
+| ------------------ | ----------------------- | -------------------------------------------------------------------------------- |
+| `TRIX_BROWSERS`    | `chrome,firefox,webkit` | fewer engines on a tight budget — `chrome` alone roughly halves the browser time |
+| `TRIX_PAGE_SAMPLE` | `5`                     | more pages per section, or `all`                                                 |
+| `TRIX_SAFARI`      | off in private          | `on` — real Safari on macOS, billed at ten times the Linux rate                  |

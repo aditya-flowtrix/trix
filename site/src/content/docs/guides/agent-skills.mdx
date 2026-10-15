@@ -1,0 +1,23 @@
+---
+title: Agent skills
+description: Procedures a coding agent follows to build with Trix — new projects, design systems, migrations, CMS moves, SEO and upgrades.
+order: 2
+---
+
+A skill is a folder in `.agents/skills/` with a `SKILL.md` — the procedure —
+and any scripts it runs. An agent loads the one that fits the task, so it works
+the way Trix intends instead of the way the average website is built.
+
+<Skills />
+
+## Using them
+
+- **Claude Code** — type `/trix-cms`, or describe the task and the matching
+  skill loads. `.claude/skills/` links to `.agents/skills/`.
+- **Codex** — `$trix-cms`, or ask for it by name.
+- **Anything else** — read `SKILL.md`. The instructions are Markdown and the
+  scripts are Node, so every step also runs by hand.
+
+`AGENTS.md` and `TRIX.md` are what an agent reads first in any Trix project.
+`/trix-build` holds the places Trix deliberately differs from ordinary web
+practice, so an agent doesn't "fix" them.

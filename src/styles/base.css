@@ -1,0 +1,168 @@
+/*
+ * Reset and element defaults. Tokens live in tokens.css, themes in
+ * themes.css, and the text-style classes are generated from tokens.css into
+ * generated/text-styles.css.
+ */
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+/* `hidden` hides, whatever display a class or the leading trim gives the
+   element. `until-found` stays findable: the browser hides it its own way. */
+[hidden]:not([hidden="until-found"]) {
+  display: none !important;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  > main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+}
+
+hr {
+  width: 100%;
+  height: 0;
+  border: 0;
+  border-top: var(--border-width) solid var(--border);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:not([class]) {
+  text-decoration: underline;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  width: 100%;
+  object-fit: cover;
+}
+
+img {
+  height: auto;
+  overflow: clip;
+  user-select: none;
+}
+
+button {
+  background-color: transparent;
+  text-align: inherit;
+  padding: 0;
+  border: 0;
+}
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+  list-style-type: "";
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* Headings and text sit in flex containers, where `break-word` still lets
+   the longest word set the minimum width: a long word in a display heading
+   would push past a phone screen. `anywhere` breaks it only when it cannot
+   fit, and lets the box shrink. */
+.heading,
+.text {
+  overflow-wrap: anywhere;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+label {
+  font-weight: inherit;
+}
+
+select:has(option[value=""]:checked) {
+  color: var(--text-2);
+}
+
+:target {
+  scroll-margin-block: 2rem;
+}
+
+:focus-visible {
+  outline-color: var(--text);
+  outline-offset: var(--focus-offset);
+  outline-width: var(--focus-width);
+  outline-style: solid;
+}
+
+::selection {
+  background-color: var(--selection-background);
+  color: var(--selection-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Leading trim */
+:is(h1, h2, h3, h4, h5, h6, p, [class*="text-style-"]:not(:has(h1, h2, h3, h4, h5, h6, p))) {
+  display: flow-root;
+  &::before {
+    content: "";
+    display: table;
+    margin-bottom: calc(-0.5lh + var(--_trim-top));
+  }
+  &::after {
+    content: "";
+    display: table;
+    margin-bottom: calc(-0.5lh + var(--_trim-bottom));
+  }
+}

@@ -1,0 +1,127 @@
+---
+import { parseProps, type Prop } from "../../../scripts/props.ts";
+
+interface Props {
+  /** The component's file under src/components, without `.astro`: `Button`, `wrapper/Section`. */
+  of: string;
+}
+
+const { of } = Astro.props;
+
+// Read from the source at build, so the table is the API as it is today.
+const sources = import.meta.glob<string>("@/components/**/*.astro", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+const tokenTypes = Object.values(
+  import.meta.glob<string>("@/styles/generated/tokens.ts", {
+    query: "?raw",
+    import: "default",
+    eager: true,
+  }),
+)[0];
+const file = Object.keys(sources).find((path) => path.endsWith(`/${of}.astro`));
+if (!file)
+  throw new Error(`<Props of="${of}">: no src/components/**/${of}.astro`);
+const source = sources[file];
+const { props } = parseProps(source);
+
+// Named unions — the component's own and the token scales — spelled out.
+const aliases = new Map<string, string>();
+for (const text of [tokenTypes, ...Object.values(sources)])
+  for (const m of text.matchAll(
+    /^(?:export )?type (\w+) =\s*((?:\|?\s*(?:"[^"]*"|[A-Z]\w*)\s*)+);/gm,
+  ))
+    if (!aliases.has(m[1]))
+      aliases.set(
+        m[1],
+        m[2]
+          .replace(/\s+/g, " ")
+          .replace(/^\|\s*/, "")
+          .trim(),
+      );
+// Twice, for a union of unions: `HeadingStyle = TextStyle | "inherit"`.
+const expand = (t: string) =>
+  t
+    .replace(/Exclude<(\w+),\s*("[^"]*")>/g, (_, from: string, drop: string) =>
+      (aliases.get(from) ?? from)
+        .split(/\s*\|\s*/)
+        .filter((v) => v !== drop)
+        .join(" | "),
+    )
+    .replace(/\b[A-Z]\w*\b/g, (name) => aliases.get(name) ?? name);
+const typeOf = (p: Prop) =>
+  [
+    ...new Set(p.types.flatMap((t) => expand(expand(t)).split(/\s*\|\s*/))),
+  ].join(" | ");
+
+const escape = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// Doc comments are written in Markdown's inline code and bullets.
+const docHtml = (doc: string | null) =>
+  doc
+    ? escape(doc)
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/ - (?=<code>)/g, "<br>")
+    : "";
+
+// The universal two last, as every component declares them.
+const rows = [
+  ...props.filter((p) => p.name !== "render" && p.name !== "class"),
+  ...props.filter((p) => p.name === "render"),
+];
+---
+
+{
+  rows.length <= 1 && (
+    <p class="props_note">
+      It takes only <code>render</code>, and passes any other attribute to its
+      root element.
+    </p>
+  )
+}
+{
+  rows.length > 1 && (
+    <div
+      class="props_wrap"
+      tabindex="0"
+      role="region"
+      aria-label={`${of} props`}
+    >
+      <table class="props_table">
+        <thead>
+          <tr>
+            <th scope="col">Prop</th>
+            <th scope="col">Type</th>
+            <th scope="col">Default</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((p) => (
+            <tr>
+              <th scope="row">
+                <code>{p.name}</code>
+                {!p.optional && <span class="props_required">required</span>}
+              </th>
+              <td>
+                <code class="props_type">{typeOf(p)}</code>
+              </td>
+              <td>{p.default ? <code>{p.default}</code> : "—"}</td>
+              <td set:html={docHtml(p.doc)} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+{
+  rows.length > 1 && (
+    <p class="props_note">
+      Every other attribute is passed to the root element. <code>class</code>{" "}
+      takes utility classes only.
+    </p>
+  )
+}

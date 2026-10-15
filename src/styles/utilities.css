@@ -1,0 +1,388 @@
+/* Hand-written utilities. Spacing, radius, line height, letter spacing,
+ * weight and grid-span utilities are generated from tokens.css into
+ * generated/utilities.css. */
+
+.flex-grow {
+  flex: 1;
+}
+
+.flex-shrink {
+  flex: 0 auto;
+}
+
+.flex-noshrink {
+  flex: none;
+}
+
+/* Align & justify */
+.alignment-start {
+  --_alignment: start;
+  text-align: start;
+}
+
+.alignment-center {
+  --_alignment: center;
+  text-align: center;
+}
+
+.alignment-end {
+  --_alignment: end;
+  text-align: end;
+}
+
+.align-self-inherit {
+  align-self: inherit;
+}
+
+.align-self-start {
+  align-self: flex-start;
+}
+
+.align-self-center {
+  align-self: center;
+}
+
+.align-self-end {
+  align-self: flex-end;
+}
+
+.align-self-stretch {
+  align-self: stretch;
+}
+
+.align-items-stretch {
+  align-items: stretch;
+}
+
+.align-items-start {
+  align-items: flex-start;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.align-items-inherit {
+  align-items: inherit;
+}
+
+.justify-content-start {
+  justify-content: flex-start;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.justify-content-around {
+  justify-content: space-around;
+}
+
+.justify-content-inherit {
+  justify-content: inherit;
+}
+
+/* Sizing */
+.width-full {
+  width: 100%;
+}
+
+.width-auto {
+  width: auto;
+}
+
+.min-width-auto {
+  min-width: auto;
+}
+
+.height-full {
+  height: 100%;
+}
+
+.height-auto {
+  height: auto;
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+}
+
+.max-width-none {
+  max-width: none;
+}
+
+.max-width-small {
+  max-width: var(--max-width-small);
+}
+
+.max-width-full {
+  max-width: var(--max-width-full);
+}
+
+.min-height-screen {
+  min-height: 100svh;
+}
+
+/* Aspect ratio & object fit */
+.ratio-auto {
+  aspect-ratio: auto;
+}
+
+.ratio-1-1 {
+  aspect-ratio: 1;
+}
+
+.ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.ratio-3-2 {
+  aspect-ratio: 3 / 2;
+}
+
+.ratio-2-3 {
+  aspect-ratio: 2 / 3;
+}
+
+.ratio-2-1 {
+  aspect-ratio: 2;
+}
+
+.ratio-5-4 {
+  aspect-ratio: 5 / 4;
+}
+
+.ratio-4-5 {
+  aspect-ratio: 4 / 5;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.object-fit-contain {
+  object-fit: contain;
+}
+
+/* Typography (line height, letter spacing, weight: generated) */
+.text-transform-none {
+  text-transform: none;
+}
+
+.text-transform-uppercase {
+  text-transform: uppercase;
+}
+
+.text-transform-capitalize {
+  text-transform: capitalize;
+}
+
+.text-transform-lowercase {
+  text-transform: lowercase;
+}
+
+.text-wrap-default {
+  text-wrap: wrap;
+}
+
+.text-wrap-balance {
+  text-wrap: balance;
+}
+
+.text-wrap-pretty {
+  text-wrap: pretty;
+}
+
+.line-clamp-2 {
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+}
+
+.line-clamp-4 {
+  line-clamp: 4;
+  -webkit-line-clamp: 4;
+}
+
+.color-inherit {
+  color: inherit;
+}
+
+.color-faded {
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+.color-text-2 {
+  color: var(--text-2);
+}
+
+/* Background (radius: generated) */
+.background-transparent {
+  background-color: transparent;
+}
+
+.background-1 {
+  background-color: var(--background);
+}
+
+.background-2 {
+  background-color: var(--background-2);
+}
+
+.background-3 {
+  background-color: var(--background-3);
+}
+
+.background-skeleton {
+  background-color: var(--background-skeleton);
+}
+
+/* Display */
+.display-block {
+  display: block;
+}
+
+.display-inline {
+  display: inline;
+}
+
+.display-inline-block {
+  display: inline-block;
+}
+
+.display-inline-flex {
+  display: inline-flex;
+}
+
+.display-inline-grid {
+  display: inline-grid;
+}
+
+.display-none {
+  display: none;
+}
+
+/* Overflow */
+.overflow-visible {
+  overflow: visible;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-clip {
+  overflow: clip;
+}
+
+.overflow-x-auto {
+  overflow: auto clip;
+}
+
+.overflow-y-auto {
+  overflow: clip auto;
+}
+
+.overflow-hidden-left {
+  clip-path: polygon(0 0, calc(100% + 100vw) 0, calc(100% + 100vw) 100%, 0% 100%);
+}
+
+/* Position & z-index */
+.position-static {
+  position: static;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.position-sticky {
+  position: sticky;
+  top: 0;
+}
+
+.position-fixed {
+  position: fixed;
+}
+
+.zindex-negative {
+  z-index: -1;
+  position: relative;
+}
+
+.zindex-0 {
+  z-index: 0;
+  position: relative;
+}
+
+.zindex-unset {
+  z-index: unset;
+  position: relative;
+}
+
+.zindex-1 {
+  z-index: 1;
+  position: relative;
+}
+
+.zindex-2 {
+  z-index: 2;
+  position: relative;
+}
+
+.zindex-3 {
+  z-index: 3;
+  position: relative;
+}
+
+/* Interaction & order */
+.pointer-on {
+  pointer-events: auto;
+}
+
+.pointer-off {
+  pointer-events: none;
+}
+
+.order-first {
+  order: -1;
+}
+
+.order-last {
+  order: 1;
+}
+
+/* Accessibility */
+.sr-only {
+  white-space: nowrap;
+  clip: rect(0, 0, 0, 0);
+  border-width: 0;
+  width: 1px;
+  height: 1px;
+  margin-inline: auto;
+  padding: 0;
+  position: absolute;
+  inset: 0% 0% auto;
+  overflow: hidden;
+}

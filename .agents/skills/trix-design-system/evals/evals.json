@@ -1,0 +1,64 @@
+{
+  "skill_name": "trix-design-system",
+  "evals": [
+    {
+      "id": 0,
+      "name": "designer-changes-fonts-no-files",
+      "prompt": "Our designer wants headings in Instrument Serif and body text in DM Sans now.",
+      "expected_output": "Asks once which weights and italics, whether files exist or where the fonts are hosted, and the licence; configures both through Astro's Google provider; points --primary-family and --secondary-family at them; measures and writes the trims with scripts/fonts.ts; npm run check and build pass.",
+      "files": [],
+      "assertions": [
+        "The weights, styles and hosting were asked before anything was edited, in one message",
+        "No font file was downloaded by hand for a Google-hosted family — the google provider is configured in astro.config.mjs",
+        "The body family is the first entry in astro.config.mjs fonts",
+        "--primary-family points at the body font's cssVariable and --secondary-family at the heading font's",
+        "scripts/fonts.ts --write was run and the heading text styles reference --secondary-trim-top/-bottom",
+        "Weight tokens name only weights the configured fonts provide",
+        "npm run check and npm run build pass"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "figma-style-guide-trix-names",
+      "prompt": "The designer updated the style guide in Figma: https://www.figma.com/design/EXAMPLE/Brand?node-id=1-2 — apply it to the site.",
+      "expected_output": "Variables read with get_variable_defs; Trix-named variables mapped directly (Mobile → -min, Desktop → -max); tokens.css and themes.css updated; npm run tokens; /style-guide compared to the Figma screenshot; report of every changed token with its source node.",
+      "files": [],
+      "assertions": [
+        "get_variable_defs and get_screenshot were used on the style guide",
+        "Responsive Mobile values became -min and Desktop values -max — no clamp() written by hand",
+        "Every themed color change was made in every theme block of themes.css",
+        "No component file was edited to change a value",
+        "The report lists each changed token as old → new with its Figma source"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "commercial-font-no-licence",
+      "prompt": "Use the font from https://example-agency.com for our headings, it looks great.",
+      "expected_output": "Does not download the font. Asks whether the project holds a web licence and for the files; records the open question; keeps the current font.",
+      "files": [],
+      "assertions": [
+        "No font file was downloaded from the third-party site",
+        "The owner was asked about the licence and for the files",
+        "PROJECT.md → Still open records the font question",
+        "tokens.css and astro.config.mjs are unchanged"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "unattended-new-project-variables-export",
+      "prompt": "Build this new client's design system from their Figma variables export in ~/Downloads/variables (Typography has Desktop and Mobile modes; every Mobile value is 0). Nobody is available to answer questions — decide and log.",
+      "expected_output": "Reads the export with convert.mjs --from-figma, names the rows, runs --json --fresh so the design's type scale and palette replace Trix's by name; treats the Mobile 0s as not drawn and writes the derived mins as guesses; logs every guess and decision in PROJECT.md; asks nothing and waits for nothing; npm run check and build pass.",
+      "files": [],
+      "assertions": [
+        "convert.mjs --from-figma read the export and convert.mjs --json … --fresh was run",
+        "No -min token is 0: every Mobile 0 was treated as not drawn",
+        "Each derived min is listed in PROJECT.md → Still open as a guess",
+        "Type rows replaced the text style of the same name (H1 → h1), not the stock style nearest in size",
+        "The palette uses the design's names in kebab-case, and no swatch sits beside a ramp of the same name (no --grey next to --grey-10)",
+        "No question was put to the user and the run did not stop to wait",
+        "npm run check and npm run build pass"
+      ]
+    }
+  ]
+}

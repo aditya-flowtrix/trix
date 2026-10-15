@@ -1,0 +1,37 @@
+---
+title: Spacer
+description: One spot that needs more, or less, space than the container's gap — exactly that much.
+order: 15
+component: wrapper/Spacer
+badge: Mast
+---
+
+A section spaces its blocks with its `gap`. When one spot in the design needs
+something else, put a `Spacer` there:
+
+## Usage
+
+```astro live stage="full"
+<Section paddingTop="small" paddingBottom="small" gap="3">
+  <Heading tag="h3" variant="h5">Heading</Heading>
+  <Paragraph>Four steps of space above this line — the section's gap.</Paragraph
+  >
+  <Spacer size="xlarge" />
+  <Paragraph>An xlarge space above this one, from the Spacer.</Paragraph>
+</Section>
+```
+
+**It is exact.** In a Section it takes the gap back on both sides, so the two
+blocks end up exactly `size` apart — not `size` plus two gaps, which is what an
+empty div would give. In a `Col` or anywhere without a gap, it adds `size`.
+
+`size` is a space step (`1` … `12`) or a section size (`xsmall` … `xlarge`).
+
+<Aside type="tip">
+  A Spacer used on every section is a gap set wrong. Change the Section's `gap`
+  instead.
+</Aside>
+
+## Props
+
+<Props of="wrapper/Spacer" />

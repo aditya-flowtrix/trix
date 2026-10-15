@@ -1,0 +1,69 @@
+---
+title: Slider
+description: A row of slides that scrolls — as many in view as you ask for at each breakpoint, by touch, mouse or keyboard.
+order: 54
+component: interactive/Slider
+---
+
+## Usage
+
+```astro live stage="block"
+<Slider label="Services" small={2} medium={3}>
+  <Card heading="Strategy" text="What to build, and why." />
+  <Card heading="Design" text="How it looks and feels." />
+  <Card heading="Development" text="Building it, and proving it works." />
+  <Card heading="Research" text="Who it is for." />
+  <Card heading="Support" text="After launch." />
+</Slider>
+```
+
+It is a scrolling list with snap points, so touch, trackpad and keyboard
+scrolling all work, with or without JavaScript. The arrows and dots are
+buttons with labels.
+
+`xsmall`, `small`, `medium` and `large` set how many slides show — fractions
+show part of the next one, to say there is more.
+
+| Variant      | Bounds                                                     |
+| ------------ | ---------------------------------------------------------- |
+| `bleed`      | slides run past the container to the screen edge (default) |
+| `crop-start` | they start in line with the content and run off the right  |
+| `contained`  | they stay inside the container                             |
+
+## Looping and autoplay
+
+`loop` wraps the arrows: past the last slide comes the first. `playback="auto"`
+moves one slide every six seconds and loops, as `Tabs` does — with a pause
+button, and holding still while a slide has focus, while the slider is off
+screen, or for visitors who prefer less motion.
+
+```astro live stage="block"
+<Slider label="Clients" small={2} medium={3} playback="auto">
+  <Card heading="One" text="A first slide." />
+  <Card heading="Two" text="A second slide." />
+  <Card heading="Three" text="A third slide." />
+  <Card heading="Four" text="A fourth slide." />
+</Slider>
+```
+
+## Controls
+
+The arrows and dots sit below the slides. `controls="top"` sets them above,
+at the end of the row the `header` slot starts — a heading with arrows beside
+it. `markers={false}` drops the dots and keeps the arrows.
+
+```astro live stage="block"
+<Slider label="Stories" controls="top" markers={false} small={2}>
+  <Heading slot="header" tag="h3" variant="h4">Stories</Heading>
+  <Card heading="One" text="A first story." />
+  <Card heading="Two" text="A second story." />
+  <Card heading="Three" text="A third story." />
+</Slider>
+```
+
+The controls stay after the slides in the page, so a keyboard reaches the
+slides first wherever the arrows are drawn.
+
+## Props
+
+<Props of="interactive/Slider" />

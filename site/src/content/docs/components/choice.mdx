@@ -1,0 +1,25 @@
+---
+title: Choice
+description: Checkboxes and radio buttons — plain, as a switch, or as chips — each with its label and the right name.
+order: 65
+component: form/Choice
+---
+
+```astro live stage="stack"
+<Fieldset legend="Plan" variant="inline" legendStyle="label">
+  <Choice type="radio" name="plan" label="Monthly" checked />
+  <Choice type="radio" name="plan" label="Yearly" />
+</Fieldset>
+<Choice variant="toggle" label="Email me updates" />
+<Fieldset legend="Interests" variant="inline" legendStyle="label">
+  <Choice variant="chip" label="Design" />
+  <Choice variant="chip" label="Code" checked />
+</Fieldset>
+```
+
+`type="radio"` for one of several, a checkbox otherwise. Radios share a
+`name`; a checkbox's `name` defaults to its label's slug.
+
+## Props
+
+<Props of="form/Choice" />

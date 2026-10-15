@@ -1,0 +1,64 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import type { SpaceStep } from "@/styles/generated/tokens.ts";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /**
+   * Column and row gap. Defaults to the site gutter — the gutter of the
+   * layout grid — so change it only to break from the grid.
+   */
+  gap?: "0" | SpaceStep;
+  /** Row gap only, for stacked columns that need more room than the gutter. */
+  rowGap?: "0" | SpaceStep;
+  /** Vertical alignment of the columns. Defaults to `stretch`. */
+  align?: "stretch" | "start" | "center" | "end";
+  /** Reveal the columns one after another as the row scrolls into view. */
+  animate?: boolean;
+};
+
+const {
+  render = true,
+  gap,
+  rowGap,
+  align = "stretch",
+  animate = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const content = await slotContent(Astro.slots);
+---
+
+{
+  render && content && (
+    <div
+      class:list={[
+        "row",
+        gap && `gap-${gap}`,
+        rowGap && `gap-row-${rowGap}`,
+        align !== "stretch" && `align-items-${align}`,
+        className,
+      ]}
+      data-animate={animate ? "" : undefined}
+      {...rest}
+    >
+      <Fragment set:html={content} />
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .row {
+      --_gap-size: var(--site-gutter);
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      grid-column-gap: var(--_gap-size);
+      grid-row-gap: var(--_gap-size);
+    }
+  }
+</style>
