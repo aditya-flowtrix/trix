@@ -240,10 +240,21 @@ async function safari(): Promise<Driver | string> {
           return v.v as never;
         },
         async click(selector) {
-          const el = await call("POST", s("/element"), {
-            using: "css selector",
-            value: selector,
-          });
+          // Wait for it, as Playwright's click does: right after a load, a
+          // component's script may not have marked it up yet.
+          const find = () =>
+            call("POST", s("/element"), {
+              using: "css selector",
+              value: selector,
+            });
+          let el: Record<string, unknown> | undefined;
+          for (const until = Date.now() + 5000; !el;) {
+            el = await find().catch((e) => {
+              if (Date.now() > until || !/no such element/.test(String(e)))
+                throw e;
+              return wait(100).then(() => undefined);
+            });
+          }
           const id = Object.values(el)[0];
           await call("POST", s(`/element/${id}/click`), {});
         },
