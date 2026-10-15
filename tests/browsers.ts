@@ -308,6 +308,20 @@ const check = (where: string, name: string, ok: boolean, detail = "") => {
     console.log(`  FAIL ${where} — ${name}${detail ? `: ${detail}` : ""}`);
 };
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/**
+ * Whether `cond` (a function's source) comes true within 1.5s, asked again
+ * every 50ms — as Playwright's expect retries. Safari's WebDriver acts less
+ * promptly, so a fixed pause passes or fails by luck.
+ */
+const until = (page: Page, cond: string) =>
+  page.evaluate<boolean>(`async () => {
+    const ok = ${cond};
+    for (let i = 0; i < 30; i++) {
+      try { if (ok()) return true; } catch {}
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    return !!ok();
+  }`);
 
 const PAGE_FACTS = `async () => {
   for (let y = 0; y < document.body.scrollHeight; y += 600) {
@@ -494,16 +508,16 @@ async function testPage(driver: Driver, page: Page, path: string) {
     check(
       where,
       "first Tab reaches the skip link",
-      await page.evaluate(
+      await until(
+        page,
         `() => document.activeElement?.classList.contains("skip-link")`,
       ),
     );
     await page.press("Enter");
-    await wait(300);
     check(
       where,
       "skip link moves focus to main",
-      await page.evaluate(`() => !!document.activeElement?.closest("main")`),
+      await until(page, `() => !!document.activeElement?.closest("main")`),
     );
   }
   if (has.accordion) {
@@ -520,11 +534,11 @@ async function testPage(driver: Driver, page: Page, path: string) {
   if (has.dropdown) {
     await fresh();
     await page.click("details.dropdown_wrap summary");
-    await wait(300);
     check(
       where,
       "dropdown opens",
-      await page.evaluate(
+      await until(
+        page,
         `() => document.querySelector("details.dropdown_wrap").open`,
       ),
     );
@@ -532,51 +546,57 @@ async function testPage(driver: Driver, page: Page, path: string) {
   if (has.tabs) {
     await fresh();
     await page.click('[role="tablist"] [role="tab"]:nth-child(2)');
-    await wait(300);
     check(
       where,
       "tabs: a click selects the tab and shows its panel",
-      await page.evaluate(`() => {
+      await until(
+        page,
+        `() => {
       const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
       const t = tabs[1];
       const panel = document.getElementById(t.getAttribute("aria-controls"));
       return t.getAttribute("aria-selected") === "true" && tabs.filter((x) => x.getAttribute("aria-selected") === "true").length === 1 && panel && !panel.hidden && panel.checkVisibility();
-    }`),
+    }`,
+      ),
     );
     await page.evaluate(
       `() => document.querySelector('[role="tablist"] [role="tab"][aria-selected="true"]').focus()`,
     );
     await page.press("ArrowRight");
-    await wait(200);
     check(
       where,
       "tabs: arrow key moves focus to the next tab",
-      await page.evaluate(`() => {
+      await until(
+        page,
+        `() => {
       const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
       return tabs.indexOf(document.activeElement) === 2;
-    }`),
+    }`,
+      ),
     );
   }
   if (has.modal) {
     await fresh();
     await page.click("[data-modal-open]");
-    await wait(400);
     check(
       where,
       "modal opens",
-      await page.evaluate(
+      await until(
+        page,
         `() => document.getElementById(document.querySelector("[data-modal-open]").dataset.modalOpen)?.open === true`,
       ),
     );
     await page.press("Escape");
-    await wait(400);
     check(
       where,
       "modal closes on Escape and returns focus",
-      await page.evaluate(`() => {
+      await until(
+        page,
+        `() => {
       const opener = document.querySelector("[data-modal-open]");
       return !document.getElementById(opener.dataset.modalOpen).open && document.activeElement === opener;
-    }`),
+    }`,
+      ),
     );
   }
   if (has.slider) {
@@ -585,7 +605,10 @@ async function testPage(driver: Driver, page: Page, path: string) {
       `() => document.querySelector(".slider_list").scrollLeft`,
     );
     await page.click('.slider_controls button[data-step="1"]');
-    await wait(900);
+    await until(
+      page,
+      `() => document.querySelector(".slider_list").scrollLeft > ${before}`,
+    );
     const after = await page.evaluate<number>(
       `() => document.querySelector(".slider_list").scrollLeft`,
     );
@@ -610,7 +633,10 @@ async function testPage(driver: Driver, page: Page, path: string) {
       `() => document.querySelector('${selector}').getAttribute("aria-pressed")`,
     );
     await page.click(selector);
-    await wait(200);
+    await until(
+      page,
+      `() => document.querySelector('${selector}').getAttribute("aria-pressed") !== ${JSON.stringify(was)}`,
+    );
     const now = await page.evaluate<string>(
       `() => document.querySelector('${selector}').getAttribute("aria-pressed")`,
     );
@@ -637,11 +663,11 @@ async function testPage(driver: Driver, page: Page, path: string) {
   if (has.overlay) {
     await fresh();
     await page.press("Shift+G");
-    await wait(200);
     check(
       where,
       "Shift+G shows the grid overlay",
-      await page.evaluate(
+      await until(
+        page,
         `() => !document.querySelector(".grid-overlay_wrap").hidden`,
       ),
     );
