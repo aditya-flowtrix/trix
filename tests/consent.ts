@@ -82,6 +82,22 @@ try {
         if (name.startsWith("@c15t/")) assert.equal(pinned, version, name);
   });
 
+  await it("SKILL.md installs the pinned version, and the skill is linked for Claude Code", () => {
+    const text = readFileSync(join(skill, "SKILL.md"), "utf8");
+    assert.ok(
+      text.includes(`@c15t/core@${version}`),
+      "SKILL.md installs another version",
+    );
+    assert.ok(text.includes(`@c15t/integrations@${version}`));
+    assert.match(
+      readFileSync(join(root, "AGENTS.md"), "utf8"),
+      /`trix-consent`/,
+    );
+    assert.ok(
+      readFileSync(join(root, ".claude/skills/trix-consent/SKILL.md"), "utf8"),
+    );
+  });
+
   await it("the database packages are the versions the backend pins", () => {
     const backend = JSON.parse(
       readFileSync(

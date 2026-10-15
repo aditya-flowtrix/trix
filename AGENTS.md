@@ -69,6 +69,7 @@ any scripts they need. Measuring tools shared by several skills live in
 - `trix-import-figma` — build pages or tokens from a Figma file.
 - `trix-cms` — move a CMS (Webflow, WordPress, Framer, CSV, any API) into content collections, or keep it headless.
 - `trix-seo` — metadata, structured data, the SEO audit, migration parity and the launch handoff.
+- `trix-consent` — add or change cookie consent: the banner, gated scripts, where consent is recorded.
 - `trix-audit-props` — check prop order and tooltip consistency.
 - `trix-scaling-graphic` — build an editable graphic that scales as one piece.
 - `trix-upgrade` — upgrade a site to the latest Trix; sync Trix with Lumos.
