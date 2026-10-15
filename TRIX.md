@@ -12,7 +12,7 @@ these by hand:
 | Generated                              | From                                                                                  |
 | -------------------------------------- | ------------------------------------------------------------------------------------- |
 | `src/styles/generated/fluid.css`       | each `-min` / `-max` pair → a `clamp()` between `--viewport-min` and `--viewport-max` |
-| `src/styles/generated/text-styles.css` | each group with a `-font-family` token → `.text-style-*` (and `h1`–`h6`, `body`)      |
+| `src/styles/generated/text-styles.css` | each `/* Text style — name */` group → `.text-style-*` (and `h1`–`h6`, `body`)        |
 | `src/styles/generated/utilities.css`   | spacing, section, radius, line-height, letter-spacing, weight and grid-span utilities |
 | `src/styles/generated/tokens.ts`       | the prop types that follow the scales (`SpaceStep`, `TextStyle`, `Theme`, …)          |
 | `design/tokens/*.tokens.json`          | the Figma variable collections, one file per mode                                     |

@@ -51,8 +51,9 @@ What each collection holds:
 
 When a project changes a token in code, `design/tokens/` regenerates; import
 again to update the file. When the designer changes variables first, export
-the collections and give the files to the developer — `/trix-import-figma`
-writes them into the code.
+the collections (right-click each → **Export modes**) and give the files to the
+developer — `/trix-import-figma` reads them with
+`convert.mjs --from-figma` and writes them into the code.
 
 ## 3. Text styles
 
@@ -68,7 +69,7 @@ Text Small, Text XSmall, Eyebrow**. Bind each property to variables:
 | Line height (%)    | `Text Styles/<style>/line-height`    |
 | Letter spacing (%) | `Text Styles/<style>/letter-spacing` |
 
-Eyebrow is uppercase; set the case on the style. Leading trim: set vertical
+Eyebrow matches Text Small until the design gives it its own case and tracking; set the case on the style. Leading trim: set vertical
 trim to **cap height to baseline** — the code trims the same way, so spacing
 measured between text boxes in Figma is the spacing in the browser.
 

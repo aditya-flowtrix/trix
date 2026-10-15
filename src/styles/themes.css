@@ -34,6 +34,9 @@
   --selection-background: var(--text);
   --selection-text: var(--background);
 
+  --tag-background: var(--text);
+  --tag-text: var(--background);
+
   --button-background: var(--brand-300);
   --button-border: var(--button-background);
   --button-text: var(--brand-text);
@@ -71,6 +74,9 @@
   --selection-background: var(--text);
   --selection-text: var(--background);
 
+  --tag-background: var(--text);
+  --tag-text: var(--background);
+
   --button-background: var(--brand-300);
   --button-border: var(--button-background);
   --button-text: var(--brand-text);
@@ -105,6 +111,9 @@
 
   --selection-background: var(--text);
   --selection-text: var(--background);
+
+  --tag-background: var(--text);
+  --tag-text: var(--background);
 
   --button-background: var(--brand-text);
   --button-border: var(--button-background);

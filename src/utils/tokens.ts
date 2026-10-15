@@ -33,6 +33,8 @@ export interface Model {
   themes: Theme[];
   fluid: Fluid[];
   textStyles: string[];
+  /** Font family roles: `--<name>-family` (primary, secondary, mono, …). */
+  families: string[];
   palette: Token[];
   spaces: string[];
   sectionSpaces: string[];
@@ -103,6 +105,22 @@ export function parseThemes(css: string): Theme[] {
   return themes;
 }
 
+/**
+ * Text styles are opt-in: a `/* Text style — name *\/` group. A `-font-family`
+ * token elsewhere (`--button-label-family`) is a component setting, not a style.
+ */
+function textStyles(groups: Model["groups"], byName: Map<string, string>) {
+  return groups.flatMap((g) => {
+    const name = g.name.match(/^Text style\s*[—–-]\s*([\w-]+)$/)?.[1];
+    if (!name) return [];
+    if (!byName.has(`${name}-font-family`))
+      throw new Error(
+        `"/* ${g.name} */" has no --${name}-font-family — a text style's tokens are named after its heading.`,
+      );
+    return [name];
+  });
+}
+
 const NUMERIC = (a: string, b: string) =>
   Number(a.match(/\d+$/)?.[0] ?? 0) - Number(b.match(/\d+$/)?.[0] ?? 0);
 
@@ -148,7 +166,8 @@ export function buildModel(tokensCss: string, themesCss: string): Model {
     groups,
     themes: parseThemes(themesCss),
     fluid,
-    textStyles: pick(/^(.+)-font-family$/),
+    textStyles: textStyles(groups, byName),
+    families: pick(/^(\w+)-family$/),
     palette: tokens.filter(
       (t) =>
         t.group.startsWith("Color") &&

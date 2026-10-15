@@ -6,8 +6,10 @@ order: 5
 
 ## Text styles
 
-Every group in `tokens.css` with a `-font-family` token is a text style, and
-becomes a `.text-style-*` class — the same names as the Figma text styles:
+Every `/* Text style — name */` group in `tokens.css` is a text style, and
+becomes a `.text-style-*` class — the same names as the Figma text styles. A
+design adds its own by adding a group; a `-font-family` token anywhere else
+(`--button-label-family`) is a component setting, not a style:
 
 ```astro live stage="stack"
 <Heading tag="h2" variant="display">Display</Heading>
@@ -55,7 +57,8 @@ node scripts/fonts.ts --url http://localhost:4321/style-guide --write
 
 It opens the style guide, measures each family's cap height and line metrics
 in a real browser, and writes `--primary-trim-top` and `--primary-trim-bottom`
-(and the secondary family's). Run it after any font change.
+(and `--<family>-trim-*` for every other family in a different font). Run it
+after any font change.
 
 ## Fonts
 
@@ -85,7 +88,8 @@ fonts: [
 ```
 
 Then point `--primary-family` (body) and `--secondary-family` (headings) at
-the variable in `tokens.css`. `BaseHead` loads every family and preloads the
+the variable in `tokens.css`. Another role is one more token — `--mono-family`
+— measured, exported to Figma and available to every text style. `BaseHead` loads every family and preloads the
 first.
 
 <Aside type="tip" title="Changing fonts or type with an agent">

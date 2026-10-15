@@ -40,6 +40,10 @@ jobs:
 
       - run: npm run test:cms
 
+      - run: npm run test:tokens
+
+      - run: npm run test:import-figma
+
       - name: The installer (framework only)
         if: hashFiles('packages/create-trix-astro/package.json') != ''
         run: npm run test:create

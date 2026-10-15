@@ -9,6 +9,8 @@ type Props = HTMLAttributes<"div"> & {
   render?: boolean;
   /** Trigger text. */
   label?: string;
+  /** `menu` opens in the flow below the `medium` breakpoint, for a nav's mobile menu; above it, it floats like `default`. */
+  variant?: "default" | "menu";
   /** Keep the panel open in design mode. */
   preview?: boolean;
 };
@@ -16,6 +18,7 @@ type Props = HTMLAttributes<"div"> & {
 const {
   render = true,
   label,
+  variant = "default",
   preview = false,
   class: className,
   ...rest
@@ -27,7 +30,12 @@ const content = await slotContent(Astro.slots);
 {
   render && label && content && (
     <details
-      class:list={["dropdown_wrap", preview && "preview", className]}
+      class:list={[
+        "dropdown_wrap",
+        variant !== "default" && variant,
+        preview && "preview",
+        className,
+      ]}
       {...rest}
     >
       <summary class="dropdown_toggle">
@@ -182,6 +190,33 @@ const content = await slotContent(Astro.slots);
 
     .dropdown_body {
       padding: var(--space-6);
+    }
+
+    /* A block, so it lines up with the links beside it rather than sitting
+       on a text baseline. */
+    .dropdown_wrap.menu {
+      display: block;
+    }
+
+    /* In a nav's mobile menu a floating panel would be clipped by the menu's
+       scroll box, so it opens in the flow instead. */
+    @media (width < 48rem) {
+      .dropdown_wrap.menu {
+        & .dropdown_toggle {
+          justify-content: space-between;
+        }
+        & .dropdown_content {
+          position: static;
+          width: auto;
+          max-width: none;
+          background-color: transparent;
+          translate: none;
+          scale: none;
+        }
+        & .dropdown_body {
+          padding: 0 0 var(--space-4);
+        }
+      }
     }
   }
 </style>

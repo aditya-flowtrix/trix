@@ -20,6 +20,8 @@
     "test:browsers": "node tests/browsers.ts",
     "test:cms": "node tests/cms.ts",
     "test:create": "node tests/create.ts",
+    "test:import-figma": "node tests/import-figma.ts",
+    "test:tokens": "node tests/tokens.ts",
     "preview": "astro preview",
     "docs:dev": "cd site && astro dev",
     "docs:build": "cd site && astro build",

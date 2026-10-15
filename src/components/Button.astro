@@ -171,7 +171,11 @@ const named = {
       color: var(--button-text);
       border: var(--border-width) solid var(--button-border);
       border-radius: var(--button-radius);
+      font-family: var(--button-label-family);
+      font-size: var(--button-label-size);
       font-weight: var(--button-font-weight);
+      letter-spacing: var(--button-label-letter-spacing);
+      text-transform: var(--button-label-text-transform);
       line-height: var(--button-line-height);
       text-decoration: none;
       text-align: center;
@@ -225,10 +229,16 @@ const named = {
           }
         }
       }
+      /* An Icon written in the label, before or after the text (as Mast
+         does), stays on the text's line instead of breaking it. */
+      & .button_text .icon {
+        display: inline-block;
+        vertical-align: -0.125em;
+      }
       &:is(.play, .close, .arrow) {
         gap: 0;
         padding: var(--button-padding-block);
-        border-radius: var(--radius-round);
+        border-radius: var(--button-icon-radius);
       }
       &.back .button_mark {
         rotate: 180deg;

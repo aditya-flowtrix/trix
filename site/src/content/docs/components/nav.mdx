@@ -17,6 +17,23 @@ button; on large ones they sit in the bar.
 </ul>
 ```
 
+A group of links is a `Dropdown variant="menu"` in its own `<li>`, its links
+a `nav_sub` list:
+
+```astro
+<li>
+  <Dropdown variant="menu" label="Design system">
+    <ul class="nav_sub">
+      <NavLink href="/style-guide">Style Guide</NavLink>
+      <NavLink href="/components">Components</NavLink>
+    </ul>
+  </Dropdown>
+</li>
+```
+
+On small screens it opens inside the menu; on large ones it floats under the
+bar, toward the middle of the page.
+
 `NavLink` marks itself with `aria-current="page"` when its `href` is the page
 being shown — whatever the URL's trailing slash or `.html`.
 

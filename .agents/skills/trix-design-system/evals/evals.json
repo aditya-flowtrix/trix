@@ -43,6 +43,22 @@
         "PROJECT.md → Still open records the font question",
         "tokens.css and astro.config.mjs are unchanged"
       ]
+    },
+    {
+      "id": 3,
+      "name": "unattended-new-project-variables-export",
+      "prompt": "Build this new client's design system from their Figma variables export in ~/Downloads/variables (Typography has Desktop and Mobile modes; every Mobile value is 0). Nobody is available to answer questions — decide and log.",
+      "expected_output": "Reads the export with convert.mjs --from-figma, names the rows, runs --json --fresh so the design's type scale and palette replace Trix's by name; treats the Mobile 0s as not drawn and writes the derived mins as guesses; logs every guess and decision in PROJECT.md; asks nothing and waits for nothing; npm run check and build pass.",
+      "files": [],
+      "assertions": [
+        "convert.mjs --from-figma read the export and convert.mjs --json … --fresh was run",
+        "No -min token is 0: every Mobile 0 was treated as not drawn",
+        "Each derived min is listed in PROJECT.md → Still open as a guess",
+        "Type rows replaced the text style of the same name (H1 → h1), not the stock style nearest in size",
+        "The palette uses the design's names in kebab-case, and no swatch sits beside a ramp of the same name (no --grey next to --grey-10)",
+        "No question was put to the user and the run did not stop to wait",
+        "npm run check and npm run build pass"
+      ]
     }
   ]
 }

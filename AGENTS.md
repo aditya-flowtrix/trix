@@ -16,10 +16,13 @@ Read in this order before changing anything:
 Start the dev server in background mode:
 
 ```
-astro dev --background
+npx astro dev --background
 ```
 
-Use `astro dev stop`, `astro dev status`, and `astro dev logs` to manage it.
+Use `npx astro dev stop`, `npx astro dev status`, and `npx astro dev logs` to
+manage it (`astro` alone is not on the shell's PATH). The site is at the URL
+`npx astro dev status` prints — `http://localhost:4321` unless that port was
+taken; the commands in the skills assume 4321.
 
 - `npm run tokens` — regenerate everything derived from `src/styles/tokens.css`
   and `themes.css` (also runs on save while `astro dev` is running).

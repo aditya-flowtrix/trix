@@ -28,8 +28,12 @@ classes, utilities, prop types, Figma variable files and token docs, and
 look.
 
 **The rule that outranks the rest: every value comes from the designer —
-from their Figma file or their answer.** Nothing is guessed, and nothing
-still in question is written.
+from their Figma file or their answer.** A value the design leaves out (a
+mobile size nobody drew, a hover nobody drew) is never guessed silently: it
+follows the one rule in `/trix-import-figma` → _Mobile values_, is marked as a
+guess, and is asked about — or, with nobody to ask, decided and logged as
+`/trix-import-figma` → _Working unattended_ says. Nothing else still in
+question is written.
 
 | The request                                          | Use                  |
 | ---------------------------------------------------- | -------------------- |
@@ -47,7 +51,10 @@ change that undoes a recorded decision is confirmed with the owner first.
 ### With a Figma link
 
 Use the Figma MCP tools on the file's style guide page (or the frame the
-designer points at):
+designer points at). Without the MCP, the designer exports the variables
+(Local variables → each collection → **Export modes**) and
+`/trix-import-figma`'s `convert.mjs --from-figma` reads the files — see its
+_Getting the values in_.
 
 1. `get_variable_defs` — the variables. **If the names are Trix's**
    (`space/7`, `font-size/h2`, `color/brand/500`, `font/family/primary`,
@@ -57,18 +64,21 @@ designer points at):
    value of the token at the same path.
 2. `get_design_context` on the type specimens — each text style's family,
    weight, size, line height, letter spacing and case. Sizes come in pairs:
-   the Desktop frame gives `-max`, the Mobile frame `-min`. A style drawn only
-   on desktop has no mobile value yet; that is a question, not a ratio to
-   apply.
+   the Desktop frame gives `-max`, the Mobile frame `-min`. A mobile value
+   that is missing or `0` was not drawn — `/trix-import-figma` → _Mobile
+   values_ says what happens to it.
 3. Color styles and variables; the theme modes on section frames.
 4. Each frame's layout grid — margin and gutter at 1440 and 375 are
    `--site-margin-*` and `--site-gutter-*`.
 5. `get_screenshot` of the style guide, to compare against at the end.
 
 Names that are not Trix's go through `/trix-import-figma`'s converter
-(`.agents/skills/trix-import-figma/convert.mjs`): it matches each value to the
-existing tokens, converts units (px → rem, line height ÷ size, opacity →
-`color-mix`) and prints the questions.
+(`.agents/skills/trix-import-figma/convert.mjs`): it converts units (px →
+rem, line height ÷ size, opacity → `color-mix`), derives the mins nobody drew
+and prints the questions. For a new project's design add `--fresh`: the
+design's type scale and palette replace Trix's, matched by name, not snapped
+to the stock sizes. For a change to this site, leave it off: each value is
+matched to the existing token it is closest to.
 
 ### Without a link — ask
 
@@ -80,6 +90,11 @@ value beside it so "keep" is one word:
 - **Text styles** — for each of display, h1–h6, text-xlarge … text-xsmall and
   eyebrow that changes: desktop and mobile size, line height, letter spacing,
   weight, uppercase or not.
+- **Light or dark** — is the site light, dark, or the visitor's choice? That
+  is `COLOR_MODE` in `src/consts.ts` (`"light"`, `"dark"`, `"auto"` with a
+  `ThemeToggle`). A dark-first design sets `"dark"`: the dark block of
+  `themes.css` is then what most pages show, so it gets the designer's main
+  colors. A Figma file shows this too — the theme mode set on the page frames.
 - **Colors** — the palette (hex per swatch), and per theme: background, text,
   heading accent, button colors, border. A single brand color is not a
   palette: ask for the shades the design uses, or whether to keep Trix's
@@ -140,5 +155,5 @@ file too. Figma and code now hold the same values.
 ## Using this without Claude Code
 
 The steps are plain edits and Node scripts. Without the Figma MCP, ask the
-designer to export the variables (`design/tokens` format) or to fill in the
-questions above.
+designer for the variables export (`convert.mjs --from-figma` reads it) or to
+fill in the questions above.

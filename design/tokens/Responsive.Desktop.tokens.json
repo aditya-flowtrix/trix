@@ -87,7 +87,7 @@
     "eyebrow": {
       "$type": "dimension",
       "$value": {
-        "value": 14,
+        "value": 16,
         "unit": "px"
       }
     }

@@ -1,5 +1,101 @@
 # Changelog
 
+## Unreleased
+
+From building a client design on Trix. Lumos stays the base and the defaults
+keep its look; every design brings its own type, colours and components, so
+the framework now follows what a project adds to `tokens.css` instead of a
+fixed set of names.
+
+### Tokens
+
+- Text styles are opt-in: each `/* Text style — name */` group, and nothing
+  else. Before, any group with a `*-font-family` token became one — adding
+  `--button-font-family` created `.text-style-button`, a `TextStyle` value, a
+  Figma text style and a docs row, silently. A Text style group without its
+  `--name-font-family` fails.
+- Any number of font families: every `--<word>-family` token is exported to
+  Figma as `font/family/*`, so a text style set in a third font (a mono label)
+  keeps its family in Figma instead of losing it. `scripts/fonts.ts --write`
+  writes `--<family>-trim-*` for each family in a different font, not only
+  `secondary`.
+- Component groups keep multi-word names in Figma: `/* Components —
+content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
+  not `content.wrapper-gap`.
+- Names that collide in Figma fail instead of overwriting: `--grey` next to
+  `--grey-10` would make `color.grey` both a value and a group.
+- Contrast is checked for every `--X-text…` / `--X-background…` role pair a
+  theme defines, so a project's new component roles are covered without
+  editing `conventions.ts`.
+- `npm run test:tokens` covers the above.
+
+### Components
+
+- `Button` with an icon: write an `Icon` into the label, before or after the
+  text (Mast's way) — it now stays on the text's line instead of breaking it.
+  No new prop.
+- `Button`: the label's font, size, tracking and case come from
+  `--button-label-family`, `--button-label-size`,
+  `--button-label-letter-spacing` and `--button-label-text-transform`
+  (default `inherit`, as before); `arrow`, `play` and `close` round to
+  `--button-icon-radius` (default `var(--radius-round)`).
+- `Eyebrow`: set in the `eyebrow` text style (was `text-small`, which ignored
+  the eyebrow tokens). The style's defaults are now `text-small`'s, so an
+  eyebrow looks as it did — as in Lumos — until a design changes that group.
+  `variant="tag"` reads the `--tag-background` and `--tag-text` theme
+  roles and `--tag-radius`.
+- `Dropdown variant="menu"`: opens in the flow of a mobile menu, floats from
+  `medium` up. `Nav` no longer clips a dropdown's panel on desktop; the Nav and
+  Dropdown docs show one in a nav. The template's Nav keeps Lumos's plain links.
+
+### Figma import (`/trix-import-figma`, `/trix-design-system`)
+
+- `convert.mjs --fresh` for a new project: the design's type scale and
+  palette replace Trix's. Type rows match text styles by name (H1 → `h1`),
+  never by size — before, a design's 62px H1 landed on stock `--h2` — and print
+  as whole `Text style` groups with family, weight, line height, tracking and
+  case; the colours print as ramps. Without it, a design _change_ still snaps
+  each value to the nearest token.
+- `convert.mjs --from-figma <export>` reads Figma's own variables export (one
+  DTCG file per mode) into the inventory: Desktop/Mobile modes paired,
+  aliases resolved, theme colours and fonts listed apart. The path for an
+  agent without the Figma MCP.
+- One rule for mobile values, in both skills: a Mobile value of `0`, empty or
+  missing was not drawn. Its min is derived from the token it replaces,
+  listed under `GUESSED`, and asked about — or, unattended, written and logged.
+  The two skills used to give opposite rules.
+- _Working unattended_: the decisions an agent may take alone, and where each
+  is logged; fonts get the same section.
+- Token names are kebab-case from the Figma label (`Plum-400 (Violet)` →
+  `--plum-400`, `r_12` → `--radius-r-12`), not copied raw; `--grey` beside
+  `--grey-10` is flagged.
+- Text styles are read from `tokens.css` (`text-xlarge`, `text-xsmall`,
+  `eyebrow` were missed); un-numbered swatches (`--plum-dark`) are matched.
+- `/trix-design-system` asks whether the site is light, dark or the visitor's
+  choice (`COLOR_MODE`).
+- `npm run test:import-figma`.
+
+### Testing
+
+- `npm run test:browsers` reports a link to a page that isn't built once,
+  with the page linking to it, instead of failing every check on the 404 page
+  at every width (18 broken links had become ~70 failures that buried the
+  real ones). A Playwright browser that doesn't match `playwright-core`
+  says `npx playwright-core install <browser>`.
+- CI runs `npm run test:tokens` and `npm run test:import-figma`, in Trix and
+  in every project; both read the project's own `tokens.css`.
+- `npm run test:browsers` refuses a `dist/` older than `src/`, `public/` or
+  `astro.config.mjs`, instead of testing a build of code that is gone.
+
+### Housekeeping
+
+- `npx astro dev --background` in `AGENTS.md` and the skills — `astro` alone
+  is not on an agent's PATH (the same line is in Lumos's `AGENTS.md`).
+- A new project's first `npm run check` no longer shows a hint (an unused
+  import in `scripts/cms/write.ts`).
+- Changing fonts says to remove the `latin` / `latinExt` ranges in
+  `astro.config.mjs` once no family uses them.
+
 ## 0.2.0 — 2026-10-14
 
 The best of Mast for Astro, rebuilt the Lumos way: typed components, CSS in

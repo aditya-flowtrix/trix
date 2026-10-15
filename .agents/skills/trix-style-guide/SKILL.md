@@ -66,7 +66,7 @@ Read `PROJECT.md`. Fill **Sources** as each one arrives — the live URL, export
 path, Figma link, who owns decisions. Nothing in the repository points at a
 file on someone's desktop unless this file does.
 
-Start the Trix dev server: `astro dev --background`.
+Start the Trix dev server: `npx astro dev --background`.
 
 ### 1. Identify the source
 

@@ -21,12 +21,49 @@ opens in a new tab, and how a screen reader announces it.
 `variant` is what kind of button it is; `emphasis` is how much weight it
 carries.
 
+## With an icon
+
+Write an `Icon` into the label, before or after the text — it stays on the
+text's line and takes the label's colour:
+
+```astro live
+<Button>Read story <Icon name="arrow-right" variant="small" /></Button>
+<Button emphasis="secondary"
+  ><Icon name="play" weight="fill" variant="small" /> Watch</Button
+>
+```
+
 ```astro live
 <Button variant="arrow" direction="back" />
 <Button variant="arrow" />
 <Button variant="play" />
 <Button variant="play" pressed />
 <Button variant="close" />
+```
+
+## From the design
+
+Colours are theme roles (`--button-*` in `themes.css`). The rest is the
+`Components — button` group in `tokens.css`, so a design's button lands there
+once, not on every `Button`:
+
+| Token                           | Default               | Sets                                   |
+| ------------------------------- | --------------------- | -------------------------------------- |
+| `--button-label-family`         | `inherit`             | the label's font                       |
+| `--button-label-size`           | `inherit`             | its size                               |
+| `--button-label-letter-spacing` | `inherit`             | its tracking                           |
+| `--button-label-text-transform` | `inherit`             | its case                               |
+| `--button-icon-radius`          | `var(--radius-round)` | the corner of `arrow`, `play`, `close` |
+
+`inherit` takes the text around the button. When the design has a text style
+for buttons — say a `Text style — cta` group — point the label at it:
+
+```css
+/* Components — button */
+--button-label-family: var(--cta-font-family);
+--button-label-size: var(--cta);
+--button-label-letter-spacing: var(--cta-letter-spacing);
+--button-label-text-transform: var(--cta-text-transform);
 ```
 
 ## Props

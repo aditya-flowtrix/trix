@@ -50,7 +50,6 @@ import {
   stripPlatformMarkup,
   type CmsExport,
   type Collection,
-  type Item,
 } from "../../src/utils/cms/model.ts";
 
 const opts = args();

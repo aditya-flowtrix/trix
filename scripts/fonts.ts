@@ -13,8 +13,9 @@
  *   node scripts/fonts.ts --url http://localhost:4321/style-guide --write
  *
  * Measures every `--*-family` token. `--write` sets `--primary-trim-*` in
- * src/styles/tokens.css and, when the secondary family is a different font,
- * adds `--secondary-trim-*` and points the text styles set in it at them.
+ * src/styles/tokens.css and, for each other family (secondary, mono, …) that
+ * is a different font, adds `--<family>-trim-*` and points the text styles set
+ * in it at them.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -98,35 +99,39 @@ if (unloaded.length) {
 }
 
 if (opts.write) {
+  const trimToken = new RegExp(
+    `(--(?:${families.join("|")})-trim-[a-z]+:[^;]+;)(?![\\s\\S]*--(?:${families.join("|")})-trim-[a-z]+:)`,
+  );
   const set = (token: string, value: string) => {
     const re = new RegExp(`(--${token}:\\s*)[^;]+;`);
     if (re.test(css)) css = css.replace(re, `$1${value};`);
-    else
-      // After the last family trim token, so the group stays in order.
-      css = css.replace(
-        /(--(?:primary|secondary)-trim-[a-z]+:[^;]+;)(?![\s\S]*--(?:primary|secondary)-trim-[a-z]+:)/,
-        `$1\n  --${token}: ${value};`,
-      );
+    // After the last family trim token, so the group stays in order.
+    else css = css.replace(trimToken, `$1\n  --${token}: ${value};`);
   };
-  const { primary, secondary } = trims;
+  const { primary } = trims;
   set("primary-trim-top", primary.top);
   set("primary-trim-bottom", primary.bottom);
-  if (secondary && secondary.font !== primary.font) {
-    set("secondary-trim-top", secondary.top);
-    set("secondary-trim-bottom", secondary.bottom);
-    // Text styles set in the secondary family trim by its metrics.
+  for (const [name, t] of Object.entries(trims)) {
+    if (name === "primary") continue;
+    if (t.font === primary.font) {
+      // Back on one font: its trims, if any, follow the primary.
+      if (css.includes(`--${name}-trim-top`)) {
+        set(`${name}-trim-top`, primary.top);
+        set(`${name}-trim-bottom`, primary.bottom);
+      }
+      continue;
+    }
+    set(`${name}-trim-top`, t.top);
+    set(`${name}-trim-bottom`, t.bottom);
+    // Text styles set in this family trim by its metrics.
     for (const m of css.matchAll(
-      /--([\w-]+)-font-family:\s*var\(--secondary-family\)/g,
+      new RegExp(`--([\\w-]+)-font-family:\\s*var\\(--${name}-family\\)`, "g"),
     ))
       for (const side of ["top", "bottom"])
         css = css.replace(
           `--${m[1]}-trim-${side}: var(--primary-trim-${side});`,
-          `--${m[1]}-trim-${side}: var(--secondary-trim-${side});`,
+          `--${m[1]}-trim-${side}: var(--${name}-trim-${side});`,
         );
-  } else if (secondary && css.includes("--secondary-trim-top")) {
-    // Back on one font: the secondary trims follow it.
-    set("secondary-trim-top", primary.top);
-    set("secondary-trim-bottom", primary.bottom);
   }
   writeFileSync(file, css);
   console.log(`\nWrote the trim tokens to ${file}. Run npm run tokens.`);

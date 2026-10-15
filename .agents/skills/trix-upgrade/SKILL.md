@@ -62,7 +62,7 @@ against, and `git diff <that commit>` becomes the review.
 Before anything changes, with the dev server running:
 
 ```bash
-astro dev --background
+npx astro dev --background
 node .agents/skills/trix-upgrade/visual-check.mjs capture before
 ```
 

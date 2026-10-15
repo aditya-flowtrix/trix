@@ -70,5 +70,14 @@
         "unit": "px"
       }
     }
+  },
+  "tag": {
+    "radius": {
+      "$type": "dimension",
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      }
+    }
   }
 }

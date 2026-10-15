@@ -276,15 +276,15 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--eyebrow` | 12px | 14px |
+| `--eyebrow` | 14px | 16px |
 | `--eyebrow-font-family` | `var(--primary-family) → var(--font-inter, Arial, sans-serif)` | `var(--primary-family) → var(--font-inter, Arial, sans-serif)` |
-| `--eyebrow-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--eyebrow-line-height` | `var(--line-height-large) → 1.3` | `var(--line-height-large) → 1.3` |
-| `--eyebrow-letter-spacing` | `var(--letter-spacing-wider) → 0.1em` | `var(--letter-spacing-wider) → 0.1em` |
-| `--eyebrow-text-transform` | `uppercase` | `uppercase` |
-| `--eyebrow-text-wrap` | `balance` | `balance` |
-| `--eyebrow-margin-top` | `var(--space-4)` | `var(--space-4)` |
-| `--eyebrow-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
+| `--eyebrow-font-weight` | `var(--primary-regular) → 400` | `var(--primary-regular) → 400` |
+| `--eyebrow-line-height` | `var(--line-height-huge) → 1.5` | `var(--line-height-huge) → 1.5` |
+| `--eyebrow-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
+| `--eyebrow-text-transform` | `none` | `none` |
+| `--eyebrow-text-wrap` | `pretty` | `pretty` |
+| `--eyebrow-margin-top` | `var(--space-5)` | `var(--space-5)` |
+| `--eyebrow-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
 | `--eyebrow-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--eyebrow-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -386,6 +386,11 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--button-gap` | `0.5em` |
 | `--button-line-height` | `1.2` |
 | `--button-font-weight` | `inherit` |
+| `--button-label-family` | `inherit` |
+| `--button-label-size` | `inherit` |
+| `--button-label-letter-spacing` | `inherit` |
+| `--button-label-text-transform` | `inherit` |
+| `--button-icon-radius` | `var(--radius-round) → 100vw` |
 
 ## Components — field
 
@@ -400,6 +405,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | Token | Value |
 | --- | --- |
 | `--card-radius` | `var(--radius-medium) → 1rem` |
+
+## Components — tag
+
+| Token | Value |
+| --- | --- |
+| `--tag-radius` | `var(--radius-small) → 0.5rem` |
 
 ## Layout grid
 
@@ -431,6 +442,8 @@ column is exactly `span 3`.
 | `--heading-accent` | `#018547` | `#0fd375` | `#333333` |
 | `--selection-background` | `#000000` | `#ffffff` | `#000000` |
 | `--selection-text` | `#ffffff` | `#000000` | `#0fd375` |
+| `--tag-background` | `#000000` | `#ffffff` | `#000000` |
+| `--tag-text` | `#ffffff` | `#000000` | `#0fd375` |
 | `--button-background` | `#0fd375` | `#0fd375` | `#000000` |
 | `--button-border` | `#0fd375` | `#0fd375` | `#000000` |
 | `--button-text` | `#000000` | `#000000` | `#0fd375` |

@@ -12,7 +12,28 @@ and to be explicit about every guess.
 **The rule that outranks the rest: never invent a variable or a class to paper
 over an inconsistency in the design. Surface it and ask.** Two paddings that
 differ by 6px are usually one padding drawn twice. Ask which it is before
-writing anything.
+writing anything. With nobody to ask, follow [Working unattended](#working-unattended).
+
+**Which job is it?**
+
+- **A new project** — the design replaces Trix's look. Its type scale and
+  palette _become_ the tokens: run the converter with `--fresh`, which matches
+  type rows to text styles by name, never by size, and prints the palette as
+  ramps.
+- **A change** — the design adjusts a site that already has its system. Each
+  value is matched to the token it is closest to and snapped within 2px.
+
+## Getting the values in
+
+| What you have                               | Read it with                                                                                                                                                                                                    |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the Figma MCP                               | `get_variable_defs`, `get_design_context`, `get_screenshot`                                                                                                                                                     |
+| a **variables export** (no MCP)             | the designer, in Figma: Local variables → right-click each collection → **Export modes**. The zip holds one `.tokens.json` per mode. `convert.mjs --from-figma <folder>` turns them into the inventory (step 2) |
+| only the file in a browser, or a spec / PDF | Dev Mode's variables table and inspect panel, written into the inventory by hand. Screenshot each frame at 100% so measurements are design px                                                                   |
+
+Variables carry no text styles: whichever way the values arrive, each text
+style's line height, letter spacing, weight, family and case come from the
+style guide's type specimens.
 
 ## Fast path: a file built on the Trix Figma setup
 
@@ -20,7 +41,8 @@ A designer who followed `docs/design/figma-setup.md` built the file on Trix's
 own variable collections — Primitives, Responsive (Mobile/Desktop), Text Styles,
 Theme (one mode per theme) and Components — with Trix's names. Check first:
 
-1. `get_variable_defs` on the main frame. If the names are Trix's
+1. `get_variable_defs` on the main frame (or open the variables export). If
+   the names are Trix's
    (`space/7`, `font-size/h2`, `color/brand/500`, theme modes `Light`/`Dark`),
    there is nothing to convert: the Responsive collection's Mobile value is the
    token's `-min`, Desktop is `-max`, and every other variable is the value of
@@ -54,36 +76,52 @@ The opacity one matters most. A designer who wants a muted label has no
 color — it is the existing swatch, mixed. Adding `--grey-400: #999` for it is
 the mistake this skill exists to prevent.
 
-## A desktop frame is the maximum, not the value
+## Mobile values: the one rule
+
+`/trix-design-system` follows this rule too.
 
 Tokens here are fluid: `--space-6-min: 32` at a 320px viewport, `--space-6-max: 40`
-at 1440px. A measurement taken off a 1440px frame is therefore the token's
-**max**. The min has to come from somewhere:
+at 1440px. A value read off the desktop frame (or a variable's **Desktop**
+mode) is the token's **max**; the mobile frame's (or **Mobile** mode's) is its
+**min** — give it to the converter as `mobilePx`.
 
-**Check which frames exist before measuring anything** — files differ, and the
-two paths produce different work:
+**A mobile value of `0`, an empty one, or none at all means "not drawn"** —
+never a size of 0. Figma files often carry a Mobile mode nobody filled in.
 
-- **Both frames.** Measure each. The mobile value is the min, the desktop value
-  is the max, and nothing is guessed. Say which frame widths you measured, since
-  a 375px frame and a 320px `--viewport-min` are not the same thing — a value
-  read at 375 is slightly larger than the token's true min.
-- **Desktop only.** `convert.mjs` derives the min from the ratio of whichever
-  existing token is closest in size, and marks it as a guess. Every derived min
-  goes in the report; they are the values most likely to be wrong.
+A min that was not drawn is **derived and marked as a guess**: `convert.mjs`
+takes the ratio of the token it replaces (in `--fresh`, the style of the same
+name) or else the one closest in size, and lists it under `GUESSED`. Then:
 
-Never mix the two silently. If half the tokens are measured and half derived,
-the report has to say which is which.
+- someone to ask — put the guesses to the designer with the other questions;
+- unattended — write them, and log each in `PROJECT.md` → Still open.
+
+A guess is never written silently, and the report says which mins were
+measured and which derived. A 375px frame is not the 320px `--viewport-min`:
+say which width you measured.
 
 ## Steps
 
-1. **Read the file.** Use the Figma MCP tools — `get_variable_defs` for whatever
-   variables do exist, `get_design_context` for the frame, `get_screenshot` to
-   see what it should look like. Start with the variables: they tell you how
-   much of the system the designer actually used.
+1. **Read the file** — see [Getting the values in](#getting-the-values-in).
+   With the MCP: `get_variable_defs` for whatever variables do exist,
+   `get_design_context` for the frame, `get_screenshot` to see what it should
+   look like. Start with the variables: they tell you how much of the system
+   the designer actually used.
 
 2. **Inventory before converting.** List every distinct spacing value, type
    size with its line height, and color with its opacity. Distinct _values_,
    not distinct layers — the same 24px appearing eleven times is one value.
+   From a variables export, `--from-figma` writes the first draft:
+
+   ```bash
+   node .agents/skills/trix-import-figma/convert.mjs --from-figma ~/Downloads/variables > design.json
+   ```
+
+   It pairs Desktop and Mobile modes, resolves aliases, drops a Mobile `0`,
+   lists each weight once, and prints what it could not place — theme colours
+   (map them onto `themes.css` roles), font families (→ `/trix-design-system`
+   fonts), line heights and borders — on stderr. Name the rows (`"token"`) and
+   add each type row's details from the specimens before converting.
+
    Add each frame's **layout grid** (count, margin, gutter): the desktop and
    mobile margins are `--site-margin-max`/`-min`, the gutters
    `--site-gutter-max`/`-min`. A frame with no layout grid, or one that is not
@@ -93,7 +131,8 @@ the report has to say which is which.
 3. **Convert and match.** Write the inventory to JSON and run the script:
 
    ```bash
-   node .agents/skills/trix-import-figma/convert.mjs --json design.json
+   node .agents/skills/trix-import-figma/convert.mjs --json design.json            # a change
+   node .agents/skills/trix-import-figma/convert.mjs --json design.json --fresh    # a new project
    ```
 
    The script does the arithmetic because there is a lot of it and it is easy
@@ -103,14 +142,42 @@ the report has to say which is which.
 
    ```json
    {
-     "space": [{ "name": "stack gap", "px": 30 }],
-     "type": [{ "name": "Section title", "sizePx": 64, "lineHeightPx": 70 }],
+     "space": [{ "name": "stack gap", "px": 30, "mobilePx": 20 }],
+     "type": [
+       {
+         "name": "Section title",
+         "token": "h2",
+         "sizePx": 64,
+         "mobilePx": 40,
+         "lineHeightPx": 70,
+         "letterPct": -2,
+         "weight": "Medium",
+         "family": "secondary"
+       },
+       {
+         "name": "Label",
+         "token": "eyebrow",
+         "sizePx": 12,
+         "family": "mono",
+         "uppercase": true
+       }
+     ],
      "letter": [{ "name": "Hero tracking", "px": -2.4, "sizePx": 80 }],
      "radius": [{ "name": "Card corner", "px": 16 }],
      "weight": [{ "name": "Heading", "value": "Medium" }],
-     "color": [{ "name": "Muted label", "hex": "#FFFFFF", "alpha": 0.6 }]
+     "color": [
+       { "name": "Plum/Plum-400 (Violet)", "hex": "#735385" },
+       { "name": "Muted label", "hex": "#FFFFFF", "alpha": 0.6 }
+     ]
    }
    ```
+
+   `mobilePx` is the mobile frame's value — leave it out, or `0`, when there is
+   none. A type row's `lineHeightPx` (or `lineHeightPct`), `letterPx`/`letterPct`,
+   `weight`, `family` (a role: `primary`, `secondary`, `mono`…) and `uppercase`
+   fill its Text style group in `--fresh`. Every name becomes kebab-case from
+   the last part of a Figma path, without the designer's (aside):
+   `Plum/Plum-400 (Violet)` → `--plum-400`.
 
    Add `"on": "#1F1D1E"` and `"sizePx"` to a colour and the script also reports
    its WCAG contrast, using the large-text bar of 3:1 at 24px and above. These
@@ -124,19 +191,26 @@ the report has to say which is which.
    to convert".
 
    It reads the real tokens out of `src/styles/tokens.css`, converts the units,
-   snaps anything within 2px to the token it is drifting from, derives fluid
-   mins, and prints an `ASK BEFORE WRITING` list. Values off by more than 2px
-   are decisions, not drift, and belong in that list.
+   snaps anything within 2px to the token it is drifting from, derives the
+   mins nobody drew (`GUESSED`), and prints an `ASK BEFORE WRITING` list.
+   Values off by more than 2px are decisions, not drift, and belong in that
+   list.
+
+   With `--fresh` it also prints each type row as a whole `Text style — name`
+   group (replacing the stock style of that name, or `NEW`), the Trix styles
+   the design leaves undefined, and the palette as ramps — flagging a swatch
+   like `--grey` beside `--grey-10`, which Figma cannot hold.
 
    For one-off lookups: `--px 30`, `--lh 50/42`, `--color "#FFFFFF@60"`.
 
-4. **Ask the questions.** Put the whole `ASK BEFORE WRITING` list to the user
-   at once, each with the option to consolidate:
+4. **Ask the questions.** Put the whole `ASK BEFORE WRITING` and `GUESSED`
+   lists to the user at once, each with the option to consolidate:
 
    > The design uses 30px, 32px and 34px gaps in three places. `--space-5` is
    > 32px. Consolidate all three, or is one of them deliberate?
 
    Wait for answers. Do not write tokens for anything still in question.
+   Unattended, decide by [Working unattended](#working-unattended) instead.
 
 5. **Place the tokens yourself.** The script prints what to add under
    `TO PLACE BY HAND`; it does not touch `tokens.css`. Where a token goes says
@@ -186,7 +260,7 @@ the report has to say which is which.
    screenshot from step 1:
 
    ```bash
-   astro dev --background
+   npx astro dev --background
    ```
 
    Screenshot the built page at the same width as the frame you measured, and
@@ -195,6 +269,26 @@ the report has to say which is which.
    derived mins show up as wrong. Report what does not match rather than
    quietly adjusting tokens until it does: a mismatch is often the design
    being inconsistent, which is a question, not a bug.
+
+## Working unattended
+
+With no designer or owner to answer — an agent building alone — these are
+the only decisions to take alone. Each one is logged where the table says, so
+a person can reverse it later; anything not listed stays open.
+
+| Decision                                                                        | Rule                                                                                                                                                      | Log it in                                            |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| a value within 2px (line height 0.05, tracking 0.005em) of a token              | snap to it                                                                                                                                                | report → Snapped                                     |
+| a min nobody drew                                                               | the converter's derived value                                                                                                                             | `PROJECT.md` → Still open, report → Guesses          |
+| a size or colour off every token by more than 2px                               | type size, colour, radius: a new token, named from the design. Spacing: snap to the nearest step and note the drift — a new step would renumber the scale | `PROJECT.md` → Design system, report → New variables |
+| a frame with no layout grid                                                     | keep Trix's 12 columns, gutter and margin; take the margin from where the content edge sits, if it shows                                                  | `PROJECT.md` → Still open                            |
+| a state the design did not draw (hover, focus, the dark-theme twin of a button) | derive it from the pattern in `themes.css`                                                                                                                | report → Guesses                                     |
+| a table and a real text style that disagree                                     | the text style — it is what the designer applies                                                                                                          | `PROJECT.md` → Design system                         |
+| a design colour below its contrast floor in a theme role                        | keep the designer's colour with `/* contrast: accepted — why */` on its line in `themes.css`                                                              | `PROJECT.md` → Still open                            |
+| a font                                                                          | `/trix-design-system` → fonts, [Unattended](../trix-design-system/references/fonts.md#unattended)                                                         | `PROJECT.md` → Design system                         |
+
+Never decide alone: a renumbered scale, a removed token something uses, a
+licence, or anything the design contradicts itself on twice.
 
 ## The report
 
@@ -221,7 +315,7 @@ Trix release, and a Trix release does not invalidate the skill.
   duplicates it; the script reads it and prints both on every run:
 
   ```
-  trix-import-figma 1.0.0  ·  Trix <whatever package.json says>
+  trix-import-figma 1.1.0  ·  Trix <whatever package.json says>
   ```
 
   If the running project is a different version than `TESTED_AGAINST`, the

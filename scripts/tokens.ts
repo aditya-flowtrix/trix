@@ -266,9 +266,19 @@ export type Breakpoint = ${union(model.breakpoints.map((b) => b.name))};
 
 type Tree = Record<string, unknown>;
 
+// Figma paths are dot-joined: `--grey` and `--grey-10` would make `color.grey`
+// both a value and a group, and one would silently overwrite the other.
 function set(tree: Tree, path: string[], token: Tree) {
+  const clash = () =>
+    new Error(
+      `Token "${path.join(".")}" collides with another token: a Figma variable can't be both a value and a group. Rename one (e.g. --grey → --grey-base).`,
+    );
   let node = tree;
-  for (const key of path.slice(0, -1)) node = (node[key] ??= {}) as Tree;
+  for (const key of path.slice(0, -1)) {
+    node = (node[key] ??= {}) as Tree;
+    if ("$type" in node) throw clash();
+  }
+  if (path.at(-1)! in node) throw clash();
   node[path.at(-1)!] = token;
 }
 
@@ -290,8 +300,8 @@ function palettePath(name: string): string[] {
 function primitivePath(model: Model, name: string): string | undefined {
   if (model.palette.some((t) => t.name === name))
     return palettePath(name).join(".");
-  if (/^(primary|secondary)-family$/.test(name))
-    return `font.family.${name.split("-")[0]}`;
+  if (model.families.some((f) => `${f}-family` === name))
+    return `font.family.${name.slice(0, -7)}`;
   if (model.weights.some((w) => `primary-${w}` === name))
     return `font.weight.${name.slice(8)}`;
   if (name.startsWith("line-height-")) return `line-height.${name.slice(12)}`;
@@ -331,13 +341,13 @@ function figmaFiles(model: Model): Record<string, Tree> {
     else if (c)
       set(prim, palettePath(t.name), { $type: "color", $value: colorValue(c) });
   }
-  for (const f of ["primary", "secondary"]) {
-    const v = model.byName.get(`${f}-family`);
-    if (!v) continue;
-    const ref = v.match(/^var\(--((?:primary|secondary)-family)\)$/);
+  for (const f of model.families) {
+    const v = model.byName.get(`${f}-family`)!;
+    const ref = v.match(/^var\(--([\w-]+)\)$/)?.[1];
+    const path = ref && primitivePath(model, ref);
     set(prim, ["font", "family", f], {
       $type: "fontFamily",
-      $value: ref ? alias(primitivePath(model, ref[1])!) : families(v),
+      $value: path ? alias(path) : families(v),
     });
   }
   for (const w of model.weights) {
@@ -458,7 +468,13 @@ function figmaFiles(model: Model): Record<string, Tree> {
   )) {
     const v = resolveVar(t.value, model.byName);
     const n = toPx(v);
-    const [component, ...rest] = t.name.split("-");
+    // The group names the component, so `/* Components — content-wrapper */`
+    // keeps `--content-wrapper-gap` together as content-wrapper.gap.
+    const named = t.group.match(/^Components\s*[—–-]\s*([\w-]+)/)?.[1];
+    const [component, ...rest] =
+      named && t.name.startsWith(`${named}-`)
+        ? [named, t.name.slice(named.length + 1)]
+        : t.name.split("-");
     if (/^-?[\d.]+$/.test(v)) {
       set(comp, [component, rest.join("-")], {
         $type: "number",

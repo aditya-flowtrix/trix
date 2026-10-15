@@ -120,15 +120,19 @@ const ratio = (a: Rgba, b: Rgba) => {
   const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
 };
+// Page text, plus every role pair a theme defines: `--X-text…` on
+// `--X-background…` (button, button-2, tag, and any a project adds).
+const roles = new Set(model.themes.flatMap((t) => [...t.tokens.keys()]));
 const pairs: [text: string, surface: string, min: number][] = [
   ["text", "background", 4.5],
   ["text-2", "background", 4.5],
   ["link-text", "background", 4.5],
   ["heading-accent", "background", 3],
-  ["button-text", "button-background", 4.5],
-  ["button-text-hover", "button-background-hover", 4.5],
-  ["button-2-text", "button-2-background", 4.5],
-  ["button-2-text-hover", "button-2-background-hover", 4.5],
+  ...[...roles].flatMap((name): [string, string, number][] => {
+    const m = name.match(/^(.+)-text(-.+)?$/);
+    const surface = m && `${m[1]}-background${m[2] ?? ""}`;
+    return surface && roles.has(surface) ? [[name, surface, 4.5]] : [];
+  }),
 ];
 // An owner can keep a failing pair on purpose (a migration that must match
 // its source): `--text-2: …; /* contrast: accepted — why */` on that line,

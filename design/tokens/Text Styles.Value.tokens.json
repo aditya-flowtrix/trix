@@ -222,15 +222,15 @@
     },
     "font-weight": {
       "$type": "fontWeight",
-      "$value": "{font.weight.medium}"
+      "$value": "{font.weight.regular}"
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.large}"
+      "$value": "{line-height.huge}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.wider}"
+      "$value": "{letter-spacing.normal}"
     }
   }
 }

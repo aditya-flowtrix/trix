@@ -260,6 +260,28 @@ const { render = true, overlap = false } = Astro.props;
       }
     }
 
+    /* A Dropdown in the links: its trigger reads as a link, its links as a list. */
+    .nav_links .dropdown_wrap {
+      --_control-pad: var(--space-4);
+    }
+
+    .nav_links .dropdown_toggle {
+      color: var(--text-2);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+
+    .nav_sub {
+      display: flex;
+      flex-direction: column;
+      & .nav_link {
+        padding-block: var(--space-3);
+      }
+    }
+
     .nav_theme {
       margin: 0 var(--site-margin) var(--space-5);
     }
@@ -279,9 +301,11 @@ const { render = true, overlap = false } = Astro.props;
         margin: 0;
       }
 
+      /* visible, or a Dropdown's panel is clipped by the bar */
       .nav_menu {
         position: static;
         display: block;
+        overflow: visible;
         visibility: visible;
         background-color: transparent;
         border-bottom: 0;
@@ -301,6 +325,23 @@ const { render = true, overlap = false } = Astro.props;
         font-size: var(--text-small);
         & > li + li {
           border-top: 0;
+        }
+      }
+
+      .nav_links .dropdown_wrap {
+        --_control-pad: 0rem;
+      }
+
+      /* The links sit at the bar's end: open toward the middle. */
+      .nav_links .dropdown_content {
+        inset-inline: auto 0;
+        transform-origin: top right;
+      }
+
+      .nav_sub {
+        gap: var(--space-4);
+        & .nav_link {
+          padding-block: 0;
         }
       }
 

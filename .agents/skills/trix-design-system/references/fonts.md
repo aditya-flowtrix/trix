@@ -19,6 +19,15 @@ One question, before touching anything:
 >
 > Is the font licensed for web use on this site?
 
+### Unattended
+
+With nobody to ask, take the families the design names. One on Google Fonts,
+Fontshare, Bunny Fonts or Fontsource → that provider (their licences cover the
+web; log "confirm the licence" in `PROJECT.md` → Still open). Anything else —
+a commercial font, files you don't have → keep the current font for that role
+and log it in Still open. A role the design adds (a mono label font) is one
+more family token, as §4 says.
+
 ## 2. What each answer means
 
 | The answer                                                 | What happens                                                                                                                                                                                                                                                          |
@@ -77,7 +86,9 @@ same fields; `adobe({ id: "kit-id" })` adds the kit; `npm()` for packages):
 metrics from it, so text does not jump when the font arrives. Name a system
 font of the same kind (serif for a serif).
 
-Remove the family the new one replaces, and its files.
+Remove the family the new one replaces, and its files — and the `latin` /
+`latinExt` unicode ranges at the top of `astro.config.mjs` if no family left
+uses them.
 
 ## 4. Point the tokens at it
 
@@ -88,8 +99,10 @@ Remove the family the new one replaces, and its files.
 ```
 
 `--primary-family` is the body font; `--secondary-family` is for headings
-(`var(--primary-family)` when there is one family). Each text style picks one
-in its `--*-font-family`. Weight tokens (`--primary-regular: 400` …) must
+(`var(--primary-family)` when there is one family). A design with another
+font role adds one more — `--mono-family`, `--label-family`: one word, then
+`-family`. Every family is measured, exported to Figma as `font/family/*`, and
+can be picked by any text style in its `--*-font-family`. Weight tokens (`--primary-regular: 400` …) must
 name weights the font actually has — remove the ones it lacks, add the ones
 the design uses.
 
@@ -105,8 +118,8 @@ npm run tokens
 ```
 
 It reads cap height, ascent and descent from the browser, writes
-`--primary-trim-*` and — when headings use a different font —
-`--secondary-trim-*`, pointing the heading styles at them. It refuses to
+`--primary-trim-*` and — for every other family that is a different font —
+`--<family>-trim-*`, pointing the text styles set in it at them. It refuses to
 write if a family did not load (a wrong name or path): fix that first.
 
 ## 6. Check

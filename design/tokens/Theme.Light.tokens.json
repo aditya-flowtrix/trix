@@ -69,6 +69,14 @@
     "$type": "color",
     "$value": "{background}"
   },
+  "tag-background": {
+    "$type": "color",
+    "$value": "{text}"
+  },
+  "tag-text": {
+    "$type": "color",
+    "$value": "{background}"
+  },
   "button-background": {
     "$type": "color",
     "$value": "{color.brand.300}"

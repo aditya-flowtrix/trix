@@ -9,6 +9,7 @@
  *
  * Usage
  *   npm run build && npm run test:browsers        every browser on this machine
+ *   (refuses a dist/ older than src/, public/ or astro.config.mjs)
  *   node tests/browsers.ts --dir dist --browser firefox,brave
  *   options: --widths 375,768,1440   --pages /,/about
  *
@@ -22,7 +23,8 @@
  * Writes .trix/browsers.md. Exit code 1 on any failure.
  */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 import { spawn } from "node:child_process";
 import {
@@ -36,6 +38,38 @@ import { args, output, serve } from "../scripts/measure/browser.ts";
 
 const opts = args();
 const dir = typeof opts.dir === "string" ? opts.dir : "dist";
+
+// A build older than the source tests code that is no longer there: a fix
+// still "fails", a regression still "passes".
+if (resolve(dir) === resolve("dist")) {
+  const built = join(dir, "index.html");
+  const files = (p: string): string[] =>
+    !existsSync(p)
+      ? []
+      : statSync(p).isDirectory()
+        ? [
+            p,
+            ...readdirSync(p, { recursive: true, encoding: "utf8" }).map((f) =>
+              join(p, f),
+            ),
+          ]
+        : [p];
+  const since = existsSync(built) ? statSync(built).mtimeMs : -1;
+  const [newer] = ["src", "public", "astro.config.mjs"]
+    .flatMap(files)
+    .map((f) => ({ f, t: statSync(f).mtimeMs }))
+    .filter(({ t }) => t > since)
+    .sort((a, b) => b.t - a.t)
+    .map(({ f }) => f);
+  if (newer) {
+    console.error(
+      since < 0
+        ? `No build in ${dir}/ — run \`npm run build\` first.`
+        : `${dir}/ is older than ${newer} — run \`npm run build\` first.`,
+    );
+    process.exit(1);
+  }
+}
 const widths =
   typeof opts.widths === "string"
     ? opts.widths.split(",").map(Number)
@@ -93,7 +127,12 @@ async function playwright(name: string): Promise<Driver | string> {
   try {
     browser = await launchers[name]();
   } catch (e) {
-    return String(e).split("\n")[0];
+    const first = String(e).split("\n")[0];
+    // Playwright's own builds must match playwright-core's version.
+    return /Executable doesn't exist/.test(first) &&
+      ["chromium", "firefox", "webkit"].includes(name)
+      ? `${first} — run \`npx playwright-core install ${name}\``
+      : first;
   }
   return {
     name,
@@ -604,24 +643,33 @@ const asked =
 const s = await serve(dir);
 origin = s.origin;
 const skipped: string[] = [];
+const missing = new Map<string, string>(); // page → a page linking to it
 
 for (const name of asked ?? all) {
+  current = name;
   const driver = name === "safari" ? await safari() : await playwright(name);
   if (typeof driver === "string") {
     skipped.push(`${name}: ${driver}`);
     if (asked) check(name, "browser available", false, driver);
     continue;
   }
-  current = name;
   console.log(`${name}`);
   const page = await driver.page();
-  const queue =
-    typeof opts.pages === "string" ? opts.pages.split(",") : ["/", "/404"];
+  const queue: [path: string, from: string][] = (
+    typeof opts.pages === "string" ? opts.pages.split(",") : ["/", "/404"]
+  ).map((p) => [p, ""]);
   const seen = new Set<string>();
   while (queue.length) {
-    const path = queue.shift()!;
+    const [path, from] = queue.shift()!;
     if (seen.has(path)) continue;
     seen.add(path);
+    // A link to a page that isn't built is one broken link, reported once
+    // with where it is — not every check failing on the 404 page it lands on.
+    if (from && path !== "/404") {
+      if (!missing.has(path) && (await fetch(origin + path)).status === 404)
+        missing.set(path, from);
+      if (missing.has(path)) continue;
+    }
     const links = await testPage(driver, page, path).catch((e) => {
       check(path, "page could be tested", false, String(e).split("\n")[0]);
       return [] as string[];
@@ -630,13 +678,16 @@ for (const name of asked ?? all) {
       for (const href of links) {
         const u = new URL(href);
         if (u.origin === origin && !/\.[a-z0-9]+$/i.test(u.pathname))
-          queue.push(u.pathname.replace(/(.)\/$/, "$1"));
+          queue.push([u.pathname.replace(/(.)\/$/, "$1"), path]);
       }
   }
   await page.close();
   await driver.close();
 }
 s.server.close();
+current = "all";
+for (const [path, from] of missing)
+  check(path, "linked page exists", false, `404 — linked from ${from}`);
 
 const byBrowser = Object.groupBy(results, (r) => r.browser);
 const summary = Object.entries(byBrowser).map(

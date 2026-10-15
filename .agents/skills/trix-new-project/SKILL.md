@@ -97,7 +97,7 @@ Choose by what exists:
 
 ```bash
 npm run check && npm run build
-astro dev --background   # then open /style-guide
+npx astro dev --background   # then open /style-guide
 ```
 
 ## Using this without Claude Code

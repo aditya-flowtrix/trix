@@ -10,7 +10,7 @@
  * interpolates between them is generated into `generated/fluid.css` by
  * `npm run tokens` — and on save while `astro dev` runs.
  *
- * Text styles are any group with a `-font-family` token; each becomes a
+ * Text styles are the `Text style — name` groups; each becomes a
  * `.text-style-*` class. Spacing steps become padding, margin and gap
  * utilities. Add a step or a style here and the classes follow.
  */
@@ -244,17 +244,18 @@
   --text-xsmall-trim-top: var(--primary-trim-top);
   --text-xsmall-trim-bottom: var(--primary-trim-bottom);
 
-  /* Text style — eyebrow */
-  --eyebrow-min: 12;
-  --eyebrow-max: 14;
+  /* Text style — eyebrow
+     Lumos sets eyebrows in text-small; these match it until a design differs. */
+  --eyebrow-min: 14;
+  --eyebrow-max: 16;
   --eyebrow-font-family: var(--primary-family);
-  --eyebrow-font-weight: var(--primary-medium);
-  --eyebrow-line-height: var(--line-height-large);
-  --eyebrow-letter-spacing: var(--letter-spacing-wider);
-  --eyebrow-text-transform: uppercase;
-  --eyebrow-text-wrap: balance;
-  --eyebrow-margin-top: var(--space-4);
-  --eyebrow-margin-bottom: var(--space-4);
+  --eyebrow-font-weight: var(--primary-regular);
+  --eyebrow-line-height: var(--line-height-huge);
+  --eyebrow-letter-spacing: var(--letter-spacing-normal);
+  --eyebrow-text-transform: none;
+  --eyebrow-text-wrap: pretty;
+  --eyebrow-margin-top: var(--space-5);
+  --eyebrow-margin-bottom: var(--space-5);
   --eyebrow-trim-top: var(--primary-trim-top);
   --eyebrow-trim-bottom: var(--primary-trim-bottom);
 
@@ -349,6 +350,11 @@
   --button-gap: 0.5em;
   --button-line-height: 1.2;
   --button-font-weight: inherit;
+  --button-label-family: inherit;
+  --button-label-size: inherit;
+  --button-label-letter-spacing: inherit;
+  --button-label-text-transform: inherit;
+  --button-icon-radius: var(--radius-round);
 
   /* Components — field */
   --field-padding-block: 0.75em;
@@ -357,4 +363,7 @@
 
   /* Components — card */
   --card-radius: var(--radius-medium);
+
+  /* Components — tag */
+  --tag-radius: var(--radius-small);
 }
