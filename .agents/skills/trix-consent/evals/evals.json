@@ -11,9 +11,11 @@
         "Questions were asked one at a time, each saying what it decides and offering a default",
         "@c15t/core and @c15t/integrations are installed at exactly 3.0.0; the c15t package is not installed",
         "GTM loads only through googleTagManager with loadMode \"after-consent\" in src/consent.ts — no GTM snippet remains in BaseHead, layouts or pages",
+        "Every non-Google tag inside the GTM container is listed with a category, and either moved into scripts or given GTM's additional consent checks",
         "Every YouTube iframe uses data-src and data-category=\"marketing\", with no src",
         "Reject all and Accept all have the same emphasis",
         "verify.ts was run with --vendor googletagmanager.com and a YouTube --vendor, and passed",
+        "verify.ts was also run with --page on a blog post that embeds a video, and passed",
         "PROJECT.md has a Consent section with region rules, records, vendors and design, each dated"
       ]
     },

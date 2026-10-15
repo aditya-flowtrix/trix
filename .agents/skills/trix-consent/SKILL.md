@@ -72,6 +72,7 @@ into `PROJECT.md` → **Consent** as it is given, with the date.
    - `BaseHead` and the layouts
    - `<iframe` embeds (YouTube, Vimeo, Maps)
    - with a live site, every third-party request its homepage makes
+   - the tags inside a Google Tag Manager container, from the container
 
    List them in a table: vendor, where it loads from, proposed category. The
    developer confirms each category. Anything the team wants to run
@@ -96,6 +97,14 @@ into `PROJECT.md` → **Consent** as it is given, with the date.
      exception: offer it only if the owner asks, record it under
      **Decisions**, and verify with `--allow www.googletagmanager.com`
      instead of its `--vendor`.
+   - The tags inside the container are vendors too, and verify cannot see
+     them. Google's own tags follow the consent signals. Every other tag (a
+     Meta Pixel, LinkedIn Insight, Hotjar) either moves out of the container
+     into `scripts`, through its `@c15t/integrations` helper where one
+     exists, or gets GTM's **Additional consent checks** for its category:
+     `analytics_storage` for measurement, `ad_storage` for marketing.
+     Otherwise it fires as soon as the visitor allows Analytics alone. A
+     container holding only analytics tags takes `category: "measurement"`.
 
 6. **Design.**
    - Layout: `variant="card"` (bottom corner, the default) or `"bar"` (full
@@ -238,6 +247,9 @@ node .agents/skills/trix-consent/verify.ts --vendor googletagmanager.com --vendo
 ```
 
 - Name every gated vendor with `--vendor`.
+- verify checks one page, `/` unless `--page` says otherwise. Run it again
+  with `--page` for each page that loads something the homepage does not: a
+  blog post with a video, a page with a map or a booking widget.
 - `--allow <host>` is only for an exception recorded under **Decisions**.
 - verify builds in offline mode into a temporary folder, so it never writes
   to the live record.

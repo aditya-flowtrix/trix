@@ -34,7 +34,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import type { Browser, Page } from "playwright-core";
-import { launch, serve } from "../../../scripts/measure/browser.ts";
+import { launch, open, serve } from "../../../scripts/measure/browser.ts";
 
 const { values } = parseArgs({
   options: {
@@ -104,9 +104,24 @@ async function visit(
       : route.fulfill({ status: 200, body: "" });
   });
   const page = await context.newPage();
-  await page.goto(url);
-  await settle(page);
+  // Without scripting, timers never fire for open()'s scroll, and browsers
+  // load lazy content at once anyway.
+  if (options.javaScriptEnabled === false) {
+    await page.goto(url);
+    await settle(page);
+  } else await load(page, options.width);
   return { context, page, requests };
+}
+
+/**
+ * Scrolled to the bottom and back, so lazy embeds and images load, then a
+ * wait for widgets a timer injects.
+ */
+// ponytail: a widget injected later than 2 s goes unseen; raise LATE for one.
+const LATE = 2_000;
+async function load(page: Page, width = 1280) {
+  await open(page, url, width);
+  await page.waitForTimeout(LATE);
 }
 
 const settle = async (page: Page) => {
@@ -271,9 +286,14 @@ try {
       await button("reject").click();
       await until(async () => !(await bannerOpen(first.page)));
       await settle(first.page);
-      await first.page.reload();
-      await settle(first.page);
+      await load(first.page);
       assert.equal(await bannerOpen(first.page), false, "the banner came back");
+      const after = thirdParty(first.requests);
+      assert.deepEqual(
+        after,
+        [],
+        `loaded after Reject all: ${after.join(", ")}`,
+      );
       assert.deepEqual(vendorRequests(first.requests), []);
       assert.equal(await filledEmbeds(first.page), 0);
     },
@@ -367,7 +387,13 @@ try {
         second.requests.length = 0;
         await panel.locator('[data-consent-action="save"]').click();
         await reloaded;
-        await settle(second.page);
+        await load(second.page);
+        const after = thirdParty(second.requests);
+        assert.deepEqual(
+          after,
+          [],
+          `loaded after withdrawal: ${after.join(", ")}`,
+        );
         assert.deepEqual(vendorRequests(second.requests), []);
         assert.equal(await filledEmbeds(second.page), 0);
       },

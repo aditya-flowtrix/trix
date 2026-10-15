@@ -89,6 +89,9 @@ try {
       "SKILL.md installs another version",
     );
     assert.ok(text.includes(`@c15t/integrations@${version}`));
+    // A GTM container's own tags are vendors too, and verify sees one page.
+    assert.match(text, /additional consent/i, "GTM's inner tags go ungated");
+    assert.match(text, /--page/, "verify runs on the homepage only");
     assert.match(
       readFileSync(join(root, "AGENTS.md"), "utf8"),
       /`trix-consent`/,
@@ -262,6 +265,38 @@ try {
       "verify passed a site with an ungated tag",
     );
     assert.match(result.stdout, /ungated\.example/);
+  });
+
+  await it("verify.ts fails a lazy embed below the fold, and a tag that loads on any choice", () => {
+    edit(
+      "src/pages/index.astro",
+      '  <script is:inline src="https://ungated.example/tag.js"></script>\n',
+      `  <div style="height: 500vh"></div>
+  <iframe loading="lazy" src="https://lazy.example/embed" title="Lazy embed"></iframe>
+  <script is:inline>
+    addEventListener("click", (event) => {
+      if (!event.target.closest("[data-consent-action]")) return;
+      const tag = document.createElement("script");
+      tag.src = "https://any-choice.example/tag.js";
+      document.head.append(tag);
+    });
+  </script>
+`,
+    );
+    const result = verify("--vendor", "fake-vendor.js");
+    assert.notEqual(result.status, 0, "verify passed both");
+    // Each must fail the check a visitor with JavaScript meets, not only the
+    // JavaScript-off one (lazy loading is off without scripting).
+    assert.match(
+      result.stdout,
+      /FAIL {2}Before a choice[^\n]*\n[^\n]*lazy\.example/,
+      "the lazy embed passed before a choice",
+    );
+    assert.match(
+      result.stdout,
+      /FAIL {2}Reject all[^\n]*\n[^\n]*any-choice\.example/,
+      "the any-choice tag passed Reject all",
+    );
   });
 } finally {
   rmSync(tmp, { recursive: true, force: true });
