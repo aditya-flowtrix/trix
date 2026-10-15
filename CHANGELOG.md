@@ -4,8 +4,7 @@
 
 ### Trix is Flowtrix's own
 
-Trix stands on its own: no upstream framework to track, and the docs, skills
-and installer describe Trix alone.
+The docs, skills and installer describe Trix alone.
 
 - `/trix-upgrade` upgrades projects only. `package.json` → `trix.basedOn` is
   gone, and the 0.2 → 0.3 token rename script is now

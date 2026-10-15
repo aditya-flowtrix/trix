@@ -291,7 +291,7 @@ function measure(): Raw {
       r.width >= vw / 2 &&
       left > 0.5 &&
       Math.abs(left - right) < 1 &&
-      // Rows with negative margins (Bootstrap, Mast) reach past the container.
+      // Rows with negative margins (Bootstrap-style grids) reach past the container.
       px(cs.marginLeft) >= 0 &&
       px(cs.marginRight) >= 0
         ? Math.round(left * 100) / 100
@@ -310,7 +310,7 @@ function measure(): Raw {
   }
   // Rows: two or more children side by side, evenly spaced, filling the row.
   // The space between them is the gutter; columns that touch use padding
-  // gutters (Bootstrap, Mast), where the gutter is their inner padding.
+  // gutters (Bootstrap-style grids), where the gutter is their inner padding.
   const rows: Raw["rows"] = [];
   for (const e of all) {
     if (skip.has(e.tagName)) continue;

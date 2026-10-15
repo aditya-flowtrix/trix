@@ -8,7 +8,7 @@
   other), Figma import, prop audit, scaling graphic, upgrade.
 - Measuring toolkit: inventory, design, propose, variables, classes, verify.
 - v0.2: the 12-column grid (`Row`/`Col`, overlay, measured margin and
-  gutter), scroll-in reveals, tables and dividers, prefetch — from Mast.
+  gutter), scroll-in reveals, tables and dividers, prefetch.
 
 ## Phase 2 — SEO (v0.2, done)
 

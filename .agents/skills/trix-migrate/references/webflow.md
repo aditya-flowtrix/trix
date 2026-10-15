@@ -36,8 +36,8 @@ structurally — `u-section` is `Section`, `u-heading` is `Heading` — but **no
 by value**: Trix's spacing scale, type ramp and palette are its own, and the
 site's are the site's. `--_spacing---space--8` is *not* `--space-8`. Measure
 (`/trix-style-guide` sets the project's scale to the site's values), then map
-by value (`classes.ts`, `variables.ts`). A Client-First, Mast or hand-built
-site takes more component work, but the destination is the same.
+by value (`classes.ts`, `variables.ts`). A Client-First, `cc-` combo-class or
+hand-built site takes more component work, but the destination is the same.
 
 ## The passes, and the order to apply them
 
@@ -202,11 +202,11 @@ edit that brings the page across.
 | `u-rich-text`                                                          | `Typography/RichText`                                          |
 | `u-svg`                                                                | `Media/Icon`                                                   |
 
-**Mast rows and columns are the 12-column grid**, also by name: `row` →
-`Wrapper/Row`, `col` → `Wrapper/Col`. Mast is desktop-first and Trix is
-mobile-first, so translate the classes, do not copy them:
+**A `cc-` system's rows and columns are the 12-column grid**, also by name:
+`row` → `Wrapper/Row`, `col` → `Wrapper/Col`. Its grid is desktop-first and
+Trix is mobile-first, so translate the classes, do not copy them:
 
-| Mast                                                                                 | Trix                                                                          |
+| `cc-` system                                                                         | Trix                                                                          |
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
 | `col-N` (smart column)                                                               | `span={N}` — the automatic stacking is the same table                         |
 | `col-lg-N`                                                                           | `large={N}`                                                                   |
@@ -221,7 +221,7 @@ mobile-first, so translate the classes, do not copy them:
 | `spacer-component` (`cc-sm`, `cc-md`, `cc-lg`)                                       | `<Spacer size>` — the step whose measured height matches                      |
 | `u-border` dividers                                                                  | `<hr>` — spaced by the container's gap                                        |
 
-**Spacer elements from any framework** — Mast's `spacer-component`,
+**Spacer elements from any framework** — the `cc-` system's `spacer-component`,
 Client-First's `spacer-small` … `spacer-huge` (or `padding-bottom` on an
 empty div), Relume's spacers — become `<Spacer size>` with the step whose
 value matches the measured height at every width (`design.json` lists
@@ -230,7 +230,7 @@ spacer heights with the spacing series). The `u-` system's
 `Section`'s `paddingTop` / `paddingBottom`.
 
 Then check the result with the grid overlay (Shift+G) against the live site:
-Mast's gutter is padding inside each column, Trix's is the row's `gap`, so the
+a `cc-` grid's gutter is padding inside each column, Trix's is the row's `gap`, so the
 column _boxes_ differ by half a gutter on each side while the content lines
 up. A column with a background or border shows the difference; give that
 background to an element inside the `Col`, which is where Trix wants it.

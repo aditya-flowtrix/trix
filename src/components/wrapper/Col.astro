@@ -75,7 +75,7 @@ const {
 const valid = (n?: number) =>
   n !== undefined && Number.isInteger(n) && n >= 1 && n <= 12;
 
-// ponytail: the automatic stacking assumes a 12-column grid (Mast's table, mobile-first).
+// ponytail: the automatic stacking assumes a 12-column grid, mobile-first.
 const smart = valid(span)
   ? {
       xs: span === 1 ? 1 : span === 2 ? 6 : 12,
