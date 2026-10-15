@@ -189,9 +189,13 @@ async function safari(): Promise<Driver | string> {
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const j = (await r.json()) as {
-      value: Record<string, unknown> & { message?: string };
+      value: Record<string, unknown> & { message?: string; error?: string };
     };
-    if (!r.ok) throw new Error(j.value?.message ?? `${r.status}`);
+    // Safari often sends an empty message: name the error and the call.
+    if (!r.ok)
+      throw new Error(
+        `${method} ${path.replace(/^\/session\/[^/]+/, "")}: ${j.value?.message || j.value?.error || r.status}`,
+      );
     return j.value;
   };
   let session: string;
