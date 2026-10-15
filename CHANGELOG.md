@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+### CI for private repositories
+
+Projects run in private repositories, where GitHub bills Actions by the
+minute. The workflow now spends about 5 minutes a push on a small site, from
+about 14:
+
+- One job installs and builds once, then tests the three engines every
+  browser is built on — Chromium, Firefox and WebKit. Edge and Brave are
+  Chromium, so their jobs went: they never found what Chrome didn't.
+  `npm run test:browsers` still tests them locally.
+- `--sample N` tests at most N pages per section (`/blog/…`); CI uses 5, so
+  a site of hundreds of CMS pages costs little more than one of dozens. Every
+  top-level page is always tested, and the report lists what was left out.
+- The SEO audit reads three pages at a time — a third of the time — and
+  still reads every page.
+- The weekly run audits dependencies and tries the newest Astro; it no longer
+  re-runs the browsers on code already tested. "Astro latest" runs weekly
+  and by hand, not on every push. Safari waits for the checks to pass.
+- Repository variables: `TRIX_BROWSERS`, `TRIX_PAGE_SAMPLE`, `TRIX_SAFARI`.
+  Testing → _A private repository's minutes_ has the budget.
+
 ## 0.3.0 — 2026-10-15
 
 From building a client design on Trix. Lumos stays the base and the defaults

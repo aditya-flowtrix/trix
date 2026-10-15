@@ -11,7 +11,12 @@
  *   npm run build && npm run test:browsers        every browser on this machine
  *   (refuses a dist/ older than src/, public/ or astro.config.mjs)
  *   node tests/browsers.ts --dir dist --browser firefox,brave
- *   options: --widths 375,768,1440   --pages /,/about
+ *   options: --widths 375,768,1440   --pages /,/about   --sample 5
+ *
+ * --sample N tests at most N pages per section (/blog/a, /blog/b … → N of
+ * them); every top-level page is always tested. CI passes it so a site of
+ * hundreds of CMS pages stays within a private repository's minutes. The
+ * SEO audit still reads every page and every link.
  *
  * Browsers: chrome, chromium, edge, brave (Playwright: Chromium-based, each
  * at its own install), firefox, webkit (Playwright's builds; WebKit is
@@ -661,6 +666,10 @@ const s = await serve(dir);
 origin = s.origin;
 const skipped: string[] = [];
 const missing = new Map<string, string>(); // page → a page linking to it
+// Pages per section, or every page: --sample 5, --sample all (the default).
+const sample = Number(opts.sample) > 0 ? Number(opts.sample) : 0;
+const section = (path: string) => path.replace(/\/[^/]*$/, "") || "/";
+const unsampled = new Map<string, number>(); // section → pages not tested
 
 for (const name of asked ?? all) {
   current = name;
@@ -676,6 +685,8 @@ for (const name of asked ?? all) {
     typeof opts.pages === "string" ? opts.pages.split(",") : ["/", "/404"]
   ).map((p) => [p, ""]);
   const seen = new Set<string>();
+  const sampled = new Map<string, number>();
+  const passed = new Map<string, number>(); // not tested, this browser
   while (queue.length) {
     const [path, from] = queue.shift()!;
     if (seen.has(path)) continue;
@@ -686,6 +697,15 @@ for (const name of asked ?? all) {
       if (!missing.has(path) && (await fetch(origin + path)).status === 404)
         missing.set(path, from);
       if (missing.has(path)) continue;
+    }
+    const sec = section(path);
+    if (sample && sec !== "/") {
+      const n = sampled.get(sec) ?? 0;
+      if (n >= sample) {
+        passed.set(sec, (passed.get(sec) ?? 0) + 1);
+        continue;
+      }
+      sampled.set(sec, n + 1);
     }
     const links = await testPage(driver, page, path).catch((e) => {
       const after = last;
@@ -704,6 +724,8 @@ for (const name of asked ?? all) {
           queue.push([u.pathname.replace(/(.)\/$/, "$1"), path]);
       }
   }
+  for (const [sec, n] of passed)
+    unsampled.set(sec, Math.max(unsampled.get(sec) ?? 0, n));
   await page.close();
   await driver.close();
 }
@@ -725,6 +747,13 @@ output(
     ...(skipped.length
       ? ["", "Not run:", ...skipped.map((x) => `- ${x}`)]
       : []),
+    ...(unsampled.size
+      ? [
+          "",
+          `Sampled, ${sample} pages per section — not tested:`,
+          ...[...unsampled].map(([sec, n]) => `- ${sec}/… ${n} more`),
+        ]
+      : []),
     "",
     "| Browser | Where | Check | Result |",
     "| --- | --- | --- | --- |",
@@ -736,4 +765,8 @@ output(
 );
 console.log(`\n${summary.join(" · ")}`);
 if (skipped.length) console.log(`Not run — ${skipped.join("; ")}`);
+if (unsampled.size)
+  console.log(
+    `Sampled ${sample} per section; not tested: ${[...unsampled].map(([sec, n]) => `${sec}/… ${n}`).join(", ")}`,
+  );
 process.exit(results.some((r) => !r.ok) ? 1 : 0);

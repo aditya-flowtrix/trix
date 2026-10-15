@@ -129,10 +129,7 @@ const pages = new Map<string, Page>();
 const todo = ["/", ...inSitemap];
 const linkedFrom = new Map<string, string>();
 const browser = await launch();
-const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-while (todo.length && pages.size < max) {
-  const path = todo.shift()!;
-  if (pages.has(path)) continue;
+const visit = async (page: import("playwright-core").Page, path: string) => {
   let status = 0;
   try {
     const response = await page.goto(origin + path, {
@@ -148,7 +145,7 @@ while (todo.length && pages.size < max) {
   }
   if (status !== 200) {
     pages.set(path, { path, status } as Page);
-    continue;
+    return;
   }
   // A late navigation (an error page settling) can reset the page: retry once.
   const collect = () =>
@@ -222,10 +219,41 @@ while (todo.length && pages.size < max) {
     const target = pathOf(href);
     if (!target || /\.(pdf|jpe?g|png|webp|avif|svg|zip|xml|txt)$/i.test(target))
       continue;
-    if (!linkedFrom.has(target)) linkedFrom.set(target, path);
+    // The first linking page in path order, so the report is the same
+    // however the parallel visits finish.
+    const from = linkedFrom.get(target);
+    if (!from || path < from) linkedFrom.set(target, path);
     if (!pages.has(target)) todo.push(target);
   }
-}
+};
+// Three pages at a time: a site of hundreds of pages is read in a third of
+// the time, which is CI minutes in a private repository.
+const claimed = new Set<string>();
+let active = 0;
+await Promise.all(
+  Array.from({ length: 3 }, async () => {
+    const page = await browser.newPage({
+      viewport: { width: 390, height: 844 },
+    });
+    for (;;) {
+      const path = todo.shift();
+      if (path === undefined) {
+        if (!active) break;
+        await new Promise((r) => setTimeout(r, 25));
+        continue;
+      }
+      if (claimed.has(path) || claimed.size >= max) continue;
+      claimed.add(path);
+      active++;
+      await visit(page, path).finally(() => active--);
+    }
+    await page.close();
+  }),
+);
+// Path order, not finishing order, so two runs report alike.
+const sorted = [...pages].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+pages.clear();
+for (const [k, v] of sorted) pages.set(k, v);
 await browser.close();
 close();
 

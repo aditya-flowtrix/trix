@@ -1,14 +1,26 @@
 # The checks every push must pass — in the Trix repository and in every
 # project made from it (`npm create trix-astro` copies this file). Steps for
 # the framework's own docs site and installer run only where those exist.
+#
+# Built for a private repository, where GitHub bills every job by the minute,
+# rounded up: one job installs and builds once, then tests the three browser
+# engines — Chromium, Firefox and WebKit — that every browser is built on.
+# About 5 minutes a push for a small site. Repository variables (Settings →
+# Secrets and variables → Actions → Variables) tune it:
+#   TRIX_BROWSERS     chrome,firefox,webkit (default) — or fewer, e.g. chrome
+#   TRIX_PAGE_SAMPLE  pages tested per section, default 5 (/blog/* → 5 posts);
+#                     every top-level page is always tested; all = every page
+#   TRIX_SAFARI       on — also test real Safari (macOS, 10× the Linux rate)
 name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
-  # Monday morning, so an Astro release is found within a week of landing
-  # rather than whenever someone next happens to upgrade.
+  workflow_dispatch:
+  # Monday morning: new security advisories, and whether the newest Astro
+  # still builds the site. The code is the one already tested, so the
+  # browsers are not run again.
   schedule:
     - cron: "0 6 * * 1"
 
@@ -18,9 +30,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Type-check and build
+  test:
+    name: Check, build and test
     runs-on: ubuntu-latest
+    # A browser that hangs fails here, instead of spending minutes for hours.
+    timeout-minutes: 25
+    env:
+      BROWSERS: ${{ vars.TRIX_BROWSERS || 'chrome,firefox,webkit' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -51,7 +67,7 @@ jobs:
       - run: npm run build
 
       # What search engines read, page by page, in Chrome: titles, canonicals,
-      # one h1, alt text, structured data, broken links, sitemap.
+      # one h1, alt text, structured data, broken links, sitemap — every page.
       - run: npm run seo
 
       # The docs site renders every component as it is now, so a component
@@ -63,54 +79,21 @@ jobs:
           npm run docs:build
           node scripts/seo/audit.ts --dir site/dist
 
-  browsers:
-    name: Browser (${{ matrix.browser }})
-    runs-on: ${{ matrix.os }}
-    # A browser that hangs fails here, instead of holding a runner for hours.
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { browser: chrome, os: ubuntu-latest }
-          - { browser: edge, os: ubuntu-latest }
-          - { browser: brave, os: ubuntu-latest }
-          - { browser: firefox, os: ubuntu-latest }
-          - { browser: webkit, os: ubuntu-latest }
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22.19.0
-          cache: npm
-
-      - run: npm ci
-
-      - run: npm run build
-
-      # Chrome and Edge come with the Ubuntu image; the rest are installed.
-      - name: Install Firefox or WebKit
-        if: matrix.browser == 'firefox' || matrix.browser == 'webkit'
-        run: npx playwright-core install --with-deps ${{ matrix.browser }}
-
-      - name: Install Edge if missing
-        if: matrix.browser == 'edge'
-        run: command -v microsoft-edge || npx playwright-core install --with-deps msedge
-
-      - name: Install Brave
-        if: matrix.browser == 'brave'
+      # Chrome comes with the Ubuntu image; Firefox and WebKit are installed.
+      - name: Install Firefox and WebKit
+        if: github.event_name != 'schedule'
         run: |
-          sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-          sudo apt-get update && sudo apt-get install -y brave-browser
+          engines=$(echo "$BROWSERS" | tr ',' '\n' | grep -E '^(firefox|webkit)$' | tr '\n' ' ')
+          [ -z "$engines" ] || npx playwright-core install --with-deps $engines
 
-      - run: node tests/browsers.ts --browser ${{ matrix.browser }}
+      - name: Every page in every engine
+        if: github.event_name != 'schedule'
+        run: node tests/browsers.ts --browser "$BROWSERS" --sample "${{ vars.TRIX_PAGE_SAMPLE || '5' }}"
 
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: browsers-${{ matrix.browser }}
+          name: browsers
           path: .trix/browsers.md
 
   safari:
@@ -118,8 +101,9 @@ jobs:
     # The real Safari runs only on macOS, which GitHub bills at ten times the
     # Linux rate in a private repository. So it runs on every push of a public
     # one; a private project relies on WebKit — Safari's engine, tested above —
-    # unless its repository variable TRIX_SAFARI is "on". Never on the weekly
-    # run, which is there for Astro releases.
+    # unless its repository variable TRIX_SAFARI is "on". Only once the checks
+    # pass, and never on the weekly run.
+    needs: test
     if: github.event_name != 'schedule' && (!github.event.repository.private || vars.TRIX_SAFARI == 'on')
     runs-on: macos-latest
     timeout-minutes: 20
@@ -137,7 +121,7 @@ jobs:
 
       - run: sudo safaridriver --enable
 
-      - run: node tests/browsers.ts --browser safari
+      - run: node tests/browsers.ts --browser safari --sample "${{ vars.TRIX_PAGE_SAMPLE || '5' }}"
 
       - if: failure()
         uses: actions/upload-artifact@v7
@@ -147,9 +131,11 @@ jobs:
 
   astro-latest:
     name: Astro latest (advisory)
+    # Weekly (or by hand from the Actions tab), not on every push: it reports
+    # that Astro moved, which changes on Astro's schedule, not the site's.
+    # A signal, not a gate — red here never blocks a merge.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    # A signal, not a gate. Red here means Astro moved, not that this branch is
-    # broken, so it never blocks a merge — it just says the pairing needs a look.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
