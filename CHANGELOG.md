@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-10-15
+
+Trix is Flowtrix's alone, with cookie consent, a before/after `Compare`, and
+a Figma import that asks what moves. One breaking change: a hand-written
+section's background now goes in `.section_background` — see below.
 
 ### Trix is Flowtrix's own
 
