@@ -7,14 +7,14 @@ order: 3
 A fluid token is a pair, in px, the way a designer measures it:
 
 ```css
---space-7-min: 32; /* at a 320px screen — Figma's Mobile mode */
---space-7-max: 40; /* at a 1440px screen — Figma's Desktop mode */
+--space-6-min: 32; /* at a 320px screen — Figma's Mobile mode */
+--space-6-max: 40; /* at a 1440px screen — Figma's Desktop mode */
 ```
 
 `npm run tokens` turns the pair into one `clamp()`:
 
 ```css
---space-7: clamp(2rem, 1.857rem + 0.714vw, 2.5rem);
+--space-6: clamp(2rem, 1.857rem + 0.714vw, 2.5rem);
 ```
 
 Below 320px it holds at 32px, above 1440px at 40px, and between them it grows
@@ -33,7 +33,7 @@ setting; WCAG 1.4.4 asks that it doesn't.
 | Fluid                                     | Fixed                                               |
 | ----------------------------------------- | --------------------------------------------------- |
 | font sizes (every text style)             | font weights, line heights, letter spacing (ratios) |
-| `--space-1` … `--space-12`, section sizes | radius, border width                                |
+| `--space-1` … `--space-11`, section sizes | radius, border width                                |
 | `--site-margin`, `--site-gutter`          | breakpoints, max widths                             |
 
 ## Breakpoints still exist

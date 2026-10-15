@@ -23,7 +23,7 @@ container stacks its children with a `gap` — so **the space between blocks
 belongs to the section, not to the blocks**.
 
 ```astro
-<Section paddingTop="large" gap="7">
+<Section paddingTop="large" gap="6">
   <Eyebrow>Services</Eyebrow>
   <Heading tag="h2">What we do</Heading>
   <Grid medium={3}>…</Grid>
@@ -39,12 +39,12 @@ development to see it.
 
 ```astro live stage="block"
 <Row>
-  <Col span={8} class="background-skeleton radius-small padding-5">span 8</Col>
-  <Col span={4} class="background-skeleton radius-small padding-5">span 4</Col>
-  <Col span={5} offset={1} class="background-skeleton radius-small padding-5"
+  <Col span={8} class="background-skeleton radius-small padding-4">span 8</Col>
+  <Col span={4} class="background-skeleton radius-small padding-4">span 4</Col>
+  <Col span={5} offset={1} class="background-skeleton radius-small padding-4"
     >span 5, offset 1</Col
   >
-  <Col span={6} class="background-skeleton radius-small padding-5">span 6</Col>
+  <Col span={6} class="background-skeleton radius-small padding-4">span 6</Col>
 </Row>
 ```
 

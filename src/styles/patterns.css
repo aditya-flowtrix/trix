@@ -35,7 +35,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: var(--_alignment, start);
-  --_gap-size: var(--space-9);
+  --_gap-size: var(--space-8);
   gap: var(--_gap-size);
   position: relative;
   margin-inline: auto;
@@ -46,13 +46,13 @@
 }
 
 .button-wrapper {
-  margin-top: var(--space-7);
+  margin-top: var(--space-6);
   display: flex;
   flex-flow: wrap;
   align-items: center;
   justify-content: var(--_alignment, start);
-  grid-column-gap: var(--space-3);
-  grid-row-gap: var(--space-3);
+  grid-column-gap: var(--space-2);
+  grid-row-gap: var(--space-2);
 }
 
 .image {
@@ -181,7 +181,7 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   width: 100%;
 }
 

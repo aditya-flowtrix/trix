@@ -50,23 +50,23 @@ const content = await slotContent(Astro.slots);
     .style-guide-group_wrap {
       display: flex;
       flex-direction: column;
-      gap: var(--space-6);
+      gap: var(--space-5);
       width: 100%;
 
       .style-guide-group_list {
         display: flex;
         flex-direction: column;
-        gap: var(--space-7);
+        gap: var(--space-6);
       }
 
       &.rows .style-guide-group_list {
-        gap: var(--space-4);
+        gap: var(--space-3);
       }
 
       &.grid .style-guide-group_list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(14rem, 40%), 1fr));
-        gap: var(--space-6) var(--site-gutter);
+        gap: var(--space-5) var(--site-gutter);
       }
 
       &.scroll .style-guide-group_list {

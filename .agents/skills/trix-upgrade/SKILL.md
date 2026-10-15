@@ -110,6 +110,24 @@ taking the new skill, and say so in the report.
 
 ### 5. Merge `tokens.css` and `themes.css` rather than replacing them
 
+**From Trix 0.2 to 0.3, rename the tokens first.** 0.3 took Lumos for Astro's
+names for the scales (values unchanged): `--space-N` became `--space-(N-1)`
+with every `gap-N`, `padding-*-N`, `margin-*-N` and spacing prop; the
+line heights, letter spacing and `--radius-medium` → `--radius-main` moved
+too. One script does all of it in one pass, before the three-way merge below:
+
+```bash
+node .agents/skills/trix-upgrade/rename-lumos-names.mjs          # what it would change
+node .agents/skills/trix-upgrade/rename-lumos-names.mjs --write
+```
+
+It refuses when the site uses one of the three 0.2 tokens with no 0.3 name
+(`--space-1` at 4px, `--line-height-medium` 1.2, `--letter-spacing-tight`
+-0.02em) and lists where — ask the owner whether to keep each as the site's
+own token or write the value in place. Run it in the `base` reference copy
+from step 3 too, so the merge compares like with like. Step 8 then proves
+nothing moved.
+
 Global CSS is the file most likely to be in the fourth pile: the framework adds
 tokens, the user changes brand colours and fonts. Merge it three ways, token by
 token, and hold to two rules:
@@ -201,7 +219,7 @@ upgrade has an exact base. Then delete `.trix-upgrade/`.
 
 ## Versions
 
-- **Skill version** — 1.0.0.
+- **Skill version** — 1.1.0.
 - **Framework** — Trix is versioned in `package.json` (`trix.version`) and
   `CHANGELOG.md`. Prefer a tagged release as "latest" and read the changelog in
   step 4 rather than diffing blind; the stamp's commit stays the merge base.
@@ -226,15 +244,14 @@ git merge upstream/main
 Expect conflicts where Trix diverged on purpose, and resolve them toward
 Trix's conventions:
 
-| Lumos                                           | Trix                                                        |
-| ----------------------------------------------- | ----------------------------------------------------------- |
-| tokens, themes and text styles in `base.css`    | `tokens.css`, `themes.css`, generated `text-styles.css`     |
-| `--space-1…8`                                   | `--space-1…12` — Lumos step N is Trix step N+1, same values |
-| `--radius-main`                                 | `--radius-medium`                                           |
-| breakpoint `64rem`                              | `62rem` (Webflow's 992px)                                   |
-| `--light-*`, `--dark-*`, `--brand-500` swatches | `--neutral-*`, `--brand-*` ramps                            |
-| `[lumos]` dev warnings, `lumos-*` skills        | `[trix]`, `trix-*`                                          |
-| project record inside the Webflow skill         | `PROJECT.md`                                                |
+| Lumos                                           | Trix                                                      |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| tokens, themes and text styles in `base.css`    | `tokens.css`, `themes.css`, generated `text-styles.css`   |
+| `--space-1…8`                                   | the same names and values, then `--space-9…11` above them |
+| breakpoint `64rem`                              | `62rem` (Webflow's 992px)                                 |
+| `--light-*`, `--dark-*`, `--brand-500` swatches | `--neutral-*`, `--brand-*` ramps                          |
+| `[lumos]` dev warnings, `lumos-*` skills        | `[trix]`, `trix-*`                                        |
+| project record inside the Webflow skill         | `PROJECT.md`                                              |
 
 After the merge: `npm run tokens && npm run check && npm run build`, then
 update `trix.basedOn` in `package.json` to the merged upstream commit and add

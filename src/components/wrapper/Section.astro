@@ -39,7 +39,7 @@ const {
   theme = "inherit",
   paddingTop = "medium",
   paddingBottom = "medium",
-  gap = "9",
+  gap = "8",
   align,
   fullHeight = false,
   animate = false,
@@ -84,7 +84,7 @@ const background = await slotContent(Astro.slots, "background");
         <div
           class:list={[
             "container",
-            gap !== "9" && `gap-${gap}`,
+            gap !== "8" && `gap-${gap}`,
             containerClass,
             containerAttrsClass,
           ]}

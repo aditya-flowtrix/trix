@@ -10,11 +10,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.xsmall}"
+      "$value": "{line-height.small}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h1": {
@@ -28,11 +28,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.xsmall}"
+      "$value": "{line-height.small}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h2": {
@@ -46,11 +46,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.xsmall}"
+      "$value": "{line-height.small}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h3": {
@@ -64,11 +64,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.small}"
+      "$value": "{line-height.medium}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h4": {
@@ -82,11 +82,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.small}"
+      "$value": "{line-height.medium}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h5": {
@@ -100,11 +100,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.small}"
+      "$value": "{line-height.medium}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "h6": {
@@ -118,11 +118,11 @@
     },
     "line-height": {
       "$type": "number",
-      "$value": "{line-height.small}"
+      "$value": "{line-height.medium}"
     },
     "letter-spacing": {
       "$type": "number",
-      "$value": "{letter-spacing.tighter}"
+      "$value": "{letter-spacing.tight}"
     }
   },
   "text-xlarge": {

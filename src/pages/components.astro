@@ -96,7 +96,7 @@ const lorem =
       <Eyebrow>auto-width</Eyebrow>
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={28} slot="column2">{text}</Paragraph>
-      <ButtonWrapper slot="column2" marginTop="5">
+      <ButtonWrapper slot="column2" marginTop="4">
         <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
@@ -242,7 +242,7 @@ const lorem =
       <Eyebrow>auto-width</Eyebrow>
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Paragraph maxWidth={28} slot="column2">{text}</Paragraph>
-      <ButtonWrapper slot="column2" marginTop="5">
+      <ButtonWrapper slot="column2" marginTop="4">
         <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
     </ContentWrapper>
@@ -280,7 +280,7 @@ const lorem =
   </Section>
   <!-- row: media and text, 6 + 5 with a column of air -->
   <Section paddingTop="small" paddingBottom="small">
-    <Row align="center" rowGap="9">
+    <Row align="center" rowGap="8">
       <Col span={6}>
         <Eyebrow>row · span 6 + span 5 offset 1</Eyebrow>
         <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
@@ -311,7 +311,7 @@ const lorem =
   </Section>
   <!-- row: sidebar 4 + 8, image first on desktop -->
   <Section paddingTop="small" paddingBottom="small">
-    <Row rowGap="9">
+    <Row rowGap="8">
       <Col span={8}>
         <RichText>
           <h3>Body copy on 8 columns</h3>
@@ -330,7 +330,7 @@ const lorem =
   <!-- row: 4 features, revealed in turn -->
   <Section paddingTop="small" paddingBottom="small">
     <Eyebrow>row animate · span 3 × 4</Eyebrow>
-    <Row animate rowGap="9">
+    <Row animate rowGap="8">
       {
         ["squares-four", "lightning", "shield-check", "chart-line-up"].map(
           (icon) => (
@@ -406,7 +406,7 @@ const lorem =
         <Textarea label="Message" placeholder="Your message" required />
       </Fieldset>
 
-      <ButtonWrapper marginTop="5">
+      <ButtonWrapper marginTop="4">
         <Button type="submit">Submit</Button>
       </ButtonWrapper>
     </Form>

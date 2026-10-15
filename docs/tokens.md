@@ -63,9 +63,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Value |
 | --- | --- |
-| `--line-height-xsmall` | `1` |
-| `--line-height-small` | `1.1` |
-| `--line-height-medium` | `1.2` |
+| `--line-height-small` | `1` |
+| `--line-height-medium` | `1.1` |
 | `--line-height-large` | `1.3` |
 | `--line-height-xlarge` | `1.4` |
 | `--line-height-huge` | `1.5` |
@@ -74,8 +73,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Value |
 | --- | --- |
-| `--letter-spacing-tighter` | `-0.03em` |
-| `--letter-spacing-tight` | `-0.02em` |
+| `--letter-spacing-tight` | `-0.03em` |
 | `--letter-spacing-normal` | `0em` |
 | `--letter-spacing-wide` | `0.05em` |
 | `--letter-spacing-wider` | `0.1em` |
@@ -87,12 +85,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--display` | 64px | 112px |
 | `--display-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--display-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--display-line-height` | `var(--line-height-xsmall) → 1` | `var(--line-height-xsmall) → 1` |
-| `--display-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--display-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
+| `--display-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--display-text-transform` | `none` | `none` |
 | `--display-text-wrap` | `balance` | `balance` |
-| `--display-margin-top` | `var(--space-8)` | `var(--space-8)` |
-| `--display-margin-bottom` | `var(--space-7)` | `var(--space-7)` |
+| `--display-margin-top` | `var(--space-7)` | `var(--space-7)` |
+| `--display-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
 | `--display-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--display-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -103,12 +101,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h1` | 48px | 80px |
 | `--h1-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h1-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h1-line-height` | `var(--line-height-xsmall) → 1` | `var(--line-height-xsmall) → 1` |
-| `--h1-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h1-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
+| `--h1-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h1-text-transform` | `none` | `none` |
 | `--h1-text-wrap` | `balance` | `balance` |
-| `--h1-margin-top` | `var(--space-8)` | `var(--space-8)` |
-| `--h1-margin-bottom` | `var(--space-7)` | `var(--space-7)` |
+| `--h1-margin-top` | `var(--space-7)` | `var(--space-7)` |
+| `--h1-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
 | `--h1-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h1-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -119,12 +117,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h2` | 40px | 64px |
 | `--h2-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h2-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h2-line-height` | `var(--line-height-xsmall) → 1` | `var(--line-height-xsmall) → 1` |
-| `--h2-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h2-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
+| `--h2-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h2-text-transform` | `none` | `none` |
 | `--h2-text-wrap` | `balance` | `balance` |
-| `--h2-margin-top` | `var(--space-8)` | `var(--space-8)` |
-| `--h2-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
+| `--h2-margin-top` | `var(--space-7)` | `var(--space-7)` |
+| `--h2-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
 | `--h2-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h2-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -135,12 +133,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h3` | 36px | 48px |
 | `--h3-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h3-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h3-line-height` | `var(--line-height-small) → 1.1` | `var(--line-height-small) → 1.1` |
-| `--h3-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h3-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
+| `--h3-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h3-text-transform` | `none` | `none` |
 | `--h3-text-wrap` | `balance` | `balance` |
-| `--h3-margin-top` | `var(--space-7)` | `var(--space-7)` |
-| `--h3-margin-bottom` | `var(--space-6)` | `var(--space-6)` |
+| `--h3-margin-top` | `var(--space-6)` | `var(--space-6)` |
+| `--h3-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
 | `--h3-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h3-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -151,12 +149,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h4` | 28px | 32px |
 | `--h4-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h4-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h4-line-height` | `var(--line-height-small) → 1.1` | `var(--line-height-small) → 1.1` |
-| `--h4-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h4-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
+| `--h4-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h4-text-transform` | `none` | `none` |
 | `--h4-text-wrap` | `balance` | `balance` |
-| `--h4-margin-top` | `var(--space-7)` | `var(--space-7)` |
-| `--h4-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--h4-margin-top` | `var(--space-6)` | `var(--space-6)` |
+| `--h4-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--h4-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h4-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -167,12 +165,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h5` | 22px | 24px |
 | `--h5-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h5-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h5-line-height` | `var(--line-height-small) → 1.1` | `var(--line-height-small) → 1.1` |
-| `--h5-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h5-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
+| `--h5-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h5-text-transform` | `none` | `none` |
 | `--h5-text-wrap` | `balance` | `balance` |
-| `--h5-margin-top` | `var(--space-6)` | `var(--space-6)` |
-| `--h5-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--h5-margin-top` | `var(--space-5)` | `var(--space-5)` |
+| `--h5-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--h5-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h5-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -183,12 +181,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--h6` | 16px | 18px |
 | `--h6-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h6-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
-| `--h6-line-height` | `var(--line-height-small) → 1.1` | `var(--line-height-small) → 1.1` |
-| `--h6-letter-spacing` | `var(--letter-spacing-tighter) → -0.03em` | `var(--letter-spacing-tighter) → -0.03em` |
+| `--h6-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
+| `--h6-letter-spacing` | `var(--letter-spacing-tight) → -0.03em` | `var(--letter-spacing-tight) → -0.03em` |
 | `--h6-text-transform` | `none` | `none` |
 | `--h6-text-wrap` | `balance` | `balance` |
-| `--h6-margin-top` | `var(--space-6)` | `var(--space-6)` |
-| `--h6-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
+| `--h6-margin-top` | `var(--space-5)` | `var(--space-5)` |
+| `--h6-margin-bottom` | `var(--space-3)` | `var(--space-3)` |
 | `--h6-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--h6-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -203,8 +201,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-xlarge-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-xlarge-text-transform` | `none` | `none` |
 | `--text-xlarge-text-wrap` | `pretty` | `pretty` |
-| `--text-xlarge-margin-top` | `var(--space-5)` | `var(--space-5)` |
-| `--text-xlarge-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--text-xlarge-margin-top` | `var(--space-4)` | `var(--space-4)` |
+| `--text-xlarge-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-xlarge-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--text-xlarge-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -219,8 +217,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-large-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-large-text-transform` | `none` | `none` |
 | `--text-large-text-wrap` | `pretty` | `pretty` |
-| `--text-large-margin-top` | `var(--space-5)` | `var(--space-5)` |
-| `--text-large-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--text-large-margin-top` | `var(--space-4)` | `var(--space-4)` |
+| `--text-large-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-large-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--text-large-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -235,8 +233,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-main-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-main-text-transform` | `none` | `none` |
 | `--text-main-text-wrap` | `pretty` | `pretty` |
-| `--text-main-margin-top` | `var(--space-5)` | `var(--space-5)` |
-| `--text-main-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--text-main-margin-top` | `var(--space-4)` | `var(--space-4)` |
+| `--text-main-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-main-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--text-main-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -251,8 +249,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-small-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-small-text-transform` | `none` | `none` |
 | `--text-small-text-wrap` | `pretty` | `pretty` |
-| `--text-small-margin-top` | `var(--space-5)` | `var(--space-5)` |
-| `--text-small-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--text-small-margin-top` | `var(--space-4)` | `var(--space-4)` |
+| `--text-small-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-small-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--text-small-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -267,8 +265,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-xsmall-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-xsmall-text-transform` | `none` | `none` |
 | `--text-xsmall-text-wrap` | `pretty` | `pretty` |
-| `--text-xsmall-margin-top` | `var(--space-4)` | `var(--space-4)` |
-| `--text-xsmall-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
+| `--text-xsmall-margin-top` | `var(--space-3)` | `var(--space-3)` |
+| `--text-xsmall-margin-bottom` | `var(--space-3)` | `var(--space-3)` |
 | `--text-xsmall-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--text-xsmall-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -283,8 +281,8 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--eyebrow-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--eyebrow-text-transform` | `none` | `none` |
 | `--eyebrow-text-wrap` | `pretty` | `pretty` |
-| `--eyebrow-margin-top` | `var(--space-5)` | `var(--space-5)` |
-| `--eyebrow-margin-bottom` | `var(--space-5)` | `var(--space-5)` |
+| `--eyebrow-margin-top` | `var(--space-4)` | `var(--space-4)` |
+| `--eyebrow-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--eyebrow-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
 | `--eyebrow-trim-bottom` | `var(--primary-trim-bottom) → 0.364em` | `var(--primary-trim-bottom) → 0.364em` |
 
@@ -292,18 +290,17 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--space-1` | 4px | 4px |
-| `--space-2` | 6px | 8px |
-| `--space-3` | 10px | 12px |
-| `--space-4` | 14px | 16px |
-| `--space-5` | 20px | 24px |
-| `--space-6` | 28px | 32px |
-| `--space-7` | 32px | 40px |
-| `--space-8` | 36px | 48px |
-| `--space-9` | 40px | 64px |
-| `--space-10` | 48px | 80px |
-| `--space-11` | 56px | 96px |
-| `--space-12` | 64px | 128px |
+| `--space-1` | 6px | 8px |
+| `--space-2` | 10px | 12px |
+| `--space-3` | 14px | 16px |
+| `--space-4` | 20px | 24px |
+| `--space-5` | 28px | 32px |
+| `--space-6` | 32px | 40px |
+| `--space-7` | 36px | 48px |
+| `--space-8` | 40px | 64px |
+| `--space-9` | 48px | 80px |
+| `--space-10` | 56px | 96px |
+| `--space-11` | 64px | 128px |
 
 ## Spacing — section
 
@@ -322,7 +319,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | --- | --- |
 | `--radius-xsmall` | `0.25rem` |
 | `--radius-small` | `0.5rem` |
-| `--radius-medium` | `1rem` |
+| `--radius-main` | `1rem` |
 | `--radius-large` | `1.5rem` |
 | `--radius-round` | `100vw` |
 
@@ -404,7 +401,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Value |
 | --- | --- |
-| `--card-radius` | `var(--radius-medium) → 1rem` |
+| `--card-radius` | `var(--radius-main) → 1rem` |
 
 ## Components — tag
 

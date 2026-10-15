@@ -20,7 +20,7 @@
 
     @media (width >= 62rem) {
       grid-template-columns: 15rem minmax(0, 46rem);
-      gap: var(--space-11);
+      gap: var(--space-10);
     }
   }
   .docs_menu {
@@ -29,9 +29,9 @@
     z-index: 5;
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
     margin-inline: calc(var(--site-margin) * -1);
-    padding: var(--space-3) var(--site-margin);
+    padding: var(--space-2) var(--site-margin);
     border: 0;
     border-bottom: var(--border-width) solid var(--border);
     background-color: var(--background);
@@ -52,7 +52,7 @@
     width: min(20rem, 85vw);
     height: 100dvh;
     margin: 0;
-    padding: var(--space-6) var(--space-5);
+    padding: var(--space-5) var(--space-4);
     overflow-y: auto;
     border: 0;
     border-right: var(--border-width) solid var(--border);
@@ -69,16 +69,16 @@
       display: block;
       width: auto;
       height: calc(100dvh - 3.5rem);
-      padding: var(--space-8) var(--space-2) var(--space-8) 0;
+      padding: var(--space-7) var(--space-1) var(--space-7) 0;
       border: 0;
       background: none;
     }
   }
   .docs-nav_group + .docs-nav_group {
-    margin-top: var(--space-7);
+    margin-top: var(--space-6);
   }
   .docs-nav_label {
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
     color: var(--text-2);
     font-size: var(--text-xsmall);
     font-weight: var(--primary-semibold);
@@ -93,7 +93,7 @@
     a {
       display: flex;
       align-items: center;
-      gap: var(--space-2);
+      gap: var(--space-1);
       padding: 0.3125rem 0.625rem;
       border-radius: var(--radius-small);
       color: var(--text-2);
@@ -125,18 +125,18 @@
 
   .docs_main {
     min-width: 0;
-    padding-block: var(--space-9) var(--space-12);
+    padding-block: var(--space-8) var(--space-11);
   }
   .docs_header {
-    padding-bottom: var(--space-7);
-    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-7);
     border-bottom: var(--border-width) solid var(--border);
   }
   .docs_eyebrow {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     color: var(--text-2);
     font-size: var(--text-xsmall);
     font-weight: var(--primary-semibold);
@@ -154,17 +154,17 @@
     text-transform: none;
   }
   .docs_title {
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
     font-size: var(--h3);
   }
   .docs_lead {
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
     color: var(--text-2);
     font-size: var(--text-large);
   }
   .docs_footer {
-    margin-top: var(--space-11);
-    padding-top: var(--space-7);
+    margin-top: var(--space-10);
+    padding-top: var(--space-6);
     border-top: var(--border-width) solid var(--border);
   }
   .docs_edit {
@@ -174,16 +174,16 @@
   .docs_pager {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-    margin-top: var(--space-6);
+    gap: var(--space-3);
+    margin-top: var(--space-5);
   }
   .docs_pager_link {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
-    padding: var(--space-4) var(--space-5);
+    gap: 0.25rem;
+    padding: var(--space-3) var(--space-4);
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-medium);
+    border-radius: var(--radius-main);
     color: var(--text);
     font-weight: var(--primary-medium);
     text-decoration: none;
@@ -207,24 +207,24 @@
 
   .docs-prose {
     > * + * {
-      margin-top: var(--space-5);
+      margin-top: var(--space-4);
     }
     > h2 {
-      margin-top: var(--space-11);
+      margin-top: var(--space-10);
       font-size: var(--h4);
     }
     > h3 {
-      margin-top: var(--space-9);
+      margin-top: var(--space-8);
       font-size: var(--h6);
     }
     > :is(h2, h3) + * {
-      margin-top: var(--space-4);
+      margin-top: var(--space-3);
     }
     > :is(ul, ol) {
       padding-left: 1.25em;
 
       li + li {
-        margin-top: var(--space-2);
+        margin-top: var(--space-1);
       }
     }
     > :is(p, ul, ol, table, .aside_wrap) a {
@@ -252,7 +252,7 @@
       font-size: var(--text-small);
     }
     > table :is(th, td) {
-      padding: var(--space-3) var(--space-4) var(--space-3) 0;
+      padding: var(--space-2) var(--space-3) var(--space-2) 0;
       border-bottom: var(--border-width) solid var(--border);
       text-align: start;
       vertical-align: top;
@@ -261,7 +261,7 @@
       font-weight: var(--primary-semibold);
     }
     > blockquote {
-      padding-left: var(--space-5);
+      padding-left: var(--space-4);
       border-left: 0.1875rem solid var(--border);
       color: var(--text-2);
     }
@@ -292,14 +292,14 @@
   /* The box — the pre itself until the script wraps it, then the wrapper. */
   pre.astro-code,
   .code_wrap {
-    padding: var(--space-5);
+    padding: var(--space-4);
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-medium);
+    border-radius: var(--radius-main);
     background-color: var(--code-background);
     text-align: start;
   }
   .code_wrap {
-    padding-top: var(--space-4);
+    padding-top: var(--space-3);
 
     pre.astro-code {
       padding: 0;
@@ -309,7 +309,7 @@
     }
   }
   .code_lang {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
     color: var(--text-2);
     font-family: var(--mono-family);
     font-size: var(--text-xsmall);
@@ -318,12 +318,12 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
-    column-gap: var(--space-4);
+    column-gap: var(--space-3);
   }
   .copy_button {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: 0.25rem;
     /* Exactly one code line tall, so it sits level with the first line. */
     height: calc(var(--text-small) * 1.6);
     padding: 0;
@@ -344,7 +344,7 @@
   .example_wrap {
     margin-inline: 0;
     border: var(--border-width) solid var(--border);
-    border-radius: var(--radius-medium);
+    border-radius: var(--radius-main);
     overflow: hidden;
 
     > :is(pre.astro-code, .code_wrap) {
@@ -357,8 +357,8 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-8) var(--space-7);
+    gap: var(--space-3);
+    padding: var(--space-7) var(--space-6);
 
     > [class] {
       margin-block: 0;
@@ -366,7 +366,7 @@
     &[data-stage="stack"] {
       flex-direction: column;
       align-items: stretch;
-      gap: var(--space-5);
+      gap: var(--space-4);
     }
     &[data-stage="block"] {
       display: block;
@@ -388,7 +388,7 @@
     font-size: var(--text-small);
 
     :is(th, td) {
-      padding: var(--space-3) var(--space-4) var(--space-3) 0;
+      padding: var(--space-2) var(--space-3) var(--space-2) 0;
       border-bottom: var(--border-width) solid var(--border);
       text-align: start;
       vertical-align: top;
@@ -422,14 +422,14 @@
   /* ---------- Aside ---------- */
 
   .aside_wrap {
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-4);
     border: var(--border-width) solid var(--border);
     border-left-width: 0.1875rem;
     border-radius: var(--radius-small);
     background-color: var(--background-2);
 
     > * + * {
-      margin-top: var(--space-2);
+      margin-top: var(--space-1);
     }
     &.tip {
       border-left-color: var(--heading-accent);

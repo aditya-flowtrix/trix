@@ -219,7 +219,7 @@ const lorem =
   </Section>
 
   <!-- Brand -->
-  <Section id="brand" gap="9">
+  <Section id="brand" gap="8">
     <StyleGuideTitle>Brand</StyleGuideTitle>
 
     <StyleGuideGroup title="Logo" variant="grid">
@@ -279,7 +279,7 @@ const lorem =
   </Section>
 
   <!-- Typography -->
-  <Section id="typography" gap="9" paddingTop="none">
+  <Section id="typography" gap="8" paddingTop="none">
     <StyleGuideTitle>Typography</StyleGuideTitle>
 
     <StyleGuideGroup title="Text styles">
@@ -374,7 +374,7 @@ const lorem =
   </Section>
 
   <!-- Colors -->
-  <Section id="colors" gap="9" paddingTop="none">
+  <Section id="colors" gap="8" paddingTop="none">
     <StyleGuideTitle>Colors</StyleGuideTitle>
 
     {
@@ -405,7 +405,7 @@ const lorem =
   </Section>
 
   <!-- Spacing -->
-  <Section id="spacing" gap="9" paddingTop="none">
+  <Section id="spacing" gap="8" paddingTop="none">
     <StyleGuideTitle>Spacing</StyleGuideTitle>
 
     <StyleGuideGroup title="Space scale" variant="rows">
@@ -462,7 +462,7 @@ const lorem =
   </Section>
 
   <!-- Layout -->
-  <Section id="layout" gap="9" paddingTop="none">
+  <Section id="layout" gap="8" paddingTop="none">
     <StyleGuideTitle>Layout</StyleGuideTitle>
 
     <StyleGuideGroup title="Breakpoints" variant="rows">
@@ -488,7 +488,7 @@ const lorem =
       <StyleGuideItem
         label={`--grid-columns: ${grids[0].grid.columns} · gutter --site-gutter · margin --site-margin · max width --max-width-main`}
       >
-        <div class="flex-horizontal-wrap gap-4">
+        <div class="flex-horizontal-wrap gap-3">
           <Button data-grid-overlay-toggle aria-pressed="false">
             Show grid overlay
           </Button>
@@ -503,7 +503,7 @@ const lorem =
             Array.from({ length: grids[0].grid.columns }, (_, i) => (
               <Col
                 xsmall={1}
-                class="alignment-center background-skeleton radius-xsmall padding-block-3 text-style-xsmall"
+                class="alignment-center background-skeleton radius-xsmall padding-block-2 text-style-xsmall"
               >
                 {i + 1}
               </Col>
@@ -558,7 +558,7 @@ const lorem =
               {example.cols.map(({ text, ...props }) => (
                 <Col
                   {...props}
-                  class="background-skeleton radius-small padding-4 text-style-small"
+                  class="background-skeleton radius-small padding-3 text-style-small"
                 >
                   {text}
                 </Col>
@@ -574,7 +574,7 @@ const lorem =
         <Grid xsmall={1} small={2} medium={3} large={4} class="width-full">
           {
             [1, 2, 3, 4, 5, 6, 7, 8].map((cell) => (
-              <div class="background-skeleton radius-small padding-4 text-style-small">
+              <div class="background-skeleton radius-small padding-3 text-style-small">
                 {cell}
               </div>
             ))
@@ -585,7 +585,7 @@ const lorem =
         <Grid variant="autofit" minColumnWidth={14} class="width-full">
           {
             [1, 2, 3, 4, 5].map((cell) => (
-              <div class="background-skeleton radius-small padding-4 text-style-small">
+              <div class="background-skeleton radius-small padding-3 text-style-small">
                 {cell}
               </div>
             ))
@@ -620,7 +620,7 @@ const lorem =
   </Section>
 
   <!-- Motion -->
-  <Section id="motion" gap="9" paddingTop="none">
+  <Section id="motion" gap="8" paddingTop="none">
     <StyleGuideTitle>Motion</StyleGuideTitle>
 
     <StyleGuideGroup title="Tokens" variant="rows">
@@ -644,7 +644,7 @@ const lorem =
             [1, 2, 3, 4].map((n) => (
               <Col
                 span={3}
-                class="background-skeleton radius-small padding-4 text-style-small"
+                class="background-skeleton radius-small padding-3 text-style-small"
               >
                 {n}
               </Col>
@@ -656,7 +656,7 @@ const lorem =
   </Section>
 
   <!-- Icons -->
-  <Section id="icons" gap="9" paddingTop="none">
+  <Section id="icons" gap="8" paddingTop="none">
     <StyleGuideTitle>Icons</StyleGuideTitle>
 
     <StyleGuideGroup title="Phosphor — <Icon name>" variant="grid">

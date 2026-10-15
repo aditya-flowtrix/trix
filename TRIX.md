@@ -18,10 +18,10 @@ these by hand:
 | `design/tokens/*.tokens.json`          | the Figma variable collections, one file per mode                                     |
 | `docs/tokens.md`                       | the token reference                                                                   |
 
-- **Fluid values are two numbers in px**: `--space-7-min: 32` (at 320px) and
-  `--space-7-max: 40` (at 1440px). Never write a `clamp()` by hand.
+- **Fluid values are two numbers in px**: `--space-6-min: 32` (at 320px) and
+  `--space-6-max: 40` (at 1440px). Never write a `clamp()` by hand.
 - **Add a step or style in the file and everything follows** — a
-  `--space-13` gets `padding-13`, `gap-13`, `margin-top-13`, a `SpaceStep`
+  `--space-12` gets `padding-12`, `gap-12`, `margin-top-12`, a `SpaceStep`
   type, a Figma variable and a docs row.
 - **Components read semantic tokens**, never the palette: `--background`,
   `--text`, `--button-*`. Palette swatches are for defining themes.

@@ -2,7 +2,7 @@
 /**
  * Every class in one of Trix's stylesheets, grouped under the file's own
  * section banners, read at build — so the list is the CSS as it is today.
- * A family that only steps through a scale (`padding-0` … `padding-12`)
+ * A family that only steps through a scale (`padding-0` … `padding-11`)
  * is one row.
  */
 interface Props {
@@ -45,7 +45,7 @@ for (const block of css.split(/\n(?=\/\*|\.[\w-])/)) {
   });
 }
 
-// `padding-1` … `padding-12` → one row, `padding-{1…12}`.
+// `padding-1` … `padding-11` → one row, `padding-{1…11}`.
 const step = /-(\d+|auto|none|xsmall|small|medium|large|xlarge|round)$/;
 const merged = sections.map(({ title, rows }) => {
   const out: { name: string; decls: string }[] = [];

@@ -360,19 +360,14 @@
     }
   },
   "line-height": {
-    "xsmall": {
+    "small": {
       "$type": "number",
       "$value": 100,
       "$description": "Percent of font size (Figma line height %)."
     },
-    "small": {
-      "$type": "number",
-      "$value": 110,
-      "$description": "Percent of font size (Figma line height %)."
-    },
     "medium": {
       "$type": "number",
-      "$value": 120,
+      "$value": 110,
       "$description": "Percent of font size (Figma line height %)."
     },
     "large": {
@@ -392,14 +387,9 @@
     }
   },
   "letter-spacing": {
-    "tighter": {
-      "$type": "number",
-      "$value": -3,
-      "$description": "Percent of font size (Figma letter spacing %)."
-    },
     "tight": {
       "$type": "number",
-      "$value": -2,
+      "$value": -3,
       "$description": "Percent of font size (Figma letter spacing %)."
     },
     "normal": {
@@ -433,7 +423,7 @@
         "unit": "px"
       }
     },
-    "medium": {
+    "main": {
       "$type": "dimension",
       "$value": {
         "value": 16,

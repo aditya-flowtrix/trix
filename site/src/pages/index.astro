@@ -55,7 +55,7 @@ const features = [
     paddingTop="large"
     paddingBottom="large"
     align="center"
-    gap="7"
+    gap="6"
     class="home-hero_wrap"
   >
     <Aurora slot="background" />
@@ -81,7 +81,7 @@ const features = [
     </ButtonWrapper>
   </Section>
   <Section paddingTop="small" paddingBottom="large">
-    <Row rowGap="9" animate>
+    <Row rowGap="8" animate>
       {
         features.map((f) => (
           <Col span={4}>
@@ -113,11 +113,11 @@ const features = [
     .home-feature_wrap {
       display: flex;
       flex-direction: column;
-      gap: var(--space-3);
+      gap: var(--space-2);
       height: 100%;
-      padding: var(--space-6);
+      padding: var(--space-5);
       border: var(--border-width) solid var(--border);
-      border-radius: var(--radius-medium);
+      border-radius: var(--radius-main);
 
       > [class] {
         margin-block: 0;

@@ -162,7 +162,7 @@ const column2 = await slotContent(Astro.slots, "column2");
       display: flex;
       flex-direction: column;
       column-gap: var(--site-gutter);
-      row-gap: var(--space-9);
+      row-gap: var(--space-8);
       align-items: stretch;
       grid-template-columns: repeat(var(--_column-count), minmax(0, 1fr));
 
@@ -205,7 +205,7 @@ const column2 = await slotContent(Astro.slots, "column2");
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: end;
-        row-gap: var(--space-7);
+        row-gap: var(--space-6);
         & > * {
           width: auto;
           align-self: unset;
@@ -296,11 +296,11 @@ const column2 = await slotContent(Astro.slots, "column2");
         column-gap: 0;
         row-gap: 0;
         background-color: var(--background-2);
-        border-radius: var(--radius-medium);
+        border-radius: var(--radius-main);
         position: relative;
         overflow: clip;
         & > :first-child {
-          padding: var(--space-7);
+          padding: var(--space-6);
         }
         & > :last-child {
           border-radius: 0;
@@ -315,17 +315,17 @@ const column2 = await slotContent(Astro.slots, "column2");
         }
       }
       &.card-layout {
-        border-radius: var(--radius-medium);
+        border-radius: var(--radius-main);
         position: relative;
         overflow: clip;
         min-height: 26rem;
         justify-content: center;
         & > :first-child {
-          padding: var(--space-7);
+          padding: var(--space-6);
         }
         & > :first-child {
           padding-block: var(--section-space-medium);
-          padding-inline: var(--space-6);
+          padding-inline: var(--space-5);
           position: relative;
           z-index: 1;
           --_alignment: center;

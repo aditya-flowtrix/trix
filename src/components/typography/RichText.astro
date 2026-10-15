@@ -109,15 +109,15 @@ const content = (await slotContent(Astro.slots)).replace(
         color: var(--text-2);
       }
       & li + li {
-        margin-top: var(--space-3);
+        margin-top: var(--space-2);
       }
 
       & li > :is(ul, ol) {
-        margin-block: var(--space-3);
+        margin-block: var(--space-2);
       }
 
       & blockquote {
-        padding-left: var(--space-5);
+        padding-left: var(--space-4);
         border-left: var(--border-width) solid var(--border);
       }
 
@@ -130,7 +130,7 @@ const content = (await slotContent(Astro.slots)).replace(
         border-collapse: collapse;
       }
       & :is(th, td) {
-        padding: var(--space-3) var(--space-4);
+        padding: var(--space-2) var(--space-3);
         border-bottom: var(--border-width) solid var(--border);
         text-align: start;
         vertical-align: top;

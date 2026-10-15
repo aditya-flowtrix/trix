@@ -37,7 +37,7 @@ fails on px lengths and on `var()`s that point at nothing.
 
 **3. Containers space their children with `gap`.** Inside a `Section` the
 children's margins are zeroed and the container's `gap` spaces them. Change
-it for the section (`gap="7"`), or at one spot with `<Spacer size="11" />` —
+it for the section (`gap="6"`), or at one spot with `<Spacer size="10" />` —
 the blocks either side end up exactly that far apart. Headings and text keep
 their own rhythm margins; don't fight them with `margin-top: 0`.
 

@@ -94,7 +94,7 @@ H1 is "H2, styled H1" — say so in an annotation, never make a new style for it
 
 ### 6. Space comes from the scale
 
-`space/1` to `space/12` for everything inside a section (gaps, padding,
+`space/1` to `space/11` for everything inside a section (gaps, padding,
 margins between elements), `section-space/xsmall` … `xlarge` for the padding
 above and below sections. Use auto layout everywhere, with gaps and padding
 bound to these variables. Elements inside a section are spaced by the
@@ -175,7 +175,7 @@ that. Name a body font (primary) and, if headings differ, a heading font
 | Text style `H2`                   | `.text-style-h2`, `<Heading variant="h2">`              |
 | `space/7`                         | `--space-7`, `gap-7`, `padding-7`, `margin-top-7`       |
 | `section-space/large`             | `--section-space-large`, `<Section paddingTop="large">` |
-| `radius/medium`                   | `--radius-medium`, `radius-medium`                      |
+| `radius/main`                     | `--radius-main`, `radius-main`                          |
 | `Button`, variant `secondary`     | `<Button emphasis="secondary">`                         |
 | Component `Hero Home`             | `src/components/content/HeroHome.astro`                 |
 

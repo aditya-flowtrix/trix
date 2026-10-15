@@ -7,6 +7,28 @@ keep its look; every design brings its own type, colours and components, so
 the framework now follows what a project adds to `tokens.css` instead of a
 fixed set of names.
 
+### Lumos's names for the scales (breaking for 0.2 projects)
+
+Trix's values were always Lumos's, but some names pointed elsewhere: Trix's
+`--space-4` was Lumos's `--space-3`. Now the names match Lumos for Astro,
+so Lumos's docs, examples and components mean the same thing here. Nothing
+looks different — every page renders to the same pixels.
+
+| 0.2                                        | 0.3                                      |
+| ------------------------------------------ | ---------------------------------------- |
+| `--space-2…12`                             | `--space-1…11` (1–8 are Lumos's exactly) |
+| `--space-1` (4px, unused)                  | removed                                  |
+| `--line-height-xsmall` / `-small`          | `--line-height-small` / `-medium`        |
+| `--line-height-medium` (1.2, unused)       | removed                                  |
+| `--letter-spacing-tighter`                 | `--letter-spacing-tight`                 |
+| `--letter-spacing-tight` (-0.02em, unused) | removed                                  |
+| `--radius-medium`                          | `--radius-main`                          |
+
+Utilities (`gap-N`, `padding-*-N`, `margin-*-N`, `radius-main`), the
+`SpaceStep` type, `Section`'s default `gap` (`"8"`) and the Figma
+variables follow. `/trix-upgrade` renames a 0.2 site in one pass with
+`rename-lumos-names.mjs`. The `62rem` breakpoint stays (Webflow's 992px).
+
 ### Tokens
 
 - Text styles are opt-in: each `/* Text style — name */` group, and nothing
