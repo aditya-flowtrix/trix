@@ -7,6 +7,27 @@ keep its look; every design brings its own type, colours and components, so
 the framework now follows what a project adds to `tokens.css` instead of a
 fixed set of names.
 
+### More from Mast, under Lumos's names
+
+The rest of what Mast for Astro does better, each rebuilt the Lumos way (typed
+props in Lumos's order and wording, CSS in the component, a script only on
+pages that use it):
+
+- `Video autoplay` downloads nothing until the video scrolls into view, plays
+  only while it is on screen and pauses when it leaves; `desktopOnly` keeps
+  it off phones and tablets (poster only, nothing downloaded).
+- `Slider`: `loop` wraps the arrows; `playback="auto"` — Lumos's name, from
+  `Tabs` — moves a slide every six seconds with a pause button, holding
+  while focused, off screen or for reduced motion.
+- `Marquee pauseOnHover`, beside the pause button.
+- `Modal openOnLoad` and `cooldownDays`, for a newsletter or announcement.
+- `NavBanner`: a one-line announcement above the nav, in the brand theme.
+- `Dropdown variant="mega"`: the nav's full width from `medium` up.
+- `GridOverlay`'s root is `grid-overlay_wrap`, as Lumos names a root.
+
+Left out on purpose: the slider's fade (Lumos's `Tabs playback="auto"` is the
+rotating panel), a vertical marquee, and a tabs-to-dropdown menu on phones.
+
 ### Lumos's names for the scales (breaking for 0.2 projects)
 
 Trix's values were always Lumos's, but some names pointed elsewhere: Trix's

@@ -12,6 +12,12 @@ type Props = HTMLAttributes<"dialog"> & {
   label?: string;
   /** Modal style. */
   variant?: "small" | "side-panel" | "full-screen";
+  /** Open on page load — a newsletter or an announcement. */
+  openOnLoad?: boolean;
+  /** Days before an `openOnLoad` modal opens again once closed. Without it, it opens on every visit.
+   *
+   * @min 1 */
+  cooldownDays?: number;
   /** Keep open in design mode. */
   preview?: boolean;
 };
@@ -21,6 +27,8 @@ const {
   id,
   label,
   variant = "small",
+  openOnLoad = false,
+  cooldownDays,
   preview = false,
   class: className,
   ...rest
@@ -46,6 +54,7 @@ if (import.meta.env.DEV && render && content && !id) {
         className,
       ]}
       aria-label={label}
+      data-modal-on-load={openOnLoad ? (cooldownDays ?? 0) : undefined}
       {...rest}
     >
       <div class="modal_content">
@@ -87,7 +96,22 @@ if (import.meta.env.DEV && render && content && !id) {
       modal.dispatchEvent(new CustomEvent("modal-open", { bubbles: true }));
     };
 
+    // Opened on load, it stays closed for its cooldown once dismissed.
+    const cooldown = Number(modal.dataset.modalOnLoad);
+    const key = `trix-modal-${modal.id}`;
+    const resting = () => {
+      try {
+        return Number(localStorage.getItem(key)) > Date.now();
+      } catch {
+        return false;
+      }
+    };
+
     modal.addEventListener("close", () => {
+      if (cooldown > 0)
+        try {
+          localStorage.setItem(key, String(Date.now() + cooldown * 86_400_000));
+        } catch {}
       if (returnTo?.isConnected) returnTo.focus();
       returnTo = null;
       modal.dispatchEvent(new CustomEvent("modal-close", { bubbles: true }));
@@ -123,6 +147,8 @@ if (import.meta.env.DEV && render && content && !id) {
       open();
       url.searchParams.delete("modal");
       history.replaceState(history.state, "", url);
+    } else if (modal.hasAttribute("data-modal-on-load") && !resting()) {
+      open();
     }
   }
 </script>

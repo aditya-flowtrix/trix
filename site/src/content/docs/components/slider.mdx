@@ -30,6 +30,22 @@ show part of the next one, to say there is more.
 | `crop-start` | they start in line with the content and run off the right  |
 | `contained`  | they stay inside the container                             |
 
+## Looping and autoplay
+
+`loop` wraps the arrows: past the last slide comes the first. `playback="auto"`
+moves one slide every six seconds and loops, as `Tabs` does — with a pause
+button, and holding still while a slide has focus, while the slider is off
+screen, or for visitors who prefer less motion.
+
+```astro live stage="block"
+<Slider label="Clients" small={2} medium={3} playback="auto">
+  <Card heading="One" text="A first slide." />
+  <Card heading="Two" text="A second slide." />
+  <Card heading="Three" text="A third slide." />
+  <Card heading="Four" text="A fourth slide." />
+</Slider>
+```
+
 ## Props
 
 <Props of="interactive/Slider" />

@@ -34,6 +34,22 @@ floats like the default.
 </li>
 ```
 
+`variant="mega"` opens in the mobile menu the same way, and from `medium` up
+spans the nav's full width, its content as wide as the page — room for
+columns of links:
+
+```astro
+<li>
+  <Dropdown variant="mega" label="Products">
+    <Row>
+      <Col span={4}>…</Col>
+      <Col span={4}>…</Col>
+      <Col span={4}>…</Col>
+    </Row>
+  </Dropdown>
+</li>
+```
+
 ## Props
 
 <Props of="interactive/Dropdown" />

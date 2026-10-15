@@ -15,11 +15,23 @@ rebuilt the Lumos way: a typed component, CSS co-located in
 | Components with co-located `<style is:global>` in `@layer components`        | Icons inlined by name at build time (Phosphor)                                                                                                                 | Style guide rendered from the tokens — no copied values                                                                                                                         |
 | Typed props, `render`, discriminated unions on `variant`                     | Site-wide light/dark mode with a pre-paint script and a toggle                                                                                                 | Measuring toolkit: inventory, design extraction, token proposal, value-based class and variable maps, verification                                                              |
 | Spacing owned by the receiving element; containers space children with `gap` | Skill evals (prompts with assertions)                                                                                                                          | Webflow breakpoints as defaults (30 / 48 / 62rem)                                                                                                                               |
-| `_wrap` naming, variants as bare classes                                     | 12-column grid with automatic stacking — `Row` / `Col` (`span`, `offset`, `order`); on CSS Grid, mobile-first, with the gutter and margin from the site tokens | 12-step spacing scale, 13 text styles, palette ramps, component tokens                                                                                                          |
+| `_wrap` naming, variants as bare classes                                     | 12-column grid with automatic stacking — `Row` / `Col` (`span`, `offset`, `order`); on CSS Grid, mobile-first, with the gutter and margin from the site tokens | Lumos's spacing names plus three larger steps, 13 text styles, palette ramps, component tokens                                                                                  |
 | Themes as classes with semantic tokens, `theme-invert`                       | Scroll-in reveal with stagger — an `animate` prop, timed by `--reveal-*` tokens, CSS-only hiding (no `html.js` class)                                          | Conventions check in CI; `PROJECT.md` outside the framework                                                                                                                     |
 | Agent skills with Node scripts                                               | Link prefetch; rich-text tables and dividers; `Spacer` — rebuilt to take back the container's gap, so the space at that spot is exactly its size               | Platform adapters for Framer, WordPress and others · SEO toolkit: audit, migration parity, structured data, breadcrumbs · fonts from any source, leading trim measured per font |
 
-What Trix deliberately did **not** take from Mast: one global
+Also from Mast, each under the name Lumos uses for the same idea: `Video`
+that loads nothing until it is on screen and plays only while seen
+(`desktopOnly` keeps it off phones), `Slider playback="auto"` and `loop`,
+`Marquee pauseOnHover`, `Modal openOnLoad` with `cooldownDays`, `NavBanner`
+and `Dropdown variant="mega"`.
+
+**Names are Lumos's, always.** A token, utility, prop, theme role or class that
+Lumos for Astro has keeps Lumos's name and value; Trix's additions follow the
+same patterns beside them.
+
+What Trix deliberately did **not** take from Mast: the slider's fade effect
+(Lumos's `Tabs playback="auto"` is the rotating panel), a vertical marquee, a
+tabs-to-dropdown menu on phones, one global
 `components.css` (Trix keeps CSS with its component), `em`-based spacing
 utilities (they drift with font size), a `Divider` component (an `<hr>` is styled instead, and the container's `gap` spaces it), negative-margin rows with padding gutters
 (CSS Grid's `gap` is the gutter, so a column's box is its content), `cc-` combo classes and `u-` prefixes

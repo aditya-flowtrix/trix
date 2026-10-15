@@ -19,12 +19,17 @@ type Head = Omit<
 type Tail = {
   /** Restart after playback. */
   loop?: boolean;
-  /** Start automatically. Requires `muted`. */
+  /**
+   * Play while on screen. Requires `muted`. Nothing downloads until the
+   * video scrolls into view, and it pauses when it scrolls out.
+   */
   autoplay?: boolean;
   /** Mute audio. */
   muted?: boolean;
   /** Fit without cropping and remove the skeleton tint. */
   transparent?: boolean;
+  /** Play only from the `large` breakpoint. Smaller screens keep the poster and download nothing. */
+  desktopOnly?: boolean;
   /**
    * Show a pause button over an autoplaying video. Defaults to `true` with
    * `autoplay`: moving content that plays for more than five seconds must be
@@ -80,6 +85,7 @@ const {
   autoplay = true,
   muted = true,
   transparent = false,
+  desktopOnly = false,
   pauseButton = autoplay,
   pausePosition = "bottom-right",
   class: className,
@@ -134,9 +140,11 @@ const pauseMargins = {
       ]}
       style={isCustom && ratio ? `aspect-ratio: ${ratio};` : undefined}
       loop={loop}
-      autoplay={autoplay}
+      preload={autoplay ? "none" : undefined}
       muted={muted}
       playsinline
+      data-video-autoplay={autoplay ? "" : undefined}
+      data-video-desktop-only={desktopOnly ? "" : undefined}
       {...rest}
     />
   )
@@ -159,27 +167,53 @@ const pauseMargins = {
 }
 
 <script>
-  // The pause button sits right after its video. Visitors who prefer less
-  // motion get the video still, and can start it.
+  // An autoplaying video loads and plays only while on screen. Its pause
+  // button, right after it, is the visitor's: once they pause, scrolling
+  // never restarts it. Visitors who prefer less motion start it themselves.
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  for (const toggle of document.querySelectorAll<HTMLButtonElement>(
-    "[data-video-toggle]",
+  const desktop = matchMedia("(width >= 62rem)");
+  const stopped = new WeakSet<HTMLVideoElement>();
+  const allowed = (video: HTMLVideoElement) =>
+    !stopped.has(video) &&
+    !reduced.matches &&
+    (desktop.matches || !("videoDesktopOnly" in video.dataset));
+
+  const seen = new IntersectionObserver((entries) => {
+    for (const { target, isIntersecting } of entries) {
+      const video = target as HTMLVideoElement;
+      if (isIntersecting && allowed(video)) video.play().catch(() => {});
+      else if (!isIntersecting) video.pause();
+    }
+  });
+
+  for (const video of document.querySelectorAll<HTMLVideoElement>(
+    "video[data-video-autoplay]",
   )) {
-    const video = toggle.previousElementSibling;
-    if (!(video instanceof HTMLVideoElement)) continue;
+    if (reduced.matches) stopped.add(video);
+    seen.observe(video);
+    const toggle = video.nextElementSibling;
+    if (
+      !(toggle instanceof HTMLButtonElement) ||
+      !toggle.matches("[data-video-toggle]")
+    )
+      continue;
     const show = (playing: boolean) => {
       toggle.setAttribute("aria-pressed", String(playing));
       toggle.setAttribute("aria-label", playing ? "Pause video" : "Play video");
     };
-    const set = (playing: boolean) => {
-      if (playing) video.play().catch(() => show(false));
-      else video.pause();
-      show(playing);
-    };
-    if (reduced.matches) set(false);
-    video.addEventListener("pause", () => show(false));
+    show(!reduced.matches);
     video.addEventListener("play", () => show(true));
-    toggle.addEventListener("click", () => set(video.paused));
+    video.addEventListener("ended", () => show(false));
+    toggle.addEventListener("click", () => {
+      if (video.paused) {
+        stopped.delete(video);
+        video.play().catch(() => show(false));
+      } else {
+        stopped.add(video);
+        video.pause();
+        show(false);
+      }
+    });
   }
 </script>
 
@@ -196,6 +230,12 @@ const pauseMargins = {
       margin: var(--_margin, auto 0 0 auto);
       z-index: 1;
       pointer-events: auto;
+    }
+    /* Desktop only: below `large` the poster stands alone. */
+    @media (width < 62rem) {
+      [data-video-desktop-only] + .video_toggle {
+        display: none;
+      }
     }
   }
 </style>

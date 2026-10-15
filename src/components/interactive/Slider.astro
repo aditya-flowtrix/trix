@@ -30,6 +30,10 @@ type Props = HTMLAttributes<"div"> & {
    * @min 1
    * @max 12 */
   large?: number;
+  /** Wrap from the last slide to the first, and back. */
+  loop?: boolean;
+  /** Slide playback. `auto` advances every six seconds and loops, with a pause button. */
+  playback?: "manual" | "auto";
 };
 
 const {
@@ -40,6 +44,8 @@ const {
   small,
   medium,
   large,
+  loop = false,
+  playback = "manual",
   class: className,
   ...rest
 } = Astro.props;
@@ -75,7 +81,13 @@ const slides = await slotContent(Astro.slots);
 {
   render && slides && (
     <div
-      class:list={["slider_wrap", variant !== "bleed" && variant, className]}
+      class:list={[
+        "slider_wrap",
+        variant !== "bleed" && variant,
+        loop && "loop",
+        playback === "auto" && "auto",
+        className,
+      ]}
       style={visible}
       {...rest}
     >
@@ -100,6 +112,15 @@ const slides = await slotContent(Astro.slots);
             data-step="1"
           />
         </div>
+        {playback === "auto" && (
+          <Button
+            variant="play"
+            emphasis="secondary"
+            label="Pause automatic rotation"
+            pressed
+            data-toggle
+          />
+        )}
       </div>
     </div>
   )
@@ -125,6 +146,8 @@ const slides = await slotContent(Astro.slots);
       slide.setAttribute("aria-label", `${i + 1} of ${slides.length}`);
     });
 
+    const auto = slider.classList.contains("auto");
+    const loop = auto || slider.classList.contains("loop");
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const behavior = () => (reduced.matches ? "auto" : "smooth");
 
@@ -182,7 +205,8 @@ const slides = await slotContent(Astro.slots);
       const atEnd = list.scrollLeft >= end - 1;
 
       for (const step of steps) {
-        step.disabled = Number(step.dataset.step) < 0 ? atStart : atEnd;
+        step.disabled =
+          !loop && (Number(step.dataset.step) < 0 ? atStart : atEnd);
       }
 
       const index = current();
@@ -195,13 +219,71 @@ const slides = await slotContent(Astro.slots);
       controls?.classList.toggle("is-empty", end <= 1);
     };
 
+    // One step either way; looping, past an end comes round to the other.
+    const go = (by: number) => {
+      const end = list.scrollWidth - list.clientWidth;
+      if (loop && by > 0 && list.scrollLeft >= end - 1)
+        list.scrollTo({ left: 0, behavior: behavior() });
+      else if (loop && by < 0 && list.scrollLeft <= 1)
+        list.scrollTo({ left: end, behavior: behavior() });
+      else list.scrollBy({ left: by * stride(), behavior: behavior() });
+    };
+
     for (const step of steps) {
-      step.addEventListener("click", () =>
-        list.scrollBy({
-          left: Number(step.dataset.step) * stride(),
-          behavior: behavior(),
-        }),
+      step.addEventListener("click", () => {
+        go(Number(step.dataset.step));
+        restart();
+      });
+    }
+
+    // Auto: a step every six seconds, held while it is focused, off screen,
+    // paused by its button, or the visitor prefers less motion — as Tabs.
+    const toggle = slider.querySelector<HTMLButtonElement>("[data-toggle]");
+    let timer: number | undefined;
+    let paused = !auto;
+    const restart = () => {
+      window.clearTimeout(timer);
+      if (!paused) timer = window.setTimeout(() => (go(1), restart()), 6000);
+    };
+    const holds = {
+      motion: reduced.matches,
+      focus: false,
+      offscreen: false,
+      asked: false,
+    };
+    const settle = () => {
+      paused = !auto || Object.values(holds).some(Boolean);
+      slider.classList.toggle("is-paused", paused);
+      toggle?.setAttribute("aria-pressed", String(!holds.asked));
+      toggle?.setAttribute(
+        "aria-label",
+        holds.asked ? "Start automatic rotation" : "Pause automatic rotation",
       );
+      restart();
+    };
+    if (auto) {
+      toggle?.addEventListener("click", () => {
+        holds.asked = !holds.asked;
+        settle();
+      });
+      reduced.addEventListener("change", (event) => {
+        holds.motion = event.matches;
+        settle();
+      });
+      list.addEventListener("focusin", () => {
+        holds.focus = true;
+        settle();
+      });
+      list.addEventListener("focusout", (event) => {
+        if (list.contains(event.relatedTarget as Node)) return;
+        holds.focus = false;
+        settle();
+      });
+      new IntersectionObserver((entries) => {
+        holds.offscreen = !entries[0].isIntersecting;
+        settle();
+      }).observe(slider);
+      settle();
     }
 
     let origin = 0;

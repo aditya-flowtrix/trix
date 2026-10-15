@@ -9,8 +9,8 @@ type Props = HTMLAttributes<"div"> & {
   render?: boolean;
   /** Trigger text. */
   label?: string;
-  /** `menu` opens in the flow below the `medium` breakpoint, for a nav's mobile menu; above it, it floats like `default`. */
-  variant?: "default" | "menu";
+  /** In a nav, `menu` and `mega` open in the flow of the mobile menu; from `medium` up, `menu` floats like `default` and `mega` spans the nav's full width. */
+  variant?: "default" | "menu" | "mega";
   /** Keep the panel open in design mode. */
   preview?: boolean;
 };
@@ -194,14 +194,14 @@ const content = await slotContent(Astro.slots);
 
     /* A block, so it lines up with the links beside it rather than sitting
        on a text baseline. */
-    .dropdown_wrap.menu {
+    .dropdown_wrap:is(.menu, .mega) {
       display: block;
     }
 
     /* In a nav's mobile menu a floating panel would be clipped by the menu's
        scroll box, so it opens in the flow instead. */
     @media (width < 48rem) {
-      .dropdown_wrap.menu {
+      .dropdown_wrap:is(.menu, .mega) {
         & .dropdown_toggle {
           justify-content: space-between;
         }
@@ -215,6 +215,27 @@ const content = await slotContent(Astro.slots);
         }
         & .dropdown_body {
           padding: 0 0 var(--space-3);
+        }
+      }
+    }
+
+    /* Mega: the panel hangs from the nav's bottom edge, full width, its
+       content as wide as the page's. */
+    @media (width >= 48rem) {
+      .dropdown_wrap.mega {
+        position: static;
+        & .dropdown_content {
+          top: 100%;
+          inset-inline: 0;
+          width: auto;
+          max-width: none;
+          border-radius: 0;
+          transform-origin: top center;
+        }
+        & .dropdown_body {
+          max-width: var(--max-width-main);
+          margin-inline: auto;
+          padding: var(--space-6) var(--site-margin);
         }
       }
     }

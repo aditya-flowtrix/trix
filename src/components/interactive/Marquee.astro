@@ -10,12 +10,15 @@ type Props = HTMLAttributes<"div"> & {
   label?: string;
   /** Travel direction. */
   direction?: "forwards" | "backwards";
+  /** Hold still while the pointer is over it. */
+  pauseOnHover?: boolean;
 };
 
 const {
   render = true,
   label = "Marquee",
   direction = "forwards",
+  pauseOnHover = false,
   class: className,
   ...rest
 } = Astro.props;
@@ -74,6 +77,7 @@ const locals = `--_count: ${count}`;
       class:list={[
         "marquee_wrap",
         direction !== "forwards" && direction,
+        pauseOnHover && "hover-pause",
         className,
       ]}
       style={locals}
@@ -185,6 +189,7 @@ const locals = `--_count: ${count}`;
       /* Held while something inside has focus, so a link can't travel out from
          under the person reading it. The toggle sits outside the track. */
       &:focus-within,
+      .marquee_wrap.hover-pause:hover &,
       .marquee_wrap[data-state="paused"] & {
         animation-play-state: paused;
       }

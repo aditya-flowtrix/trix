@@ -7,13 +7,13 @@
  */
 ---
 
-<div class="grid-overlay" aria-hidden="true" hidden>
+<div class="grid-overlay_wrap" aria-hidden="true" hidden>
   <div class="grid-overlay_columns"></div>
 </div>
 
 <script>
   const KEY = "trix-grid-overlay";
-  const overlay = document.querySelector<HTMLElement>(".grid-overlay")!;
+  const overlay = document.querySelector<HTMLElement>(".grid-overlay_wrap")!;
   const show = (on: boolean) => {
     overlay.hidden = !on;
     document
@@ -42,7 +42,7 @@
 
 <style is:global>
   @layer components {
-    .grid-overlay {
+    .grid-overlay_wrap {
       position: fixed;
       inset: 0;
       z-index: 2147483647;

@@ -35,6 +35,18 @@ Three ways to open one:
 - a link to `#<id>`,
 - a URL with `?modal=<id>` — a modal you can link to from an email.
 
+## Opening on load
+
+`openOnLoad` opens the modal as the page loads — a newsletter sign-up or an
+announcement. With `cooldownDays`, closing it keeps it closed for that many
+days on this browser; without it, it opens on every visit.
+
+```astro
+<Modal id="newsletter" label="Newsletter" openOnLoad cooldownDays={30}>
+  …
+</Modal>
+```
+
 ## Props
 
 <Props of="interactive/Modal" />

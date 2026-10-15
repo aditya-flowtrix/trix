@@ -13,6 +13,16 @@ By default a video autoplays, muted and looping, at 16:9 — the background
 video most sites use. `variant` sets the ratio: `2-1`, `16-9`, `3-2`, `5-4`,
 `1-1`, `4-5`, `2-3`, `custom` (with `ratio`), or `auto`.
 
+## Loading and playback
+
+An autoplaying video downloads nothing until it scrolls into view, plays while
+it is on screen and pauses when it leaves — a page of videos costs only the
+ones being watched. Give it a `poster`: that is what shows until then, and
+what shows without JavaScript.
+
+`desktopOnly` keeps a heavy background video off phones and tablets: below
+the `large` breakpoint the poster stands alone and nothing downloads.
+
 ## The pause button
 
 Moving content that plays for more than five seconds must be pausable (WCAG

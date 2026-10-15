@@ -335,7 +335,7 @@ const PAGE_FACTS = `async () => {
       nav: ".nav_toggle", accordion: "details.accordion_item", dropdown: "details.dropdown_wrap",
       tabs: '[role="tablist"] [role="tab"]', modal: "[data-modal-open]", slider: '.slider_controls button[data-step="1"]',
       marquee: "[data-marquee-toggle]", video: "[data-video-toggle]", reveal: "[data-animate]",
-      row: ".row", spacer: ".container > .spacer", overlay: ".grid-overlay",
+      row: ".row", spacer: ".container > .spacer", overlay: ".grid-overlay_wrap",
     }).map(([k, sel]) => [k, !!document.querySelector(sel)])),
   };
 }`;
@@ -620,7 +620,7 @@ async function testPage(driver: Driver, page: Page, path: string) {
       where,
       "Shift+G shows the grid overlay",
       await page.evaluate(
-        `() => !document.querySelector(".grid-overlay").hidden`,
+        `() => !document.querySelector(".grid-overlay_wrap").hidden`,
       ),
     );
   }
