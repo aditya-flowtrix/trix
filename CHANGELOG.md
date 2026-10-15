@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-10-15
 
 From building a client design on Trix. Lumos stays the base and the defaults
 keep its look; every design brings its own type, colours and components, so

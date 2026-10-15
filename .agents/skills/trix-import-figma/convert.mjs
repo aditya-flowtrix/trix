@@ -47,7 +47,7 @@ const SKILL_VERSION = "1.1.0";
 /* A pin, not a mirror: the release this skill was last checked against.
    Deriving it from package.json would make it always equal to the running
    version, and the mismatch note would never fire. */
-const TESTED_AGAINST = "0.2.0";
+const TESTED_AGAINST = "0.3.0";
 
 const ROOT_PX = 16;
 const SNAP_PX = 2; // ±2px counts as drift, not a decision
