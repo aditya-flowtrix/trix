@@ -69,6 +69,7 @@ anywhere with `gridOverlay`.
 | `Interactive/Modal`                       | dialogs                  | `variant`: small, side-panel, full-screen · native `<dialog>` · `openOnLoad`, `cooldownDays`                       |
 | `Interactive/Dropdown`                    | menus                    | native `<details>`, keyboard support · `variant`: default, menu, mega                                              |
 | `Interactive/Marquee`                     | logo strips, tickers     | `direction`: forwards, backwards · `pauseOnHover`                                                                  |
+| `Interactive/Compare`                     | before/after, two views  | `before` and `after` slots · `start` · native range input                                                          |
 | `Interactive/ThemeToggle`                 | light/dark switch        | renders only when `COLOR_MODE` is `auto`                                                                           |
 
 ## Forms

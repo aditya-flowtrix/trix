@@ -160,7 +160,7 @@ for (const line of visible) {
   const host = section(line);
   add(line.parent ?? line, {
     kind: "compare",
-    component: null,
+    component: "Compare",
     evidence: [
       `a ${Math.round(line.h)}px line at ${Math.round(((cx - host.ax) / host.w) * 100)}% of the width`,
       `a ${Math.round(handle.w)}px handle centred on it ("${handle.name}")`,
@@ -329,7 +329,7 @@ for (const shown of visible) {
 const NAMED = [
   [/marquee|ticker|logo[\s-]?(strip|wall|bar|row|band)/i, "marquee", "Marquee"],
   [/slider|carousel|swiper|slideshow/i, "slider", "Slider"],
-  [/\b(compare|comparison|before|after)\b/i, "compare", null],
+  [/\b(compare|comparison|before|after)\b/i, "compare", "Compare"],
   [/\btabs?\b/i, "tabs", "Tabs"],
   [/accordion|faq|collapse/i, "accordion", "Accordion"],
   [/modal|popup|pop-up|dialog|lightbox/i, "modal", "Modal"],

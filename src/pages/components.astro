@@ -31,6 +31,7 @@ import Modal from "@/components/interactive/Modal.astro";
 import Slider from "@/components/interactive/Slider.astro";
 import Accordion from "@/components/interactive/Accordion.astro";
 import Marquee from "@/components/interactive/Marquee.astro";
+import Compare from "@/components/interactive/Compare.astro";
 import AccordionItem from "@/components/interactive/AccordionItem.astro";
 import Video from "@/components/media/Video.astro";
 import Icon from "@/components/media/Icon.astro";
@@ -718,6 +719,21 @@ const lorem =
       <Paragraph variant="large">Research</Paragraph>
       <Icon src={logo_icon} variant="large" />
     </Marquee>
+  </Section>
+  <!-- compare -->
+  <Section>
+    <ContentWrapper>
+      <Eyebrow>compare</Eyebrow>
+      <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
+    </ContentWrapper>
+    <Compare label="Light and dark theme">
+      <div slot="before" class="theme-light ratio-16-9 padding-6">
+        <Heading tag="h3">{heading}</Heading>
+      </div>
+      <div slot="after" class="theme-dark ratio-16-9 padding-6">
+        <Heading tag="h3">{heading}</Heading>
+      </div>
+    </Compare>
   </Section>
   <!-- hero -->
   <Section paddingTop="small" paddingBottom="small" fullHeight={true}>

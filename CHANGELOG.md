@@ -49,6 +49,10 @@ Added:
   states. The skill puts each to the user as a question, with the evidence
   and a suggestion, and always asks whether anything else moves. Unattended,
   it builds the suggestion and logs it. Skill 1.2.0.
+- `Compare`: two versions of one thing, one over the other, with a divider
+  the visitor drags — the before/after the import kept finding and had
+  nothing to build with. The divider is a native range input, so keyboard,
+  touch and screen readers come with it.
 
 ### CI for private repositories
 

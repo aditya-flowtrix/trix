@@ -1,0 +1,32 @@
+---
+title: Compare
+description: Two versions of one thing, one over the other, with a divider the visitor drags — before and after, light and dark.
+order: 55.5
+component: interactive/Compare
+---
+
+```astro live stage="block"
+<Compare label="Light and dark theme">
+  <div slot="before" class="theme-light ratio-16-9 padding-6">
+    <Heading tag="h3">The same card</Heading>
+  </div>
+  <div slot="after" class="theme-dark ratio-16-9 padding-6">
+    <Heading tag="h3">The same card</Heading>
+  </div>
+</Compare>
+```
+
+`before` shows on the left of the divider and `after` on the right. They
+share one space, so give them the same size — two images of one ratio, or two
+blocks with the same `ratio-*` class. A label inside a side is cut with it.
+
+The divider is a native range input: drag it, click anywhere along it, or
+focus it and use the arrow keys. Without JavaScript it stays where `start`
+puts it. A `handle` slot replaces the arrows in the knob.
+
+Restyle the divider from a class on the component: `--_line-color`,
+`--_line-width`, `--_knob-size`, `--_knob-background` and `--_knob-color`.
+
+## Props
+
+<Props of="interactive/Compare" />

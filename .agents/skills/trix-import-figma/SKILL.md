@@ -331,7 +331,7 @@ reason to ask, never a decision.
 | --------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | marquee         | five or more images in one row across most of the width; stronger if the row overflows or repeats | `Interactive/Marquee`                      |
 | slider          | blocks of one size in a row that runs past the frame; two square buttons nearby                   | `Interactive/Slider`                       |
-| before/after    | a long thin line with a small square handle centred on it, splitting two pictures                 | none yet — a new component, if confirmed   |
+| before/after    | a long thin line with a small square handle centred on it, splitting two pictures                 | `Interactive/Compare`                      |
 | accordion       | three or more stacked rows of one width, each ending in an icon                                   | `Interactive/Accordion`                    |
 | pagination dots | three or more small dots evenly spaced                                                            | `Interactive/Slider` or `Interactive/Tabs` |
 | a second state  | a hidden layer the same size, exactly under a visible one                                         | a hover, a tab panel, or nothing           |

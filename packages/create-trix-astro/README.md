@@ -26,7 +26,7 @@ install. Node 22.19 or newer.
 - **Content** — `Heading`, `Paragraph`, `Eyebrow`, `RichText`, `Button`, `Card`
 - **Media** — `Img`, `Video`, `Icon`, `Overlay`
 - **Interactive** — `Accordion`, `Tabs`, `Modal`, `Dropdown`, `Slider`,
-  `Marquee`, `ThemeToggle`
+  `Marquee`, `Compare`, `ThemeToggle`
 - **Forms** — `Form`, `Fieldset`, `Input`, `Textarea`, `Select`, `Choice`, `Range`
 - **Site** — `Nav`, `Footer`, `Breadcrumbs`, `SkipLink`, `BaseHead`, `JsonLd`
 

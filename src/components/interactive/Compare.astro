@@ -1,0 +1,154 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/components/media/Icon.astro";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Accessible label. Defaults to `Compare`. */
+  label?: string;
+  /**
+   * Where the divider starts, as a percentage from the left. Defaults to `50`.
+   *
+   * @min 0
+   * @max 100
+   */
+  start?: number;
+};
+
+const {
+  render = true,
+  label = "Compare",
+  start = 50,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const before = await slotContent(Astro.slots, "before");
+const after = await slotContent(Astro.slots, "after");
+const handle = await slotContent(Astro.slots, "handle");
+---
+
+{
+  render && before && after && (
+    <div
+      class:list={["compare_wrap", className]}
+      style={`--_position: ${start}%`}
+      {...rest}
+    >
+      <div class="compare_side">
+        <Fragment set:html={before} />
+      </div>
+      <div class="compare_side after">
+        <Fragment set:html={after} />
+      </div>
+      <div class="compare_handle" aria-hidden="true">
+        <span class="compare_knob">
+          {handle ? (
+            <Fragment set:html={handle} />
+          ) : (
+            <Icon name="arrows-horizontal" />
+          )}
+        </span>
+      </div>
+      <input
+        class="compare_range"
+        type="range"
+        min="0"
+        max="100"
+        value={start}
+        aria-label={label}
+        data-compare
+      />
+    </div>
+  )
+}
+
+<script>
+  for (const range of document.querySelectorAll<HTMLInputElement>(
+    "[data-compare]",
+  )) {
+    const update = () =>
+      range.parentElement?.style.setProperty("--_position", `${range.value}%`);
+    range.addEventListener("input", update);
+    update();
+  }
+</script>
+
+<style is:global>
+  @layer components {
+    .compare_wrap {
+      --_position: 50%;
+      --_knob-size: 3rem;
+      --_line-width: var(--border-width);
+      --_line-color: currentcolor;
+      --_knob-background: var(--background);
+      --_knob-color: var(--text);
+      position: relative;
+      display: grid;
+      overflow: clip;
+    }
+
+    .compare_side {
+      grid-area: 1 / 1;
+      &.after {
+        clip-path: inset(0 0 0 var(--_position));
+      }
+    }
+
+    .compare_handle {
+      position: absolute;
+      inset-block: 0;
+      left: var(--_position);
+      width: var(--_line-width);
+      translate: -50% 0;
+      background-color: var(--_line-color);
+      pointer-events: none;
+    }
+
+    .compare_knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: grid;
+      place-items: center;
+      width: var(--_knob-size);
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      border: var(--_line-width) solid var(--_line-color);
+      border-radius: 50%;
+      background-color: var(--_knob-background);
+      color: var(--_knob-color);
+
+      .compare_wrap:has(.compare_range:focus-visible) & {
+        outline: var(--focus-width) solid var(--text);
+        outline-offset: var(--focus-offset);
+      }
+    }
+
+    .compare_range {
+      position: absolute;
+      inset-block: 0;
+      left: calc(var(--_knob-size) / -2);
+      width: calc(100% + var(--_knob-size));
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: ew-resize;
+      touch-action: pan-y;
+      appearance: none;
+
+      &::-webkit-slider-thumb {
+        width: var(--_knob-size);
+        height: var(--_knob-size);
+        appearance: none;
+      }
+      &::-moz-range-thumb {
+        width: var(--_knob-size);
+        height: var(--_knob-size);
+        border: 0;
+      }
+    }
+  }
+</style>
