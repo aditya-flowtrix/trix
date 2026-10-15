@@ -284,8 +284,10 @@ type Result = {
 };
 const results: Result[] = [];
 let current = "";
+let last = ""; // the check before a page stopped, to say where it did
 const check = (where: string, name: string, ok: boolean, detail = "") => {
   results.push({ browser: current, where, check: name, ok, detail });
+  last = `${where} — ${name}`;
   if (!ok)
     console.log(`  FAIL ${where} — ${name}${detail ? `: ${detail}` : ""}`);
 };
@@ -675,7 +677,13 @@ for (const name of asked ?? all) {
       if (missing.has(path)) continue;
     }
     const links = await testPage(driver, page, path).catch((e) => {
-      check(path, "page could be tested", false, String(e).split("\n")[0]);
+      const after = last;
+      check(
+        path,
+        "page could be tested",
+        false,
+        `${String(e).split("\n")[0]} (after: ${after})`,
+      );
       return [] as string[];
     });
     if (typeof opts.pages !== "string")
