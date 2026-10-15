@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Cookie consent
+
+`/trix-consent` adds cookie consent to a site:
+
+- It asks where the visitors are, where consent is recorded, what the site
+  loads and how the banner looks.
+- It builds a banner and settings panel from Trix components on
+  [c15t](https://c15t.com) v3, headless, with every tracker held until its
+  category is allowed.
+- Self-hosting it scaffolds `consent-api/`, a Cloudflare Worker on Postgres,
+  and sets it up end to end.
+- `verify.ts` proves the gating, fairness and accessibility in a browser, and
+  `live-check.ts` proves a deployed backend.
+
+Nothing is added to a project that doesn't run it. `npm run test:consent`
+keeps the templates working in CI (framework only).
+
 ### From importing a homepage from Figma
 
 Building one client page from a Figma file found places where Trix failed
