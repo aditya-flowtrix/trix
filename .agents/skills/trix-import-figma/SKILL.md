@@ -114,6 +114,20 @@ say which width you measured.
    so before building: every `-min`, every stacking decision and every mobile
    height will be a guess, and the report opens with that.
 
+   **Find what moves.** A frame is a still picture: a marquee, a slider and a
+   static row of logos look the same in it. Save `get_metadata`'s output for
+   the page frame to `.trix/figma-meta.xml` and run:
+
+   ```bash
+   node .agents/skills/trix-import-figma/patterns.mjs --xml .trix/figma-meta.xml
+   ```
+
+   It lists each part that looks like it moves or responds — see
+   [What moves](#what-moves) — with its evidence and a question. Run
+   `get_motion_context` on the frame too: any node it returns animates, and is
+   a finding of its own. None of this is decided yet; the questions go to the
+   user in step 4.
+
 2. **Inventory before converting.** List every distinct spacing value, type
    size with its line height, and color with its opacity. Distinct _values_,
    not distinct layers — the same 24px appearing eleven times is one value.
@@ -216,7 +230,16 @@ say which width you measured.
    > The design uses 30px, 32px and 34px gaps in three places. `--space-5` is
    > 32px. Consolidate all three, or is one of them deliberate?
 
-   Wait for answers. Do not write tokens for anything still in question.
+   Ask about each part from **Find what moves** in the same round, one
+   question per part, naming it by its section and its text so the user can
+   find it, with the script's options and its suggestion first. In Claude Code
+   that is `AskUserQuestion`, up to four questions a call; elsewhere a
+   numbered list. Close with one question the script cannot ask: _does
+   anything else on the page move or respond — a sticky nav, a hover reveal,
+   a counter?_ An empty finding list still gets that question.
+
+   Wait for answers. Do not write tokens for anything still in question, and
+   do not build a part as static while its question is open.
    Unattended, decide by [Working unattended](#working-unattended) instead.
 
 5. **Place the tokens yourself.** The script prints what to add under
@@ -298,6 +321,27 @@ say which width you measured.
    not match rather than quietly adjusting tokens until it does: a mismatch is
    often the design being inconsistent, which is a question, not a bug.
 
+## What moves
+
+What `patterns.mjs` looks for, and what each answer builds. The signals are
+structure only — positions, sizes, names, hidden layers — so a finding is a
+reason to ask, never a decision.
+
+| Part            | Signals in the frame                                                                              | Builds with                                |
+| --------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| marquee         | five or more images in one row across most of the width; stronger if the row overflows or repeats | `Interactive/Marquee`                      |
+| slider          | blocks of one size in a row that runs past the frame; two square buttons nearby                   | `Interactive/Slider`                       |
+| before/after    | a long thin line with a small square handle centred on it, splitting two pictures                 | none yet — a new component, if confirmed   |
+| accordion       | three or more stacked rows of one width, each ending in an icon                                   | `Interactive/Accordion`                    |
+| pagination dots | three or more small dots evenly spaced                                                            | `Interactive/Slider` or `Interactive/Tabs` |
+| a second state  | a hidden layer the same size, exactly under a visible one                                         | a hover, a tab panel, or nothing           |
+| named parts     | a layer named marquee, slider, carousel, compare, tabs, faq, modal, dropdown, video, sticky       | the component of that name                 |
+
+A line at the page's edge (the frame's side rules) is not a compare, and a
+row of images inside the frame is not a slider: the script leaves both out.
+What it cannot see at all — a sticky nav, a scroll reveal, a hover that
+changes nothing's size — is why step 4 always asks the closing question.
+
 ## Working unattended
 
 With no designer or owner to answer — an agent building alone — these are
@@ -314,6 +358,7 @@ a person can reverse it later; anything not listed stays open.
 | a table and a real text style that disagree                                     | the text style — it is what the designer applies                                                                                                          | `PROJECT.md` → Design system                         |
 | a design colour below its contrast floor in a theme role                        | keep the designer's colour with `/* contrast: accepted — why */` on its line in `themes.css`                                                              | `PROJECT.md` → Still open                            |
 | a font                                                                          | `/trix-design-system` → fonts, [Unattended](../trix-design-system/references/fonts.md#unattended)                                                         | `PROJECT.md` → Design system                         |
+| a part [What moves](#what-moves) flags                                          | build the script's suggestion where it has one; with none, build it static. Never build a new component for it                                            | `PROJECT.md` → Still open, report → Behaviour        |
 
 Never decide alone: a renumbered scale, a removed token something uses, a
 licence, or anything the design contradicts itself on twice.
@@ -321,10 +366,12 @@ licence, or anything the design contradicts itself on twice.
 ## The report
 
 Open with what the file did not have — a mobile frame, a layout grid — then
-close with six lists. Anything empty, say so.
+close with seven lists. Anything empty, say so.
 
 - **New variables** — name, value, and what in the design asked for it.
 - **New components** — what was built, and why nothing existing covered it.
+- **Behaviour** — each part from [What moves](#what-moves): what it was built
+  as, and whether the user said so or it was decided unattended.
 - **Guesses** — derived fluid mins, invented states (dark-theme button hover,
   focus rings), anything the file did not actually specify.
 - **Snapped** — values moved to an existing token, with the delta. These were
@@ -344,7 +391,7 @@ Trix release, and a Trix release does not invalidate the skill.
   duplicates it; the script reads it and prints both on every run:
 
   ```
-  trix-import-figma 1.1.0  ·  Trix <whatever package.json says>
+  trix-import-figma 1.2.0  ·  Trix <whatever package.json says>
   ```
 
   If the running project is a different version than `TESTED_AGAINST`, the

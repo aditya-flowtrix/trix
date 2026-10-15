@@ -42,6 +42,13 @@ Added:
   section. `/trix-import-figma` now builds and checks one section at a time,
   takes every value from the design context (never the screenshot), and says
   up front when the file has no mobile frame.
+- `/trix-import-figma` asks what moves. A frame can't show a logo marquee from
+  a still row, so the import built one static without a word. Its new
+  `patterns.mjs` reads the frame's metadata for likely marquees, sliders,
+  before/after handles, accordions, pagination dots and hidden second
+  states. The skill puts each to the user as a question, with the evidence
+  and a suggestion, and always asks whether anything else moves. Unattended,
+  it builds the suggestion and logs it. Skill 1.2.0.
 
 ### CI for private repositories
 
