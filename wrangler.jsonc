@@ -13,6 +13,11 @@
     "not_found_handling": "404-page",
   },
 
+  // Pull-request previews: Workers Builds runs `wrangler preview` for every
+  // branch but the production one, and it refuses a config without this
+  // block. Empty means a preview is built exactly like production.
+  "previews": {},
+
   // A custom domain goes here (and in SITE_URL, site/src/consts.ts):
   // "routes": [{ "pattern": "trix.example.com", "custom_domain": true }],
 

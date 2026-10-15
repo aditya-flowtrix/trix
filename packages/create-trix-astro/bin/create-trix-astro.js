@@ -275,6 +275,11 @@ build pages and components here is in [TRIX.md](TRIX.md).
     "not_found_handling": "404-page",
   },
 
+  // Pull-request previews: Workers Builds runs \`wrangler preview\` for every
+  // branch but the production one, and it refuses a config without this
+  // block. Empty means a preview is built exactly like production.
+  "previews": {},
+
   // Your domain, once it is in this Cloudflare account. Until then the site
   // is at https://${name}.<your-subdomain>.workers.dev.
   // "routes": [{ "pattern": "www.example.com", "custom_domain": true }],

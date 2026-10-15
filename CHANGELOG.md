@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Cloudflare's pull-request previews build again. Workers Builds runs
+  `wrangler preview` for every branch but the production one, and it refuses
+  a config without a `previews` block. The docs site's `wrangler.jsonc` has
+  one now, and `create-trix-astro` 0.2.3 writes one into every new project.
+
 ## 0.4.0 — 2026-10-15
 
 Trix is Flowtrix's alone, with cookie consent, a before/after `Compare`, and

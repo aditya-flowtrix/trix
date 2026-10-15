@@ -102,6 +102,14 @@ try {
       /"name": "my-site"/,
     );
   });
+  it("a Cloudflare config its pull requests can preview", () => {
+    // `wrangler preview`, which Workers Builds runs for every branch but the
+    // production one, refuses a config without a previews block.
+    assert.match(
+      readFileSync(join(site, "wrangler.jsonc"), "utf8"),
+      /"previews": \{\}/,
+    );
+  });
   it("components, styles and skills arrive — the skill links included", () => {
     assert.ok(existsSync(join(site, "src/components/wrapper/Row.astro")));
     assert.ok(existsSync(join(site, "src/styles/tokens.css")));
