@@ -32,41 +32,50 @@ const {
 }
 
 <script>
-  const KEY = "trix-mode";
-  const root = document.documentElement;
-  const media = matchMedia("(prefers-color-scheme: dark)");
+  import { COLOR_MODE } from "@/consts.ts";
 
-  const sync = () => {
-    for (const button of document.querySelectorAll(".theme-toggle_wrap")) {
-      button.setAttribute("aria-pressed", String(root.dataset.mode === "dark"));
-    }
-  };
+  // Only a site that offers the choice follows the OS or a click. In "light"
+  // or "dark" this is false at build time, so the bundle drops it all.
+  if (COLOR_MODE === "auto") {
+    const KEY = "trix-mode";
+    const root = document.documentElement;
+    const media = matchMedia("(prefers-color-scheme: dark)");
 
-  const saved = () => {
-    try {
-      return localStorage.getItem(KEY);
-    } catch {
-      return null;
-    }
-  };
+    const sync = () => {
+      for (const button of document.querySelectorAll(".theme-toggle_wrap")) {
+        button.setAttribute(
+          "aria-pressed",
+          String(root.dataset.mode === "dark"),
+        );
+      }
+    };
 
-  document.addEventListener("click", (event) => {
-    if (!(event.target as Element).closest?.(".theme-toggle_wrap")) return;
-    const mode = root.dataset.mode === "dark" ? "light" : "dark";
-    try {
-      localStorage.setItem(KEY, mode);
-    } catch {}
-    root.dataset.mode = mode;
+    const saved = () => {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    };
+
+    document.addEventListener("click", (event) => {
+      if (!(event.target as Element).closest?.(".theme-toggle_wrap")) return;
+      const mode = root.dataset.mode === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem(KEY, mode);
+      } catch {}
+      root.dataset.mode = mode;
+      sync();
+    });
+
+    media.addEventListener("change", () => {
+      if (saved()) return;
+      root.dataset.mode = media.matches ? "dark" : "light";
+      sync();
+    });
+
     sync();
-  });
-
-  media.addEventListener("change", () => {
-    if (saved()) return;
-    root.dataset.mode = media.matches ? "dark" : "light";
-    sync();
-  });
-
-  sync();
+  }
 </script>
 
 <style is:global>

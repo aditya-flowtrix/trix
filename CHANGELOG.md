@@ -48,6 +48,16 @@ content-wrapper */` exports `--content-wrapper-gap` as `content-wrapper.gap`,
   `medium` up. `Nav` no longer clips a dropdown's panel on desktop; the Nav and
   Dropdown docs show one in a nav. The template's Nav keeps Lumos's plain links.
 
+### Fixed — found comparing Trix with Lumos, page by page
+
+- A `COLOR_MODE: "light"` (or `"dark"`) site turned dark (or light)
+  mid-visit when the visitor's OS switched theme: `ThemeToggle`'s script
+  shipped and listened whatever the mode. It now compiles away unless the
+  mode is `"auto"` — one script fewer on every page of a light or dark site.
+- A `Video` with its pause button lost `ContentWrapper`'s visual frame
+  (ratio and rounded corners) where it was the page's first video: the
+  component's script lands beside it and wasn't on the frame's list.
+
 ### Figma import (`/trix-import-figma`, `/trix-design-system`)
 
 - `convert.mjs --fresh` for a new project: the design's type scale and

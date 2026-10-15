@@ -182,7 +182,7 @@ const column2 = await slotContent(Astro.slots, "column2");
       /* visual ratio lock */
       &
         > :last-child:not(
-          :has(> :not(.image, .video, .overlay, .video_toggle))
+          :has(> :not(.image, .video, .overlay, .video_toggle, script))
         ) {
         position: relative;
         border-radius: var(--radius-small);
