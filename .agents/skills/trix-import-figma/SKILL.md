@@ -105,7 +105,14 @@ say which width you measured.
    With the MCP: `get_variable_defs` for whatever variables do exist,
    `get_design_context` for the frame, `get_screenshot` to see what it should
    look like. Start with the variables: they tell you how much of the system
-   the designer actually used.
+   the designer actually used. Every value and every line of copy comes from
+   the design context; the screenshot is the target to compare against, never
+   a source of numbers. A section the context returns sparse is fetched again
+   by its child nodes, not read off the picture.
+
+   **Check for a mobile frame now.** If the file has only desktop frames, say
+   so before building: every `-min`, every stacking decision and every mobile
+   height will be a guess, and the report opens with that.
 
 2. **Inventory before converting.** List every distinct spacing value, type
    size with its line height, and color with its opacity. Distinct _values_,
@@ -255,6 +262,18 @@ say which width you measured.
    existing covered it. That list is the one most worth arguing with: it is
    where the system grows, and growth is harder to undo than a token.
 
+   Check the library's options before building around one: `Button size`,
+   `Slider controls="top"` with a `header` slot and `markers`,
+   `ContentWrapper distribute` (heading at the top, text at the bottom of a
+   tall column), `Section`'s `background` slot. A design background goes in
+   that slot, or in a `.section_background` — any other child of a section
+   stays in the flow.
+
+   **Build one section, look at it, then the next** (step 8). A layering or
+   inheritance mistake made in the first section is repeated in every one
+   after it, and no check catches it: `npm run check` passes on a heading
+   hidden under an overlay.
+
 8. **Look at it.** Tokens matching the table does not mean the page matches the
    design. Start the dev server, open the page, and compare it against the
    screenshot from step 1:
@@ -263,12 +282,21 @@ say which width you measured.
    npx astro dev --background
    ```
 
-   Screenshot the built page at the same width as the frame you measured, and
-   check the two side by side. Then check the width you did _not_ measure —
-   a design given only at 1440px still has to survive 375px, and that is where
-   derived mins show up as wrong. Report what does not match rather than
-   quietly adjusting tokens until it does: a mismatch is often the design
-   being inconsistent, which is a question, not a bug.
+   Measure the page against the frame, section by section — the design's
+   heights in order are the top-level frames `get_metadata` lists:
+
+   ```bash
+   node scripts/measure/sections.ts --url http://localhost:4321/ \
+     --widths 1440,375 --expect 970,162,800,861 --shots
+   ```
+
+   It flags each section off by more than 16px and any width that scrolls
+   sideways, and saves a screenshot per section in `.trix/sections/`. Put each
+   beside the design's screenshot of the same section. Then check the width
+   you did _not_ measure — a design given only at 1440px still has to survive
+   375px, and that is where derived mins show up as wrong. Report what does
+   not match rather than quietly adjusting tokens until it does: a mismatch is
+   often the design being inconsistent, which is a question, not a bug.
 
 ## Working unattended
 
@@ -292,7 +320,8 @@ licence, or anything the design contradicts itself on twice.
 
 ## The report
 
-Close with four lists. Anything empty, say so.
+Open with what the file did not have — a mobile frame, a layout grid — then
+close with six lists. Anything empty, say so.
 
 - **New variables** — name, value, and what in the design asked for it.
 - **New components** — what was built, and why nothing existing covered it.

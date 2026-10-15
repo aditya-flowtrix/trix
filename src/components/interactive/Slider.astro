@@ -34,6 +34,10 @@ type Props = HTMLAttributes<"div"> & {
   loop?: boolean;
   /** Slide playback. `auto` advances every six seconds and loops, with a pause button. */
   playback?: "manual" | "auto";
+  /** Controls placement. `top` sets them above the slides, beside the `header` slot. */
+  controls?: "bottom" | "top";
+  /** Show a dot for each position. Set to `false` for arrows only. */
+  markers?: boolean;
 };
 
 const {
@@ -46,6 +50,8 @@ const {
   large,
   loop = false,
   playback = "manual",
+  controls = "bottom",
+  markers = true,
   class: className,
   ...rest
 } = Astro.props;
@@ -76,6 +82,7 @@ const visible =
     .join("; ") || undefined;
 
 const slides = await slotContent(Astro.slots);
+const header = await slotContent(Astro.slots, "header");
 ---
 
 {
@@ -86,17 +93,23 @@ const slides = await slotContent(Astro.slots);
         variant !== "bleed" && variant,
         loop && "loop",
         playback === "auto" && "auto",
+        controls === "top" && "controls-top",
         className,
       ]}
       style={visible}
       {...rest}
     >
+      {header && (
+        <div class="slider_header">
+          <Fragment set:html={header} />
+        </div>
+      )}
       <div class="slider_list" role="group" aria-label={label} tabindex="0">
         <Fragment set:html={slides} />
       </div>
 
       <div class="slider_controls">
-        <div class="slider_markers" />
+        {markers && <div class="slider_markers" />}
         <div class="slider_steps">
           <Button
             variant="arrow"
@@ -452,6 +465,28 @@ const slides = await slotContent(Astro.slots);
       .slider_wrap:not(.is-ready) &,
       &.is-empty {
         display: none;
+      }
+
+      &:not(:has(.slider_markers)) {
+        justify-content: end;
+      }
+    }
+
+    /* Controls above the slides, at the end of the header's row — the DOM
+       keeps them after the slides, so they follow them in tab order. */
+    .slider_wrap.controls-top {
+      grid-template-columns: minmax(0, 1fr) auto;
+      & > .slider_header {
+        grid-area: 1 / 1;
+        align-self: end;
+      }
+      & > .slider_controls {
+        grid-area: 1 / 2;
+        align-self: end;
+      }
+      & > .slider_list {
+        grid-row: 2;
+        grid-column: 1 / -1;
       }
     }
 

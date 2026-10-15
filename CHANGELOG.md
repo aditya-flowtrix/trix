@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+### From importing a homepage from Figma
+
+Building one client page from a Figma file found places where Trix failed
+silently — the page passed `npm run check` and still rendered wrong — and
+options designs ask for that the components lacked. Nothing here carries the
+client's look: no colours, fonts or sizes changed.
+
+**A section's background is opt-in (breaking for hand-written sections).**
+Every child of a `.section` that was not the `.container` used to become an
+absolute, full-size background — a band or header added to a project's own
+section vanished behind the content. Now only the `background` slot is: the
+`Section` component wraps it in `.section_background`, which is also its own
+stacking layer, so an overlay's `z-index` stays behind the content. Pages
+built with `Section` change nothing. A section written by hand puts its
+background in `<div class="section_background">`.
+
+Fixed:
+
+- `NavLink` no longer marks a `#` link as the current page — every
+  placeholder link in a new nav rendered underlined.
+- A `Text style` heading with words after the name, like
+  `/* Text style — eyebrow (note) */`, dropped the style without a word;
+  `npm run tokens` now fails and says how to write it. A note on the next
+  line is fine.
+
+Added:
+
+- `Button size`: `small`, `main`, `large`, from four `--button-small-*` and
+  `--button-large-*` padding tokens. The default look is unchanged.
+- `Slider controls="top"` sets the arrows above the slides, beside a new
+  `header` slot; `markers={false}` keeps the arrows and drops the dots.
+- `ContentWrapper distribute` spreads a stack over a tall column — heading at
+  the top, text at the foot — which a `justify-content` class could not do.
+- `.color-text-2` and `.background-3`, the utilities `--text-2` and
+  `--background-3` were missing.
+- `scripts/measure/sections.ts` measures a built page section by section
+  against the design's heights, flags sideways scrolling and screenshots each
+  section. `/trix-import-figma` now builds and checks one section at a time,
+  takes every value from the design context (never the screenshot), and says
+  up front when the file has no mobile frame.
+
 ### CI for private repositories
 
 Projects run in private repositories, where GitHub bills Actions by the

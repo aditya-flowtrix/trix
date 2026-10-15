@@ -39,6 +39,22 @@ a video, an overlay.
 </Section>
 ```
 
+Only the slot is a background. Every other child of a `.section` stays in the
+flow — a band, a header, a second container. A section written by hand in
+a project component marks its background the same way the slot does:
+
+```astro
+<section class="section theme-dark">
+  <div class="section_background">
+    <Img src={hero} />
+  </div>
+  <div class="container">…</div>
+</section>
+```
+
+The background is its own layer: a `z-index` inside it — an overlay's
+pseudo-element, a canvas — stays behind the content.
+
 ## Alignment
 
 `align="center"` centers the container's children and their text together.

@@ -78,13 +78,21 @@
     object-fit: contain;
   }
 }
-/* Section background children */
-.section > :where(:not(.container)) {
+/* Section background: the Section's `background` slot, or a
+   `.section_background` written into a hand-made `.section`. Opt-in, so a
+   band, a header or any other child stays in the flow. Its own stacking
+   context keeps an overlay's z-index inside it, behind the content. */
+.section_background {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  z-index: 0;
+  & > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* Flex */

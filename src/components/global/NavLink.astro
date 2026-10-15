@@ -12,8 +12,10 @@ type Props = HTMLAttributes<"a"> & {
 
 const { render = true, href, class: className, ...rest } = Astro.props;
 
-/** Marks the link for the page being viewed, whatever the URL style. */
+/** Marks the link for the page being viewed, whatever the URL style. A
+    `#` link — a placeholder or an anchor — never names the page. */
 const current =
+  !href.startsWith("#") &&
   pagePath(Astro.url) === pagePath(new URL(href, Astro.url))
     ? "page"
     : undefined;

@@ -27,6 +27,31 @@ buttons and the block together.
 </ContentWrapper>
 ```
 
+## Filling a column
+
+In a column taller than its content — beside an image in a `Row` — a stack
+gathers at the top. `distribute` spreads it over the whole height instead: the
+first block at the top, the last at the bottom.
+
+```astro
+<Row>
+  <Col span={6}>
+    <ContentWrapper distribute>
+      <ContentWrapper>
+        <Heading tag="h2">One platform</Heading>
+        <ButtonWrapper><Button>Explore</Button></ButtonWrapper>
+      </ContentWrapper>
+      <Paragraph>The text at the foot of the column.</Paragraph>
+    </ContentWrapper>
+  </Col>
+  <Col span={6}><Img src={visual} /></Col>
+</Row>
+```
+
+The wrapper's blocks are spaced by their own margins, not a flex gap, so a
+`justify-content` class on it does nothing — `distribute` is the way to spread
+them.
+
 ## Beside media
 
 Put the media in the `column2` slot and choose the arrangement:

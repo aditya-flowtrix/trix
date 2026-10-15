@@ -38,7 +38,8 @@ An announcement above the bar is a [`NavBanner`](/docs/components/nav-banner),
 placed just before `<Nav />` in `BaseLayout`.
 
 `NavLink` marks itself with `aria-current="page"` when its `href` is the page
-being shown — whatever the URL's trailing slash or `.html`.
+being shown — whatever the URL's trailing slash or `.html`. A `#` link, a
+placeholder or an anchor on the page, is never marked.
 
 `overlap` (on `BaseLayout`) fixes the bar over the first section instead of
 above it — give that section `paddingTop="navoverlap"` to clear it.

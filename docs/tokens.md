@@ -379,6 +379,10 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | --- | --- |
 | `--button-padding-block` | `0.75em` |
 | `--button-padding-inline` | `1.5em` |
+| `--button-small-padding-block` | `0.5em` |
+| `--button-small-padding-inline` | `1em` |
+| `--button-large-padding-block` | `1em` |
+| `--button-large-padding-inline` | `2em` |
 | `--button-radius` | `0.5em` |
 | `--button-gap` | `0.5em` |
 | `--button-line-height` | `1.2` |

@@ -9,6 +9,8 @@ import { slotContent } from "@/utils/slots.ts";
 
 type Emphasis = "primary" | "secondary";
 
+type Size = "small" | "main" | "large";
+
 type Tag =
   | (HTMLAttributes<"button"> & {
       /** Rendered element. */
@@ -33,6 +35,8 @@ type Kind =
       variant?: "main";
       /** Visual emphasis. */
       emphasis?: Emphasis;
+      /** Button size. */
+      size?: Size;
       label?: never;
       pressed?: never;
       direction?: never;
@@ -41,6 +45,8 @@ type Kind =
       variant: "link";
       /** A link carries no weight of its own: it is already the quietest. */
       emphasis?: never;
+      /** A link is sized by its text. */
+      size?: never;
       label?: never;
       pressed?: never;
       direction?: never;
@@ -48,6 +54,7 @@ type Kind =
   | {
       variant: "play";
       emphasis?: Emphasis;
+      size?: Size;
       /** Accessible label. Defaults to `Play` or `Pause`. */
       label?: string;
       /** Show the pause icon and pressed state. */
@@ -57,6 +64,7 @@ type Kind =
   | {
       variant: "close";
       emphasis?: Emphasis;
+      size?: Size;
       /** Accessible label. Defaults to `Close`. */
       label?: string;
       pressed?: never;
@@ -65,6 +73,7 @@ type Kind =
   | {
       variant: "arrow";
       emphasis?: Emphasis;
+      size?: Size;
       /** Accessible label. Defaults to `Next` or `Previous`. */
       label?: string;
       pressed?: never;
@@ -83,6 +92,7 @@ type AllProps = HTMLAttributes<"button"> &
     render?: boolean;
     variant?: "main" | "link" | "play" | "close" | "arrow";
     emphasis?: Emphasis;
+    size?: Size;
     label?: string;
     pressed?: boolean;
     direction?: "forward" | "back";
@@ -95,6 +105,7 @@ const {
   render = true,
   variant = "main",
   emphasis = "primary",
+  size = "main",
   label,
   pressed = false,
   direction = "forward",
@@ -129,6 +140,7 @@ const named = {
       class:list={[
         "button_wrap",
         emphasis !== "primary" && emphasis,
+        size !== "main" && size,
         variant !== "main" && variant,
         variant === "arrow" && direction === "back" && "back",
         className,
@@ -189,6 +201,14 @@ const named = {
           color: var(--button-text-hover);
           border-color: var(--button-border-hover);
         }
+      }
+      &.small {
+        --button-padding-block: var(--button-small-padding-block);
+        --button-padding-inline: var(--button-small-padding-inline);
+      }
+      &.large {
+        --button-padding-block: var(--button-large-padding-block);
+        --button-padding-inline: var(--button-large-padding-inline);
       }
       &.secondary {
         --button-background: var(--button-2-background);

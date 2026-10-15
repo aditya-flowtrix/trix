@@ -112,7 +112,13 @@ export function parseThemes(css: string): Theme[] {
 function textStyles(groups: Model["groups"], byName: Map<string, string>) {
   return groups.flatMap((g) => {
     const name = g.name.match(/^Text style\s*[—–-]\s*([\w-]+)$/)?.[1];
-    if (!name) return [];
+    if (!name) {
+      if (/^text style\b/i.test(g.name))
+        throw new Error(
+          `"/* ${g.name} */" is not a text style heading — write exactly "/* Text style — name */" and put any note on the next line.`,
+        );
+      return [];
+    }
     if (!byName.has(`${name}-font-family`))
       throw new Error(
         `"/* ${g.name} */" has no --${name}-font-family — a text style's tokens are named after its heading.`,

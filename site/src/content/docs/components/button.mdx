@@ -41,6 +41,18 @@ text's line and takes the label's colour:
 <Button variant="close" />
 ```
 
+## Sizes
+
+`size` sets the padding — `small`, `main` (default) or `large` — around the
+same label, as designs draw a compact button in a nav and a large one in a
+hero.
+
+```astro live
+<Button size="small">Small</Button>
+<Button>Main</Button>
+<Button size="large">Large</Button>
+```
+
 ## From the design
 
 Colours are theme roles (`--button-*` in `themes.css`). The rest is the
@@ -49,6 +61,10 @@ once, not on every `Button`:
 
 | Token                           | Default               | Sets                                   |
 | ------------------------------- | --------------------- | -------------------------------------- |
+| `--button-small-padding-block`  | `0.5em`               | `size="small"`'s padding, top/bottom   |
+| `--button-small-padding-inline` | `1em`                 | and left/right                         |
+| `--button-large-padding-block`  | `1em`                 | `size="large"`'s padding, top/bottom   |
+| `--button-large-padding-inline` | `2em`                 | and left/right                         |
 | `--button-label-family`         | `inherit`             | the label's font                       |
 | `--button-label-size`           | `inherit`             | its size                               |
 | `--button-label-letter-spacing` | `inherit`             | its tracking                           |

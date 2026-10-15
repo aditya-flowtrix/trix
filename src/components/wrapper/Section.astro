@@ -79,7 +79,11 @@ const background = await slotContent(Astro.slots, "background");
       ]}
       {...rest}
     >
-      <Fragment set:html={background} />
+      {background && (
+        <div class="section_background">
+          <Fragment set:html={background} />
+        </div>
+      )}
       {content && (
         <div
           class:list={[

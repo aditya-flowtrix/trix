@@ -46,6 +46,24 @@ screen, or for visitors who prefer less motion.
 </Slider>
 ```
 
+## Controls
+
+The arrows and dots sit below the slides. `controls="top"` sets them above,
+at the end of the row the `header` slot starts — a heading with arrows beside
+it. `markers={false}` drops the dots and keeps the arrows.
+
+```astro live stage="block"
+<Slider label="Stories" controls="top" markers={false} small={2}>
+  <Heading slot="header" tag="h3" variant="h4">Stories</Heading>
+  <Card heading="One" text="A first story." />
+  <Card heading="Two" text="A second story." />
+  <Card heading="Three" text="A third story." />
+</Slider>
+```
+
+The controls stay after the slides in the page, so a keyboard reaches the
+slides first wherever the arrows are drawn.
+
 ## Props
 
 <Props of="interactive/Slider" />

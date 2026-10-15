@@ -16,6 +16,38 @@
       },
       "$description": "1.5em — scales with the component's font size"
     },
+    "small-padding-block": {
+      "$type": "dimension",
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "0.5em — scales with the component's font size"
+    },
+    "small-padding-inline": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "1em — scales with the component's font size"
+    },
+    "large-padding-block": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "1em — scales with the component's font size"
+    },
+    "large-padding-inline": {
+      "$type": "dimension",
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$description": "2em — scales with the component's font size"
+    },
     "radius": {
       "$type": "dimension",
       "$value": {

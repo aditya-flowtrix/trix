@@ -79,4 +79,19 @@ assert.throws(
   /collides/,
 );
 
+// A Text style heading with extra words fails instead of dropping the style.
+assert.throws(
+  () =>
+    run(
+      "  /* Text style — cta (from the design) */\n  --cta-font-family: var(--primary-family);",
+    ),
+  /not a text style heading/,
+);
+
+// A note on the heading's next line is fine.
+out = run(
+  "  /* Text style — cta\n     from the design */\n  --cta-min: 14;\n  --cta-max: 16;\n  --cta-font-family: var(--primary-family);",
+);
+assert.match(out("src/styles/generated/text-styles.css"), /\.text-style-cta/);
+
 console.log("Token generator OK.");
