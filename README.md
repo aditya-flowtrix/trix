@@ -46,7 +46,8 @@ npm run docs:deploy     # build and deploy it (wrangler.jsonc)
 ```
 
 Cloudflare builds and deploys it on every push to `main`: build command
-`npm run docs:build`, deploy command `npx wrangler deploy`.
+`npm run docs:build`, deploy command `npx wrangler deploy`. Every other branch
+gets a preview URL, built by the same command under Previews Base.
 
 Its pages are MDX in `site/src/content/docs/`. Props tables, the utility and
 pattern lists, the token reference and the skills list are read from the
