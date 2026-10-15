@@ -243,7 +243,7 @@
   --text-xsmall-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — eyebrow
-     Lumos sets eyebrows in text-small; these match it until a design differs. */
+     Eyebrows default to text-small's look until a design differs. */
   --eyebrow-min: 14;
   --eyebrow-max: 16;
   --eyebrow-font-family: var(--primary-family);

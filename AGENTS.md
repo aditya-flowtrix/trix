@@ -1,8 +1,8 @@
 # Trix
 
-This is **Trix**, a design-ready Astro framework built on Lumos for Astro,
-styled with plain CSS and custom properties. Do not apply conventions from
-Lumos for Webflow, Mast, Client-First or Tailwind.
+This is **Trix**, Flowtrix's design-ready Astro framework, styled with plain
+CSS and custom properties. Do not apply conventions from other frameworks or
+Webflow class systems (Client-First, `u-` utilities, Tailwind and the like).
 
 Read in this order before changing anything:
 
@@ -72,7 +72,7 @@ any scripts they need. Measuring tools shared by several skills live in
 - `trix-consent` — add or change cookie consent: the banner, gated scripts, where consent is recorded.
 - `trix-audit-props` — check prop order and tooltip consistency.
 - `trix-scaling-graphic` — build an editable graphic that scales as one piece.
-- `trix-upgrade` — upgrade a site to the latest Trix; sync Trix with Lumos.
+- `trix-upgrade` — upgrade a site to the latest Trix.
 
 `.agents/skills/` is the source of truth. Claude Code loads the same skills from
 relative symlinks in `.claude/skills/`. For each new skill, add

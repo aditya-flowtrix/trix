@@ -12,12 +12,12 @@ exactly; motion survives and gets smoother.
 
 Platform-specific detail lives in `references/`:
 
-| Platform                                                 | Read                      |
-| -------------------------------------------------------- | ------------------------- |
-| Webflow (any framework: Lumos, Client-First, Mast, none) | `references/webflow.md`   |
-| Framer                                                   | `references/framer.md`    |
-| WordPress (blocks, Elementor, Divi, Bricks, classic)     | `references/wordpress.md` |
-| Wix, Squarespace, static HTML, anything else             | `references/other.md`     |
+| Platform                                                             | Read                      |
+| -------------------------------------------------------------------- | ------------------------- |
+| Webflow (any framework: Client-First, `u-` or `cc-` utilities, none) | `references/webflow.md`   |
+| Framer                                                               | `references/framer.md`    |
+| WordPress (blocks, Elementor, Divi, Bricks, classic)                 | `references/wordpress.md` |
+| Wix, Squarespace, static HTML, anything else                         | `references/other.md`     |
 
 Read the main file first, then the platform's reference.
 

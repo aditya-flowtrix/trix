@@ -8,8 +8,8 @@
  * properties that differ from an unclassed element are compared. Two classes
  * match only if they change the same properties to the same values at every
  * width. A class with the same name and a different effect is reported — on
- * a migrated site that is the dangerous case (`margin-bottom-2` in Lumos for
- * Webflow is not `margin-bottom-2` in a project with its own spacing scale).
+ * a migrated site that is the dangerous case (`margin-bottom-2` in a Webflow
+ * utility system is not `margin-bottom-2` in a project with its own spacing scale).
  *
  * Usage
  *   node scripts/measure/classes.ts --source https://site.com/ --local http://localhost:4321/style-guide

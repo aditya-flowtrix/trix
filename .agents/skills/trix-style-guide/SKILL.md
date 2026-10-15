@@ -3,7 +3,7 @@ name: trix-style-guide
 description: >-
   Build or rebuild a project's Trix design system — typography, colors,
   themes, spacing, radius, breakpoints, fonts, brand assets — from any source:
-  a live site on any platform (Webflow with Lumos, Mast, Client-First or no
+  a live site on any platform (Webflow with Client-First, a utility system or no
   framework; Framer; WordPress; Wix; Squarespace; hand-built), a code export,
   platform variables, or nothing but a design. Use when starting a migration,
   setting up a new project's style guide, when a source has no style guide and
@@ -76,15 +76,15 @@ node scripts/measure/inventory.ts --url https://example.com
 
 The platform and framework lines decide where the authoritative values live:
 
-| Source                                                          | Structure and names come from                                                                                                              | Values are checked by                |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
-| Webflow with Variables (Lumos, Client-First v2, Mast 2, custom) | Variables panel via the Webflow MCP (`data_variable_tool`: collections, modes)                                                             | `design.ts` + `variables.ts`         |
-| Webflow without Variables                                       | `design.ts` measurements                                                                                                                   | `classes.ts` against utility classes |
-| Framer                                                          | `--token-*` / `--framer-*` custom properties in `design.json → variables`, and the Framer project if available                             | `design.ts`                          |
-| WordPress block theme                                           | `theme.json` (`/wp-content/themes/<theme>/theme.json`): `settings.color.palette`, `typography.fontSizes`, `spacing.spacingSizes`, `custom` | `design.ts`                          |
-| WordPress page builder (Elementor, Divi, Bricks)                | Builder global colors and fonts (Site Settings), then `design.ts`                                                                          | `design.ts`                          |
-| Anything else, or no style guide at all                         | `design.ts` measurements alone                                                                                                             | `verify.ts`                          |
-| A Figma file                                                    | `/trix-import-figma` instead                                                                                                               | that skill's report                  |
+| Source                                                            | Structure and names come from                                                                                                              | Values are checked by                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| Webflow with Variables (Client-First v2, utility systems, custom) | Variables panel via the Webflow MCP (`data_variable_tool`: collections, modes)                                                             | `design.ts` + `variables.ts`         |
+| Webflow without Variables                                         | `design.ts` measurements                                                                                                                   | `classes.ts` against utility classes |
+| Framer                                                            | `--token-*` / `--framer-*` custom properties in `design.json → variables`, and the Framer project if available                             | `design.ts`                          |
+| WordPress block theme                                             | `theme.json` (`/wp-content/themes/<theme>/theme.json`): `settings.color.palette`, `typography.fontSizes`, `spacing.spacingSizes`, `custom` | `design.ts`                          |
+| WordPress page builder (Elementor, Divi, Bricks)                  | Builder global colors and fonts (Site Settings), then `design.ts`                                                                          | `design.ts`                          |
+| Anything else, or no style guide at all                           | `design.ts` measurements alone                                                                                                             | `verify.ts`                          |
+| A Figma file                                                      | `/trix-import-figma` instead                                                                                                               | that skill's report                  |
 
 When a source has named variables, they give **structure** (which colors are
 the palette, which modes exist, which sizes are a scale) and intended values.
@@ -165,7 +165,7 @@ group. The file's comment headings are the groups; keep them.
 - **Text styles** — one group per style, all twelve properties. A source with
   no heading margins (most Webflow builds) gets `0rem` margin tokens. A source
   without leading trim gets `--primary-trim-top/bottom: 0.5lh` (trim off). A
-  source that trims (Lumos for Webflow) keeps its own trim values; for a
+  source that already trims keeps its own trim values; for a
   font the source never trimmed but the project now should, measure it:
   `node scripts/fonts.ts --url <dev>/style-guide --write`.
 - **Spacing** — the numbered scale in size order. If its length or values

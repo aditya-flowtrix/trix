@@ -193,7 +193,7 @@ npm install --save-exact @c15t/integrations@3.0.0   # only with a vendor helper
 5. **`public/_headers`**: if it has a `Content-Security-Policy`, add the
    backend's origin to `connect-src` and each vendor to `script-src`.
 
-Lumos conventions apply: `consent_` classes, project tokens, the component's
+Trix conventions apply: `consent_` classes, project tokens, the component's
 own `<style>`.
 
 ## 4. A self-hosted backend

@@ -48,12 +48,6 @@
     "wrangler": "^4.123.0"
   },
   "trix": {
-    "version": "0.3.0",
-    "basedOn": {
-      "name": "Lumos for Astro",
-      "version": "0.0.5",
-      "commit": "0e32ded964de80d62636346c2e0e3fb3a701beda",
-      "repository": "https://github.com/lumosframework/lumos-for-astro"
-    }
+    "version": "0.3.0"
   }
 }

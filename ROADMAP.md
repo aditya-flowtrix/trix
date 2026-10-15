@@ -2,7 +2,7 @@
 
 ## Phase 1 — Framework and migration (v0.1–0.2, now)
 
-- Trix framework on Lumos for Astro: token generator, style guide, components,
+- Trix framework: token generator, style guide, components,
   designer guide, Figma variable files.
 - Skills: new project, style guide, migrate (Webflow, Framer, WordPress,
   other), Figma import, prop audit, scaling graphic, upgrade.

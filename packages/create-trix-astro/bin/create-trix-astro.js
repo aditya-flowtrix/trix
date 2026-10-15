@@ -7,7 +7,6 @@
  * and commit it started from (what /trix-upgrade merges against), with a
  * Cloudflare config of its own. Then installs dependencies.
  *
- * Modelled on create-lumos (Lumos for Astro, MIT, Timothy Ricks).
  */
 import {
   cp,

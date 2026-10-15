@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Trix 0.2 → 0.3: the token scales take Lumos for Astro's names. Values never
+ * Trix 0.2 → 0.3: the token scales take their 0.3 names. Values never
  * change — a site renamed by this looks exactly as it did.
  *
  *   --space-N (N ≥ 2)            → --space-(N-1), and gap-N, padding-*-N,
@@ -15,8 +15,8 @@
  * the script lists where and writes nothing: ask the owner whether to keep
  * the value as a token of the site's own or write it in place.
  *
- *   node .agents/skills/trix-upgrade/rename-lumos-names.mjs           # report
- *   node .agents/skills/trix-upgrade/rename-lumos-names.mjs --write
+ *   node .agents/skills/trix-upgrade/rename-scale-names.mjs           # report
+ *   node .agents/skills/trix-upgrade/rename-scale-names.mjs --write
  *
  * One pass per name, so `small → medium` never then becomes `medium → …`.
  */
@@ -41,7 +41,7 @@ if (
     readFileSync(TOKENS, "utf8"),
   )
 ) {
-  console.log("tokens.css already uses Lumos's names — nothing to rename.");
+  console.log("tokens.css already uses the 0.3 names — nothing to rename.");
   process.exit(0);
 }
 const used = [];
@@ -62,7 +62,7 @@ for (const file of files("src")) {
   };
   for (const old of ["line-height-medium", "letter-spacing-tight"])
     for (const m of s.matchAll(new RegExp(`--${old}\\b(?!-)`, "g")))
-      used.push(`${file}: --${old} (no Lumos name)`);
+      used.push(`${file}: --${old} (no 0.3 name)`);
   s = s
     .replace(/--space-(\d+)(?!\d)/g, (m, n) => `--space-${step("--space")(n)}`)
     .replace(
