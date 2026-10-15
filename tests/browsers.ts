@@ -261,6 +261,26 @@ async function safari(): Promise<Driver | string> {
             });
           }
           const id = Object.values(el)[0];
+          // WebDriver clicks wherever the element is the moment it asks, so
+          // a page still settling takes the click somewhere else. Scroll it
+          // where the click's own scroll would, then wait until it has held
+          // still for 150ms and nothing covers it, as Playwright does.
+          await call("POST", s("/execute/async"), {
+            script: `const [el, done] = arguments;
+              el.scrollIntoView({ block: "end", inline: "nearest" });
+              let last = "", since = performance.now();
+              const end = since + 2000;
+              const tick = (now) => {
+                const r = el.getBoundingClientRect();
+                const box = [r.x, r.y, r.width, r.height].join();
+                const hit = el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+                if (box !== last || !hit) [last, since] = [box, now];
+                if (now - since >= 150 || now > end) done();
+                else requestAnimationFrame(tick);
+              };
+              requestAnimationFrame(tick);`,
+            args: [el],
+          });
           await call("POST", s(`/element/${id}/click`), {});
         },
         async press(key) {
