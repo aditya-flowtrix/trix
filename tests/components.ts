@@ -145,6 +145,17 @@ try {
       );
     });
 
+    await it("a Marquee of text alone moves", async () => {
+      await page.goto(`${origin}/test/marquee-text`);
+      const offset = () =>
+        page
+          .locator(".marquee_track")
+          .evaluate((track) => track.getBoundingClientRect().x);
+      const before = await offset();
+      await page.waitForTimeout(300);
+      assert.notEqual(await offset(), before);
+    });
+
     await it("form fields in any script keep their names, and ids of their own", async () => {
       await page.goto(`${origin}/test/form-scripts`);
       const form = await page.evaluate(() => ({

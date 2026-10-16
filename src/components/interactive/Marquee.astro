@@ -64,7 +64,10 @@ const countItems = (html: string) => {
   return count;
 };
 
-const count = countItems(items);
+// Text alone holds no elements, and a count of 0 would stop the strip, so it
+// moves at one item's pace. ponytail: long text alone moves fast; count its
+// length too if that ever reads badly.
+const count = Math.max(1, countItems(items));
 
 /* The one thing the stylesheet cannot work out for itself. The pace it is
    multiplied by is set there, beside the rest of the animation. */
