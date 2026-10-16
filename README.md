@@ -133,3 +133,7 @@ Trix is made by [Flowtrix](https://flowtrix.co). Icons by
 
 [MIT](LICENSE), © Flowtrix. Third-party notices are in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+The license covers the code. It doesn't cover the Flowtrix name or the Trix and
+Flowtrix logos. A new project starts with the Trix logo and icons as
+placeholders; replace them with your own before launch.
