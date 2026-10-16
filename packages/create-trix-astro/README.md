@@ -10,14 +10,21 @@ cd my-site
 npm run dev
 ```
 
-The command copies Trix into `my-site` at one exact commit, names the project
-after the folder, records which Trix it started from (so upgrades know what to
-merge against), writes a Cloudflare config of its own, and installs
+The command copies the latest Trix release into `my-site`, names the project
+after the folder, records the exact commit it started from (so upgrades know
+what to merge against), writes a Cloudflare config of its own, and installs
 dependencies with whichever package manager you ran it with — `npm`, `pnpm`,
 `yarn` or `bun`.
 
-Run it without a directory name and it asks for one. `--no-install` skips the
-install. Node 22.19 or newer.
+Run it without a directory name and it asks for one. `--ref` copies another
+tag, branch or commit, and `--no-install` skips the install; with npm, options
+go after `--`:
+
+```sh
+npm create trix-astro@latest my-site -- --ref main
+```
+
+Node 22.19 or newer.
 
 ## What you get
 

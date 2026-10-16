@@ -23,6 +23,13 @@
   `téléphone`, not `t-l-phone`.
 - `Form` renders without a `name` — it rendered nothing, silently — and
   `astro dev` warns when it has no `action`, since it then sends nothing.
+- `create-trix-astro` 0.3.0 copies the latest release, not `main`: a new
+  project starts from a version that was released, and its stamp matches its
+  `trix.version`. `--ref` copies another tag, branch or commit. The stamp's
+  commit is read from the download itself, so it no longer goes missing when
+  GitHub's API is rate-limited; when the API can't name the latest release,
+  the installer copies `main` and says so. Unknown options are refused rather
+  than ignored, and `--ref v0.4.0` no longer reads as the folder name.
 - A component inside a `Marquee` binds once. The Marquee repeats its
   content, scripts included, and an inline script ran once per copy: a
   `Video`'s pause button paused and resumed on the same click.
