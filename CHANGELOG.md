@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 — 2026-10-16
+
+Trix works under Astro's `<ClientRouter />` and in any language, new projects
+start from a release, and a Content Security Policy is one switch away. One
+change to check: a form field labelled with accents gets a new name — see
+below.
 
 - Trix works with Astro's `<ClientRouter />` (view transitions). Every
   component with a script set itself up once, at load: after the router
@@ -46,6 +51,30 @@
   its SEO audit runs with `--production`. The framework's CI also runs every
   component script in a scratch site, under ClientRouter and under the
   policy.
+- A `Marquee` of text alone moves. It holds no elements to count, so its
+  duration came to zero and the strip stood still; it now moves at one
+  item's pace.
+- Links prefetch the next page on hover or focus, as `astro.config.mjs` said
+  they did. `prefetch: true` alone only prefetches links marked
+  `data-astro-prefetch`, so nothing was prefetched; it is now
+  `prefetchAll`, on the docs site too. A link opts out with
+  `data-astro-prefetch="false"`.
+- A new project keeps local secrets out of git: `.gitignore` covers Vite's
+  `.env.local` and `.env.*.local`, and Wrangler's `.dev.vars`.
+- The trix-consent backend caps saves at 20 a minute per address.
+  `trustedOrigins` only stops browsers: a script could post choices from
+  anywhere, and consent records are never deleted. The Worker checks
+  Cloudflare's rate limiter, bound as `SAVES` in its `wrangler.jsonc`,
+  before a save reaches the database, and answers 429 past the limit. A
+  backend already deployed needs the template's `ratelimits` block and the
+  check in `src/index.ts`.
+- The trix-consent banner keeps working under `<ClientRouter />`. It bound
+  itself to the first page's banner and settings panel, so after one swap
+  the banner was gone before the visitor chose, Cookie settings stayed
+  hidden, and the panel saved nothing. Both now persist across swaps, and
+  the banner renders again after each. A project with the banner already in
+  place needs the template's two `transition:persist` lines and its
+  `astro:after-swap` listener.
 
 - Cloudflare's pull-request previews build again. Workers Builds runs
   `wrangler preview` for every branch but the production one, and it refuses

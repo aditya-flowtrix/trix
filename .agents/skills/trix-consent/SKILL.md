@@ -159,7 +159,9 @@ npm install --save-exact @c15t/integrations@3.0.0   # only with a vendor helper
 
 2. **`src/components/global/ConsentBanner.astro`**: copy
    `templates/ConsentBanner.astro`. Place it once in `BaseLayout`, after
-   `<Footer />`, with the props from questions 4 and 6. Keep its `popover`
+   `<Footer />`, with the props from questions 4 and 6, so every page has it:
+   under `<ClientRouter />` the banner and the panel move from page to page,
+   and a page without them drops them until a reload. Keep its `popover`
    attribute: it puts the banner in the browser's top layer, above every
    third-party widget whatever its z-index.
 
@@ -207,8 +209,11 @@ own `<style>`.
 Copy `templates/consent-api/` to `consent-api/` at the project's root. It is
 its own package, and a site deploy never touches it. Then edit:
 
-- `wrangler.jsonc`: `name` (`<site>-consent`) and the route
-  (`consent.<domain>`)
+- `wrangler.jsonc`: `name` (`<site>-consent`), the route
+  (`consent.<domain>`), and the `SAVES` limiter's `namespace_id` if another
+  limiter on the account already uses `1001`. The limiter caps each address
+  at 20 saves a minute: `trustedOrigins` only stops browsers, and records are
+  never deleted.
 - `src/settings.ts`: `trustedOrigins` (production, www, staging) and the
   rules from question 1
 

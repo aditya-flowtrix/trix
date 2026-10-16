@@ -18,6 +18,8 @@ should look, then builds it and proves nothing tracks before a choice.
   - The banner sits in the browser's top layer, so no widget can cover it.
   - The settings panel is `Modal` with a `Choice` switch per category.
   - "Reject all" always carries the same weight as "Accept all".
+  - Under Astro's `<ClientRouter />`, the banner and the panel move from
+    page to page.
 - **A "Cookie settings" link in the footer**, so a visitor can change their
   mind on any page.
 - **Embeds on `data-src`**, filled only once their category is allowed.
@@ -29,6 +31,9 @@ should look, then builds it and proves nothing tracks before a choice.
 | Browser only | None             | Nothing; not for production                                                  |
 | Inth         | On Inth          | The backend URL                                                              |
 | Self-hosted  | Your database    | `consent-api/`: a Cloudflare Worker, Postgres through Hyperdrive, migrations |
+
+The self-hosted Worker takes 20 saves a minute from each address, so a
+script can't fill the database.
 
 Consent records are legal evidence: once the site is live, none is ever
 deleted. Development builds and `verify.ts` never write to them; the go-live

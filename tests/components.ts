@@ -145,6 +145,17 @@ try {
       );
     });
 
+    await it("a Marquee of text alone moves", async () => {
+      await page.goto(`${origin}/test/marquee-text`);
+      const offset = () =>
+        page
+          .locator(".marquee_track")
+          .evaluate((track) => track.getBoundingClientRect().x);
+      const before = await offset();
+      await page.waitForTimeout(300);
+      assert.notEqual(await offset(), before);
+    });
+
     await it("form fields in any script keep their names, and ids of their own", async () => {
       await page.goto(`${origin}/test/form-scripts`);
       const form = await page.evaluate(() => ({
@@ -394,6 +405,17 @@ try {
       assert.equal(
         color,
         `rgb(${[0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`,
+      );
+    });
+    // ClientRouter prefetches on its own; without it, the config has to.
+    await it("without ClientRouter, hovering a link prefetches its page", async () => {
+      await csp.goto(`${origin}/`);
+      await csp.locator('.footer_link[href="/style-guide"]').hover();
+      await csp.waitForFunction(
+        () =>
+          document.querySelector('link[rel="prefetch"][href$="/style-guide"]'),
+        null,
+        { timeout: 2000 },
       );
     });
 

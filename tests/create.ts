@@ -127,6 +127,15 @@ try {
     assert.ok(pkg.trix.version);
     assert.equal(pkg.repository, undefined);
   });
+  await it("local secrets stay out of git: .env.local, .env.*.local, .dev.vars", () => {
+    execFileSync("git", ["init", "-q"], { cwd: site });
+    const secrets = [".env.local", ".env.production.local", ".dev.vars"];
+    const ignored = execFileSync("git", ["check-ignore", ...secrets], {
+      cwd: site,
+      encoding: "utf8",
+    });
+    assert.deepEqual(ignored.trim().split("\n"), secrets);
+  });
   await it("nothing points at what stayed behind", () => {
     assert.ok(
       !Object.keys(pkg.scripts).some((s) =>

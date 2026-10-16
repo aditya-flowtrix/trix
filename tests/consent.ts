@@ -5,7 +5,8 @@
  *   - the consent-api Worker bundles for Cloudflare (a dry run, nothing is
  *     deployed) and its region rules pass c15t's own inspection
  *   - the site templates, in a scratch copy of the framework with a fake
- *     vendor and a gated embed, pass `npm run check` and the skill's verify.ts
+ *     vendor and a gated embed, pass `npm run check` and the skill's verify.ts,
+ *     and work on the pages Astro's ClientRouter swaps in
  *
  * Installs the c15t version the templates pin into a temporary folder, never
  * into the framework, so it needs the network. Framework only: projects
@@ -27,6 +28,7 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { launch, serve } from "../scripts/measure/browser.ts";
 import { scratchProject } from "./scratch.ts";
 
 const root = resolve(import.meta.dirname, "..");
@@ -127,7 +129,43 @@ try {
     );
   });
 
-  await it("the Worker bundles for Cloudflare, under 1 MB gzipped", () => {
+  await it("the Worker caps each address's saves before they reach the database", async () => {
+    const { default: worker } = await import(
+      pathToFileURL(join(tmp, "consent-api/src/index.ts")).href
+    );
+    // Cloudflare's rate limiter, as the Worker sees it.
+    const counted: string[] = [];
+    let allowed = true;
+    const env = {
+      SAVES: {
+        limit: async ({ key }: { key: string }) => {
+          counted.push(key);
+          return { success: allowed };
+        },
+      },
+    };
+    const ctx = { waitUntil() {} };
+    const call = (method: string) =>
+      worker.fetch(
+        new Request("https://consent.example.com/api/c15t/subjects", {
+          method,
+          headers: { "cf-connecting-ip": "203.0.113.7" },
+        }),
+        env,
+        ctx,
+      );
+    // Allowed: on to the database, which this one doesn't have.
+    assert.equal((await call("POST")).status, 503);
+    allowed = false;
+    assert.equal((await call("POST")).status, 429);
+    assert.deepEqual(counted, ["203.0.113.7", "203.0.113.7"]);
+    // Reading and CORS preflights save nothing, and aren't counted.
+    await call("GET");
+    await call("OPTIONS");
+    assert.equal(counted.length, 2);
+  });
+
+  await it("the Worker bundles for Cloudflare, under 1 MB gzipped, its rate limit bound", () => {
     const result = spawnSync(
       process.execPath,
       [
@@ -147,6 +185,7 @@ try {
     assert.equal(result.status, 0, output);
     const gzip = Number(/gzip: ([\d.]+) KiB/.exec(output)?.[1]);
     assert.ok(gzip > 0 && gzip < 1024, `${gzip} KiB gzipped`);
+    assert.match(output, /env\.SAVES\b/, "wrangler.jsonc binds no SAVES limit");
   });
 
   // A scratch copy of everything a project gets, with the templates in place,
@@ -214,6 +253,110 @@ try {
     );
     process.stdout.write(result.stdout.replace(/^/gm, "    "));
     assert.equal(result.status, 0, result.stdout + result.stderr);
+  });
+
+  // Astro's ClientRouter swaps pages without reloading them, and the banner's
+  // script runs once, on the first.
+  await it("under ClientRouter, the banner, the settings panel and gated embeds work on the pages it swaps in", async () => {
+    const router = [
+      [
+        'import Footer from "@/components/global/Footer.astro";',
+        'import Footer from "@/components/global/Footer.astro";\nimport { ClientRouter } from "astro:transitions";',
+      ],
+      ["<BaseHead {...seo} />", "<BaseHead {...seo} />\n    <ClientRouter />"],
+    ];
+    for (const [from, to] of router)
+      edit("src/layouts/BaseLayout.astro", from, to);
+    const out = join(tmp, "client-router");
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          join(site, "node_modules/astro/bin/astro.mjs"),
+          "build",
+          "--outDir",
+          out,
+        ],
+        { cwd: site, stdio: ["ignore", "ignore", "inherit"] },
+      );
+    } finally {
+      // Put back, so the checks below run on the site verify.ts passed.
+      for (const [from, to] of router)
+        edit("src/layouts/BaseLayout.astro", to, from);
+    }
+    const { origin, server } = await serve(out);
+    const browser = await launch();
+    try {
+      const page = await browser.newPage();
+      page.setDefaultTimeout(5000);
+      const bannerOpen = () =>
+        page.evaluate(
+          () =>
+            document
+              .querySelector("[data-consent-banner]")
+              ?.matches(":popover-open") ?? false,
+        );
+      const swapTo = async (href: string) => {
+        await page.locator(`.footer_link[href="${href}"]`).click();
+        await page.waitForURL(origin + href);
+        await page.waitForTimeout(300);
+      };
+
+      await page.goto(`${origin}/`);
+      await page.waitForFunction(() =>
+        document
+          .querySelector("[data-consent-banner]")
+          ?.matches(":popover-open"),
+      );
+      // A swap keeps the window; a reload would start a new one.
+      await page.evaluate(() => Reflect.set(window, "unswapped", true));
+
+      await swapTo("/style-guide");
+      assert.ok(await bannerOpen(), "the banner closed before a choice");
+      await page
+        .locator('[data-consent-banner] [data-consent-action="accept"]')
+        .click();
+      await page.waitForFunction(
+        () =>
+          !document
+            .querySelector("[data-consent-banner]")
+            ?.matches(":popover-open"),
+      );
+
+      await swapTo("/");
+      assert.equal(
+        await page.evaluate(() => Reflect.get(window, "unswapped")),
+        true,
+        "a page reloaded instead of swapping",
+      );
+      await page
+        .waitForFunction(() =>
+          document.querySelector("iframe[data-category]")?.getAttribute("src"),
+        )
+        .catch(() => assert.fail("the embed stayed empty after Accept all"));
+      const opener = page.locator("[data-consent-open] [data-modal-open]");
+      assert.ok(await opener.isVisible(), "Cookie settings is hidden");
+
+      // Withdrawing consent saves, and c15t reloads the page without it.
+      await opener.click();
+      const panel = page.locator("#consent-settings");
+      await panel.waitFor({ state: "visible" });
+      let withdrawn = 0;
+      for (const row of await panel
+        .locator("[data-consent-category]:not([hidden])")
+        .all())
+        if (await row.locator("input:checked:not(:disabled)").count()) {
+          await row.locator(".form-choice").click();
+          withdrawn++;
+        }
+      assert.ok(withdrawn, "the panel shows nothing to withdraw");
+      const reloaded = page.waitForEvent("load");
+      await panel.locator('[data-consent-action="save"]').click();
+      await reloaded;
+    } finally {
+      await browser.close();
+      server.close();
+    }
   });
 
   await it("verify.ts fails a site that loads a tracker outside c15t", () => {

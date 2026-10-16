@@ -74,7 +74,7 @@ const fonts = (trix.fonts ?? []).map((font) => ({
 
 export default defineConfig({
   site: SITE_URL,
-  prefetch: true,
+  prefetch: { prefetchAll: true },
   trailingSlash: "never",
   build: { format: "file" },
   integrations: [mdx(), sitemap()],

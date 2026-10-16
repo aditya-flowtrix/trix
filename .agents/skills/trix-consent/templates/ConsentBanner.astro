@@ -81,6 +81,7 @@ const themed = theme !== "inherit" ? `theme-${theme}` : undefined;
         popover="manual"
         aria-labelledby="consent-heading"
         data-consent-banner
+        transition:persist="consent-banner"
       >
         <div class="consent_content">
           <p id="consent-heading" class="consent_heading text-style-large">
@@ -132,7 +133,12 @@ const themed = theme !== "inherit" ? `theme-${theme}` : undefined;
           </Button>
         </div>
       </section>
-      <Modal id="consent-settings" label="Cookie settings" class={themed}>
+      <Modal
+        id="consent-settings"
+        label="Cookie settings"
+        class={themed}
+        transition:persist="consent-settings"
+      >
         <p class="consent_heading text-style-large">Cookie settings</p>
         <p class="consent_text text-style-small">
           Choose what this site may use. You can change it at any time from
@@ -348,6 +354,15 @@ const themed = theme !== "inherit" ? `theme-${theme}` : undefined;
           "[consent] The policy did not load: check BACKEND_URL in src/consent.ts and that this site is in the backend's trustedOrigins.",
         );
     });
+
+    // Astro's ClientRouter carries both surfaces from page to page, but each
+    // page brings its own Cookie settings links, and in a browser without
+    // moveBefore() (Safari) the move closes the banner. ponytail: a page
+    // swapped in without this component drops both until a reload; set them
+    // up per page with mount() if a layout ever leaves it out.
+    document.addEventListener("astro:after-swap", () =>
+      render(kernel.getSnapshot()),
+    );
 
     draft.subscribe(renderDraft);
     kernel.subscribe(render);
