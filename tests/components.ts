@@ -407,6 +407,17 @@ try {
         `rgb(${[0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`,
       );
     });
+    // ClientRouter prefetches on its own; without it, the config has to.
+    await it("without ClientRouter, hovering a link prefetches its page", async () => {
+      await csp.goto(`${origin}/`);
+      await csp.locator('.footer_link[href="/style-guide"]').hover();
+      await csp.waitForFunction(
+        () =>
+          document.querySelector('link[rel="prefetch"][href$="/style-guide"]'),
+        null,
+        { timeout: 2000 },
+      );
+    });
 
     await it("no script errors on any of it", async () =>
       assert.ok(!errors.length, errors.join("\n")));

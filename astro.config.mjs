@@ -83,8 +83,9 @@ const latinExt = [
 
 export default defineConfig({
   site: SITE_URL,
-  // Prefetch internal links on hover or focus, so the next page is ready on click.
-  prefetch: true,
+  // Prefetch internal links on hover or focus, so the next page is ready on
+  // click. `true` alone only prefetches links marked data-astro-prefetch.
+  prefetch: { prefetchAll: true },
   // One URL per page, no trailing slash — Webflow's and Framer's style, so
   // migrated URLs answer directly instead of through a redirect. Pages build
   // to `about.html`, which hosts serve at `/about`. A site whose old URLs end
