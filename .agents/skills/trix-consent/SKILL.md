@@ -159,7 +159,9 @@ npm install --save-exact @c15t/integrations@3.0.0   # only with a vendor helper
 
 2. **`src/components/global/ConsentBanner.astro`**: copy
    `templates/ConsentBanner.astro`. Place it once in `BaseLayout`, after
-   `<Footer />`, with the props from questions 4 and 6. Keep its `popover`
+   `<Footer />`, with the props from questions 4 and 6, so every page has it:
+   under `<ClientRouter />` the banner and the panel move from page to page,
+   and a page without them drops them until a reload. Keep its `popover`
    attribute: it puts the banner in the browser's top layer, above every
    third-party widget whatever its z-index.
 

@@ -355,11 +355,11 @@ const themed = theme !== "inherit" ? `theme-${theme}` : undefined;
         );
     });
 
-    // Astro's ClientRouter carries both surfaces from page to page, but the
-    // banner leaves the top layer as it moves, and each page brings its own
-    // Cookie settings links. ponytail: a page swapped in without this
-    // component drops both for good; set them up per page with mount() if a
-    // layout ever leaves it out.
+    // Astro's ClientRouter carries both surfaces from page to page, but each
+    // page brings its own Cookie settings links, and in a browser without
+    // moveBefore() (Safari) the move closes the banner. ponytail: a page
+    // swapped in without this component drops both until a reload; set them
+    // up per page with mount() if a layout ever leaves it out.
     document.addEventListener("astro:after-swap", () =>
       render(kernel.getSnapshot()),
     );
