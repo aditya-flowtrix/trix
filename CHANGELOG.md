@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 — 2026-10-16
+
+Trix works under Astro's `<ClientRouter />` and in any language, new projects
+start from a release, and a Content Security Policy is one switch away. One
+change to check: a form field labelled with accents gets a new name — see
+below.
 
 - Trix works with Astro's `<ClientRouter />` (view transitions). Every
   component with a script set itself up once, at load: after the router
