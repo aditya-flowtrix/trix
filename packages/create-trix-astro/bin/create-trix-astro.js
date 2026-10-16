@@ -2,11 +2,11 @@
 /**
  * npm create trix-astro@latest [directory]
  *
- * Copies the Trix framework into a new folder, at one exact commit, and makes
- * it the project's own: named after the folder, stamped with the Trix version
- * and commit it started from (what /trix-upgrade merges against), with a
- * Cloudflare config of its own. Then installs dependencies.
- *
+ * Copies the Trix framework into a new folder — its latest release, or the
+ * tag, branch or commit `--ref` names — and makes it the project's own: named
+ * after the folder, stamped with the Trix version and commit it started from
+ * (what /trix-upgrade merges against), with a Cloudflare config of its own.
+ * Then installs dependencies.
  */
 import {
   cp,
@@ -22,11 +22,14 @@ import { basename, dirname, join, resolve, sep } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { argv, cwd, env, exit, platform, stdin, stdout } from "node:process";
 import { spawn } from "node:child_process";
+import { parseArgs } from "node:util";
 
 const REPO = "aditya-flowtrix/trix";
-const BRANCH = "main";
-const TARBALL = (ref) => `https://codeload.github.com/${REPO}/tar.gz/${ref}`;
-const COMMIT = `https://api.github.com/repos/${REPO}/commits/${BRANCH}`;
+// CREATE_TRIX_GITHUB stands in for both of GitHub's hosts, for testing.
+const API = env.CREATE_TRIX_GITHUB ?? "https://api.github.com";
+const CODELOAD = env.CREATE_TRIX_GITHUB ?? "https://codeload.github.com";
+const TAGS = `${API}/repos/${REPO}/tags?per_page=100`;
+const TARBALL = (ref) => `${CODELOAD}/${REPO}/tar.gz/${ref}`;
 // A date the framework was tested against: it selects Workers runtime behaviour.
 const COMPAT_DATE = "2026-08-13";
 // The framework's own: its docs site and this installer. A site gets neither.
@@ -38,10 +41,15 @@ const dim = style("2");
 const bold = style("1");
 const green = style("32");
 const red = style("31");
+const yellow = style("33");
 
 function die(message) {
   console.error(`\n${red("Error:")} ${message}\n`);
   exit(1);
+}
+
+function warn(message) {
+  console.error(`\n${yellow("Warning:")} ${message}\n`);
 }
 
 /** The package manager that ran this — npm, pnpm, yarn and bun all say so. */
@@ -118,6 +126,32 @@ function* readTar(buf) {
   }
 }
 
+/**
+ * The commit an archive is of. GitHub names it in the archive's first
+ * header, as `git archive` does; an archive of a tree alone names none.
+ */
+function archiveCommit(tar) {
+  if (tar[156] !== "g".charCodeAt(0)) return null;
+  const size = parseInt(tar.subarray(124, 136).toString("utf8").trim(), 8);
+  const header = tar.subarray(512, 512 + size).toString("utf8");
+  return /(?:^|\n)\d+ comment=([0-9a-f]{40})\n/.exec(header)?.[1] ?? null;
+}
+
+/** The highest vX.Y.Z tag — pre-releases and other tags aside — or null. */
+async function latestRelease() {
+  // ponytail: one page of 100 tags; page through them past that many releases.
+  const res = await fetch(TAGS, {
+    headers: { accept: "application/vnd.github+json" },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const versions = (await res.json())
+    .map((tag) => /^v(\d+)\.(\d+)\.(\d+)$/.exec(tag.name))
+    .filter(Boolean)
+    .map((match) => match.slice(1).map(Number));
+  versions.sort((a, b) => b[0] - a[0] || b[1] - a[1] || b[2] - a[2]);
+  return versions.length ? `v${versions[0].join(".")}` : null;
+}
+
 function usage() {
   console.log(
     [
@@ -125,18 +159,30 @@ function usage() {
       "  npm create trix-astro@latest [directory] [options]",
       "",
       bold("Options"),
+      `  --ref <ref>    ${dim("copy this tag, branch or commit instead of the latest release")}`,
       `  --no-install   ${dim("copy the framework without installing dependencies")}`,
       `  -h, --help     ${dim("show this message")}`,
       `  -v, --version  ${dim("print the version")}`,
+      "",
+      dim("With npm, options go after --:"),
+      dim("  npm create trix-astro@latest my-site -- --ref v0.4.0"),
       "",
     ].join("\n"),
   );
 }
 
 async function main() {
-  const args = argv.slice(2);
-  const flags = args.filter((a) => a.startsWith("-"));
-  if (flags.includes("--version") || flags.includes("-v")) {
+  const { values: options, positionals } = parseArgs({
+    args: argv.slice(2),
+    allowPositionals: true,
+    options: {
+      ref: { type: "string" },
+      "no-install": { type: "boolean" },
+      help: { type: "boolean", short: "h" },
+      version: { type: "boolean", short: "v" },
+    },
+  });
+  if (options.version) {
     const pkg = JSON.parse(
       await readFile(new URL("../package.json", import.meta.url), "utf8"),
     );
@@ -145,9 +191,9 @@ async function main() {
   console.log(
     `\n${bold("Trix")}  ${dim("A design-ready framework for Astro.")}\n`,
   );
-  if (flags.includes("--help") || flags.includes("-h")) return usage();
+  if (options.help) return usage();
 
-  let target = args.find((a) => !a.startsWith("-"));
+  let target = positionals[0];
   if (!target && stdin.isTTY) {
     const rl = createInterface({ input: stdin, output: stdout });
     target = (await rl.question("Directory name: ")).trim();
@@ -155,34 +201,38 @@ async function main() {
   }
   if (!target)
     die("A directory name is required: npm create trix-astro@latest my-site");
-  const install = !flags.includes("--no-install");
+  const install = !options["no-install"];
   const dir = resolve(cwd(), target);
   if (existsSync(dir) && (await readdir(dir)).length > 0)
     die(`${target} already exists and is not empty.`);
 
-  // One exact commit: the download can't change halfway, and the site records
-  // where it started. Offline or rate-limited, it still works, unstamped.
-  // CREATE_TRIX_TARBALL points at a local archive instead, for testing.
-  let commit = env.CREATE_TRIX_COMMIT ?? null;
-  let archive;
-  if (env.CREATE_TRIX_TARBALL) {
-    archive = await readFile(env.CREATE_TRIX_TARBALL);
-  } else {
+  // The latest release unless --ref names another. A ref is a git ref name,
+  // which never holds "..", so it can't reach outside the repository's URLs.
+  let ref = options.ref;
+  if (ref !== undefined && (!/^\w[\w./-]*$/.test(ref) || ref.includes("..")))
+    die(`--ref takes a tag, branch or commit name: ${ref}`);
+  if (ref === undefined) {
     try {
-      const meta = await fetch(COMMIT, {
-        headers: { accept: "application/vnd.github+json" },
-      });
-      if (meta.ok) commit = (await meta.json())?.sha ?? null;
-    } catch {}
-    stdout.write(dim("Downloading Trix… "));
-    const res = await fetch(TARBALL(commit ?? `refs/heads/${BRANCH}`));
-    if (!res.ok) die(`Could not download Trix (HTTP ${res.status}).`);
-    archive = Buffer.from(await res.arrayBuffer());
-    console.log(green("done"));
+      ref = await latestRelease();
+      if (!ref) warn("Trix has no release yet, so this copies main.");
+    } catch (error) {
+      warn(
+        `Couldn't look up the latest Trix release (${error.message}), so this copies main, which may be ahead of it. To copy a release, run this again with --ref and one of https://github.com/${REPO}/tags.`,
+      );
+    }
+    ref ??= "main";
   }
-  const entries = [...readTar(gunzipSync(archive))].filter(
-    (e) => !WITHHELD.test(e.path),
-  );
+
+  stdout.write(dim(`Downloading Trix ${ref}… `));
+  const res = await fetch(TARBALL(ref));
+  if (!res.ok) die(`Could not download Trix ${ref} (HTTP ${res.status}).`);
+  const tar = gunzipSync(Buffer.from(await res.arrayBuffer()));
+  console.log(green("done"));
+
+  // The commit the archive is of, which /trix-upgrade merges against: exact
+  // even when the ref is a branch that has moved on since.
+  const commit = archiveCommit(tar);
+  const entries = [...readTar(tar)].filter((e) => !WITHHELD.test(e.path));
   const manifest = entries.find((e) => e.path === "package.json" && e.data);
   if (!manifest) die("The download has no package.json.");
   requireNode(JSON.parse(manifest.data.toString("utf8")).engines?.node);
@@ -236,7 +286,7 @@ async function main() {
   // The docs site, this installer and the framework-only tests stayed behind,
   // and so do their scripts.
   for (const script of Object.keys(pkg.scripts ?? {}))
-    if (/^(docs:|test:(create|consent)$)/.test(script))
+    if (/^(docs:|test:(create|consent|components)$)/.test(script))
       delete pkg.scripts[script];
   delete pkg.devDependencies?.["@astrojs/mdx"]; // only the docs site used it
   await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
@@ -290,6 +340,11 @@ build pages and components here is in [TRIX.md](TRIX.md).
 }
 `,
   );
+
+  if (!commit)
+    warn(
+      `The download doesn't say which commit it is, so the project isn't stamped with one, and /trix-upgrade would have to guess. Add it to package.json → trix.commit, from: git ls-remote https://github.com/${REPO} ${ref}`,
+    );
 
   const pm = packageManager();
   let installed = false;

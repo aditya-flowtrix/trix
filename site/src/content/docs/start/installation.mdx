@@ -22,11 +22,13 @@ The site opens at `http://localhost:4321`, with the home page, the
 [style guide](/docs/guides/designers-and-figma) at `/style-guide` and every
 component at `/components`.
 
-The installer copies Trix at one exact commit, names the project after its
-folder, records which Trix it started from — so
+The installer copies the latest Trix release, names the project after its
+folder, records the exact commit it started from — so
 [upgrades](/docs/guides/upgrading) know what to merge against — writes a
 Cloudflare config of its own, and installs dependencies with whichever of
-npm, pnpm, yarn or bun ran it. `--no-install` skips the install.
+npm, pnpm, yarn or bun ran it. `--ref` copies another tag, branch or commit,
+and `--no-install` skips the install; with npm, options go after `--`
+(`npm create trix-astro@latest my-site -- --ref main`).
 
 <Aside type="tip" title="With an agent">
   Ask Claude Code or Codex to “start a new site with Trix”. The

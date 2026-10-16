@@ -190,8 +190,14 @@ npm install --save-exact @c15t/integrations@3.0.0   # only with a vendor helper
    ></iframe>
    ```
 
-5. **`public/_headers`**: if it has a `Content-Security-Policy`, add the
-   backend's origin to `connect-src` and each vendor to `script-src`.
+5. **The Content Security Policy**, when `CSP` in `src/consts.ts` is on: add
+   each vendor's origin to `scriptDirective.resources` in `astro.config.mjs`,
+   keeping `'self'`, then open every page with **Accept all** chosen and the
+   console open. A vendor that runs inline code is reported there — in Chrome,
+   with the hash it needs, which goes in `scriptDirective.hashes`. That policy covers
+   scripts, styles and fonts, so the backend needs no entry; a
+   `Content-Security-Policy` in `public/_headers` is a second one — add the
+   backend's origin to its `connect-src` and each vendor to its `script-src`.
 
 Trix conventions apply: `consent_` classes, project tokens, the component's
 own `<style>`.

@@ -19,8 +19,13 @@ component: interactive/Tabs
 ```
 
 `TabLink`s go in the `links` slot; every other child is a panel, in the same
-order. Arrow keys move between tabs, and the selected tab is in the URL, so a
-link can open a page on the right panel.
+order. Arrow keys move between tabs, Home and End to the first and last.
+
+The selected tab is in the URL, so a link can open a page on the right panel:
+`?tab=design` names the tab by its text, in any language, and a tab with no
+text (an icon alone) by its position, `?tab=2`. Each Tabs on a page keeps its
+own place: its `id`, or for those without one, `tab` for the first and then
+`tab-2`, `tab-3`.
 
 | Prop              | Does                                                                                                              |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |

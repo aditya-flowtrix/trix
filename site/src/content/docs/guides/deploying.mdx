@@ -32,13 +32,36 @@ npx wrangler deploy
 ## What's already set
 
 - **`public/_headers`** — files in `/_astro/` are fingerprinted, so browsers
-  keep them for a year; every page gets `nosniff`, a referrer policy,
-  `X-Frame-Options` and a permissions policy.
+  keep them for a year; every page gets HSTS (HTTPS only, for a year, leaving
+  subdomains alone), `nosniff`, a referrer policy, `X-Frame-Options` and a
+  permissions policy.
 - **`public/_redirects`** — real 301s, one per line: `/old /new 301`.
   `/trix-cms` adds a block for moved CMS items.
 - **404** — `src/pages/404.astro`, served with a 404 status.
 - **URLs** — one per page, no trailing slash (`/about`), the way Webflow and
   Framer publish them, so migrated URLs answer without a redirect.
+
+## A Content Security Policy
+
+`CSP` in `src/consts.ts` puts every page under one: scripts and stylesheets
+only from the site itself, and Astro's own inline ones by their hash. It's off
+by default because the browser then blocks every script from anywhere else —
+a tag manager, analytics, a chat widget. Before turning it on, list `'self'`
+and each origin in `astro.config.mjs`; a tag manager needs the origins of the
+scripts it loads, too:
+
+```js
+csp: CSP && {
+  scriptDirective: {
+    resources: ["'self'", "https://www.googletagmanager.com"],
+  },
+  // styleDirective as it is
+},
+```
+
+Then build, and open each page with the browser's console open and **Accept
+all** chosen in the consent banner, so every vendor loads: a blocked script is
+reported there. Astro's `<ClientRouter />` doesn't work under a policy.
 
 ## Elsewhere
 

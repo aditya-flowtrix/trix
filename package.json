@@ -21,6 +21,7 @@
     "test:cms": "node tests/cms.ts",
     "test:create": "node tests/create.ts",
     "test:consent": "node tests/consent.ts",
+    "test:components": "node tests/components.ts",
     "test:import-figma": "node tests/import-figma.ts",
     "test:tokens": "node tests/tokens.ts",
     "preview": "astro preview",

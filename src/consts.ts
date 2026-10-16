@@ -17,3 +17,11 @@ export const NOINDEX_ROUTES: string[] = ["/404", "/style-guide", "/components"];
  * small inline script to apply it before first paint.
  */
 export const COLOR_MODE: "light" | "dark" | "auto" = "light";
+/**
+ * A Content Security Policy on every page: scripts and stylesheets only from
+ * this site. Turn it on once each third-party script the site loads — a tag
+ * manager, analytics, a chat widget — has its origin in `astro.config.mjs` →
+ * `security.csp.scriptDirective.resources`, beside `'self'`, or the browser
+ * blocks it. Astro's `<ClientRouter />` doesn't support it.
+ */
+export const CSP: boolean = false;

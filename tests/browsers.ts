@@ -220,6 +220,8 @@ async function safari(): Promise<Driver | string> {
     Enter: ["\uE007"],
     Escape: ["\uE00C"],
     ArrowRight: ["\uE014"],
+    Home: ["\uE011"],
+    End: ["\uE010"],
     "Shift+G": ["\uE008", "G"],
   };
   return {
@@ -607,6 +609,32 @@ async function testPage(driver: Driver, page: Page, path: string) {
         `() => {
       const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
       return tabs.indexOf(document.activeElement) === 2;
+    }`,
+      ),
+    );
+    await page.click('[role="tablist"] [role="tab"]:first-child');
+    await page.press("End");
+    check(
+      where,
+      "tabs: End selects the last tab",
+      await until(
+        page,
+        `() => {
+      const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
+      return document.activeElement === tabs.at(-1) && tabs.at(-1).getAttribute("aria-selected") === "true";
+    }`,
+      ),
+    );
+    await page.click('[role="tablist"] [role="tab"]:last-child');
+    await page.press("Home");
+    check(
+      where,
+      "tabs: Home selects the first tab",
+      await until(
+        page,
+        `() => {
+      const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
+      return document.activeElement === tabs[0] && tabs[0].getAttribute("aria-selected") === "true";
     }`,
       ),
     );

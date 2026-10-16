@@ -96,10 +96,12 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
 }
 
 <script>
-  for (const range of document.querySelectorAll<HTMLElement>(".form-range")) {
+  import { mount } from "@/utils/mount.ts";
+
+  mount(".form-range", (range) => {
     const input = range.querySelector<HTMLInputElement>(".form-range_input");
     const shown = range.querySelector<HTMLElement>(".form-range_value");
-    if (!input) continue;
+    if (!input) return;
 
     const update = () => {
       const min = Number(input.min || 0);
@@ -115,7 +117,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
     input.addEventListener("input", update);
     update();
     range.classList.add("is-drawn");
-  }
+  });
 </script>
 
 <style is:global>

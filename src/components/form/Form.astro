@@ -27,10 +27,16 @@ const {
 } = Astro.props;
 
 const content = await slotContent(Astro.slots);
+
+if (import.meta.env.DEV && render && content && !action) {
+  console.warn(
+    `[trix] <Form${name ? ` name="${name}"` : ""}> has no \`action\`, so it shows its sent message without sending anything. Set the endpoint before launch.`,
+  );
+}
 ---
 
 {
-  render && name && content && (
+  render && content && (
     <div
       class:list={["form_wrap", className]}
       data-state="idle"
@@ -57,9 +63,11 @@ const content = await slotContent(Astro.slots);
 }
 
 <script>
-  for (const form of document.querySelectorAll<HTMLElement>(".form_wrap")) {
+  import { mount } from "@/utils/mount.ts";
+
+  mount(".form_wrap", (form) => {
     const fields = form.querySelector<HTMLFormElement>(".form_fields");
-    if (!fields) continue;
+    if (!fields) return;
 
     const submit = fields.querySelector<HTMLButtonElement | HTMLInputElement>(
       'button:not([type]), button[type="submit"], input[type="submit"]',
@@ -90,7 +98,7 @@ const content = await slotContent(Astro.slots);
         if (submit) submit.disabled = false;
       }
     });
-  }
+  });
 </script>
 
 <style is:global>

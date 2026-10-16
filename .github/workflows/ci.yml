@@ -70,11 +70,22 @@ jobs:
         if: hashFiles('tests/consent.ts') != ''
         run: npm run test:consent
 
+      # Every scripted component in a scratch site: Tabs labelled in any
+      # language, form fields, pages swapped by ClientRouter, and every page
+      # under the Content Security Policy that CSP in src/consts.ts turns on.
+      - name: The components' scripts (framework only)
+        if: hashFiles('tests/components.ts') != ''
+        run: npm run test:components
+
       - run: npm run build
 
       # What search engines read, page by page, in Chrome: titles, canonicals,
       # one h1, alt text, structured data, broken links, sitemap — every page.
-      - run: npm run seo
+      # A project's also fails while SITE_URL in src/consts.ts is still the
+      # placeholder, which would point every canonical, the sitemap and the
+      # social images at example.com. The framework keeps the placeholder.
+      - name: SEO
+        run: npm run seo -- ${{ hashFiles('packages/create-trix-astro/package.json') == '' && '--production' || '' }}
 
       # The docs site renders every component as it is now, so a component
       # change that breaks its page fails here.

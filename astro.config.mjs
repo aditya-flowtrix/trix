@@ -2,7 +2,7 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig, fontProviders } from "astro/config";
 import sitemap from "@astrojs/sitemap";
-import { SITE_URL } from "./src/consts.ts";
+import { CSP, SITE_URL } from "./src/consts.ts";
 import { isNoindexRoute } from "./src/utils/seo.ts";
 import { generate } from "./scripts/tokens.ts";
 
@@ -137,5 +137,18 @@ export default defineConfig({
       },
     },
   ],
+  // The Content Security Policy that CSP in src/consts.ts turns on: scripts
+  // and stylesheets from this site, Astro's own hashed, and the inline style
+  // attributes components set for their props.
+  security: {
+    csp: CSP && {
+      styleDirective: {
+        resources: [
+          { resource: "'self'", kind: "element" },
+          { resource: "'unsafe-inline'", kind: "attribute" },
+        ],
+      },
+    },
+  },
   vite: { build: { cssTarget: "safari15.4" } },
 });

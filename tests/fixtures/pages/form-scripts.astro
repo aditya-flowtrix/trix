@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Form from "@/components/form/Form.astro";
+import Input from "@/components/form/Input.astro";
+import Range from "@/components/form/Range.astro";
+---
+
+<Layout title="Form fields in any script">
+  <Section>
+    <Form action="/thanks">
+      <Input label="お名前" />
+      <Range label="予算" />
+      <Range label="人数" />
+    </Form>
+  </Section>
+</Layout>

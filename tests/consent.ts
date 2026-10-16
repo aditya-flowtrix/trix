@@ -18,20 +18,16 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import {
   cpSync,
-  existsSync,
-  lstatSync,
-  mkdirSync,
   mkdtempSync,
   readFileSync,
-  readdirSync,
-  readlinkSync,
   rmSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { scratchProject } from "./scratch.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const skill = join(root, ".agents/skills/trix-consent");
@@ -154,45 +150,13 @@ try {
   });
 
   // A scratch copy of everything a project gets, with the templates in place,
-  // a fake vendor script and a gated embed.
+  // a fake vendor script and a gated embed — and c15t from tmp.
   const site = join(tmp, "site");
-  // The files git sees, as they are now: never ignored local folders.
-  const files = execFileSync(
-    "git",
-    ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
-    { cwd: root, encoding: "utf8" },
-  )
-    .split("\0")
-    .filter(
-      (f) => f && !/^(site|packages)\//.test(f) && existsSync(join(root, f)),
-    );
-  for (const file of files) {
-    mkdirSync(dirname(join(site, file)), { recursive: true });
-    // The skill links in .claude/skills stay links.
-    if (lstatSync(join(root, file)).isSymbolicLink())
-      symlinkSync(readlinkSync(join(root, file)), join(site, file));
-    else cpSync(join(root, file), join(site, file));
-  }
-  // The framework's dependencies, linked one by one, plus c15t from tmp. Its
-  // caches (.astro, .vite) stay out, so the framework's are left alone.
-  mkdirSync(join(site, "node_modules"));
-  for (const name of readdirSync(join(root, "node_modules")))
-    if (!name.startsWith(".") || name === ".bin")
-      symlinkSync(
-        join(root, "node_modules", name),
-        join(site, "node_modules", name),
-      );
+  const edit = scratchProject(root, site);
   symlinkSync(
     join(tmp, "node_modules/@c15t"),
     join(site, "node_modules/@c15t"),
   );
-
-  const edit = (path: string, from: string, to: string) => {
-    const file = join(site, path);
-    const text = readFileSync(file, "utf8");
-    assert.ok(text.includes(from), `${path} has ${from}`);
-    writeFileSync(file, text.replace(from, to));
-  };
   cpSync(join(templates, "consent.ts"), join(site, "src/consent.ts"));
   cpSync(
     join(templates, "ConsentBanner.astro"),

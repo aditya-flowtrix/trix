@@ -60,8 +60,9 @@ framework runs. Once the project is on GitHub, it runs on every push and pull
 request:
 
 - **Check, build and test**, one job — dependency audit, formatting,
-  `npm run check`, the unit tests, the build, the SEO audit of every page,
-  then every page in the three engines every browser is built on: Chromium
+  `npm run check`, the unit tests, the build, the SEO audit of every page
+  (which also fails while `SITE_URL` is still the placeholder), then every
+  page in the three engines every browser is built on: Chromium
   (Chrome, Edge, Brave, Opera, Samsung Internet), Firefox, and WebKit
   (Safari, and every browser on an iPhone). A failure uploads the report.
 - **Safari**, the real one on macOS — public repositories, or by choice.

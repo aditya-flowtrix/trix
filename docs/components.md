@@ -7,6 +7,11 @@ use the same names as the props here. Live examples of all of them are on the
 Every component takes `render` (set `false` to output nothing) and passes
 other attributes to its root element. `class` accepts utility classes only.
 
+Components with a script work under Astro's `<ClientRouter />` (view
+transitions): each sets itself up on every page the router brings in, and
+cleans up after the page it leaves. Astro's Content Security Policy (`CSP` in
+`src/consts.ts`) doesn't support the router.
+
 ## Layout
 
 | Component                     | Use it for                                                                                  | Variants and key props                                                                                                                                                                                                                                                                            |

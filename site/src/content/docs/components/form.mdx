@@ -27,7 +27,8 @@ component: form/Form
 your own API. The form posts its fields there as `FormData` with
 `Accept: application/json`, then shows `successMessage` or `errorMessage` in
 place. Without `action` it validates and shows the message without sending,
-which is how it is designed and tested before a provider is chosen.
+which is how it is designed and tested before a provider is chosen — and
+`astro dev` warns about it, so it isn't launched that way.
 
 The browser validates first: required fields, email format, patterns. Without
 JavaScript it is an ordinary form posting to `action`.

@@ -1,0 +1,11 @@
+---
+import { Code } from "astro:components";
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+---
+
+<Layout title="Code">
+  <Section>
+    <Code code={`const answer = 42;`} lang="js" />
+  </Section>
+</Layout>

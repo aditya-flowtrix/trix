@@ -2,6 +2,51 @@
 
 ## Unreleased
 
+- Trix works with Astro's `<ClientRouter />` (view transitions). Every
+  component with a script set itself up once, at load: after the router
+  swapped in the next page, tabs, sliders, the phone menu, modals and
+  dropdowns did nothing, revealed content stayed hidden, a stale listener
+  threw on every click, and the auto color mode fell back to light. Each now
+  sets up through `mount` (`src/utils/mount.ts`) on every page the router
+  brings in, and stops its listeners, observers and timers when its page
+  leaves. Component scripts load as small modules, cached from page to page,
+  rather than inline.
+- Tabs links work in any script. The URL names a tab by its text —
+  `?tab=料金` — and one with no text, an icon alone, by its position. A label
+  with no Latin letters used to give an empty name, which matched a URL
+  without one: the page opened scrolled to that Tabs, its rotation stopped.
+  Each Tabs without an `id` keeps its own place in the URL (`tab`, `tab-2`,
+  …), and Home and End select the first and last tab.
+- Form fields labelled in any script keep their name. A label with no Latin
+  letters gave `name=""`, and the browser left the field out of every
+  submission. Names from accented labels change with it: "Téléphone" is now
+  `téléphone`, not `t-l-phone`.
+- `Form` renders without a `name` — it rendered nothing, silently — and
+  `astro dev` warns when it has no `action`, since it then sends nothing.
+- `create-trix-astro` 0.3.0 copies the latest release, not `main`: a new
+  project starts from a version that was released, and its stamp matches its
+  `trix.version`. `--ref` copies another tag, branch or commit. The stamp's
+  commit is read from the download itself, so it no longer goes missing when
+  GitHub's API is rate-limited; when the API can't name the latest release,
+  the installer copies `main` and says so. Unknown options are refused rather
+  than ignored, and `--ref v0.4.0` no longer reads as the folder name.
+- A component inside a `Marquee` binds once. The Marquee repeats its
+  content, scripts included, and an inline script ran once per copy: a
+  `Video`'s pause button paused and resumed on the same click.
+- `CSP` in `src/consts.ts` puts every page under a Content Security Policy:
+  scripts and stylesheets only from the site, Astro's inline ones by their
+  hash, and the style attributes components set for their props. It is off
+  by default, since a tag manager, analytics or a chat widget is blocked
+  until its origin is listed in `astro.config.mjs`, and Astro's
+  `<ClientRouter />` doesn't support it. The Deploying guide has the steps.
+- Pages are HTTPS-only: `public/_headers` sends `Strict-Transport-Security`
+  for a year, leaving subdomains alone.
+- A project's CI fails while `SITE_URL` is still the placeholder, which
+  points every canonical, the sitemap and the social images at example.com:
+  its SEO audit runs with `--production`. The framework's CI also runs every
+  component script in a scratch site, under ClientRouter and under the
+  policy.
+
 - Cloudflare's pull-request previews build again. Workers Builds runs
   `wrangler preview` for every branch but the production one, and it refuses
   a config without a `previews` block. The docs site's `wrangler.jsonc` has

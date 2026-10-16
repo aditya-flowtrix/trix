@@ -167,6 +167,8 @@ const pauseMargins = {
 }
 
 <script>
+  import { mount } from "@/utils/mount.ts";
+
   // An autoplaying video loads and plays only while on screen. Its pause
   // button, right after it, is the visitor's: once they pause, scrolling
   // never restarts it. Visitors who prefer less motion start it themselves.
@@ -186,17 +188,16 @@ const pauseMargins = {
     }
   });
 
-  for (const video of document.querySelectorAll<HTMLVideoElement>(
-    "video[data-video-autoplay]",
-  )) {
+  mount<HTMLVideoElement>("video[data-video-autoplay]", (video, signal) => {
     if (reduced.matches) stopped.add(video);
     seen.observe(video);
+    signal.addEventListener("abort", () => seen.unobserve(video));
     const toggle = video.nextElementSibling;
     if (
       !(toggle instanceof HTMLButtonElement) ||
       !toggle.matches("[data-video-toggle]")
     )
-      continue;
+      return;
     const show = (playing: boolean) => {
       toggle.setAttribute("aria-pressed", String(playing));
       toggle.setAttribute("aria-label", playing ? "Pause video" : "Play video");
@@ -214,7 +215,7 @@ const pauseMargins = {
         show(false);
       }
     });
-  }
+  });
 </script>
 
 <style is:global>

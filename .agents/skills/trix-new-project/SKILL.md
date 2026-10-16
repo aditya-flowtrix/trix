@@ -19,7 +19,8 @@ cd my-site
 git init
 ```
 
-The installer copies Trix at one exact commit, leaves out the framework's own
+The installer copies the latest Trix release (`-- --ref <tag|branch|commit>`
+copies another), leaves out the framework's own
 parts (its docs site, installer and dependency bots), names the project after the folder,
 gives it its own README and `wrangler.jsonc`, installs dependencies, and
 stamps `package.json` → `trix` with `version`, `commit` and `created` — what
@@ -31,15 +32,15 @@ stamps `package.json` → `trix` with `version`, `commit` and `created` — what
 node -p "require('./package.json').trix"
 ```
 
-It should show `commit`. If the installer was offline it can't, and every
-later upgrade becomes a guess — so add it by hand from
-`git ls-remote https://github.com/aditya-flowtrix/trix HEAD`.
+It should show `commit`, read from the download itself. If it doesn't, the
+installer said so: every later upgrade becomes a guess, so add it by hand from
+`git ls-remote https://github.com/aditya-flowtrix/trix <the tag it copied>`.
 
 A project copied any other way (a clone, GitHub's **Use this template**) needs
 by hand what the installer does: `name` and `version: "0.1.0"`, the stamp,
 `description` and `repository` removed, and the framework's own parts gone —
-`rm -rf site packages tests/create.ts tests/consent.ts .github/dependabot.yml .github/workflows/dependabot-automerge.yml`, the `docs:*`, `test:create` and
-`test:consent` scripts, and `npm uninstall @astrojs/mdx` unless the project writes MDX.
+`rm -rf site packages tests/create.ts tests/consent.ts tests/components.ts tests/scratch.ts tests/fixtures .github/dependabot.yml .github/workflows/dependabot-automerge.yml`, the `docs:*`, `test:create`,
+`test:consent` and `test:components` scripts, and `npm uninstall @astrojs/mdx` unless the project writes MDX.
 
 ## 3. Name and domain
 
@@ -48,10 +49,13 @@ by hand what the installer does: `name` and `version: "0.1.0"`, the stamp,
 - `SITE_NAME` — the brand name, as it should appear after every page title.
 - `SITE_DESCRIPTION` — the default meta description.
 - `SITE_URL` — the **production** origin. Canonicals, the sitemap and social
-  images resolve against it; a placeholder here ships wrong canonicals.
+  images resolve against it; a placeholder here ships wrong canonicals, so
+  the project's CI fails until it is set.
 - `SITE_LOCALE` (the page language), `SITE_SOCIALS` (profile URLs for
   structured data), `COLOR_MODE` (`light`, `dark`, or `auto` for a site that
-  follows the visitor's system and offers `ThemeToggle`).
+  follows the visitor's system and offers `ThemeToggle`), `CSP` (a Content
+  Security Policy on every page — turn it on once each third-party script's
+  origin is in `astro.config.mjs`).
 
 `wrangler.jsonc` (or the host's config): the project's name and domain.
 `public/_headers` already sets security headers and a year's caching for

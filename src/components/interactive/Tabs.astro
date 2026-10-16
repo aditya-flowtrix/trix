@@ -109,14 +109,17 @@ const panels = await slotContent(Astro.slots);
 </noscript>
 
 <script>
+  import { mount } from "@/utils/mount.ts";
+  import { slug } from "@/utils/slug.ts";
+
   const INTERVAL = 6000;
   const SLIDE = 500;
 
-  for (const tabs of document.querySelectorAll<HTMLElement>(".tabs_wrap")) {
+  mount(".tabs_wrap", (tabs, signal) => {
     const links = [...tabs.querySelectorAll<HTMLButtonElement>(".tabs_link")];
     const panelList = tabs.querySelector<HTMLElement>(".tabs_panels");
     const panels = [...(panelList?.children ?? [])] as HTMLElement[];
-    if (links.length === 0 || links.length !== panels.length) continue;
+    if (links.length === 0 || links.length !== panels.length) return;
 
     const uid = Math.random().toString(36).slice(2, 8);
     const auto = tabs.classList.contains("auto");
@@ -135,14 +138,17 @@ const panels = await slotContent(Astro.slots);
     let current = 0;
     let timer: number | undefined;
     let paused = false;
+    signal.addEventListener("abort", () => window.clearTimeout(timer));
 
-    const key = tabs.id || "tab";
-    const slugs = links.map((link) =>
-      (link.textContent ?? "")
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, ""),
+    // Tabs without an id keep their own place in the URL: `tab` for the
+    // first on the page, then `tab-2`, `tab-3`. A tab with no text, only an
+    // icon, is linked by its position.
+    const unnamed = [
+      ...document.querySelectorAll(".tabs_wrap:not([id])"),
+    ].indexOf(tabs);
+    const key = tabs.id || (unnamed > 0 ? `tab-${unnamed + 1}` : "tab");
+    const slugs = links.map(
+      (link, i) => slug(link.textContent ?? "") || String(i + 1),
     );
 
     const remember = (index: number) => {
@@ -205,11 +211,18 @@ const panels = await slotContent(Astro.slots);
     links.forEach((link, i) => {
       link.addEventListener("click", () => show(i));
       link.addEventListener("keydown", (event) => {
-        const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
-        const back = event.key === "ArrowLeft" || event.key === "ArrowUp";
-        if (!forward && !back) return;
+        const moves: Record<string, number | undefined> = {
+          ArrowRight: current + 1,
+          ArrowDown: current + 1,
+          ArrowLeft: current - 1,
+          ArrowUp: current - 1,
+          Home: 0,
+          End: links.length - 1,
+        };
+        const to = moves[event.key];
+        if (to === undefined) return;
         event.preventDefault();
-        show(current + (forward ? 1 : -1), true);
+        show(to, true);
       });
     });
 
@@ -234,13 +247,12 @@ const panels = await slotContent(Astro.slots);
 
     tabs.classList.add("is-ready");
 
-    const wanted = slugs.indexOf(
-      new URLSearchParams(location.search).get(key) ?? "",
-    );
+    const asked = new URLSearchParams(location.search).get(key);
+    const wanted = asked ? slugs.indexOf(slug(asked)) : -1;
     show(wanted === -1 ? 0 : wanted, false, false);
     if (wanted !== -1) tabs.scrollIntoView({ block: "nearest" });
 
-    if (!auto) continue;
+    if (!auto) return;
 
     toggle?.addEventListener("click", () => {
       holds.asked = false;
@@ -256,10 +268,14 @@ const panels = await slotContent(Astro.slots);
     };
     const settle = () => setPaused(Object.values(holds).some(Boolean));
 
-    motion.addEventListener("change", (event) => {
-      holds.motion = event.matches;
-      settle();
-    });
+    motion.addEventListener(
+      "change",
+      (event) => {
+        holds.motion = event.matches;
+        settle();
+      },
+      { signal },
+    );
     tabs.addEventListener("focusin", () => {
       holds.focus = true;
       settle();
@@ -269,13 +285,15 @@ const panels = await slotContent(Astro.slots);
       holds.focus = false;
       settle();
     });
-    new IntersectionObserver((entries) => {
+    const seen = new IntersectionObserver((entries) => {
       holds.offscreen = !entries[0].isIntersecting;
       settle();
-    }).observe(tabs);
+    });
+    seen.observe(tabs);
+    signal.addEventListener("abort", () => seen.disconnect());
 
     settle();
-  }
+  });
 </script>
 
 <style is:global>

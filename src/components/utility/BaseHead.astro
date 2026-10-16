@@ -33,12 +33,18 @@ const fontPreload = (
   ) ?? firstFiles[0]
 )?.src[0]?.url;
 
-/* Applies the saved or system color mode before first paint. */
+/* Applies the saved or system color mode before first paint, and again
+   after each page swap: Astro's ClientRouter replaces the root's attributes
+   with the next page's, which leave the mode out. */
 const colorModeScript = `(() => {
-  let saved;
-  try { saved = localStorage.getItem("trix-mode"); } catch {}
-  const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.dataset.mode = dark ? "dark" : "light";
+  const apply = () => {
+    let saved;
+    try { saved = localStorage.getItem("trix-mode"); } catch {}
+    const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.dataset.mode = dark ? "dark" : "light";
+  };
+  apply();
+  document.addEventListener("astro:after-swap", apply);
 })();`;
 
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;

@@ -76,7 +76,7 @@ site before rebuilding (scroll the page slowly, at desktop and phone):
 | Appear effect (fade/slide in on load or in view) | a component script with `IntersectionObserver` and a CSS transition on `transform`/`opacity`                              |
 | Scroll transforms, parallax                      | CSS scroll-driven animations (`animation-timeline: view()`), GSAP ScrollTrigger only where support or sequencing needs it |
 | Hover and press variants                         | `:hover` / `:active` transitions on the component                                                                         |
-| Page transitions                                 | Astro view transitions                                                                                                    |
+| Page transitions                                 | Astro view transitions: `<ClientRouter />` in `BaseLayout`'s head; Trix's components set up again on each page            |
 | Ticker                                           | `Interactive/Marquee`                                                                                                     |
 | Carousel / Slideshow                             | `Interactive/Slider`                                                                                                      |
 

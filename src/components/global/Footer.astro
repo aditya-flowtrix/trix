@@ -51,11 +51,11 @@ const { render = true } = Astro.props;
 }
 
 <script>
-  const year = document.querySelector<HTMLSpanElement>("#year");
+  import { mount } from "@/utils/mount.ts";
 
-  if (year) {
+  mount("#year", (year) => {
     year.textContent = new Date().getFullYear().toString();
-  }
+  });
 </script>
 
 <style is:global>

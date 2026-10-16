@@ -75,9 +75,9 @@ if (import.meta.env.DEV && render && content && !id) {
 }
 
 <script>
-  for (const modal of document.querySelectorAll<HTMLDialogElement>(
-    ".modal_wrap",
-  )) {
+  import { mount } from "@/utils/mount.ts";
+
+  mount<HTMLDialogElement>(".modal_wrap", (modal, signal) => {
     const scroll = modal.querySelector<HTMLElement>("[data-modal-scroll]");
     // Where focus goes back to on close. Safari does not focus a clicked
     // button, so remember the trigger itself, not the active element.
@@ -131,16 +131,20 @@ if (import.meta.env.DEV && render && content && !id) {
       fromBackdrop = false;
     });
 
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const trigger = target.closest(
-        `[data-modal-open="${modal.id}"], a[href="#${modal.id}"]`,
-      );
-      if (!trigger) return;
-      event.preventDefault();
-      open(trigger);
-    });
+    document.addEventListener(
+      "click",
+      (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const trigger = target.closest(
+          `[data-modal-open="${modal.id}"], a[href="#${modal.id}"]`,
+        );
+        if (!trigger) return;
+        event.preventDefault();
+        open(trigger);
+      },
+      { signal },
+    );
 
     const url = new URL(location.href);
     if (url.searchParams.get("modal") === modal.id) {
@@ -150,7 +154,7 @@ if (import.meta.env.DEV && render && content && !id) {
     } else if (modal.hasAttribute("data-modal-on-load") && !resting()) {
       open();
     }
-  }
+  });
 </script>
 
 <style is:global>
