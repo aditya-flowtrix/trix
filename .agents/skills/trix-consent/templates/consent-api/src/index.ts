@@ -26,7 +26,9 @@ export default {
   ): Promise<Response> {
     // trustedOrigins only stops browsers: a script can post choices from
     // anywhere, and a consent record is never deleted. So each address's
-    // saves are capped before they reach the database.
+    // saves are capped before they reach the database. ponytail: an IPv6
+    // host can step through its /64 to get past the cap; key on the /64 if
+    // that ever happens.
     if (!READS.has(request.method)) {
       const key = request.headers.get("cf-connecting-ip") ?? "";
       if (!(await env.SAVES.limit({ key })).success)
