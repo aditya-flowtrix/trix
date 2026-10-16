@@ -127,7 +127,43 @@ try {
     );
   });
 
-  await it("the Worker bundles for Cloudflare, under 1 MB gzipped", () => {
+  await it("the Worker caps each address's saves before they reach the database", async () => {
+    const { default: worker } = await import(
+      pathToFileURL(join(tmp, "consent-api/src/index.ts")).href
+    );
+    // Cloudflare's rate limiter, as the Worker sees it.
+    const counted: string[] = [];
+    let allowed = true;
+    const env = {
+      SAVES: {
+        limit: async ({ key }: { key: string }) => {
+          counted.push(key);
+          return { success: allowed };
+        },
+      },
+    };
+    const ctx = { waitUntil() {} };
+    const call = (method: string) =>
+      worker.fetch(
+        new Request("https://consent.example.com/api/c15t/subjects", {
+          method,
+          headers: { "cf-connecting-ip": "203.0.113.7" },
+        }),
+        env,
+        ctx,
+      );
+    // Allowed: on to the database, which this one doesn't have.
+    assert.equal((await call("POST")).status, 503);
+    allowed = false;
+    assert.equal((await call("POST")).status, 429);
+    assert.deepEqual(counted, ["203.0.113.7", "203.0.113.7"]);
+    // Reading and CORS preflights save nothing, and aren't counted.
+    await call("GET");
+    await call("OPTIONS");
+    assert.equal(counted.length, 2);
+  });
+
+  await it("the Worker bundles for Cloudflare, under 1 MB gzipped, its rate limit bound", () => {
     const result = spawnSync(
       process.execPath,
       [
@@ -147,6 +183,7 @@ try {
     assert.equal(result.status, 0, output);
     const gzip = Number(/gzip: ([\d.]+) KiB/.exec(output)?.[1]);
     assert.ok(gzip > 0 && gzip < 1024, `${gzip} KiB gzipped`);
+    assert.match(output, /env\.SAVES\b/, "wrangler.jsonc binds no SAVES limit");
   });
 
   // A scratch copy of everything a project gets, with the templates in place,

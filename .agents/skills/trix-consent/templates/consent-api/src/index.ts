@@ -11,7 +11,12 @@ interface Env {
   HYPERDRIVE?: { connectionString: string };
   /** A direct connection string for `npm run dev`, in .dev.vars. */
   DATABASE_URL?: string;
+  /** Saves per address, limited in wrangler.jsonc. */
+  SAVES: { limit(options: { key: string }): Promise<{ success: boolean }> };
 }
+
+// What a banner reads, and the browser's CORS preflight, save nothing.
+const READS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 export default {
   async fetch(
@@ -19,6 +24,17 @@ export default {
     env: Env,
     ctx: { waitUntil(promise: Promise<unknown>): void },
   ): Promise<Response> {
+    // trustedOrigins only stops browsers: a script can post choices from
+    // anywhere, and a consent record is never deleted. So each address's
+    // saves are capped before they reach the database.
+    if (!READS.has(request.method)) {
+      const key = request.headers.get("cf-connecting-ip") ?? "";
+      if (!(await env.SAVES.limit({ key })).success)
+        return new Response("Too many requests.", {
+          status: 429,
+          headers: { "retry-after": "60" },
+        });
+    }
     const url = env.HYPERDRIVE?.connectionString ?? env.DATABASE_URL;
     if (!url)
       return new Response("The consent database is not configured.", {

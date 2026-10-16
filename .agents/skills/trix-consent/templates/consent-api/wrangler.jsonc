@@ -18,6 +18,16 @@
   "hyperdrive": [
     { "binding": "HYPERDRIVE", "id": "00000000000000000000000000000000" },
   ],
+  // Saves per visitor's address: 20 a minute, far more than a person makes,
+  // so a script can't fill the database, whose records are never deleted.
+  // The namespace is any number no other limiter on the account uses.
+  "ratelimits": [
+    {
+      "name": "SAVES",
+      "namespace_id": "1001",
+      "simple": { "limit": 20, "period": 60 },
+    },
+  ],
   // The site's consent subdomain, on the same Cloudflare account as the site.
   "routes": [{ "pattern": "consent.example.com", "custom_domain": true }],
   "observability": {
