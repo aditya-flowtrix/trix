@@ -1,0 +1,27 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Tabs from "@/components/interactive/Tabs.astro";
+import TabLink from "@/components/interactive/TabLink.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+---
+
+<Layout title="Mount shared">
+  <Section>
+    <Tabs>
+      <Fragment slot="links">
+        <TabLink>One</TabLink>
+        <TabLink>Two</TabLink>
+      </Fragment>
+      <Paragraph>One</Paragraph>
+      <Paragraph>Two</Paragraph>
+    </Tabs>
+  </Section>
+</Layout>
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // A project's own script, on the selector Tabs already mounts.
+  mount(".tabs_wrap", (tabs) => tabs.setAttribute("data-also", ""));
+</script>

@@ -1,9 +1,13 @@
 type Setup<T extends Element> = (element: T, signal: AbortSignal) => void;
-type Mount = { setup: Setup<Element>; live: Map<Element, AbortController> };
+type Mount = {
+  selector: string;
+  setup: Setup<Element>;
+  live: Map<Element, AbortController>;
+};
 
-const mounts = new Map<string, Mount>();
+const mounts: Mount[] = [];
 
-const start = (selector: string, { setup, live }: Mount) => {
+const start = ({ selector, setup, live }: Mount) => {
   for (const element of document.querySelectorAll(selector)) {
     if (live.has(element)) continue;
     const controller = new AbortController();
@@ -21,13 +25,13 @@ const start = (selector: string, { setup, live }: Mount) => {
 // old page is torn down, and what came with the new one is set up before it
 // is shown. An element kept with transition:persist stays as it is.
 document.addEventListener("astro:after-swap", () => {
-  for (const { live } of mounts.values())
+  for (const { live } of mounts)
     for (const [element, controller] of live)
       if (!element.isConnected) {
         controller.abort();
         live.delete(element);
       }
-  for (const [selector, mount] of mounts) start(selector, mount);
+  mounts.forEach(start);
 });
 
 /**
@@ -35,14 +39,18 @@ document.addEventListener("astro:after-swap", () => {
  * those each page brings in when Astro's ClientRouter swaps pages. `signal`
  * aborts when the element leaves the page — pass it to listeners on
  * `document`, `window` or a media query, and stop timers and observers on it.
- * Used by every component whose script sets up elements.
+ * Used by every component whose script sets up elements; a selector a
+ * component already mounts can be mounted again, and both setups run.
  */
 export function mount<T extends Element = HTMLElement>(
   selector: string,
   setup: Setup<T>,
 ) {
-  if (mounts.has(selector)) return;
-  const entry: Mount = { setup: setup as Setup<Element>, live: new Map() };
-  mounts.set(selector, entry);
-  start(selector, entry);
+  const entry: Mount = {
+    selector,
+    setup: setup as Setup<Element>,
+    live: new Map(),
+  };
+  mounts.push(entry);
+  start(entry);
 }

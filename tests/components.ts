@@ -155,6 +155,19 @@ try {
       assert.equal(new Set(form.ids).size, form.ids.length, form.ids.join(" "));
     });
 
+    await it("a project's own mount on a component's selector runs beside the component's", async () => {
+      await page.goto(`${origin}/test/mount-shared`);
+      assert.deepEqual(
+        await page
+          .locator(".tabs_wrap")
+          .evaluate((tabs) => [
+            tabs.classList.contains("is-ready"),
+            tabs.hasAttribute("data-also"),
+          ]),
+        [true, true],
+      );
+    });
+
     // /components → /style-guide → /components, swapped in place.
     await page.goto(`${origin}/components`);
     // A swap keeps the window; a reload would start a new one.
