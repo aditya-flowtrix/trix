@@ -49,10 +49,13 @@ by hand what the installer does: `name` and `version: "0.1.0"`, the stamp,
 - `SITE_NAME` — the brand name, as it should appear after every page title.
 - `SITE_DESCRIPTION` — the default meta description.
 - `SITE_URL` — the **production** origin. Canonicals, the sitemap and social
-  images resolve against it; a placeholder here ships wrong canonicals.
+  images resolve against it; a placeholder here ships wrong canonicals, so
+  the project's CI fails until it is set.
 - `SITE_LOCALE` (the page language), `SITE_SOCIALS` (profile URLs for
   structured data), `COLOR_MODE` (`light`, `dark`, or `auto` for a site that
-  follows the visitor's system and offers `ThemeToggle`).
+  follows the visitor's system and offers `ThemeToggle`), `CSP` (a Content
+  Security Policy on every page — turn it on once each third-party script's
+  origin is in `astro.config.mjs`).
 
 `wrangler.jsonc` (or the host's config): the project's name and domain.
 `public/_headers` already sets security headers and a year's caching for

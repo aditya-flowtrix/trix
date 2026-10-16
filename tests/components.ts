@@ -3,11 +3,13 @@
  * Components where /components never shows them, each one a bug once: tab
  * labels and field labels in any script, two Tabs on one page, a component
  * inside a Marquee, and Astro's ClientRouter swapping pages without
- * reloading them.
+ * reloading them — then the whole site under the CSP that `CSP` in
+ * src/consts.ts turns on.
  *
  * A scratch copy of the framework with the pages in tests/fixtures/pages,
  * ClientRouter in the layout and the color mode on auto, built and driven in
- * Chrome. Framework only: projects don't get it.
+ * Chrome; then rebuilt with the CSP on and ClientRouter out. Framework only:
+ * projects don't get it.
  *
  * Usage: node tests/components.ts
  */
@@ -295,6 +297,93 @@ try {
         "true",
       );
     });
+
+    // The same site with the CSP on, and without ClientRouter, which Astro's
+    // CSP doesn't support. Anything the policy blocks fails the check.
+    edit(
+      "src/consts.ts",
+      "export const CSP: boolean = false;",
+      "export const CSP: boolean = true;",
+    );
+    edit(
+      "src/layouts/BaseLayout.astro",
+      "<BaseHead {...seo} />\n    <ClientRouter />",
+      "<BaseHead {...seo} />",
+    );
+    execFileSync("npm", ["run", "build"], {
+      cwd: site,
+      stdio: ["ignore", "ignore", "inherit"],
+    });
+    const csp = await browser.newPage({
+      viewport: { width: 1280, height: 800 },
+    });
+    const blocked: string[] = [];
+    await csp.addInitScript(() =>
+      document.addEventListener("securitypolicyviolation", (event) =>
+        console.error(
+          `CSP blocked ${event.effectiveDirective}: ${event.blockedURI} ${event.sample}`,
+        ),
+      ),
+    );
+    csp.on("console", (message) => {
+      if (message.type() === "error") blocked.push(message.text());
+    });
+    csp.on("pageerror", (error) => errors.push(error.message));
+
+    await it("CSP: every page is under the policy, and nothing on it is blocked", async () => {
+      for (const path of [
+        "/",
+        "/style-guide",
+        "/components",
+        "/test/tabs-scripts",
+        "/test/form-scripts",
+        "/test/marquee-video",
+        "/test/code",
+      ]) {
+        await csp.goto(`${origin}${path}`);
+        assert.ok(
+          await csp
+            .locator('meta[http-equiv="content-security-policy"]')
+            .count(),
+          `${path} has no policy`,
+        );
+        await csp.evaluate(() => scrollTo(0, document.body.scrollHeight));
+        await csp.waitForTimeout(200);
+      }
+      assert.ok(!blocked.length, [...new Set(blocked)].join("\n"));
+    });
+    await it("CSP: the color mode script and the component scripts run", async () => {
+      await csp.goto(`${origin}/test/tabs-scripts`);
+      assert.ok(
+        await csp.evaluate(() => document.documentElement.dataset.mode),
+      );
+      assert.equal(
+        await csp.locator(".tabs_link").first().getAttribute("aria-selected"),
+        "true",
+      );
+    });
+    await it("CSP: inline style attributes apply — components' props and code colors", async () => {
+      await csp.goto(`${origin}/test/marquee-video`);
+      const [declared, applied] = await csp
+        .locator(".marquee_wrap")
+        .evaluate((marquee) => [
+          /--_count:\s*(\d+)/.exec(marquee.getAttribute("style")!)![1],
+          getComputedStyle(marquee).getPropertyValue("--_count"),
+        ]);
+      assert.equal(applied, declared);
+      await csp.goto(`${origin}/test/code`);
+      const token = csp.locator(".astro-code span[style]").first();
+      const [style, color] = await token.evaluate((span) => [
+        span.getAttribute("style")!,
+        getComputedStyle(span).color,
+      ]);
+      const hex = /color:\s*#([0-9a-f]{6})/i.exec(style)![1];
+      assert.equal(
+        color,
+        `rgb(${[0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`,
+      );
+    });
+
     await it("no script errors on any of it", async () =>
       assert.ok(!errors.length, errors.join("\n")));
   } finally {

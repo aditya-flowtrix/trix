@@ -84,9 +84,9 @@ entry's fields, so every item gets it.
 ## 4. Audit
 
 ```bash
-npm run build && npm run seo                  # the build (also runs in CI)
+npm run build && npm run seo                  # the build
+npm run seo -- --production                   # as a project's CI runs it
 node scripts/seo/audit.ts --url https://staging.example.com
-node scripts/seo/audit.ts --dir dist --production   # before launch
 ```
 
 Crawls every page reachable from `/` and the sitemap at phone width and

@@ -90,7 +90,8 @@ procedure for every platform.
 
 Pages set `title`, `description`, `image` and `schema` on `BaseLayout`;
 structured data comes from `src/utils/schema.ts`, breadcrumbs from
-`<Breadcrumbs>`. `npm run seo` audits the build (CI runs it). `/trix-seo` has
+`<Breadcrumbs>`. `npm run seo` audits the build; a project's CI runs it with
+`--production`, which also fails on a placeholder `SITE_URL`. `/trix-seo` has
 the per-page rules, migration parity and the launch handoff.
 
 ## Color mode
@@ -99,6 +100,13 @@ the per-page rules, migration parity and the launch handoff.
 the visitor's system setting, remember a `ThemeToggle` choice, applied before
 first paint. Dark mode swaps the root to the dark theme; sections with an
 explicit `theme` keep theirs.
+
+## Content Security Policy
+
+`CSP` in `src/consts.ts`, off by default, puts every page under one: scripts
+and stylesheets from the site only. With it on, a third-party script needs its
+origin in `astro.config.mjs` → `security.csp.scriptDirective.resources`, and
+`<ClientRouter />` doesn't work.
 
 ## Checks
 

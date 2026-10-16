@@ -33,6 +33,19 @@
 - A component inside a `Marquee` binds once. The Marquee repeats its
   content, scripts included, and an inline script ran once per copy: a
   `Video`'s pause button paused and resumed on the same click.
+- `CSP` in `src/consts.ts` puts every page under a Content Security Policy:
+  scripts and stylesheets only from the site, Astro's inline ones by their
+  hash, and the style attributes components set for their props. It is off
+  by default, since a tag manager, analytics or a chat widget is blocked
+  until its origin is listed in `astro.config.mjs`, and Astro's
+  `<ClientRouter />` doesn't support it. The Deploying guide has the steps.
+- Pages are HTTPS-only: `public/_headers` sends `Strict-Transport-Security`
+  for a year, leaving subdomains alone.
+- A project's CI fails while `SITE_URL` is still the placeholder, which
+  points every canonical, the sitemap and the social images at example.com:
+  its SEO audit runs with `--production`. The framework's CI also runs every
+  component script in a scratch site, under ClientRouter and under the
+  policy.
 
 - Cloudflare's pull-request previews build again. Workers Builds runs
   `wrangler preview` for every branch but the production one, and it refuses
