@@ -111,13 +111,13 @@ const locals = `--_count: ${count}`;
 }
 
 <script>
-  for (const marquee of document.querySelectorAll<HTMLElement>(
-    ".marquee_wrap",
-  )) {
+  import { mount } from "@/utils/mount.ts";
+
+  mount(".marquee_wrap", (marquee, signal) => {
     const toggle = marquee.querySelector<HTMLButtonElement>(
       "[data-marquee-toggle]",
     );
-    if (!toggle) continue;
+    if (!toggle) return;
 
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -129,12 +129,14 @@ const locals = `--_count: ${count}`;
 
     /* Anyone who asked for less motion gets it still, and can start it. */
     setPlaying(!reduced.matches);
-    reduced.addEventListener("change", () => setPlaying(!reduced.matches));
+    reduced.addEventListener("change", () => setPlaying(!reduced.matches), {
+      signal,
+    });
 
     toggle.addEventListener("click", () => {
       setPlaying(marquee.dataset.state !== "playing");
     });
-  }
+  });
 </script>
 
 <style is:global>

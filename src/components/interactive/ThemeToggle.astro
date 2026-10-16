@@ -74,6 +74,9 @@ const {
       sync();
     });
 
+    // The mode belongs to the document, which outlives ClientRouter's page
+    // swaps: only the toggles each new page brings need bringing up to date.
+    document.addEventListener("astro:after-swap", sync);
     sync();
   }
 </script>

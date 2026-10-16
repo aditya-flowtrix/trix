@@ -1,0 +1,15 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Marquee from "@/components/interactive/Marquee.astro";
+import Video from "@/components/media/Video.astro";
+---
+
+<Layout title="Video in a Marquee">
+  <Section>
+    <Marquee label="Videos">
+      <Video src="/video/demo.webm" />
+      <Video src="/video/demo.webm" />
+    </Marquee>
+  </Section>
+</Layout>

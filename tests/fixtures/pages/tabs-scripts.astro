@@ -1,0 +1,44 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Tabs from "@/components/interactive/Tabs.astro";
+import TabLink from "@/components/interactive/TabLink.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import Icon from "@/components/media/Icon.astro";
+---
+
+<Layout title="Tabs in any script">
+  <Section>
+    <Tabs playback="auto">
+      <Fragment slot="links">
+        <TabLink>概要</TabLink>
+        <TabLink>料金</TabLink>
+        <TabLink>サポート</TabLink>
+      </Fragment>
+      <Paragraph>概要の説明</Paragraph>
+      <Paragraph>料金の説明</Paragraph>
+      <Paragraph>サポートの説明</Paragraph>
+    </Tabs>
+  </Section>
+  <div style="height: 200vh"></div>
+  <Section>
+    <Tabs>
+      <Fragment slot="links">
+        <TabLink>نظرة عامة</TabLink>
+        <TabLink>الأسعار</TabLink>
+      </Fragment>
+      <Paragraph>نظرة عامة</Paragraph>
+      <Paragraph>الأسعار</Paragraph>
+    </Tabs>
+  </Section>
+  <Section>
+    <Tabs>
+      <Fragment slot="links">
+        <TabLink aria-label="Home"><Icon name="house" /></TabLink>
+        <TabLink aria-label="Settings"><Icon name="gear" /></TabLink>
+      </Fragment>
+      <Paragraph>Home</Paragraph>
+      <Paragraph>Settings</Paragraph>
+    </Tabs>
+  </Section>
+</Layout>

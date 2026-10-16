@@ -47,14 +47,13 @@ const items = (
 }
 
 <script>
-  const accordions = document.querySelectorAll<HTMLElement>(".accordion_wrap");
+  import { mount } from "@/utils/mount.ts";
 
-  const sync = () => {
-    const designing =
-      document.documentElement.classList.contains("stacki-designer");
-
-    for (const accordion of accordions) {
-      const preview = designing && accordion.classList.contains("preview");
+  mount(".accordion_wrap", (accordion, signal) => {
+    const sync = () => {
+      const preview =
+        document.documentElement.classList.contains("stacki-designer") &&
+        accordion.classList.contains("preview");
 
       for (const item of accordion.querySelectorAll<HTMLDetailsElement>(
         ".accordion_item",
@@ -73,20 +72,17 @@ const items = (
           item.open = true;
         }
       }
-    }
-  };
+    };
 
-  if (accordions.length > 0) {
     sync();
 
     const watcher = new MutationObserver(sync);
     const settings = { attributes: true, attributeFilter: ["class"] };
 
     watcher.observe(document.documentElement, settings);
-    for (const accordion of accordions) {
-      watcher.observe(accordion, { ...settings, subtree: true });
-    }
-  }
+    watcher.observe(accordion, { ...settings, subtree: true });
+    signal.addEventListener("abort", () => watcher.disconnect());
+  });
 </script>
 
 <style is:global>

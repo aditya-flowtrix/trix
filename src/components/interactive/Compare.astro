@@ -66,14 +66,14 @@ const handle = await slotContent(Astro.slots, "handle");
 }
 
 <script>
-  for (const range of document.querySelectorAll<HTMLInputElement>(
-    "[data-compare]",
-  )) {
+  import { mount } from "@/utils/mount.ts";
+
+  mount<HTMLInputElement>("[data-compare]", (range) => {
     const update = () =>
       range.parentElement?.style.setProperty("--_position", `${range.value}%`);
     range.addEventListener("input", update);
     update();
-  }
+  });
 </script>
 
 <style is:global>

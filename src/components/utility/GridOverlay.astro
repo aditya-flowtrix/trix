@@ -12,31 +12,43 @@
 </div>
 
 <script>
+  import { mount } from "@/utils/mount.ts";
+
   const KEY = "trix-grid-overlay";
-  const overlay = document.querySelector<HTMLElement>(".grid-overlay_wrap")!;
-  const show = (on: boolean) => {
-    overlay.hidden = !on;
-    document
-      .querySelectorAll("[data-grid-overlay-toggle]")
-      .forEach((b) => b.setAttribute("aria-pressed", String(on)));
+
+  mount(".grid-overlay_wrap", (overlay, signal) => {
+    const show = (on: boolean) => {
+      overlay.hidden = !on;
+      document
+        .querySelectorAll("[data-grid-overlay-toggle]")
+        .forEach((b) => b.setAttribute("aria-pressed", String(on)));
+      try {
+        if (on) localStorage.setItem(KEY, "1");
+        else localStorage.removeItem(KEY);
+      } catch {}
+    };
     try {
-      if (on) localStorage.setItem(KEY, "1");
-      else localStorage.removeItem(KEY);
+      show(!!localStorage.getItem(KEY));
     } catch {}
-  };
-  try {
-    show(!!localStorage.getItem(KEY));
-  } catch {}
-  addEventListener("keydown", (e) => {
-    if (e.key !== "G" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey)
-      return;
-    const t = e.target as HTMLElement | null;
-    if (t?.closest("input, textarea, select, [contenteditable]")) return;
-    show(!!overlay.hidden);
-  });
-  document.addEventListener("click", (e) => {
-    if ((e.target as Element).closest?.("[data-grid-overlay-toggle]"))
-      show(!!overlay.hidden);
+    addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key !== "G" || !e.shiftKey || e.metaKey || e.ctrlKey || e.altKey)
+          return;
+        const t = e.target as HTMLElement | null;
+        if (t?.closest("input, textarea, select, [contenteditable]")) return;
+        show(!!overlay.hidden);
+      },
+      { signal },
+    );
+    document.addEventListener(
+      "click",
+      (e) => {
+        if ((e.target as Element).closest?.("[data-grid-overlay-toggle]"))
+          show(!!overlay.hidden);
+      },
+      { signal },
+    );
   });
 </script>
 

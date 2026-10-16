@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- Trix works with Astro's `<ClientRouter />` (view transitions). Every
+  component with a script set itself up once, at load: after the router
+  swapped in the next page, tabs, sliders, the phone menu, modals and
+  dropdowns did nothing, revealed content stayed hidden, a stale listener
+  threw on every click, and the auto color mode fell back to light. Each now
+  sets up through `mount` (`src/utils/mount.ts`) on every page the router
+  brings in, and stops its listeners, observers and timers when its page
+  leaves. Component scripts load as small modules, cached from page to page,
+  rather than inline.
+- Tabs links work in any script. The URL names a tab by its text —
+  `?tab=料金` — and one with no text, an icon alone, by its position. A label
+  with no Latin letters used to give an empty name, which matched a URL
+  without one: the page opened scrolled to that Tabs, its rotation stopped.
+  Each Tabs without an `id` keeps its own place in the URL (`tab`, `tab-2`,
+  …), and Home and End select the first and last tab.
+- Form fields labelled in any script keep their name. A label with no Latin
+  letters gave `name=""`, and the browser left the field out of every
+  submission. Names from accented labels change with it: "Téléphone" is now
+  `téléphone`, not `t-l-phone`.
+- `Form` renders without a `name` — it rendered nothing, silently — and
+  `astro dev` warns when it has no `action`, since it then sends nothing.
+- A component inside a `Marquee` binds once. The Marquee repeats its
+  content, scripts included, and an inline script ran once per copy: a
+  `Video`'s pause button paused and resumed on the same click.
+
 - Cloudflare's pull-request previews build again. Workers Builds runs
   `wrangler preview` for every branch but the production one, and it refuses
   a config without a `previews` block. The docs site's `wrangler.jsonc` has

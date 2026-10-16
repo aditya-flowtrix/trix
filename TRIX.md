@@ -185,4 +185,5 @@ Every box has to be ticked before a component is done.
 - [ ] Orders props the same way as other components in the type and the destructure: `render`, content that changes per instance, `variant`, props that only apply to some variants, then occasional settings. `class` and `...rest` last; callers use `class` for utilities only.
 - [ ] Puts variant-specific props behind a discriminated union on `variant`, `never` on the variants that don't take them, so the wrong prop fails to type-check rather than being ignored. Destructure through a widened `AllProps` alias, as `Card` and `Img` do.
 - [ ] Documents each prop with the exact wording other components already use for it. A shared prop only gets its own description where it genuinely behaves differently.
+- [ ] Sets its elements up with `mount` from `@/utils/mount.ts`, so they work on every page Astro's ClientRouter brings in, and hands its `signal` to whatever it adds outside them: listeners on `document`, `window` or a media query, observers, timers.
 - [ ] Adds no comments beyond those prop tooltips, the banners dividing a stylesheet into sections, and one line labelling each section of a page.

@@ -1,0 +1,34 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Tabs from "@/components/interactive/Tabs.astro";
+import TabLink from "@/components/interactive/TabLink.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+---
+
+<Layout title="Two Tabs">
+  <Section>
+    <Tabs>
+      <Fragment slot="links">
+        <TabLink>One</TabLink>
+        <TabLink>Two</TabLink>
+        <TabLink>Three</TabLink>
+      </Fragment>
+      <Paragraph>One</Paragraph>
+      <Paragraph>Two</Paragraph>
+      <Paragraph>Three</Paragraph>
+    </Tabs>
+  </Section>
+  <Section>
+    <Tabs>
+      <Fragment slot="links">
+        <TabLink>Alpha</TabLink>
+        <TabLink>Beta</TabLink>
+        <TabLink>Gamma</TabLink>
+      </Fragment>
+      <Paragraph>Alpha</Paragraph>
+      <Paragraph>Beta</Paragraph>
+      <Paragraph>Gamma</Paragraph>
+    </Tabs>
+  </Section>
+</Layout>

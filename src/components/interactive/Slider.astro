@@ -140,19 +140,21 @@ const header = await slotContent(Astro.slots, "header");
 }
 
 <script>
+  import { mount } from "@/utils/mount.ts";
+
   const THRESHOLD = 4;
 
-  for (const slider of document.querySelectorAll<HTMLElement>(".slider_wrap")) {
+  mount(".slider_wrap", (slider, signal) => {
     const list = slider.querySelector<HTMLElement>(".slider_list");
     const markers = slider.querySelector<HTMLElement>(".slider_markers");
     const controls = slider.querySelector<HTMLElement>(".slider_controls");
     const steps = [
       ...slider.querySelectorAll<HTMLButtonElement>("[data-step]"),
     ];
-    if (!list) continue;
+    if (!list) return;
 
     const slides = [...list.children] as HTMLElement[];
-    if (slides.length === 0) continue;
+    if (slides.length === 0) return;
 
     slides.forEach((slide, i) => {
       slide.setAttribute("role", "group");
@@ -279,10 +281,14 @@ const header = await slotContent(Astro.slots, "header");
         holds.asked = !holds.asked;
         settle();
       });
-      reduced.addEventListener("change", (event) => {
-        holds.motion = event.matches;
-        settle();
-      });
+      reduced.addEventListener(
+        "change",
+        (event) => {
+          holds.motion = event.matches;
+          settle();
+        },
+        { signal },
+      );
       list.addEventListener("focusin", () => {
         holds.focus = true;
         settle();
@@ -292,10 +298,12 @@ const header = await slotContent(Astro.slots, "header");
         holds.focus = false;
         settle();
       });
-      new IntersectionObserver((entries) => {
+      const seen = new IntersectionObserver((entries) => {
         holds.offscreen = !entries[0].isIntersecting;
         settle();
-      }).observe(slider);
+      });
+      seen.observe(slider);
+      signal.addEventListener("abort", () => seen.disconnect());
       settle();
     }
 
@@ -372,9 +380,15 @@ const header = await slotContent(Astro.slots, "header");
     const resize = new ResizeObserver(sync);
     resize.observe(list);
 
-    addEventListener("load", sync);
+    addEventListener("load", sync, { signal });
     sync();
-  }
+
+    signal.addEventListener("abort", () => {
+      window.clearTimeout(timer);
+      cancelAnimationFrame(frame);
+      resize.disconnect();
+    });
+  });
 </script>
 
 <style is:global>

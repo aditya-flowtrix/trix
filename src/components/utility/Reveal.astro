@@ -9,11 +9,9 @@
 ---
 
 <script>
-  const targets = document.querySelectorAll<HTMLElement>("[data-animate]");
-  if (
-    targets.length &&
-    matchMedia("(prefers-reduced-motion: no-preference)").matches
-  ) {
+  import { mount } from "@/utils/mount.ts";
+
+  if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -24,11 +22,12 @@
       },
       { rootMargin: "0px 0px -5% 0px" },
     );
-    for (const target of targets) {
+    mount("[data-animate]", (target, signal) => {
       [...target.children].forEach((child, i) =>
         (child as HTMLElement).style.setProperty("--_reveal-index", `${i}`),
       );
       observer.observe(target);
-    }
+      signal.addEventListener("abort", () => observer.unobserve(target));
+    });
   }
 </script>
