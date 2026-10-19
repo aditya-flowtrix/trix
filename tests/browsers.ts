@@ -744,14 +744,27 @@ async function testPage(driver: Driver, page: Page, path: string) {
   }
   if (has.overlay) {
     await fresh();
-    await page.press("Shift+G");
+    // Safari's WebDriver now and then loses a key pressed right after a
+    // load. A press that is heard shows the overlay at once, so a second
+    // press goes only where the first was lost and can't hide it again. On
+    // failure, the keys the page did receive say which it was.
+    await page.evaluate(`() => {
+      window.__keys = [];
+      addEventListener("keydown", (e) => __keys.push((e.shiftKey ? "Shift+" : "") + e.key), true);
+    }`);
+    const shown = `() => !document.querySelector(".grid-overlay_wrap").hidden`;
+    let ok = false;
+    for (let i = 0; i < 2 && !ok; i++) {
+      await page.press("Shift+G");
+      ok = await until(page, shown);
+    }
     check(
       where,
       "Shift+G shows the grid overlay",
-      await until(
-        page,
-        `() => !document.querySelector(".grid-overlay_wrap").hidden`,
-      ),
+      ok,
+      ok
+        ? ""
+        : `keys received: ${await page.evaluate<string>(`() => __keys.join(", ") || "none"`)}`,
     );
   }
   return facts.links;
