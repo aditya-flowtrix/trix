@@ -35,8 +35,30 @@ in any of nine places:
 
 `top-left`, `top`, `top-right`, `left`, `center`, `right`, `bottom-left`,
 `bottom` and `bottom-right` (default). With reduced motion the video starts
-paused. `pauseButton={false}` removes the button — only for a video that stops
-within five seconds.
+paused. `pauseButton={false}` removes the button — for a video that stops
+within five seconds, and for a background video.
+
+## Background video
+
+A video behind a section's content goes in `Section`'s `background` slot,
+where it fills the section. It has no play/pause button unless the site's
+owner asks for one — ask, and the answer defaults to no:
+
+```astro
+<Section theme="dark">
+  <Video
+    slot="background"
+    src="/video/demo.webm"
+    poster="/video/demo.jpg"
+    pauseButton={false}
+  />
+  <Heading>Built to last</Heading>
+</Section>
+```
+
+A looping video with no pause control doesn't meet WCAG 2.2.2 for visitors
+who haven't asked their device for reduced motion, so say so when asking.
+With the button, it stays clickable over the background.
 
 ## Props
 

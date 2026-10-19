@@ -12,6 +12,17 @@
   moves to `src/assets/shared/graphics/background.svg`, since the home and
   components pages both use it. A site already built keeps its files where
   they are until someone moves them, imports included.
+- `/style-guide` and `/components` must look finished in every project:
+  evenly spaced, nothing touching. A project that changes a component's
+  default — a `Section` with no container gap — or sets its text margins to
+  `0rem` left blocks on them flush against each other. `TRIX.md` → The style
+  guide and components pages says what to check and how to fix it, and the
+  style guide, design system and new project skills check both pages before
+  they finish.
+- A background video — `Video` in `Section`'s `background` slot — gets no
+  play/pause button by default (`pauseButton={false}`). The owner is asked
+  whether they want one, and the answer is recorded in `PROJECT.md`. A video
+  in the content keeps its button.
 
 ## 0.5.0 — 2026-10-16
 

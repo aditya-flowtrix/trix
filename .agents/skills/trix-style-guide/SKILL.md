@@ -171,7 +171,9 @@ group. The file's comment headings are the groups; keep them.
 - **Spacing** — the numbered scale in size order. If its length or values
   differ from Trix's default, the framework components' `var(--space-N)`
   references must be remapped **by value** to the nearest new step, and the
-  map recorded in `PROJECT.md`.
+  map recorded in `PROJECT.md` — the values written on `/style-guide` and
+  `/components` with them. A component default you change (`Section`'s gap or
+  padding) gets its old value written in wherever a page relied on it.
 - **Colors** — palette ramps, then each theme in `themes.css` with the full
   set of semantic tokens. `npm run check` fails any text role below WCAG AA
   in any theme. If the source itself is below AA and the owner chooses to
@@ -214,6 +216,11 @@ node scripts/measure/variables.ts --source https://example.com/ --local http://l
 source variable that is still used; the ones it cannot map are either dead in
 the source or a token still missing. Then open `/style-guide` at desktop and
 mobile and look at it next to the source.
+
+Last, both base pages, `/style-guide` and `/components`, at 375 and 1440:
+evenly spaced, no heading, paragraph, button or demo touching another. A
+`0rem` margin token or a changed default shows up here first.
+`TRIX.md` → The style guide and components pages has what to fix.
 
 ### 8. Record and report
 

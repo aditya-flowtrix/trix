@@ -78,8 +78,10 @@ property.
 `src/assets/pages/<page>/images|graphics|logos/`, named for what it shows —
 `shared/` once a second page uses it, never one folder for the whole site
 (`TRIX.md` → Assets, which also says how to write the alt). An autoplaying
-`Video` keeps its pause button (`pausePosition` moves it). `Icon name` for
-Phosphor icons.
+`Video` in the content keeps its pause button (`pausePosition` moves it); a
+background video — in `Section`'s `background` slot — has none
+(`pauseButton={false}`) until the owner asks for one: ask, default no
+(`TRIX.md` → Building a page). `Icon name` for Phosphor icons.
 
 ## Finishing
 
