@@ -74,8 +74,12 @@ property.
 `--hover-duration` and `--hover-ease`. Everything respects reduced motion.
 
 **10. Media carry their accessibility.** `Img` (optimised; `alt` always,
-`""` only for decoration). An autoplaying `Video` keeps its pause button
-(`pausePosition` moves it). `Icon name` for Phosphor icons.
+`""` only for decoration). Its file goes in the page's own folder,
+`src/assets/pages/<page>/images|graphics|logos/`, named for what it shows —
+`shared/` once a second page uses it, never one folder for the whole site
+(`TRIX.md` → Assets, which also says how to write the alt). An autoplaying
+`Video` keeps its pause button (`pausePosition` moves it). `Icon name` for
+Phosphor icons.
 
 ## Finishing
 

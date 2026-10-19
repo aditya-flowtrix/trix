@@ -49,7 +49,9 @@ Record each in `PROJECT.md` → **Sources**:
 - **Forms** — Contact Form 7, Gravity Forms, WPForms, Elementor forms: fields,
   validation, notifications, where entries go.
 - **Media** — originals from `/wp-content/uploads/` (not the `-300x200` sizes;
-  Astro makes its own).
+  Astro makes its own). Uploads are filed by year and month; here a page's
+  images are filed by page (`TRIX.md` → Assets) and a post's by its
+  collection (`/trix-cms`).
 
 ## Content → collections
 

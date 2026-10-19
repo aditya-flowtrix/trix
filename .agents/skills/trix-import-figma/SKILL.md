@@ -292,6 +292,11 @@ say which width you measured.
    that slot, or in a `.section_background` — any other child of a section
    stays in the flow.
 
+   Images, illustrations and logos are exported from the file at their
+   largest size into the page's folder, `src/assets/pages/<page>/images|graphics|logos/`
+   (`TRIX.md` → Assets), named for what they show — a layer name rarely is —
+   and each gets its alt text as it is placed.
+
    **Build one section, look at it, then the next** (step 8). A layering or
    inheritance mistake made in the first section is repeated in every one
    after it, and no check catches it: `npm run check` passes on a heading

@@ -59,6 +59,56 @@ Set `Col`'s breakpoint props only where the design differs from the automatic
 stacking. Never fake columns with widths or `calc()` in a component — if a
 block does not sit on the grid, that is a design question first.
 
+## Assets
+
+Images, graphics and logos live in `src/assets/`, filed by the page that shows
+them — never all in one folder — so a page's files are found, replaced and
+removed together:
+
+```text
+src/assets/
+├── logo/                    the site's own logo (Nav, Footer, style guide)
+├── icons/                   the site's icons, for <Icon src>
+├── fonts/
+├── shared/                  used on more than one page, or by Nav and Footer
+│   ├── images/
+│   ├── graphics/
+│   └── logos/
+├── pages/
+│   ├── home/                /
+│   │   ├── images/          photographs, screenshots
+│   │   ├── graphics/        illustrations, backgrounds, patterns, shapes
+│   │   └── logos/           other companies' logos: clients, partners, press
+│   ├── about/               /about
+│   └── services/
+│       └── web-design/      /services/web-design
+└── cms/<collection>/        a collection's images, written by trix-cms
+```
+
+- **One folder per page, named after its route.** `/` is `home`; a nested
+  route nests. Inside it, only the kinds the page has. A file a second page
+  needs moves to `shared/`, and its imports with it.
+- **Names say what the file shows**, lowercase and hyphenated —
+  `team-workshop.jpg`, `reports-dashboard.png`, `acme.svg` — never a
+  platform's hash or a camera's name (`64f1a2c_hero-p-800.webp`,
+  `IMG_2034.jpg`).
+- **The original, once** — the largest file the source has, not one of its
+  resized copies. `Img` writes the sizes. `public/` is for files served as
+  they are — favicons, the social image, video — not for images a page shows.
+
+**Alt text is written with the image**, on the `Img` that shows it:
+
+- It says what the image shows that the page needs, in the page's language —
+  "Two engineers checking a gearbox on the assembly line". Never "image of",
+  the file name, or a list of keywords.
+- A logo's alt is the company's name: `alt="Acme"`.
+- An image that carries text — a chart, a quote card, a screenshot — puts that
+  text, or what it shows, in the alt.
+- A purely decorative graphic — a background, a pattern, a shape — has none:
+  leave `alt` out and `Img` renders `alt=""`, which screen readers skip.
+- A migrated image keeps the source's alt; where the source had none, or only
+  a file name, write one.
+
 ## Icons
 
 `<Icon name="arrow-right" />` inlines a [Phosphor](https://phosphoricons.com)
@@ -128,6 +178,8 @@ undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
   layout or semantics.
 - Create a custom component only when custom CSS or a script belongs to an
   element or its children — see [Custom components](#custom-components).
+- Put the page's images, graphics and logos in its own folder,
+  `src/assets/pages/<page>/`, each with its alt text — see [Assets](#assets).
 
 ## Custom components
 

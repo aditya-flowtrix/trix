@@ -25,7 +25,8 @@ because it depends only on what the browser renders.
      (`--dir`).
 4. **Assets** — every image and font downloaded from the platform's CDN
    (`static.wixstatic.com`, `images.squarespace-cdn.com`, `cdn.shopify.com`)
-   at original resolution. Nothing hotlinked survives the cutover.
+   at original resolution, images filed by page (`TRIX.md` → Assets).
+   Nothing hotlinked survives the cutover.
 5. **Redirects** — the platform's URL rules (Wix: SEO → URL redirect manager;
    Squarespace: Settings → URL mappings, which is plain text — copy it whole).
    Platform URL shapes (`/blank-1`, `/s/…`, `?format=json`) usually need
