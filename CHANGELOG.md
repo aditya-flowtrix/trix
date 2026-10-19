@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 — 2026-10-19
+
+Three rules for building on Trix: each page's images, graphics and logos go
+in a folder of their own, the style guide and components pages stay evenly
+spaced, and a background video has no play/pause button unless the owner asks
+for one. Nothing in a site already built changes.
 
 - A page's images, graphics and logos are filed in its own folder,
   `src/assets/pages/<page>/images/`, `graphics/` and `logos/` (`home` for
