@@ -139,6 +139,10 @@ Open `/style-guide` next to the Figma screenshot at 1440 and at 375: fonts,
 every text style, colors in every theme, spacing, the layout grid (Shift+G).
 Where they differ, the token is wrong — not the component.
 
+Then `/style-guide` and `/components` on their own: still evenly spaced,
+nothing touching (`TRIX.md` → The style guide and components pages). A
+changed spacing step or margin token moves every block on them.
+
 ## 5. Back to Figma
 
 The designer imports `design/tokens/*.tokens.json` into Figma's variables

@@ -164,6 +164,28 @@ origin in `astro.config.mjs` → `security.csp.scriptDirective.resources`, and
 tokens; the conventions below hold (media queries on breakpoint tokens, no
 undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
 
+## The style guide and components pages
+
+`/style-guide` and `/components` are every project's living documentation,
+built from the library at its defaults, and they must look finished in every
+project: evenly spaced, nothing touching. Whenever the design system changes —
+tokens, a component's default, the text margin tokens — look at both at 375
+and 1440 before calling it done:
+
+- Inside each section the blocks — title, text, buttons, demos — sit its
+  `gap` apart, and the sections sit evenly apart down the page. No heading,
+  paragraph, button or demo touches the one above or below it.
+- Remapping the spacing scale includes the values written on these pages:
+  `gap`, `rowGap`, `marginTop`, spacing and radius utilities.
+- Changing a component's default — `Section`'s `gap` or padding — changes
+  every page that relied on it. Write the old value in where it was relied on
+  (`gap="…"` at the project's nearest step) rather than changing the component
+  back.
+- Text margin tokens at `0rem` (most Webflow builds) remove the space between
+  an eyebrow, a heading and a paragraph wherever no container `gap` gives it —
+  inside `ContentWrapper`, `Card` or a `Col`. That text needs a `gap` where it
+  is held.
+
 ## Building a page
 
 - Space between a section's blocks is its container's `gap`; change it with
@@ -180,6 +202,13 @@ undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
   element or its children — see [Custom components](#custom-components).
 - Put the page's images, graphics and logos in its own folder,
   `src/assets/pages/<page>/`, each with its alt text — see [Assets](#assets).
+- A video behind a section's content goes in `Section`'s `background` slot
+  with no play/pause button: `<Video slot="background" pauseButton={false} />`.
+  Then ask the owner — "The background video loops with no way to pause it
+  (WCAG 2.2.2 asks for one). Add a play/pause button?" — default no, and record
+  the answer in `PROJECT.md` → Decisions. Visitors who ask for reduced motion
+  get it paused either way. A video in the content, not behind it, keeps its
+  button.
 
 ## Custom components
 

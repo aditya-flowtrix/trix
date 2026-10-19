@@ -33,8 +33,9 @@ type Tail = {
   /**
    * Show a pause button over an autoplaying video. Defaults to `true` with
    * `autoplay`: moving content that plays for more than five seconds must be
-   * pausable (WCAG 2.2.2). Turn it off only for a video of five seconds or
-   * less that does not loop.
+   * pausable (WCAG 2.2.2). Off for a section's background video unless the
+   * owner asks for one, and for a video of five seconds or less that does
+   * not loop.
    */
   pauseButton?: boolean;
   /** Where the pause button sits over the video. Defaults to `bottom-right`. */

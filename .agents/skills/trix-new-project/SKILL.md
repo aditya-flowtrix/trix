@@ -104,6 +104,9 @@ npm run check && npm run build
 npx astro dev --background   # then open /style-guide
 ```
 
+`/style-guide` and `/components` must look finished: evenly spaced at 375 and
+1440, nothing touching (`TRIX.md` → The style guide and components pages).
+
 ## Using this without Claude Code
 
 Plain git, npm and editing. Only the automatic triggering and
