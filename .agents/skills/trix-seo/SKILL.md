@@ -59,7 +59,8 @@ image whose alt the CMS left empty — only the rendered page shows them.
 - **type** — `article` for posts.
 - **noindex** — for a page that must exist but not rank (thank-you pages).
 - **One h1** per page, then headings in order — never skip a level.
-- **Alt text** on every `Img`; `alt=""` only for decoration.
+- **Alt text** on every `Img`; `alt=""` only for decoration. `TRIX.md` →
+  Assets says what a good one is.
 
 ## 3. Structured data
 

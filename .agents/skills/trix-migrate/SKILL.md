@@ -75,10 +75,15 @@ mistake found on page sixty has already been made fifty-nine times.
 ## Phase 2 — Groundwork
 
 - **Images** — every image the in-scope pages use, at original resolution,
-  into `src/assets/images/` and rendered with `Media/Img` (Astro optimises and
-  writes the srcset). Images on the platform's CDN are files that never came
-  across; fetch them now — they stop working when the old site does. Note any
-  that are referenced but missing from an export.
+  filed by page as `TRIX.md` → Assets lays out —
+  `src/assets/pages/<page>/images|graphics|logos/`, `shared/` for anything on
+  more than one page — renamed for what it shows, and rendered with
+  `Media/Img` (Astro optimises and writes the srcset). Each keeps the source's
+  alt text; write one where the source had none or only a file name.
+  `compare-pages.mjs` lists any alt that didn't come across. Images on the
+  platform's CDN are files that never came across; fetch them now — they stop
+  working when the old site does. Note any that are referenced but missing
+  from an export.
 - **Icons** — icon fonts become `<Icon name>` (Phosphor) or SVG files;
   favicon, webclip and OG image come with the style guide.
 - **Class map** — `node scripts/measure/classes.ts --source <live page> --local http://localhost:4321/style-guide`.

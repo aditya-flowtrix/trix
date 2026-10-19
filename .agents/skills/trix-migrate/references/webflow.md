@@ -366,9 +366,10 @@ a missing font changes every measurement and makes the later diffs meaningless.
 
 Images move too. The export ships an `images/` folder and rewrites `src` and
 `srcset` to point at it; keep those paths working. What each image becomes is a
-pass-2 decision — a plain `<img>` becomes `Media/Img` and moves to
-`src/assets` for optimisation, while a CMS-bound image stays a URL until pass 3
-binds it. Anything still served from `cdn.prod.website-files.com` is a file
+pass-2 decision — a plain `<img>` becomes `Media/Img` and moves to its page's
+folder in `src/assets/pages/` for optimisation (`TRIX.md` → Assets; the
+export's flat folder of hashed names doesn't come across as it is), while a
+CMS-bound image stays a URL until pass 3 binds it. Anything still served from `cdn.prod.website-files.com` is a file
 that never came across, and it stops working when the Webflow site does.
 
 ### Every remaining block becomes a component

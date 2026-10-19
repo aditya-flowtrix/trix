@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- A page's images, graphics and logos are filed in its own folder,
+  `src/assets/pages/<page>/images/`, `graphics/` and `logos/` (`home` for
+  `/`), and what more than one page uses in `src/assets/shared/` — no longer
+  one folder for the whole site. Files are named for what they show, and each
+  image gets its alt text as it is placed. `TRIX.md` → Assets has the rules;
+  the build, migrate, Figma import and SEO skills follow them, and the docs'
+  Project structure page shows the folders. Trix's own background graphic
+  moves to `src/assets/shared/graphics/background.svg`, since the home and
+  components pages both use it. A site already built keeps its files where
+  they are until someone moves them, imports included.
+
 ## 0.5.0 — 2026-10-16
 
 Trix works under Astro's `<ClientRouter />` and in any language, new projects

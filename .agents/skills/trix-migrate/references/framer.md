@@ -59,7 +59,8 @@ between the breakpoint values (usually the better result, and what Trix's
   its variants become the component's `variant` prop, and hover/pressed
   variants become `:hover` / `:active` rules.
 - **Images.** `framerusercontent.com/images/<id>.png?scale-down-to=1024` —
-  download the original (drop the query) into `src/assets/images/` and use
+  download the original (drop the query) into its page's folder in
+  `src/assets/pages/` (`TRIX.md` → Assets), renamed for what it shows, and use
   `Media/Img`; Astro writes the srcset.
 - **Rich text** from the CMS becomes Markdown or sanitized HTML inside
   `Typography/RichText`.
