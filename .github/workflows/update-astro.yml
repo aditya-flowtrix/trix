@@ -1,0 +1,95 @@
+# Keeps the framework on the newest Astro, every morning: Astro, its
+# integrations and Wrangler at their latest, the Node floor raised to what
+# they need, and npm audit's safe fixes — checked here, then merged on their
+# own once CI passes. A new major version waits in its pull request for a
+# person. New projects get the update with the next Trix release.
+#
+# Framework only: .gitattributes keeps this file and its script out of new
+# projects, which move to a new Astro with /trix-upgrade.
+#
+# It needs two repository settings to finish on its own:
+#   Settings → General → Allow auto-merge
+#   Settings → Actions → General → Allow GitHub Actions to create and approve
+#   pull requests
+name: Update Astro
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: update-astro
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  # A pull request opened with GITHUB_TOKEN starts no workflow, so CI is
+  # started by hand on the update branch — main requires its check.
+  actions: write
+
+jobs:
+  update:
+    if: github.repository == 'aditya-flowtrix/trix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Update Astro, its integrations and Wrangler
+        id: update
+        run: node .github/scripts/update-astro.ts
+
+      - name: Anything changed?
+        id: diff
+        run: echo "changed=$([ -n "$(git status --porcelain)" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      # The same checks as CI, on the oldest Node the update supports.
+      - uses: actions/setup-node@v7
+        if: steps.diff.outputs.changed == 'true'
+        with:
+          node-version: ${{ steps.update.outputs.node }}
+          cache: npm
+
+      - name: Check the update
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          npm ci --engine-strict
+          npm audit --audit-level=high || echo "::warning title=npm audit::Advisories remain that need a breaking change"
+          npm run check
+          npm run build
+
+      - name: Open the pull request and start CI on it
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.update.outputs.title }}
+          SUMMARY: ${{ steps.update.outputs.summary }}
+          REVIEW: ${{ steps.update.outputs.review }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B automation/astro-latest
+          git commit -qam "$TITLE" -m "$SUMMARY"
+          git push --force origin HEAD:automation/astro-latest
+
+          BODY=$(printf '%s\n\n%s\n\n%s' \
+            "$SUMMARY." \
+            "Checked by the Update Astro workflow on the oldest supported Node: install, audit, check, build." \
+            "$([ "$REVIEW" = true ] && echo "A new major version: read its release notes, then merge by hand." || echo "Merges on its own once CI passes. New projects get it with the next Trix release.")")
+          PR=$(gh pr list --head automation/astro-latest --state open --json number --jq '.[0].number')
+          if [ -z "$PR" ]; then
+            gh pr create --base main --head automation/astro-latest --title "$TITLE" --body "$BODY"
+            PR=$(gh pr list --head automation/astro-latest --state open --json number --jq '.[0].number')
+          else
+            gh pr edit "$PR" --title "$TITLE" --body "$BODY"
+          fi
+
+          gh workflow run ci.yml --ref automation/astro-latest
+          [ "$REVIEW" = true ] || gh pr merge "$PR" --auto --squash

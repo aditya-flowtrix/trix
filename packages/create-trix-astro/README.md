@@ -24,7 +24,7 @@ go after `--`:
 npm create trix-astro@latest my-site -- --ref main
 ```
 
-Node 22.19 or newer.
+Node 22.23.4 or newer.
 
 ## What you get
 

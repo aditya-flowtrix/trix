@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+- Astro 7.4.12, up from 7.3.8, with `@astrojs/sitemap` 3.7.5 and
+  `@astrojs/check` 0.9.12. A new project gets them; a site already built moves
+  with `npx @astrojs/upgrade`.
+- Trix needs Node 22.23.4 or newer, up from 22.19 — Astro 7.4 requires it.
+  `npm create trix-astro` says so before it installs anything on an older
+  Node.
+- Wrangler 4.164, and the dependencies `npm audit` flagged, are updated.
+  Prettier 3.10, Playwright 1.65 and axe-core 4.14.1 run the checks.
+- CI is fast on every push: **Check, build and test** — formatting,
+  conventions, types, the unit tests, the build and the SEO audit — in about
+  2 minutes, down from 7. The browsers, Chromium, Firefox, WebKit and real
+  Safari, run
+  every Monday and by hand (Actions → CI → Run workflow) instead of on every
+  push. The dependency audit only warns on a push, since an advisory arrives
+  on its own schedule; the Monday run still fails on one. CI reads the Node
+  version from `package.json` → `engines`, so the floor is written once. A
+  project picks the new workflow up with `/trix-upgrade`.
+- The framework follows Astro on its own: every morning **Update Astro**
+  installs the newest Astro, its integrations and Wrangler, raises the Node
+  floor to what they need, applies npm audit's safe fixes, checks the result
+  and opens a pull request that merges itself once CI passes; a new major
+  version waits for a person. It replaces Dependabot, which never moved the
+  Node floor, so Astro 7.4's updates failed for a month. It stays out of new
+  projects.
+
 ## 0.6.0 — 2026-10-19
 
 Three rules for building on Trix: each page's images, graphics and logos go

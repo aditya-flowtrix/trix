@@ -112,8 +112,8 @@ try {
       "tests/components.ts",
       "tests/scratch.ts",
       "tests/fixtures",
-      ".github/dependabot.yml",
-      ".github/workflows/dependabot-automerge.yml",
+      ".github/scripts",
+      ".github/workflows/update-astro.yml",
       ".gitattributes",
       ".claude/launch.json",
     ])

@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: What every push is checked against — tokens, conventions, contrast, types, SEO, and every page in every browser.
+description: What every push is checked against — tokens, conventions, contrast, types, SEO — and every page in every browser, every Monday.
 order: 8
 ---
 
@@ -56,36 +56,38 @@ automation**.
 ## In CI
 
 Every Trix project has `.github/workflows/ci.yml`, the same workflow the
-framework runs. Once the project is on GitHub, it runs on every push and pull
-request:
+framework runs. Once the project is on GitHub:
 
-- **Check, build and test**, one job — dependency audit, formatting,
-  `npm run check`, the unit tests, the build, the SEO audit of every page
-  (which also fails while `SITE_URL` is still the placeholder), then every
-  page in the three engines every browser is built on: Chromium
-  (Chrome, Edge, Brave, Opera, Samsung Internet), Firefox, and WebKit
-  (Safari, and every browser on an iPhone). A failure uploads the report.
-- **Safari**, the real one on macOS — public repositories, or by choice.
+- **Every push and pull request** — **Check, build and test**, one job of
+  about 2 minutes: formatting, `npm run check`, the unit tests, the build, and
+  the SEO audit of every page (which also fails while `SITE_URL` is still the
+  placeholder). A commit that fails is marked red on GitHub.
+- **Every Monday, and by hand** (Actions → CI → **Run workflow**) — every page
+  in the three engines every browser is built on: Chromium (Chrome, Edge,
+  Brave, Opera, Samsung Internet), Firefox, and WebKit (Safari, and every
+  browser on an iPhone). A failure uploads the report. Real **Safari** on
+  macOS runs alongside — public repositories, or by choice. The same run
+  builds the site with the newest Astro, as a warning that never fails it.
 
-Every Monday it audits the dependencies for new advisories and builds the site
-with the newest Astro, as a warning that never fails a commit. The browsers
-are not run again: the code is the one already tested.
+The dependency audit runs on every push but only warns there: a new advisory
+arrives on its own schedule, not with a push. The Monday run fails until the
+dependency is updated.
 
-A commit that fails is marked red on GitHub.
+Run the browser tests by hand before a release, a launch, or a change to a
+component's script — or locally with `npm run test:browsers`.
 
 ## A private repository's minutes
 
 GitHub bills a private repository's Actions by the minute, each job rounded
-up: the Free plan includes 2,000 minutes a month, Pro and Team 3,000. The
-workflow is built for that budget — one job that installs and builds once, a
-newer push cancelling the run before it, Safari only on request, and the
-browsers sampled.
+up: the Free plan includes 2,000 minutes a month, Pro and Team 3,000. A push
+costs about 2 minutes, so 2,000 minutes cover close to a thousand pushes
+after the four Monday runs. Each browser run costs about:
 
-| A site of                             | Each push, about | Pushes in 2,000 minutes |
-| ------------------------------------- | ---------------- | ----------------------- |
-| a dozen pages                         | 5 minutes        | 400                     |
-| 60 pages in a few sections            | 9 minutes        | 220                     |
-| 500 CMS posts, sampled 5 to a section | 11 minutes       | 180                     |
+| A site of                             | The browser run, about |
+| ------------------------------------- | ---------------------- |
+| a dozen pages                         | 5 minutes              |
+| 60 pages in a few sections            | 9 minutes              |
+| 500 CMS posts, sampled 5 to a section | 11 minutes             |
 
 Estimated from timed runs of this documentation site, rounded up. Sampling
 is what keeps the last row close to the middle one: five posts of
@@ -93,8 +95,8 @@ is what keeps the last row close to the middle one: five posts of
 top-level page is always tested, and the SEO audit still reads every page and
 follows every link. Usage is under the account's Settings → Billing → Usage.
 
-Three repository variables tune it — Settings → Secrets and variables →
-Actions → Variables:
+Three repository variables tune the browser run — Settings → Secrets and
+variables → Actions → Variables:
 
 | Variable           | Default                 | Set it to                                                                        |
 | ------------------ | ----------------------- | -------------------------------------------------------------------------------- |
