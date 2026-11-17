@@ -1,6 +1,6 @@
 # Kept out of `git archive` tarballs, so sites scaffolded with `npm create
 # trix-astro` and downloads of the source archive don't inherit the
-# framework's own deploy target, docs site, installer or dependency bots.
+# framework's own deploy target, docs site, installer or Astro updater.
 # CI does go with them: .github/workflows/ci.yml serves both. Clones and
 # forks still get everything — export-ignore only applies to archives.
 #
@@ -9,8 +9,8 @@
 # this repository's setup, is withheld.
 
 /.gitattributes export-ignore
-/.github/dependabot.yml export-ignore
-/.github/workflows/dependabot-automerge.yml export-ignore
+/.github/scripts export-ignore
+/.github/workflows/update-astro.yml export-ignore
 /.claude/launch.json export-ignore
 /packages export-ignore
 /site export-ignore
