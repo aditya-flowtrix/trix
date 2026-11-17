@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Astro 7.4.12, up from 7.3.8, with `@astrojs/sitemap` 3.7.5 and
+  `@astrojs/check` 0.9.12. A new project gets them; a site already built moves
+  with `npx @astrojs/upgrade`.
+- Trix needs Node 22.23.4 or newer, up from 22.19 — Astro 7.4 requires it.
+  CI tests on it, so the weekly Astro updates can merge again, and
+  `npm create trix-astro` says so before it installs anything on an older
+  Node.
+- Wrangler 4.164, and the dependencies `npm audit` flagged, are updated, so
+  the audit in CI passes again.
+
 ## 0.6.0 — 2026-10-19
 
 Three rules for building on Trix: each page's images, graphics and logos go
