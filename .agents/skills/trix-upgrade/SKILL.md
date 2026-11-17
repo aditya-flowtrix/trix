@@ -87,7 +87,8 @@ Now three trees exist: `base` (where they started), the site (where they are),
 
 ### 4. Sort every file into one of four piles
 
-For each file in the framework's surface — components, layouts, styles, utils:
+For each file in the framework's surface — components, layouts, styles, utils,
+and the tooling: `scripts/`, `tests/` and `.github/workflows/ci.yml`:
 
 | base vs site | base vs latest | What it is                             | What to do                               |
 | ------------ | -------------- | -------------------------------------- | ---------------------------------------- |
@@ -177,6 +178,10 @@ Bump it with `npx @astrojs/upgrade` rather than by hand. It moves the
 `@astrojs/*` integrations with Astro, and `@astrojs/sitemap` declares no peer
 dependency on astro — so a mismatched pair installs without a word and turns up
 as a build failure, or as a sitemap that silently stops being written.
+
+Move `engines.node` in `package.json` with it, to the release's value when
+that is higher. Astro sets the floor, and CI installs the Node it names — a
+site left on an older floor fails `npm ci --engine-strict` on its first push.
 
 ### 8. Prove nothing moved
 
