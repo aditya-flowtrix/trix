@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 — 2026-11-17
+
+Astro 7.4 and Node 22.23.4, CI that checks a push in about 2 minutes and
+tests the browsers every week, and a framework that follows Astro's releases
+on its own. Nothing in a site already built changes until it is upgraded.
 
 - Astro 7.4.12, up from 7.3.8, with `@astrojs/sitemap` 3.7.5 and
   `@astrojs/check` 0.9.12. A new project gets them; a site already built moves
@@ -13,12 +17,16 @@
 - CI is fast on every push: **Check, build and test** — formatting,
   conventions, types, the unit tests, the build and the SEO audit — in about
   2 minutes, down from 7. The browsers, Chromium, Firefox, WebKit and real
-  Safari, run
-  every Monday and by hand (Actions → CI → Run workflow) instead of on every
-  push. The dependency audit only warns on a push, since an advisory arrives
-  on its own schedule; the Monday run still fails on one. CI reads the Node
-  version from `package.json` → `engines`, so the floor is written once. A
-  project picks the new workflow up with `/trix-upgrade`.
+  Safari, run every Monday and by hand (Actions → CI → Run workflow) instead
+  of on every push. The dependency audit only warns on a push, since an
+  advisory arrives on its own schedule; the Monday run still fails on one. CI
+  reads the Node version from `package.json` → `engines`, so the floor is
+  written once. `/trix-upgrade` now carries the tooling — `scripts/`,
+  `tests/` and this workflow — and moves `engines.node` with Astro, so a
+  project picks all of it up.
+- `npm run test:browsers` gives each page 2 minutes. A page that stalls fails
+  with the step it stopped after and the run goes on, instead of holding CI
+  until the job's 25-minute limit.
 - The framework follows Astro on its own: every morning **Update Astro**
   installs the newest Astro, its integrations and Wrangler, raises the Node
   floor to what they need, applies npm audit's safe fixes, checks the result
