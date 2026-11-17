@@ -10,7 +10,8 @@
   `npm create trix-astro` says so before it installs anything on an older
   Node.
 - Wrangler 4.164, and the dependencies `npm audit` flagged, are updated, so
-  the audit in CI passes again.
+  the audit in CI passes again. Prettier 3.10, Playwright 1.65 and axe-core
+  4.14.1 run the checks.
 
 ## 0.6.0 — 2026-10-19
 
