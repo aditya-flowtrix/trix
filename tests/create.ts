@@ -144,7 +144,7 @@ try {
     );
     assert.equal(pkg.devDependencies["@astrojs/mdx"], undefined);
   });
-  await it("the framework's CI, which runs the same checks on the project's pushes", () => {
+  await it("the framework's CI, which checks the project the way it checks the framework", () => {
     assert.match(
       readFileSync(join(site, ".github/workflows/ci.yml"), "utf8"),
       /tests\/browsers\.ts/,

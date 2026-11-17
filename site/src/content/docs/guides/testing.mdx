@@ -58,10 +58,11 @@ automation**.
 Every Trix project has `.github/workflows/ci.yml`, the same workflow the
 framework runs. Once the project is on GitHub:
 
-- **Every push and pull request** — **Check, build and test**, one job of
-  about 2 minutes: formatting, `npm run check`, the unit tests, the build, and
-  the SEO audit of every page (which also fails while `SITE_URL` is still the
-  placeholder). A commit that fails is marked red on GitHub.
+- **Every push to `main` and every pull request** — **Check, build and
+  test**, one job of about 2 minutes: formatting, `npm run check`, the unit
+  tests, the build, and the SEO audit of every page (which also fails while
+  `SITE_URL` is still the placeholder). A commit that fails is marked red on
+  GitHub.
 - **Every Monday, and by hand** (Actions → CI → **Run workflow**) — every page
   in the three engines every browser is built on: Chromium (Chrome, Edge,
   Brave, Opera, Samsung Internet), Firefox, and WebKit (Safari, and every

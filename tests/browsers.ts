@@ -791,6 +791,17 @@ const missing = new Map<string, string>(); // page → a page linking to it
 const sample = Number(opts.sample) > 0 ? Number(opts.sample) : 0;
 const section = (path: string) => path.replace(/\/[^/]*$/, "") || "/";
 const unsampled = new Map<string, number>(); // section → pages not tested
+// ponytail: one ceiling for every page. A page that stalls — an evaluate or
+// fetch has no timeout of its own — fails with the step it stopped after,
+// instead of holding CI until the job's limit. Raise it if a big page needs it.
+const PAGE_LIMIT = 120_000;
+const stall = () =>
+  new Promise<never>((_, reject) =>
+    setTimeout(
+      () => reject(new Error(`no answer in ${PAGE_LIMIT / 1000}s`)),
+      PAGE_LIMIT,
+    ).unref(),
+  );
 
 for (const name of asked ?? all) {
   current = name;
@@ -828,7 +839,10 @@ for (const name of asked ?? all) {
       }
       sampled.set(sec, n + 1);
     }
-    const links = await testPage(driver, page, path).catch((e) => {
+    const links = await Promise.race([
+      testPage(driver, page, path),
+      stall(),
+    ]).catch((e) => {
       const after = last;
       check(
         path,
