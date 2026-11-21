@@ -35,9 +35,9 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
-    "@astrojs/sitemap": "^3.7.5",
+    "@astrojs/sitemap": "^3.7.6",
     "@phosphor-icons/core": "^2.1.1",
-    "astro": "^7.4.12",
+    "astro": "^7.4.13",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "playwright-core": "^1.65.1",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^0.14.1",
-    "wrangler": "^4.164.0"
+    "wrangler": "^4.166.0"
   },
   "trix": {
     "version": "0.7.0"
