@@ -1,7 +1,8 @@
 /**
  * Headless: a content collection that reads the CMS at build time instead of
- * from files, so editors keep working in Webflow or WordPress and every
- * publish rebuilds the site (a deploy hook). Same importers, same shape, same
+ * from files, so editors keep working in Webflow or WordPress — or in the
+ * headless CMS the content moved into, like Sanity — and every publish
+ * rebuilds the site (a deploy hook). Same importers, same shape, same
  * rich-text cleanup as the files scripts/cms/write.ts writes — so a project
  * can start headless and move to files, or back, without touching a page.
  *
@@ -11,14 +12,16 @@
  *     schema: z.object({ … }),
  *   });
  *
- * Secrets come from the environment at build: WEBFLOW_TOKEN, and for
- * WordPress drafts WP_APP_PASSWORD. Images stay on the CMS's CDN; add its
- * host to `image.domains` in astro.config.mjs to have Astro optimise them.
+ * Secrets come from the environment at build: WEBFLOW_TOKEN, for WordPress
+ * drafts WP_APP_PASSWORD, for a private Sanity dataset SANITY_READ_TOKEN.
+ * Images stay on the CMS's CDN; add its host to `image.domains` in
+ * astro.config.mjs to have Astro optimise them.
  */
 
 import { readFileSync } from "node:fs";
 import type { Loader } from "astro/loaders";
 import { stripPlatformMarkup, type CmsExport } from "./model.ts";
+import { fetchSanity } from "./sanity.ts";
 import { fetchWebflow, normalizeWebflow } from "./webflow.ts";
 import { fetchWordPress } from "./wordpress.ts";
 
@@ -31,6 +34,13 @@ export type CmsSource =
       /** Post types to read, and how many of each — for a large site in development. */
       types?: string[];
       limit?: number;
+    }
+  | {
+      source: "sanity";
+      projectId: string;
+      dataset: string;
+      /** Each document type's URL prefix, for internal links in rich text. */
+      routes?: Record<string, string>;
     }
   /** An export saved by scripts/cms/import.ts — offline builds and tests. */
   | { source: "json"; file: string };
@@ -62,6 +72,13 @@ function fetchSource(src: CmsSource): Promise<CmsExport> {
               password: process.env.WP_APP_PASSWORD,
               types: src.types,
               limit: src.limit,
+            });
+          case "sanity":
+            return fetchSanity({
+              projectId: src.projectId,
+              dataset: src.dataset,
+              routes: src.routes,
+              token: process.env.SANITY_READ_TOKEN,
             });
           case "json":
             return JSON.parse(readFileSync(src.file, "utf8")) as CmsExport;

@@ -7,8 +7,10 @@ description: >-
   collections with every image and file downloaded, or headless so editors
   keep their CMS. Use when a migration reaches its CMS, when someone asks to
   import, export, move, sync or convert blog posts, collections, products,
-  team members or any CMS items into Astro, or wants to keep editing in
-  Webflow or WordPress with an Astro front end.
+  team members or any CMS items into Astro, wants to keep editing in
+  Webflow or WordPress with an Astro front end, or wants to move from
+  Webflow into a new headless CMS — Sanity, EmDash, Storyblok, Contentful,
+  Payload, Strapi, ButterCMS, BCMS or any other.
 ---
 
 # Moving a CMS into Trix
@@ -34,17 +36,19 @@ worth of items, the CMS has them all, drafts and references included.
 
 Ask the owner once, and write the answer in `PROJECT.md` → **CMS**:
 
-|            | **Files** (default)                          | **Headless**                         |
-| ---------- | -------------------------------------------- | ------------------------------------ |
-| Content    | `src/content/<collection>/<slug>.md`, in git | stays in Webflow / WordPress         |
-| Editors    | edit files (or a git-based editor, later)    | keep their CMS                       |
-| Images     | downloaded, optimised at build               | on the CMS's CDN, optimised at build |
-| Publishing | a commit                                     | a CMS publish + deploy hook          |
-| Cost       | the CMS can be cancelled                     | the CMS plan stays                   |
-| Command    | `write.ts`                                   | `write.ts --headless`                |
+|            | **Files** (default)                          | **Headless**                         | **New headless CMS**                                               |
+| ---------- | -------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------ |
+| Content    | `src/content/<collection>/<slug>.md`, in git | stays in Webflow / WordPress         | moves into Sanity, EmDash, Contentful, Storyblok…                  |
+| Editors    | edit files (or a git-based editor, later)    | keep their CMS                       | learn the new one                                                  |
+| Images     | downloaded, optimised at build               | on the CMS's CDN, optimised at build | uploaded into the new CMS, on its CDN                              |
+| Publishing | a commit                                     | a CMS publish + deploy hook          | a CMS publish + deploy hook                                        |
+| Cost       | the CMS can be cancelled                     | the CMS plan stays                   | the old plan ends; the new one starts                              |
+| Command    | `write.ts`                                   | `write.ts --headless`                | `convert.ts sanity`, [headless-cms.md](references/headless-cms.md) |
 
-Both use the same importers and the same schemas, so a project can start
-headless and move to files later (or back) without touching a page.
+Files and headless use the same importers and the same schemas, so a project
+can start headless and move to files later (or back) without touching a page.
+A new headless CMS uses the same import too: its converter reads
+`.trix/cms/<source>.json`, never the old platform.
 
 ## 1. Inventory
 
@@ -66,7 +70,8 @@ From the platform, not the pages:
 
 Per platform — [Webflow](references/webflow.md),
 [WordPress](references/wordpress.md), [Framer and CSV](references/framer-csv.md),
-[anything else](references/other.md).
+[anything else](references/other.md). Into a new headless CMS, after this
+step: [headless-cms.md](references/headless-cms.md).
 
 ```bash
 node scripts/cms/import.ts webflow --site <id>                 # WEBFLOW_TOKEN in the environment

@@ -37,7 +37,15 @@ Core Web Vitals field data pulled from the CrUX API instead of lab values.
 ## Later
 
 - A published Figma community file mirroring the component library.
-- More headless sources for `cmsLoader`: Sanity, Contentful, Ghost (files
+- More headless sources for `cmsLoader`: Contentful, Storyblok, Ghost (files
   already work for them through the common JSON shape).
+- More `convert.ts` targets, each a converter and a `cmsLoader` reader around
+  the common shape as Sanity has: Storyblok, Contentful, Payload. EmDash
+  next to them, reusing `htmlToBlocks()` — its pages read EmDash directly,
+  and the site turns server-rendered.
+- `import.ts webflow --locale`: Webflow's other CMS locales, read with
+  `cmsLocaleId`, instead of saving each locale as JSON by hand.
+- Template-page SEO read from Webflow's Pages API, so an item's title and
+  description bindings come across instead of being mapped by hand.
 - Measuring toolkit: section-level theme detection (background/text pairs),
   motion inventory (durations and easings from the Web Animations API).
