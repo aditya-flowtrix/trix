@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { valuesOf, type Fields } from "@/utils/filter.ts";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The values `Filter` filters and sorts this item by, by field name: text, numbers, dates, `true` or a list. */
+  fields: Fields;
+  /** Rendered element. Defaults to `div`; `li` inside a list. */
+  tag?: "div" | "li" | "article";
+};
+
+const {
+  render = true,
+  fields,
+  tag: Tag = "div",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const data = Object.fromEntries(
+  Object.entries(fields).map(([key, value]) => [key, valuesOf(value)]),
+);
+---
+
+{
+  render && (
+    <Tag
+      class:list={["filter_item", className]}
+      data-filter-item={JSON.stringify(data)}
+      {...rest}
+    >
+      <slot />
+    </Tag>
+  )
+}

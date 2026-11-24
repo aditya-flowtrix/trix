@@ -5,11 +5,12 @@ import Classes from "~/components/Classes.astro";
 import Skills from "~/components/Skills.astro";
 import MarkdownFile from "~/components/MarkdownFile.astro";
 import Table from "~/components/Table.astro";
+import Variants from "~/components/Variants.astro";
 
 /**
  * What a docs page can use without importing it: every Trix component by its
  * file name (`<Button>`, `<Section>`), and the docs' own `Example`, `Props`,
- * `Aside`, `Classes` and `Skills`. New components appear here on their own.
+ * `Variants`, `Aside`, `Classes` and `Skills`. New components appear here on their own.
  */
 const trix = Object.fromEntries(
   Object.entries(
@@ -28,6 +29,7 @@ export const components = {
   ...trix,
   Example,
   Props,
+  Variants,
   Aside,
   Classes,
   Skills,

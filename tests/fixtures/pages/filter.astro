@@ -1,0 +1,118 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Filter from "@/components/interactive/Filter.astro";
+import FilterField from "@/components/interactive/FilterField.astro";
+import FilterItem from "@/components/interactive/FilterItem.astro";
+
+const products = [
+  ["Alpha chair", "furniture", ["oak", "black"], 120, "2024-01-10", true],
+  ["Beta lamp", "lighting", ["brass"], 80, "2024-03-02", false],
+  ["Gamma desk", "furniture", ["oak"], 340, "2023-11-20", false],
+  ["Delta sofa", "furniture", ["linen", "grey"], 900, "2024-06-15", true],
+  ["Epsilon rug", "textiles", ["wool", "grey"], 260, "2022-09-01", false],
+  ["Zeta pendant", "lighting", ["black"], 150, "2024-02-14", false],
+  ["Eta stool", "furniture", ["black"], 60, "2023-05-05", false],
+  ["Theta throw", "textiles", ["wool"], 45, "2024-04-01", false],
+  ["Iota shelf", "furniture", ["oak"], 210, "2023-08-08", false],
+  ["Kappa mirror", "decor", ["brass"], 175, "2021-12-12", false],
+] as const;
+const notes = [
+  ["One", "a"],
+  ["Two", "b"],
+  ["Three", "a"],
+  ["Four", "a"],
+  ["Five", "b"],
+];
+---
+
+<Layout title="Filter">
+  <Section>
+    <Filter variant="side" paging="pages" pageSize={3} animation="slide">
+      <Fragment slot="controls">
+        <FilterField variant="search" fields={["title"]} fuzzy highlight />
+        <FilterField
+          field="category"
+          options={["furniture", "lighting", "textiles", "decor", "outdoor"]}
+          counts
+          empty="hide"
+          clear
+        />
+        <FilterField
+          variant="radio"
+          field="tags"
+          label="Material"
+          options={["oak", "black", "brass", "wool"]}
+          choice="chip"
+        />
+        <FilterField
+          field="featured"
+          options={[{ value: "true", label: "Featured only" }]}
+          choice="toggle"
+        />
+        <FilterField variant="range" field="price" min={0} max={1000} clear />
+        <FilterField variant="range" field="date" type="date" />
+        <FilterField
+          variant="sort"
+          options={[
+            { value: "", label: "Default" },
+            { value: "price-asc", label: "Price, low to high" },
+            { value: "price-desc", label: "Price, high to low" },
+            { value: "date-desc", label: "Newest" },
+            { value: "title-asc", label: "Name" },
+          ]}
+        />
+      </Fragment>
+      <ul>
+        {
+          products.map(([title, category, tags, price, date, featured]) => (
+            <FilterItem
+              tag="li"
+              fields={{
+                title,
+                category,
+                tags: [...tags],
+                price,
+                date,
+                featured,
+              }}
+            >
+              <h3>{title}</h3>
+              <p>{category}</p>
+            </FilterItem>
+          ))
+        }
+      </ul>
+    </Filter>
+  </Section>
+
+  <Section>
+    <Filter id="notes" paging="more" pageSize={2} on="submit">
+      <Fragment slot="controls">
+        <FilterField variant="select" field="category" options={["a", "b"]} />
+        <FilterField variant="search" />
+      </Fragment>
+      {
+        notes.map(([title, category]) => (
+          <FilterItem fields={{ category }}>
+            <p>{title}</p>
+          </FilterItem>
+        ))
+      }
+      <p slot="empty">No notes.</p>
+    </Filter>
+  </Section>
+
+  <Section>
+    <Filter id="feed" paging="infinite" pageSize={2}>
+      <FilterField slot="controls" variant="search" />
+      {
+        notes.map(([title]) => (
+          <FilterItem fields={{ title }}>
+            <p style="min-height: 60vh">{title}</p>
+          </FilterItem>
+        ))
+      }
+    </Filter>
+  </Section>
+</Layout>

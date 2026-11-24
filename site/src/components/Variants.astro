@@ -1,0 +1,78 @@
+---
+import { getCollection } from "astro:content";
+import { docPath } from "~/docs.ts";
+import { components, docHtml, propsOf, valuesOf } from "~/props.ts";
+
+/**
+ * Every documented component that has a `variant` prop, with its values,
+ * read from the source at build like `Props`.
+ */
+
+const pages = new Map(
+  (await getCollection("docs"))
+    .filter((doc) => doc.data.component)
+    .map((doc) => [doc.data.component!, docPath(doc)]),
+);
+const unquote = (value: string) => value.replace(/^"(.*)"$/, "$1");
+
+const rows = Object.keys(components)
+  .filter((component) => pages.has(component))
+  .flatMap((component) => {
+    const variant = propsOf(component).find((p) => p.name === "variant");
+    return variant
+      ? [
+          {
+            name: component.split("/").pop()!,
+            href: pages.get(component)!,
+            values: valuesOf(variant).map(unquote),
+            // ponytail: a default that isn't a literal names another prop
+            // (Heading's `Tag`), so show that prop's name.
+            fallback: variant.default && unquote(variant.default).toLowerCase(),
+            doc: variant.doc,
+          },
+        ]
+      : [];
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<div
+  class="props_wrap"
+  tabindex="0"
+  role="region"
+  aria-label="Every component's variants"
+>
+  <table class="props_table">
+    <thead>
+      <tr>
+        <th scope="col">Component</th>
+        <th scope="col">Variants</th>
+        <th scope="col">Default</th>
+        <th scope="col">What it sets</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <th scope="row">
+              <a href={row.href}>
+                <code>{row.name}</code>
+              </a>
+            </th>
+            <td>
+              {row.values.map((value, i) => (
+                <>
+                  {i > 0 && ", "}
+                  <code>{value}</code>
+                </>
+              ))}
+            </td>
+            <td>{row.fallback ? <code>{row.fallback}</code> : "—"}</td>
+            <td set:html={docHtml(row.doc)} />
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

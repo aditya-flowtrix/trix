@@ -1,5 +1,43 @@
 # Changelog
 
+## Unreleased
+
+- Light and dark mode with a switch, on by default: `COLOR_MODE` in
+  `src/consts.ts` is now `auto`, so a new project follows the visitor's system
+  setting and shows `ThemeToggle` in the nav. Set `light` or `dark` for a site
+  designed in one mode. A site already built keeps the mode it set.
+- The home, Style Guide and Components pages no longer pin the dark theme, so
+  the switch changes them. A page given a `theme` through the layout keeps it
+  whatever the switch says — the layout's `theme` prop now says so.
+- The docs have a [Variants](https://trix.flowtrix.workers.dev/docs/system/variants)
+  page: what a variant is, picking one, props that belong to one, adding one,
+  and every component's variants in a table read from the source.
+- Behaviour is Trix's own code, never a library. `TRIX.md` → Behaviour: our
+  own code sets the order — HTML, then CSS, then the build, then the
+  component's own script — and what a script must do to ship. `npm run check`
+  now fails on a package imported in `src/` that Trix doesn't use and
+  `package.json` → `trix.allow` doesn't name, a `<script src>` from another
+  site, or a Finsweet `fs-` attribute; `npm run test:conventions` proves it.
+  `/trix-migrate` rebuilds Swiper, GSAP, Lenis, jQuery and Finsweet Attributes
+  instead of installing them, with a map for each, and the docs have an
+  [Our own code](https://trix.flowtrix.workers.dev/docs/system/own-code) page.
+- `Filter`, `FilterField` and `FilterItem` (`interactive/`): filter, search,
+  sort and page any list — a content collection or items written by hand —
+  with no library. Checkbox, radio, select, search, number and date range
+  and sort controls; ten operators, matching any or all within a field and
+  across fields; search that forgives a typo and marks what it found; counts
+  beside each option, and options that would leave nothing shown, disabled
+  or hidden; a live count, a tag per choice, clear one or all, an empty state;
+  load more, infinite or numbered pages; the choice in the URL. Everything
+  Finsweet's List Filter, Sort and Load do, and `/trix-migrate` maps them to
+  it. The docs have a [Filter](https://trix.flowtrix.workers.dev/docs/components/filter)
+  page.
+- `Choice` takes content after its label, like a count.
+- `/trix-consent` asks first whether the site needs cookie consent at all, and
+  which tool. c15t stays the default; a platform the client requires
+  (Cookiebot, OneTrust, Usercentrics) loads in `BaseHead`, its host allowed in
+  `package.json` → `trix.allow`.
+
 ## 0.7.0 — 2026-11-17
 
 Astro 7.4 and Node 22.23.4, CI that checks a push in about 2 minutes and

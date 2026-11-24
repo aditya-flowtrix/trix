@@ -32,6 +32,9 @@ import Slider from "@/components/interactive/Slider.astro";
 import Accordion from "@/components/interactive/Accordion.astro";
 import Marquee from "@/components/interactive/Marquee.astro";
 import Compare from "@/components/interactive/Compare.astro";
+import Filter from "@/components/interactive/Filter.astro";
+import FilterField from "@/components/interactive/FilterField.astro";
+import FilterItem from "@/components/interactive/FilterItem.astro";
 import AccordionItem from "@/components/interactive/AccordionItem.astro";
 import Video from "@/components/media/Video.astro";
 import Icon from "@/components/media/Icon.astro";
@@ -44,15 +47,22 @@ import check from "@/assets/icons/check.svg";
 const heading = "We build things that help people work smarter";
 const text =
   "We build things that help people work smarter, move faster, and grow further.";
+const posts = [
+  ["Strategy", "Finding the one thing to build first", "2026-10-02"],
+  ["Design", "A type scale that survives real content", "2026-09-18"],
+  ["Development", "Shipping a site with no libraries", "2026-11-05"],
+  ["Design", "Color that holds in light and dark", "2026-08-21"],
+  ["Strategy", "Measuring what a redesign changed", "2026-07-30"],
+  ["Development", "Pages that work before the script runs", "2026-10-27"],
+  ["Design", "Motion that respects the reader", "2026-06-12"],
+  ["Development", "Filtering a list without a framework", "2026-11-12"],
+  ["Strategy", "Writing the brief the team will use", "2026-05-08"],
+] as const;
 const lorem =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 ---
 
-<Layout
-  title="Components"
-  description="Every layout variant, side by side."
-  theme="dark"
->
+<Layout title="Components" description="Every layout variant, side by side.">
   <!-- breadcrumbs -->
   <Section paddingTop="small" paddingBottom="none">
     <Breadcrumbs
@@ -554,6 +564,45 @@ const lorem =
         <Img slot="column2" src={background} width={1920} height={1080} />
       </ContentWrapper>
     </Tabs>
+  </Section>
+  <!-- filter -->
+  <Section paddingTop="small" paddingBottom="small">
+    <ContentWrapper>
+      <Eyebrow>filter · side</Eyebrow>
+      <Heading tag="h2" variant="h3" maxWidth={17}>Journal</Heading>
+    </ContentWrapper>
+    <Filter id="journal" variant="side" paging="pages" pageSize={6}>
+      <Fragment slot="controls">
+        <FilterField variant="search" fields={["title"]} highlight fuzzy />
+        <FilterField
+          field="category"
+          options={["Strategy", "Design", "Development"]}
+          counts
+          empty="disable"
+        />
+        <FilterField
+          variant="sort"
+          options={[
+            { value: "date-desc", label: "Newest" },
+            { value: "date-asc", label: "Oldest" },
+            { value: "title-asc", label: "A to Z" },
+          ]}
+        />
+      </Fragment>
+      <Grid medium={3}>
+        {
+          posts.map(([category, title, date]) => (
+            <FilterItem fields={{ category, title, date }}>
+              <Card
+                eyebrow={category}
+                heading={title}
+                text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+              />
+            </FilterItem>
+          ))
+        }
+      </Grid>
+    </Filter>
   </Section>
   <!-- slider -->
   <Section paddingTop="small" paddingBottom="small">

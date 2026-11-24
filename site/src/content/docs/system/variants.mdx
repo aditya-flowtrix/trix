@@ -1,0 +1,120 @@
+---
+title: Variants
+description: The designed versions of a component — a Button that's an arrow, a Card with a cover image, a Modal that's a side panel — picked with one prop. Every component's variants, and how to add one.
+order: 8
+---
+
+A variant is a version of a component designed as a whole: the same `Button`
+as a text link or an arrow, the same `Card` with its image behind the text, the
+same `Modal` sliding in as a side panel. You pick one with the `variant` prop;
+everything that makes that look lives inside the component.
+
+```astro live
+<Button>Main</Button>
+<Button variant="link" element="link" href="/docs">Link</Button>
+<Button variant="arrow" />
+<Button variant="play" />
+<Button variant="close" />
+```
+
+## Picking one
+
+```astro
+<Card variant="cover" heading="Our work" image={photo} />
+<Modal variant="side-panel" id="filters" label="Filters">…</Modal>
+<Heading tag="h2" variant="h4">Designed smaller than its level</Heading>
+```
+
+- Leave `variant` out for the default, listed in the [table below](#every-components-variants).
+- Your editor lists the values as you type, and a value the component doesn't
+  have fails `npm run check`.
+- A variant in Figma is the `variant` prop here, named the same — see
+  [Designers and Figma](/docs/guides/designers-and-figma).
+
+## Props that belong to a variant
+
+Some props only make sense for some variants: `direction` for an `arrow`
+`Button`, `image` for a `cover` or `stacked` `Card`. They are typed so a wrong
+combination doesn't build — `image` on a default `Card` is an error, not a prop
+quietly ignored. The component's props table and its tooltips say which
+variants take what.
+
+## Type styles
+
+On `Heading`, `Paragraph` and `RichText`, `variant` is the text style from the
+[type scale](/docs/system/typography#level-and-look-are-separate). A
+`Heading`'s variant follows its `tag` unless you set one, so
+`<Heading tag="h3">` looks like an h3 and `<Heading tag="h3" variant="h5">`
+keeps the h3 for screen readers and search engines while looking like an h5.
+
+## Variant, prop or utility?
+
+| You want                                     | Use                                                |
+| -------------------------------------------- | -------------------------------------------------- |
+| a whole look the component was designed with | a variant: `<Card variant="cover">`                |
+| one designed setting, on any variant         | a prop: `theme="dark"`, `paddingTop="large"`       |
+| one instance adjusted in one way             | a utility: `class="margin-top-0"`                  |
+| every instance changed                       | a [token](/docs/system/tokens) or a prop's default |
+| a look the component doesn't have yet        | a new variant                                      |
+
+Several utilities that only work together are a variant waiting to be made.
+[Utility or prop?](/docs/system/utilities-or-props) has the signs you picked
+the wrong one.
+
+## Adding a variant
+
+When a design needs a look a component doesn't have, add it to the component
+rather than styling the instance from outside.
+
+1. **Check it isn't there.** The table below has every variant.
+2. **Add the value** to the `variant` union in the component's props.
+3. **Style it** as a bare class beside the root, in the component's own
+   `<style is:global>`. The root applies the class for every variant but the
+   default.
+4. **Give it its own props, if it needs any,** behind a union on `variant`,
+   `never` on the variants that don't take them — destructured through an
+   `AllProps` alias, as `Card` and `Img` do.
+5. **Update the component's docs page.** The table here and the props table
+   update themselves. `npm run check` type-checks the change;
+   `/trix-audit-props` checks the props' order and tooltips.
+
+```astro
+---
+type Props = HTMLAttributes<"div"> & {
+  /** Card layout. */
+  variant?: "default" | "cover" | "stacked" | "compact";
+};
+const { variant = "default", class: className, ...rest } = Astro.props;
+---
+
+<div
+  class:list={["card_wrap", variant !== "default" && variant, className]}
+  {...rest}
+>
+  …
+</div>
+
+<style is:global>
+  @layer components {
+    .card_wrap {
+      --_padding: var(--space-6);
+
+      &.compact {
+        --_padding: var(--space-4);
+      }
+    }
+  }
+</style>
+```
+
+A variant is a bare class, so every component root ends in `_wrap`: a
+component whose root was `.card` would pick up the styles of every variant
+named `card`. [How components work](/docs/system/components#naming) has the
+naming rules.
+
+## Every component's variants
+
+Read from the components at build, so it is always the current list. Each name
+links to the component's page, where each variant is shown.
+
+<Variants />

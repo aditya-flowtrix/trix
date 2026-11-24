@@ -733,11 +733,47 @@ button's own label, a video URL passed as a property.
 Do not expect to find them: a `u-` utility site builds its own, so the
 carousel is Swiper and the nav is custom markup.
 
-**Third-party libraries come across as they are.** Swiper, GSAP, Three.js and
-Lenis are the site's behaviour, not Webflow's, and swapping Swiper for
-`Interactive/Slider` changes how the site moves. Install them, keep the
-initialisation code with the component that needs it, and only replace a
-library where its markup was Webflow's own widget.
+**Third-party libraries are rebuilt, not installed** (`TRIX.md` → Behaviour:
+our own code). Swiper, Splide, GSAP, Lenis, jQuery plugins and Finsweet
+Attributes are how the site behaves, so the behaviour comes across and the
+library does not. Watch each one on the live site first — speed, easing, snap,
+loop, what a swipe or a scroll does — and match it:
+
+- **Swiper, Splide, Slick** → `Interactive/Slider`, its props set to the
+  source's feel; a variant if it lacks one.
+- **GSAP and ScrollTrigger** → CSS scroll-driven animations
+  (`animation-timeline: view()` or `scroll()`) behind `@supports`, pinning
+  with `position: sticky`, a timeline in the component's script on the Web
+  Animations API (`element.animate`).
+- **Lenis, Locomotive** → dropped. Native scrolling stays; in-page links get
+  `scroll-behavior: smooth` under `prefers-reduced-motion: no-preference`.
+- **jQuery** → the same logic in plain TypeScript: `$()` is
+  `querySelector`, `.on()` is `addEventListener`, `.animate()` is a CSS
+  transition.
+- **Finsweet Attributes** → the table below.
+
+A library that cannot reasonably be rebuilt — a Three.js scene, a Lottie file
+the design ships — is the owner's decision. Ask; if they allow it, it goes in
+`package.json` → `trix.allow` with the reason and in `PROJECT.md` → Decisions.
+The inventory (`scripts/measure/inventory.ts`) lists the libraries a site
+loads: each one is a line in the plan.
+
+| Finsweet Attribute                                 | In Trix                                                                                                                                                                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CMS Filter, Sort, Load (`fs-cmsfilter`, `fs-cmssort`, `fs-cmsload`, `fs-list`) | `Interactive/Filter`: the list rendered at build in `FilterItem`s with their `fields`; each filter, search, range and sort a `FilterField`; `paging` for load more, infinite or numbered pages. Match each operator, field match, count, tag and empty state from the source (docs → Components → Filter). A list too long to send whole gets a page per category with `paginate()` instead. |
+| CMS Nest, Combine (`fs-cmsnest`, `fs-cmscombine`)  | `reference()` between content collections, joined with `getCollection` at build.                                                                                                                                           |
+| CMS Slider, CMS Tabs                               | `Interactive/Slider`, `Interactive/Tabs`, filled from `getCollection`.                                                                                                                                                      |
+| Table of contents (`fs-toc`)                       | The headings `render()` returns, listed at build.                                                                                                                                                                            |
+| Custom select (`fs-selectcustom`)                  | `form/Select` — the browser's own select, styled.                                                                                                                                                                           |
+| Accordion, Modal, Tabs                             | `Interactive/Accordion`, `Interactive/Modal`, `Interactive/Tabs`.                                                                                                                                                            |
+| Copy to clipboard (`fs-copyclip`)                  | The component's script: `navigator.clipboard.writeText`, and a status message a screen reader hears.                                                                                                                        |
+| Number count (`fs-numbercount`)                    | The component's script on an `IntersectionObserver`; with reduced motion, the final number.                                                                                                                                  |
+| Cookie consent (`fs-cc`)                           | `/trix-consent`.                                                                                                                                                                                                             |
+| Social share (`fs-socialshare`)                    | Plain links to each network's share URL, or `navigator.share` where it exists.                                                                                                                                              |
+| Form helpers (`fs-formsubmit`, `fs-inputcounter`) | `form/Form` and the field's own attributes — `maxlength`, `required` — with the component's script for what's left.                                                                                                         |
+
+`npm run check` fails while any `fs-` attribute, `<script src>` from another
+site or unallowed package is left in `src/`.
 
 **Styles that came with a section — how it was set in Webflow decides.**
 
@@ -752,9 +788,12 @@ library where its markup was Webflow's own widget.
 stylesheet carrying styles for components that no longer exist is how this kind
 of migration fails.
 
-**JavaScript moves; it does not get rewritten.** A custom embed goes into the
-component that owns the markup it acts on, unchanged. A site-wide script stays
-site-wide, in the layout.
+**The site's own JavaScript moves; its logic does not get rewritten.** A
+custom embed goes into the component that owns the markup it acts on, set up
+with `mount`. What it leans on doesn't come with it: jQuery calls become the
+platform's, and a library it loads is rebuilt as above. A site-wide script
+stays site-wide, in the layout — a service (analytics, chat) goes through
+`/trix-consent` instead.
 
 The single exception is Webflow's own IX2, which is compiled into `webflow.js`
 against `data-w-id` attributes and cannot be lifted out. Only that gets

@@ -1,0 +1,410 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Choice from "@/components/form/Choice.astro";
+import Fieldset from "@/components/form/Fieldset.astro";
+import Input from "@/components/form/Input.astro";
+import Select from "@/components/form/Select.astro";
+import type { Operator } from "@/utils/filter.ts";
+
+type Option = string | { value: string; label: string };
+
+type Base = {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Field label. Defaults to the field name, capitalised. */
+  label?: string;
+};
+
+type Facets = {
+  /** Show how many results each option leaves. */
+  counts?: boolean;
+  /** What an option that would leave no results does. */
+  empty?: "show" | "disable" | "hide";
+};
+
+type Kind =
+  | ({
+      /** Control type. */
+      variant?: "checkbox";
+      /** The `FilterItem` field this control filters by. */
+      field: string;
+      /** Options to show. Strings double as labels. */
+      options: Option[];
+      /** How an item's field is compared with a chosen option. Defaults to `equal`. */
+      operator?: Operator;
+      /** With several options checked, an item meets any one or all of them. */
+      match?: "any" | "all";
+      /** Option style. */
+      choice?: "default" | "chip" | "toggle";
+      /** Show a button that clears this field. */
+      clear?: boolean;
+      allLabel?: never;
+      fields?: never;
+      name?: never;
+      placeholder?: never;
+      fuzzy?: never;
+      highlight?: never;
+      type?: never;
+      min?: never;
+      max?: never;
+      step?: never;
+      fromLabel?: never;
+      toLabel?: never;
+    } & Facets)
+  | ({
+      variant: "radio";
+      field: string;
+      options: Option[];
+      operator?: Operator;
+      match?: never;
+      choice?: "default" | "chip";
+      clear?: boolean;
+      /** Label of the option that filters nothing out. Defaults to `All`. */
+      allLabel?: string;
+      fields?: never;
+      name?: never;
+      placeholder?: never;
+      fuzzy?: never;
+      highlight?: never;
+      type?: never;
+      min?: never;
+      max?: never;
+      step?: never;
+      fromLabel?: never;
+      toLabel?: never;
+    } & Facets)
+  | ({
+      variant: "select";
+      field: string;
+      options: Option[];
+      operator?: Operator;
+      match?: never;
+      choice?: never;
+      clear?: never;
+      allLabel?: string;
+      fields?: never;
+      name?: never;
+      placeholder?: never;
+      fuzzy?: never;
+      highlight?: never;
+      type?: never;
+      min?: never;
+      max?: never;
+      step?: never;
+      fromLabel?: never;
+      toLabel?: never;
+    } & Facets)
+  | {
+      variant: "search";
+      field?: never;
+      options?: never;
+      operator?: never;
+      match?: never;
+      choice?: never;
+      clear?: never;
+      allLabel?: never;
+      /** The fields searched. Defaults to all of each item's text. */
+      fields?: string[];
+      /** Its key in the URL. Defaults to `search`. */
+      name?: string;
+      /** Empty-field hint. */
+      placeholder?: string;
+      /** Find words with a typo in them: one per four letters. */
+      fuzzy?: boolean;
+      /** Mark the words found in the results. */
+      highlight?: boolean;
+      counts?: never;
+      empty?: never;
+      type?: never;
+      min?: never;
+      max?: never;
+      step?: never;
+      fromLabel?: never;
+      toLabel?: never;
+    }
+  | {
+      variant: "range";
+      field: string;
+      options?: never;
+      operator?: never;
+      match?: never;
+      choice?: never;
+      clear?: boolean;
+      allLabel?: never;
+      fields?: never;
+      name?: never;
+      placeholder?: never;
+      fuzzy?: never;
+      highlight?: never;
+      counts?: never;
+      empty?: never;
+      /** Value type. */
+      type?: "number" | "date";
+      /** Lowest value. */
+      min?: number | string;
+      /** Highest value. */
+      max?: number | string;
+      /** Step between values.
+       *
+       * @min 0 */
+      step?: number;
+      /** Label of the lower bound. Defaults to `From`. */
+      fromLabel?: string;
+      /** Label of the upper bound. Defaults to `To`. */
+      toLabel?: string;
+    }
+  | {
+      variant: "sort";
+      field?: never;
+      /** Sort orders, as `field-asc` or `field-desc`; `""` keeps the page's order. The first is the default. */
+      options: Option[];
+      operator?: never;
+      match?: never;
+      choice?: never;
+      clear?: never;
+      allLabel?: never;
+      fields?: never;
+      name?: never;
+      placeholder?: never;
+      fuzzy?: never;
+      highlight?: never;
+      counts?: never;
+      empty?: never;
+      type?: never;
+      min?: never;
+      max?: never;
+      step?: never;
+      fromLabel?: never;
+      toLabel?: never;
+    };
+
+type Props = HTMLAttributes<"div"> & Base & Kind;
+
+type AllProps = HTMLAttributes<"div"> &
+  Base &
+  Facets & {
+    variant?: "checkbox" | "radio" | "select" | "search" | "range" | "sort";
+    field?: string;
+    options?: Option[];
+    operator?: Operator;
+    match?: "any" | "all";
+    choice?: "default" | "chip" | "toggle";
+    clear?: boolean;
+    allLabel?: string;
+    fields?: string[];
+    name?: string;
+    placeholder?: string;
+    fuzzy?: boolean;
+    highlight?: boolean;
+    type?: "number" | "date";
+    min?: number | string;
+    max?: number | string;
+    step?: number;
+    fromLabel?: string;
+    toLabel?: string;
+  };
+
+const {
+  render = true,
+  label,
+  variant = "checkbox",
+  field,
+  options = [],
+  operator,
+  match = "any",
+  choice = "default",
+  clear = false,
+  allLabel = "All",
+  fields = [],
+  name,
+  placeholder,
+  fuzzy = false,
+  highlight = false,
+  counts = false,
+  empty = "show",
+  type = "number",
+  min,
+  max,
+  step,
+  fromLabel = "From",
+  toLabel = "To",
+  class: className,
+  ...rest
+} = Astro.props as AllProps;
+
+const entries = options.map((option) =>
+  typeof option === "string" ? { value: option, label: option } : option,
+);
+const key =
+  variant === "sort"
+    ? "sort"
+    : variant === "search"
+      ? (name ?? "search")
+      : field!;
+const text =
+  label ??
+  (variant === "sort"
+    ? "Sort by"
+    : variant === "search"
+      ? "Search"
+      : key.charAt(0).toUpperCase() + key.slice(1).replace(/[-_]/g, " "));
+
+// What the Filter's script reads: which field, compared how.
+const control = {
+  kind: variant,
+  key,
+  label: text,
+  fields: field ? [field] : fields,
+  op: operator ?? (variant === "search" ? "contain" : "equal"),
+  match,
+  fuzzy: fuzzy || undefined,
+  highlight: highlight || undefined,
+  counts: counts || undefined,
+  empty: empty === "show" ? undefined : empty,
+  type: variant === "range" ? type : undefined,
+};
+const choices = variant === "checkbox" || variant === "radio";
+const bound = { min, max, step, autocomplete: "off" } as const;
+---
+
+{
+  render && (
+    <div
+      class:list={["filter-field", className]}
+      data-filter-control={JSON.stringify(control)}
+      {...rest}
+    >
+      {choices && (
+        <Fieldset
+          legend={text}
+          variant={choice === "chip" ? "inline" : "stack"}
+          legendStyle="label"
+        >
+          {variant === "radio" && (
+            <Choice
+              type="radio"
+              name={key}
+              value=""
+              label={allLabel}
+              variant={choice}
+              checked
+            >
+              {counts && <span class="filter-field_count" data-filter-count />}
+            </Choice>
+          )}
+          {entries.map((entry) => (
+            <Choice
+              type={variant as "checkbox"}
+              name={key}
+              value={entry.value}
+              label={entry.label}
+              variant={choice}
+            >
+              {counts && <span class="filter-field_count" data-filter-count />}
+            </Choice>
+          ))}
+        </Fieldset>
+      )}
+
+      {variant === "select" && (
+        <Select
+          label={text}
+          name={key}
+          options={[{ value: "", label: allLabel }, ...entries]}
+          value=""
+        />
+      )}
+
+      {variant === "sort" && (
+        <Select
+          label={text}
+          name={key}
+          options={entries}
+          value={entries[0]?.value}
+        />
+      )}
+
+      {variant === "search" && (
+        <Input
+          variant="search"
+          label={text}
+          name={key}
+          placeholder={placeholder}
+        />
+      )}
+
+      {variant === "range" && (
+        <Fieldset legend={text} variant="columns" legendStyle="label">
+          <Input
+            variant={type}
+            label={fromLabel}
+            name={`${key}-from`}
+            placeholder={type === "number" ? String(min ?? "") : undefined}
+            {...bound}
+          />
+          <Input
+            variant={type}
+            label={toLabel}
+            name={`${key}-to`}
+            placeholder={type === "number" ? String(max ?? "") : undefined}
+            {...bound}
+          />
+        </Fieldset>
+      )}
+
+      {clear && (
+        <button
+          class="filter-field_clear text-style-small"
+          type="button"
+          hidden
+        >
+          Clear {text}
+        </button>
+      )}
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .filter-field {
+      position: relative;
+      display: grid;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .filter-field_count {
+      color: var(--text-2);
+      font-variant-numeric: tabular-nums;
+      &::before {
+        content: "(";
+      }
+      &::after {
+        content: ")";
+      }
+      .form-choice.chip:has(:checked) & {
+        color: inherit;
+      }
+    }
+
+    .filter-field .form-choice:has(:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .filter-field_clear {
+      justify-self: start;
+      padding: 0;
+      background: none;
+      color: var(--text-2);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      @media (hover: hover) {
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+  }
+</style>

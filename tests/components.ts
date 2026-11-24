@@ -7,7 +7,7 @@
  * src/consts.ts turns on.
  *
  * A scratch copy of the framework with the pages in tests/fixtures/pages,
- * ClientRouter in the layout and the color mode on auto, built and driven in
+ * ClientRouter in the layout and the color mode on its default, auto, built and driven in
  * Chrome; then rebuilt with the CSP on and ClientRouter out. Framework only:
  * projects don't get it.
  *
@@ -21,6 +21,13 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { launch, serve } from "../scripts/measure/browser.ts";
 import { scratchProject } from "./scratch.ts";
+import {
+  compareBy,
+  distance,
+  meets,
+  pageRange,
+  valuesOf,
+} from "../src/utils/filter.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const tmp = mkdtempSync(join(tmpdir(), "trix-components-"));
@@ -58,11 +65,6 @@ try {
     "src/layouts/BaseLayout.astro",
     "<BaseHead {...seo} />",
     "<BaseHead {...seo} />\n    <ClientRouter />",
-  );
-  edit(
-    "src/consts.ts",
-    'COLOR_MODE: "light" | "dark" | "auto" = "light"',
-    'COLOR_MODE: "light" | "dark" | "auto" = "auto"',
   );
   execFileSync("npm", ["run", "build"], {
     cwd: site,
@@ -177,6 +179,218 @@ try {
           ]),
         [true, true],
       );
+    });
+
+    await it("Filter rules: operators, typos, sorting and page numbers", async () => {
+      const item = {
+        fields: { tags: ["oak", "black"], price: 120, date: "2024-01-10" },
+        text: "Alpha chair",
+      };
+      const c = (op: string, values: string[], fields = ["tags"]) =>
+        meets(item, {
+          key: "k",
+          fields,
+          op: op as "equal",
+          values,
+          match: "any",
+        });
+      assert.ok(c("equal", ["Oak"]) && !c("not-equal", ["oak"]));
+      assert.ok(c("contain", ["bla"]) && c("not-contain", ["wool"]));
+      assert.ok(c("exist", []) && !c("exist", [], ["video"]));
+      assert.ok(
+        c("greater-equal", ["120"], ["price"]) &&
+          !c("greater", ["120"], ["price"]),
+      );
+      assert.ok(
+        c("less", ["2024-02-01"], ["date"]) &&
+          !c("less", ["2024-01-01"], ["date"]),
+      );
+      assert.ok(
+        meets(item, {
+          key: "s",
+          fields: [],
+          op: "contain",
+          values: ["chaer alpha"],
+          match: "any",
+          fuzzy: true,
+        }),
+      );
+      assert.ok(
+        !meets(item, {
+          key: "s",
+          fields: [],
+          op: "contain",
+          values: ["chaer"],
+          match: "any",
+        }),
+      );
+      assert.equal(distance("chair", "chaer", 1), 1);
+      assert.deepEqual(valuesOf([1, "", null as never]), [1]);
+      assert.deepEqual(valuesOf(false), []);
+      const rows = ["Item 10", "Item 2", undefined].map((title) => ({
+        fields: { title },
+        text: "",
+      }));
+      assert.deepEqual(
+        rows.sort(compareBy("title", "asc")).map((r) => r.fields.title),
+        ["Item 2", "Item 10", undefined],
+      );
+      assert.deepEqual(pageRange(1, 4), [1, 2, 3, 4]);
+      assert.deepEqual(pageRange(6, 12), [1, "…", 5, 6, 7, "…", 12]);
+      assert.deepEqual(pageRange(1, 12, 0, 2), [1, 2, "…", 11, 12]);
+    });
+
+    const filter = page.locator(".filter_wrap").first();
+    const shown = () =>
+      filter.evaluate((wrap) =>
+        [...wrap.querySelectorAll<HTMLElement>("[data-filter-item]")]
+          .filter((item) => !item.hidden)
+          .map((item) => item.querySelector("h3")?.textContent),
+      );
+    const count = () => filter.locator(".filter_count").textContent();
+    // The label, not its input: the input is hidden under the label's mark.
+    const choice = (value: string) =>
+      filter
+        .locator(".form-choice")
+        .filter({ has: page.locator(`input[value="${value}"]`) });
+
+    await it("Filter: before its script, only the first page is on show", async () => {
+      const html = await (await fetch(`${origin}/test/filter`)).text();
+      assert.equal(
+        html.match(/data-filter-later data-filter-item/g)?.length,
+        // Past each filter's first page: 10 items in 3s, 5 in 2s, 5 in 2s.
+        7 + 3 + 3,
+      );
+    });
+    await it("Filter: pages, numbered, and previous and next stop at the ends", async () => {
+      await page.goto(`${origin}/test/filter`);
+      assert.equal(await count(), "Showing 1–3 of 10");
+      assert.deepEqual(await shown(), [
+        "Alpha chair",
+        "Beta lamp",
+        "Gamma desk",
+      ]);
+      assert.ok(await filter.locator('[data-filter-step="-1"]').isDisabled());
+      await filter.locator('[data-filter-step="1"]').click();
+      assert.equal(await count(), "Showing 4–6 of 10");
+      assert.match(page.url(), /[?&]page=2/);
+      await filter.locator('.filter_page[data-page="4"]').click();
+      assert.equal(await count(), "Showing 10–10 of 10");
+      assert.ok(await filter.locator('[data-filter-step="1"]').isDisabled());
+      assert.equal(
+        await filter.locator(".filter_page[aria-current]").textContent(),
+        "4",
+      );
+    });
+    await it("Filter: a checkbox filters, counts what each option leaves, hides one that leaves none", async () => {
+      await page.goto(`${origin}/test/filter`);
+      await choice("furniture").click();
+      assert.equal(await count(), "Showing 1–3 of 5");
+      assert.match(page.url(), /\?category=furniture$/);
+      assert.deepEqual(
+        await filter.locator("[data-filter-count]").allTextContents(),
+        ["5", "2", "2", "1", "0"],
+      );
+      assert.ok(await choice("outdoor").isHidden());
+      assert.deepEqual(await filter.locator(".filter_tag").allTextContents(), [
+        "Category: furniture",
+      ]);
+    });
+    await it("Filter: search forgives a typo, and marks what it found", async () => {
+      await page.goto(`${origin}/test/filter`);
+      await filter.getByRole("searchbox").fill("chaer");
+      await page.waitForTimeout(400);
+      assert.deepEqual(await shown(), ["Alpha chair"]);
+      await filter.getByRole("searchbox").fill("lamp");
+      await page.waitForTimeout(400);
+      assert.equal(
+        await page.evaluate(() => CSS.highlights.get("filter-match")?.size),
+        1,
+      );
+    });
+    await it("Filter: ranges, sorting, a radio and a toggle; a tag removes its own choice", async () => {
+      await page.goto(`${origin}/test/filter`);
+      await filter.getByLabel("From", { exact: true }).first().fill("100");
+      await filter.getByLabel("To", { exact: true }).first().fill("300");
+      await filter.getByLabel("Sort by").selectOption("price-asc");
+      await page.waitForTimeout(400);
+      assert.deepEqual(await shown(), [
+        "Alpha chair",
+        "Zeta pendant",
+        "Kappa mirror",
+      ]);
+      assert.deepEqual(await filter.locator(".filter_tag").allTextContents(), [
+        "Price ≥ 100",
+        "Price ≤ 300",
+      ]);
+      await filter.locator(".filter_tag").first().click();
+      assert.equal(await count(), "Showing 1–3 of 8");
+      assert.equal(
+        await page.evaluate(() => document.activeElement?.textContent),
+        "Price ≤ 300",
+      );
+      await choice("black").click();
+      await choice("true").click();
+      assert.deepEqual(await shown(), ["Alpha chair"]);
+      await filter.locator(".filter_clear").click();
+      assert.equal(await count(), "Showing 1–3 of 10");
+      assert.match(page.url(), /\?sort=price-asc$/, "clear all keeps the sort");
+    });
+    await it("Filter: a link with the choice in it opens filtered and sorted", async () => {
+      await page.goto(
+        `${origin}/test/filter?category=lighting&sort=price-desc`,
+      );
+      assert.deepEqual(await shown(), ["Zeta pendant", "Beta lamp"]);
+      assert.ok(
+        await filter.getByRole("checkbox", { name: /^lighting/ }).isChecked(),
+      );
+    });
+    await it("Filter: one with an id keeps its own keys, waits for Apply, and loads more", async () => {
+      await page.goto(`${origin}/test/filter`);
+      const notes = page.locator("#notes");
+      await notes.getByLabel("Category").selectOption("a");
+      assert.equal(
+        await notes.locator(".filter_count").textContent(),
+        "Showing 2 of 5",
+      );
+      await notes.getByRole("button", { name: "Apply" }).click();
+      assert.equal(
+        await notes.locator(".filter_count").textContent(),
+        "Showing 2 of 3",
+      );
+      assert.match(page.url(), /\?notes-category=a$/);
+      await notes.getByRole("button", { name: "Load more" }).click();
+      assert.equal(
+        await notes.locator(".filter_count").textContent(),
+        "Showing 3 of 3",
+      );
+      assert.equal(
+        await page.evaluate(() => document.activeElement?.textContent?.trim()),
+        "Four",
+      );
+      assert.ok(await notes.locator(".filter_paging").isHidden());
+      await notes.getByRole("searchbox").fill("zzz");
+      await notes.getByRole("button", { name: "Apply" }).click();
+      assert.equal(
+        await notes.locator('[role="status"]').textContent(),
+        "No notes.",
+      );
+    });
+    await it("Filter: infinite loads the next page as its end comes near", async () => {
+      await page.goto(`${origin}/test/filter`);
+      const feed = page.locator("#feed");
+      assert.equal(
+        await feed.locator(".filter_count").textContent(),
+        "Showing 2 of 5",
+      );
+      await feed.locator(".filter_paging").scrollIntoViewIfNeeded();
+      await page.waitForFunction(
+        () =>
+          document.querySelector("#feed .filter_count")?.textContent ===
+          "Showing 4 of 5",
+      );
+      // Kept, so a reload comes back with the same items and the same scroll.
+      assert.match(page.url(), /feed-page=2/);
     });
 
     // /components → /style-guide → /components, swapped in place.
@@ -311,6 +525,14 @@ try {
           .getAttribute("aria-pressed"),
         String(mode === "dark"),
       );
+      // The page shows it, both ways: no page pins a theme the switch can't change.
+      const scheme = () =>
+        page.evaluate(
+          () => getComputedStyle(document.documentElement).colorScheme,
+        );
+      assert.equal(await scheme(), mode);
+      await page.locator(".theme-toggle_wrap").first().click();
+      assert.equal(await scheme(), mode === "dark" ? "light" : "dark");
     });
     await it("ClientRouter: the phone menu opens", async () => {
       await page.setViewportSize({ width: 375, height: 800 });

@@ -4,7 +4,9 @@ description: >-
   Build and extend pages, sections, components and styles in a Trix project
   the way Trix intends. Use whenever writing markup or CSS here — adding a
   page or section, laying out columns, spacing things, styling, adding a
-  variant, theme, token, breakpoint rule, animation or component script.
+  variant, theme, token, breakpoint rule, animation or component script —
+  and any behaviour (tabs, filters, sliders, counters), which Trix writes
+  itself rather than with Finsweet, GSAP, Swiper or any other library.
   Trigger even when the request sounds like plain web work ("build a hero",
   "make this two columns on desktop", "add more space above this", "make it
   dark", "why is there a gap under this heading"): several of those decisions
@@ -82,6 +84,16 @@ property.
 background video — in `Section`'s `background` slot — has none
 (`pauseButton={false}`) until the owner asks for one: ask, default no
 (`TRIX.md` → Building a page). `Icon name` for Phosphor icons.
+
+**11. Behaviour is our own code, never a library.** No Finsweet, jQuery,
+Swiper, GSAP, Lenis or any other UI script. A tab, filter, slider, reveal or
+counter is HTML first, then CSS, then the build (filters and pagination in
+Astro), and only then the component's own `<script>` with `mount` — keyboard
+and screen reader ready, state in the URL, working without JavaScript. Ask
+before allowing a package; `npm run check` fails on one that isn't in
+`package.json` → `trix.allow` (`TRIX.md` → Behaviour: our own code). A list
+visitors filter, search, sort or page is `Interactive/Filter`, never a script
+of its own.
 
 ## Finishing
 

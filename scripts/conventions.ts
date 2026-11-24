@@ -10,6 +10,9 @@
  *   4. Every theme's text roles meet WCAG AA contrast against what they sit
  *      on — 4.5:1, or 3:1 for the heading accent, which is only used in
  *      headings (large text).
+ *   5. Behaviour is our own code: no package imported in src/ but the ones
+ *      Trix uses or `package.json` → `trix.allow` names, no `<script src>`
+ *      from another site, no Finsweet `fs-` attribute.
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
@@ -169,6 +172,47 @@ for (const theme of model.themes) {
       notes.push(`${line} (accepted in themes.css)`);
     else problems.push(`src/styles/themes.css  ${line}`);
   }
+}
+
+// 5. Our own code (TRIX.md → Behaviour: our own code)
+const trixUses =
+  /^(?:astro(?:$|[:/])|@astrojs\/|node:|@phosphor-icons\/core$|@c15t\/)/;
+const allowed5 = new Set(
+  Object.keys(JSON.parse(read("package.json")).trix?.allow ?? {}),
+);
+const packageOf = (specifier: string) =>
+  specifier
+    .split("/")
+    .slice(0, specifier.startsWith("@") ? 2 : 1)
+    .join("/");
+const why =
+  "build it with HTML, CSS or the component's own script, or allow it in package.json → trix.allow with the reason (TRIX.md → Behaviour: our own code)";
+for (const { path, text } of sources) {
+  if (path.endsWith(".css")) continue;
+  // `from "x"`, `import "x"`, `import("x")` — not relative, not `@/`, and
+  // not the word in a string (`["from", …]`) or a method (`Array.from("x")`).
+  for (const m of text.matchAll(
+    /(?<![@\w"'`.])(?:from|import)\s*\(?\s*["']((?:[^"'.@/~]|@[^"'/]+\/)[^"']*)["']/g,
+  )) {
+    const name = m[1].includes("://") ? m[1] : packageOf(m[1]);
+    if (trixUses.test(name) || trixUses.test(m[1]) || allowed5.has(name))
+      continue;
+    problems.push(`${path}:${lineOf(text, m.index)}  imports ${name} — ${why}`);
+  }
+  if (!path.endsWith(".astro")) continue;
+  for (const m of text.matchAll(
+    /<script\b[^>]*\bsrc\s*=\s*[{"'`]*\s*((?:https?:)?\/\/([^/"'`}\s>]+)[^"'`}\s>]*)/gi,
+  )) {
+    // A service the owner chose and allowed by host — a required consent platform.
+    if (allowed5.has(m[2])) continue;
+    problems.push(
+      `${path}:${lineOf(text, m.index)}  loads ${m[1]} — a service goes through /trix-consent, or its host is allowed in package.json → trix.allow with the reason; behaviour is our own code (TRIX.md → Behaviour: our own code)`,
+    );
+  }
+  for (const m of text.matchAll(/\s(fs-[a-z][\w-]*)(?=[\s=>/])/g))
+    problems.push(
+      `${path}:${lineOf(text, m.index)}  ${m[1]} is a Finsweet attribute — rebuild it in the component (TRIX.md → Behaviour: our own code)`,
+    );
 }
 
 if (notes.length)

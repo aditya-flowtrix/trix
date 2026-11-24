@@ -63,6 +63,8 @@ jobs:
 
       - run: npm run test:tokens
 
+      - run: npm run test:conventions
+
       - run: npm run test:import-figma
 
       - name: The installer (framework only)

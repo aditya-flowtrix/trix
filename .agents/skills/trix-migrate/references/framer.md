@@ -72,14 +72,14 @@ between the breakpoint values (usually the better result, and what Trix's
 Framer Motion effects are the site's character; inventory them on the live
 site before rebuilding (scroll the page slowly, at desktop and phone):
 
-| Framer                                           | Trix                                                                                                                      |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| Appear effect (fade/slide in on load or in view) | a component script with `IntersectionObserver` and a CSS transition on `transform`/`opacity`                              |
-| Scroll transforms, parallax                      | CSS scroll-driven animations (`animation-timeline: view()`), GSAP ScrollTrigger only where support or sequencing needs it |
-| Hover and press variants                         | `:hover` / `:active` transitions on the component                                                                         |
-| Page transitions                                 | Astro view transitions: `<ClientRouter />` in `BaseLayout`'s head; Trix's components set up again on each page            |
-| Ticker                                           | `Interactive/Marquee`                                                                                                     |
-| Carousel / Slideshow                             | `Interactive/Slider`                                                                                                      |
+| Framer                                           | Trix                                                                                                                                           |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Appear effect (fade/slide in on load or in view) | a component script with `IntersectionObserver` and a CSS transition on `transform`/`opacity`                                                   |
+| Scroll transforms, parallax                      | CSS scroll-driven animations (`animation-timeline: view()`) behind `@supports`; a sequence in the component's script on the Web Animations API |
+| Hover and press variants                         | `:hover` / `:active` transitions on the component                                                                                              |
+| Page transitions                                 | Astro view transitions: `<ClientRouter />` in `BaseLayout`'s head; Trix's components set up again on each page                                 |
+| Ticker                                           | `Interactive/Marquee`                                                                                                                          |
+| Carousel / Slideshow                             | `Interactive/Slider`                                                                                                                           |
 
 Match timing and easing (Framer springs ≈ `cubic-bezier(0.22, 1, 0.36, 1)` for
 the default ease-out feel; measure durations with the browser's animation

@@ -166,10 +166,13 @@ table headers, `rel="noopener"` on `target="_blank"` links, and no
 
 ## Animations
 
-Rebuild motion with the lightest tool that holds it: CSS transitions and
-scroll-driven animations first, the `animate` prop for fade-up reveals (one
-or staggered; `--reveal-*` tokens carry the source's timing), GSAP only
-for timelines, pinning and scrubbing the platform engine did. Platform engines
+Rebuild motion with the lightest tool that holds it, and never a library
+(`TRIX.md` → Behaviour: our own code): CSS transitions and scroll-driven
+animations first, the `animate` prop for fade-up reveals (one or staggered;
+`--reveal-*` tokens carry the source's timing), `position: sticky` for
+pinning, `animation-timeline` for scrubbing, and the Web Animations API in the
+component's script for timelines. GSAP, Lenis, Swiper and Finsweet Attributes
+are rebuilt, not installed (`references/webflow.md` maps each). Platform engines
 (Webflow IX, Framer Motion appear effects) become components' own scripts,
 targeting data attributes. Match the original's timing and easing, then make
 it smoother: transform and opacity only, no layout thrash, and

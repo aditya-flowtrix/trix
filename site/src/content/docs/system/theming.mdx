@@ -56,10 +56,12 @@ It is then reported, not failed — the decision is written down.
 
 `COLOR_MODE` in `src/consts.ts`:
 
-- `light` (default) or `dark` — fixed.
-- `auto` — follow the visitor's system setting, remember a
+- `auto` (default) — follow the visitor's system setting, remember a
   [`ThemeToggle`](/docs/components/theme-toggle) choice, and apply it before
-  the first paint, so there is no flash.
+  the first paint, so there is no flash. The switch is in the nav.
+- `light` or `dark` — fixed, for a site designed in one mode only. The switch
+  disappears.
 
 Dark mode swaps the root to the dark theme. Sections with their own `theme`
-keep it. This site runs in `auto` — try the switch in the header.
+keep it, and so does a page given one through the layout's `theme` — the switch
+can't change it, so leave pages unset on a site that offers the switch. This site runs in `auto` — try the switch in the header.

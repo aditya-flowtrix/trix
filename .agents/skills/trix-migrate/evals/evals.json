@@ -11,6 +11,7 @@
         "PROJECT.md was read first and Sources filled as inputs arrived",
         "Header and footer markup live in Global/Nav.astro and Global/Footer.astro, not in src/pages",
         "No u- class, w- class, data-wf-*, data-w-id or webflow.js reference remains in src/",
+        "No fs- (Finsweet) attribute, and no third-party UI library (Swiper, GSAP, Lenis, jQuery, Finsweet) is installed, imported or loaded; their behaviour is rebuilt in components",
         "Class renames follow .trix/class-map.md (classes.ts), never a name-based rename",
         "Moved CSS sits in <style is:global> inside @layer components in the component that owns it",
         "compare-pages.mjs reports exact content parity for the homepage",
@@ -35,7 +36,7 @@
       "id": 2,
       "name": "framer-motion",
       "prompt": "Rebuild our Framer landing page https://example.framer.website in Trix, including the scroll animations.",
-      "expected_output": "Sections rebuilt from measurement and data-framer-name layer names; appear and scroll effects reimplemented with IntersectionObserver / scroll-driven CSS (GSAP only if needed); reduced motion respected.",
+      "expected_output": "Sections rebuilt from measurement and data-framer-name layer names; appear and scroll effects reimplemented with IntersectionObserver / scroll-driven CSS / the Web Animations API, no GSAP or other animation library; reduced motion respected.",
       "files": [],
       "assertions": [
         "Component names follow the data-framer-name layer names, not framer- hashes",
