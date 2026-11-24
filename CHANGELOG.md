@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 — 2026-11-24
+
+A `Filter` that does everything Finsweet's list attributes did, a check that
+keeps every behaviour Trix's own code, and light and dark mode on by default.
+A site already built keeps its color mode. Once upgraded, `npm run check`
+fails on any library its components import, until the library is rebuilt or
+allowed in `package.json` → `trix.allow` with the reason.
 
 - Light and dark mode with a switch, on by default: `COLOR_MODE` in
   `src/consts.ts` is now `auto`, so a new project follows the visitor's system
