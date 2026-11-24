@@ -3,7 +3,7 @@ import Paragraph from "@/components/typography/Paragraph.astro";
 import RichText from "@/components/typography/RichText.astro";
 import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
 import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
-import { lorem, model, range, value } from "@/utils/style-guide.ts";
+import { model, range, sample, value } from "@/utils/style-guide.ts";
 import type { TextStyle } from "@/styles/generated/tokens.ts";
 
 interface Props {
@@ -25,7 +25,11 @@ const typeStyles = model.textStyles.map((name) => {
   if (transform && transform !== "none") parts.push(transform);
   return {
     cls,
-    heading: /^(display|h\d)$/.test(name),
+    text: /^(display|h\d)$/.test(name)
+      ? sample.heading
+      : name === "eyebrow"
+        ? sample.short
+        : sample.long,
     note: parts.join(" · "),
   };
 });
@@ -38,7 +42,7 @@ const typeStyles = model.textStyles.map((name) => {
         {typeStyles.map((style) => (
           <StyleGuideItem label={`text-style-${style.cls} · ${style.note}`}>
             <Paragraph tag="div" variant={style.cls as TextStyle} maxWidth={70}>
-              {style.heading ? "Design once, ship everywhere" : lorem}
+              {style.text}
             </Paragraph>
           </StyleGuideItem>
         ))}
@@ -68,7 +72,7 @@ const typeStyles = model.textStyles.map((name) => {
             label={`weight-${weight} · ${value(`primary-${weight}`)}`}
             variant="card"
           >
-            <Paragraph class={`weight-${weight}`}>Lorem ipsum dolor</Paragraph>
+            <Paragraph class={`weight-${weight}`}>{sample.short}</Paragraph>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
@@ -79,7 +83,7 @@ const typeStyles = model.textStyles.map((name) => {
             label={`line-height-${name} · ${value(`line-height-${name}`)}`}
             variant="card"
           >
-            <Paragraph class={`line-height-${name}`}>{lorem}</Paragraph>
+            <Paragraph class={`line-height-${name}`}>{sample.long}</Paragraph>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
@@ -91,7 +95,7 @@ const typeStyles = model.textStyles.map((name) => {
             variant="card"
           >
             <Paragraph class={`letter-spacing-${name}`}>
-              Lorem ipsum dolor
+              {sample.short}
             </Paragraph>
           </StyleGuideItem>
         ))}
@@ -109,7 +113,7 @@ const typeStyles = model.textStyles.map((name) => {
           "line-clamp-4",
         ].map((cls) => (
           <StyleGuideItem label={cls} variant="card">
-            <Paragraph class={cls}>{lorem}</Paragraph>
+            <Paragraph class={cls}>{sample.long}</Paragraph>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>

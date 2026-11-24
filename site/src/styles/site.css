@@ -274,7 +274,7 @@
     --code-background: var(--neutral-100);
   }
   :root[data-mode="dark"] {
-    --code-background: var(--neutral-950);
+    --code-background: var(--neutral-900);
   }
   pre.astro-code {
     overflow-x: auto;

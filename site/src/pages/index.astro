@@ -72,7 +72,9 @@ const features: {
     class="home-hero_wrap"
   >
     <Aurora slot="background" />
-    <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
+    <Eyebrow variant="tag">
+      <span class="text-transform-none">v{pkg.trix.version}</span>
+    </Eyebrow>
     <Heading tag="h1" variant="display" maxWidth={14} class="alignment-center">
       A design-ready framework for Astro
     </Heading>

@@ -81,7 +81,7 @@ export const codeThemes = {
     comment: "#666666",
   }),
   dark: theme("trix-dark", "dark", {
-    bg: "#0a0a0a",
+    bg: "#171717",
     fg: "#e5e5e5",
     keyword: "#0fd375",
     string: "#a3fcbf",

@@ -23,6 +23,17 @@ const paletteGroups = Object.entries(
   })),
 }));
 const singles = paletteGroups.filter((g) => g.tokens.length === 1);
+
+// A text color (`--brand-text`) is shown on what the default theme sets it on:
+// `--button-text: var(--brand-text)` → on `--button-background`.
+const defaultTheme = model.themes[0]?.tokens;
+const textOn = (name: string) => {
+  for (const [role, v] of defaultTheme ?? [])
+    if (v === `var(--${name})` && role.endsWith("-text")) {
+      const on = defaultTheme?.get(role.replace(/-text$/, "-background"));
+      if (on) return on;
+    }
+};
 const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
 ---
 
@@ -39,7 +50,19 @@ const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
 
       <StyleGuideGroup title="Base" variant="tiles">
         {singles.flatMap((g) =>
-          g.tokens.map((t) => <StyleGuideToken token={t.name} value={t.hex} />),
+          g.tokens.map((t) => {
+            const on = textOn(t.name);
+            return on ? (
+              <StyleGuideToken
+                token={t.name}
+                value={`${t.hex} · on ${on.replace(/^var\((.+)\)$/, "$1")}`}
+                variant="foreground"
+                on={on}
+              />
+            ) : (
+              <StyleGuideToken token={t.name} value={t.hex} />
+            );
+          }),
         )}
       </StyleGuideGroup>
 

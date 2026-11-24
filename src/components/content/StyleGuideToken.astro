@@ -1,25 +1,43 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 
-interface Props extends HTMLAttributes<"div"> {
+type Base = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /** Token name without the leading dashes. */
   token: string;
   /** Value shown under the token name. */
   value?: string;
-  /** Token kind. */
-  variant?: "color" | "space" | "radius";
-}
+};
+
+type Props = Base &
+  (
+    | {
+        /** Token kind. */
+        variant?: "color" | "space" | "radius";
+        on?: never;
+      }
+    | {
+        variant: "foreground";
+        /** The color the text sits on. */
+        on: string;
+      }
+  );
+
+type AllProps = Base & {
+  variant?: "color" | "space" | "radius" | "foreground";
+  on?: string;
+};
 
 const {
   render = true,
   token,
   value,
   variant = "color",
+  on,
   class: className,
   ...rest
-} = Astro.props;
+} = Astro.props as AllProps;
 ---
 
 {
@@ -30,10 +48,12 @@ const {
         variant !== "color" && variant,
         className,
       ]}
-      style={`--_token: var(--${token});`}
+      style={`--_token: var(--${token});${on ? ` --_on: ${on};` : ""}`}
       {...rest}
     >
-      <div class="style-guide-token_visual" aria-hidden="true" />
+      <div class="style-guide-token_visual" aria-hidden="true">
+        {variant === "foreground" && "Aa"}
+      </div>
       <div class="style-guide-token_info">
         <code class="style-guide-token_name text-style-small">--{token}</code>
         {value && (
@@ -85,6 +105,15 @@ const {
           border-radius: 0;
           background-color: var(--button-background);
         }
+      }
+
+      &.foreground .style-guide-token_visual {
+        display: grid;
+        place-items: center;
+        background-color: var(--_on);
+        color: var(--_token);
+        font-size: var(--h3);
+        font-weight: var(--h3-font-weight);
       }
 
       &.radius .style-guide-token_visual {

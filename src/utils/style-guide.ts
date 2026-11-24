@@ -29,5 +29,9 @@ export const lengthLabel = (name: string) => {
   return n === undefined || raw.endsWith("px") ? raw : `${raw} · ${px(n)}`;
 };
 
-export const lorem =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.";
+/** Sample text: every project shows it, so it names no brand. */
+export const sample = {
+  heading: "Design once, ship everywhere",
+  short: "Sphinx of black quartz, judge my vow",
+  long: "A clear hierarchy lets a page be scanned in seconds and read for minutes. Headings name what follows, paragraphs keep to a comfortable measure, and the space between them shows what belongs together — so the reader notices the ideas, not the letters.",
+};
