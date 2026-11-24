@@ -1,0 +1,64 @@
+---
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
+import { lengthLabel, model, range } from "@/utils/style-guide.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Space scale" variant="rows">
+        {model.spaces.map((space) => {
+          const n = space.slice(6);
+          return (
+            <StyleGuideToken
+              token={space}
+              value={`${range(space)} · gap-${n}, padding-${n}, margin-top-${n}`}
+              variant="space"
+            />
+          );
+        })}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Section space" variant="rows">
+        {model.sectionSpaces.map((name) => (
+          <StyleGuideToken
+            token={`section-space-${name}`}
+            value={`${range(`section-space-${name}`)} · Section padding "${name.replace(/-/g, "")}"`}
+            variant="space"
+          />
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Site" variant="rows">
+        <StyleGuideToken
+          token="site-margin"
+          value={`${range("site-margin")} · padding-sitemargin`}
+          variant="space"
+        />
+        <StyleGuideToken
+          token="site-gutter"
+          value={`${range("site-gutter")} · the layout grid gutter: Row and Grid gap`}
+          variant="space"
+        />
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Radius" variant="tiles">
+        {model.radii.map((name) => (
+          <StyleGuideToken
+            token={`radius-${name}`}
+            value={`${lengthLabel(`radius-${name}`)} · radius-${name}`}
+            variant="radius"
+          />
+        ))}
+      </StyleGuideGroup>
+    </>
+  )
+}

@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- The style guide is on the docs site. A new page,
+  [Style guide](https://trix.flowtrix.workers.dev/docs/system/style-guide),
+  says why it cannot drift and how a migration proves it, with Typography,
+  Colors and Spacing rendered live by the framework's own components; the
+  whole page is at
+  [/style-guide](https://trix.flowtrix.workers.dev/style-guide), indexable
+  there, and linked from the header and the homepage. Installation's "style
+  guide" link pointed at the Figma guide; it now points at the new page.
+- `/style-guide`'s sections are components in `src/components/content/`:
+  `StyleGuideBrand`, `StyleGuideTypography`, `StyleGuideColors`,
+  `StyleGuideSpacing`, `StyleGuideLayout`, `StyleGuideMotion` and
+  `StyleGuideIcons`, put together by `StyleGuide`, reading the design system
+  through `src/utils/style-guide.ts`. A project's page looks the same and is
+  still `noindex`; a project that changed its `style-guide.astro` moves those
+  changes into the section they belong to.
+- `StyleGuideGroup`'s `grid` variant is now `tiles`. Its `grid` class also
+  matched `Grid`'s, which lost only because of stylesheet order. The rich
+  text sample has the space it was missing before "a link".
+
 - Moving into Sanity is built in. `node scripts/cms/convert.ts sanity`
   turns the imported CMS into the NDJSON `sanity datasets import` takes and
   the Studio schema those documents need: IDs from the source's, so every run

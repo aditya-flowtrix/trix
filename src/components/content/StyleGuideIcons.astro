@@ -1,0 +1,72 @@
+---
+import Icon from "@/components/media/Icon.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import type { SvgComponent } from "astro/types";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const phosphor = [
+  "arrow-right",
+  "check",
+  "x",
+  "list",
+  "magnifying-glass",
+  "envelope-simple",
+  "phone",
+  "map-pin",
+  "download-simple",
+  "play",
+];
+const weights = [
+  "thin",
+  "light",
+  "regular",
+  "bold",
+  "fill",
+  "duotone",
+] as const;
+const customIcons = Object.entries(
+  import.meta.glob<{ default: SvgComponent }>("@/assets/icons/*.svg", {
+    eager: true,
+  }),
+).map(([path, mod]) => ({
+  name: path.split("/").pop()!,
+  src: mod.default,
+}));
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Phosphor — <Icon name>" variant="tiles">
+        {phosphor.map((name) => (
+          <StyleGuideItem label={name} variant="card">
+            <Icon name={name} variant="large" />
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Phosphor weights" variant="tiles">
+        {weights.map((weight) => (
+          <StyleGuideItem label={`weight="${weight}"`} variant="card">
+            <Icon name="star" weight={weight} variant="large" />
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Custom — <Icon src>" variant="tiles">
+        {customIcons.map((icon) => (
+          <StyleGuideItem label={`assets/icons/${icon.name}`} variant="card">
+            <Icon src={icon.src} variant="large" />
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+    </>
+  )
+}

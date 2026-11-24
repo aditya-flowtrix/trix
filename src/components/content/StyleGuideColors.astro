@@ -1,0 +1,53 @@
+---
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
+import StyleGuideTheme from "@/components/content/StyleGuideTheme.astro";
+import { model } from "@/utils/style-guide.ts";
+import { resolveColor, toHex } from "@/utils/tokens.ts";
+import type { Theme } from "@/styles/generated/tokens.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const paletteGroups = Object.entries(
+  Object.groupBy(model.palette, (t) => t.name.replace(/-\d+$/, "")),
+).map(([name, tokens]) => ({
+  name,
+  tokens: (tokens ?? []).map((t) => ({
+    name: t.name,
+    hex: toHex(resolveColor(t.value, [model.byName]) ?? [0, 0, 0, 0]),
+  })),
+}));
+const singles = paletteGroups.filter((g) => g.tokens.length === 1);
+const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
+---
+
+{
+  render && (
+    <>
+      {ramps.map((group) => (
+        <StyleGuideGroup title={group.name} variant="tiles">
+          {group.tokens.map((t) => (
+            <StyleGuideToken token={t.name} value={t.hex} />
+          ))}
+        </StyleGuideGroup>
+      ))}
+
+      <StyleGuideGroup title="Base" variant="tiles">
+        {singles.flatMap((g) =>
+          g.tokens.map((t) => <StyleGuideToken token={t.name} value={t.hex} />),
+        )}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Themes" variant="scroll">
+        {model.themes.map((theme) => (
+          <StyleGuideTheme theme={theme.name as Theme} />
+        ))}
+      </StyleGuideGroup>
+    </>
+  )
+}

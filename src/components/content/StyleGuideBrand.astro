@@ -1,0 +1,76 @@
+---
+import Icon from "@/components/media/Icon.astro";
+import Img from "@/components/media/Img.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import logo from "@/assets/logo/logo.svg";
+import logoIcon from "@/assets/logo/logo-icon.svg";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Logo" variant="tiles">
+        <StyleGuideItem label="assets/logo/logo.svg" variant="card">
+          <Icon src={logo} variant="full-width" aria-label="Logo" />
+        </StyleGuideItem>
+        <StyleGuideItem label="assets/logo/logo.svg" variant="dark">
+          <Icon src={logo} variant="full-width" aria-label="Logo" />
+        </StyleGuideItem>
+        <StyleGuideItem label="assets/logo/logo-icon.svg" variant="card">
+          <Icon src={logoIcon} variant="large" aria-label="Logo mark" />
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Site icons" variant="tiles">
+        <StyleGuideItem label="favicon.svg" variant="card">
+          <Img
+            src="/favicon.svg"
+            alt="Favicon"
+            width={32}
+            height={32}
+            variant="densities"
+            transparent
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label="favicon.ico · 32 × 32" variant="card">
+          <Img
+            src="/favicon.ico"
+            alt="Legacy favicon"
+            width={32}
+            height={32}
+            variant="densities"
+            transparent
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label="apple-touch-icon.png · 180 × 180" variant="card">
+          <Img
+            src="/apple-touch-icon.png"
+            alt="Webclip"
+            width={180}
+            height={180}
+            variant="densities"
+            transparent
+            class="radius-large"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label="og-image.jpg · 1200 × 630" variant="card">
+          <Img
+            src="/og-image.jpg"
+            alt="Social sharing image"
+            width={1200}
+            height={630}
+            class="radius-small"
+          />
+        </StyleGuideItem>
+      </StyleGuideGroup>
+    </>
+  )
+}

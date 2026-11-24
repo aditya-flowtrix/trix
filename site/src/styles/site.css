@@ -347,6 +347,15 @@
     border-radius: var(--radius-main);
     overflow: hidden;
 
+    /* On a phone, sections get the screen's full width, as on their own page. */
+    &:has(> [data-stage="sections"]) {
+      @media (width < 48rem) {
+        margin-inline: calc(var(--site-margin) * -1);
+        border-inline: 0;
+        border-radius: 0;
+      }
+    }
+
     > :is(pre.astro-code, .code_wrap) {
       border: 0;
       border-top: var(--border-width) solid var(--border);
@@ -367,6 +376,17 @@
       flex-direction: column;
       align-items: stretch;
       gap: var(--space-4);
+    }
+    /* Whole style guide sections, spaced as on the page. */
+    &[data-stage="sections"] {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-8);
+      padding-inline: var(--site-margin);
+
+      @media (width >= 48rem) {
+        padding-inline: var(--space-6);
+      }
     }
     &[data-stage="block"] {
       display: block;
