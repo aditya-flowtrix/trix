@@ -63,8 +63,9 @@ environment: `SANITY_IMPORT_TOKEN`, `SANITY_READ_TOKEN`.
    IDs come from Webflow's, so every run updates instead of duplicating.
    Every image and file is uploaded with its alt text. Rich text becomes
    Portable Text with a rule for each Webflow pattern — image figures with
-   captions, embeds with their scripts, videos, tables, code, links to other
-   items. It stops if any image, embed or code block would be lost.
+   their captions and links, embeds with their scripts, videos, tables, code,
+   links to other items. It stops if any image, image link, embed or code
+   block would be lost.
 
 3. **Validate, then import into staging**, with the CMS's webhooks off.
 
@@ -79,6 +80,10 @@ environment: `SANITY_IMPORT_TOKEN`, `SANITY_READ_TOKEN`.
    ```bash
    node scripts/cms/convert.ts sanity --input .trix/cms/webflow.json --check <project id>/staging
    ```
+
+   It also lists what Webflow lacked too — items with no SEO description,
+   images with no alt text — as warnings. Fill them in before launch, in the
+   Studio or with Sanity's Content Agent on staging.
 
 5. **Connect the site.** Each collection reads the dataset at build; Sanity's
    image CDN is allowed, so Astro optimises its images.
@@ -107,6 +112,11 @@ environment: `SANITY_IMPORT_TOKEN`, `SANITY_READ_TOKEN`.
 A published item that refers to a draft is the one validation error by
 design: the reference stays weak until the draft is published, and the
 converter names each one.
+
+Styling with no place in Portable Text — a class or an inline style on text,
+like `<span class="highlight">` — is listed when converting, with how often
+each appears. The text arrives; the styling needs a rule or the owner's
+decision to let it go.
 
 ## Other headless CMSs
 

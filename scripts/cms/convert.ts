@@ -61,9 +61,10 @@ if (check) {
   );
   const rows = checks.map(
     (c) =>
-      `| ${c.ok ? "ok" : "FAIL"} | ${c.what} | ${c.detail.replace(/\|/g, "\\|")} |`,
+      `| ${c.ok ? "ok" : c.warn ? "warn" : "FAIL"} | ${c.what} | ${c.detail.replace(/\|/g, "\\|")} |`,
   );
-  const failures = checks.filter((c) => !c.ok).length;
+  const failures = checks.filter((c) => !c.ok && !c.warn).length;
+  const gaps = checks.filter((c) => !c.ok && c.warn).length;
   output(
     "cms/sanity-check.md",
     [
@@ -76,9 +77,12 @@ if (check) {
   );
   console.log(rows.join("\n"));
   console.log(
-    failures
+    (failures
       ? `\n${failures} failure(s) — see .trix/cms/sanity-check.md`
-      : "\nAll checks pass.",
+      : "\nAll checks pass.") +
+      (gaps
+        ? `\n${gaps} warning(s): content the source lacked too. Fill it in the CMS before launch — editors, or Sanity's Content Agent on staging.`
+        : ""),
   );
   process.exit(failures ? 1 : 0);
 }

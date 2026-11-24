@@ -19,6 +19,7 @@ import {
   BLOCK_CONTENT,
   countBlocks,
   countPatterns,
+  droppedStyling,
   htmlToBlocks,
   type Block,
 } from "./html-to-portable-text.ts";
@@ -173,7 +174,10 @@ export function toSanity(
         ...(x.alt ? { alt: x.alt } : {}),
       };
     };
+    const styling = new Map<string, number>();
     const richText = (html: string, where: string) => {
+      for (const s of droppedStyling(html))
+        styling.set(s, (styling.get(s) ?? 0) + 1);
       const blocks = htmlToBlocks(html, { link: internal }).flatMap(
         (b): Block[] => {
           if (b._type === "embed" && /<script\b/i.test(String(b.html)))
@@ -205,7 +209,7 @@ export function toSanity(
       const out = countBlocks(blocks);
       count.patternsIn += into.images + into.embeds + into.code;
       count.blocksOut += out.images + out.embeds + out.code;
-      for (const k of ["images", "embeds", "code"] as const)
+      for (const k of ["images", "links", "embeds", "code"] as const)
         if (into[k] !== out[k])
           lost.push(
             `${where}: ${into[k]} ${k} in the HTML, ${out[k]} converted`,
@@ -286,6 +290,12 @@ export function toSanity(
       count.docs++;
       docs.push(doc);
     }
+    if (styling.size)
+      warnings.push(
+        `${c.folder}: rich-text styling Portable Text has no place for, so the text stays and the styling goes — ` +
+          [...styling].map(([s, n]) => `${s} ×${n}`).join(", ") +
+          ". Give each one a rule in scripts/cms/html-to-portable-text.ts (a decorator, a block style), or let it go.",
+      );
   }
   for (const id of draftRefs)
     warnings.push(
@@ -444,6 +454,12 @@ const blockContent = defineType({
       fields: [
         defineField({ name: "alt", type: "string" }),
         defineField({ name: "caption", type: "string" }),
+        defineField({
+          name: "link",
+          type: "url",
+          validation: (r) =>
+            r.uri({ allowRelative: true, scheme: ["http", "https", "mailto", "tel"] }),
+        }),
       ],
     }),
     // Raw HTML, rendered as it is: give it only to editors who need it.
