@@ -11,7 +11,10 @@ import { COLOR_MODE, SITE_LOCALE } from "@/consts.ts";
 import type { Theme } from "@/styles/generated/tokens.ts";
 
 type Props = SeoProps & {
-  /** Theme for the whole page. `inherit` leaves the root defaults in place. */
+  /**
+   * Theme for the whole page. `inherit` leaves the root defaults in place and
+   * lets `ThemeToggle` switch the page; any other theme pins it.
+   */
   theme?: "inherit" | Theme;
   /**
    * Fix the nav over the page rather than letting it stick in flow, so the

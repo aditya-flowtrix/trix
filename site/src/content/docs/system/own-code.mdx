@@ -1,0 +1,98 @@
+---
+title: Our own code
+description: No Finsweet, jQuery, Swiper or GSAP. How Trix builds tabs, filters, sliders and motion with HTML, CSS, the build and its own scripts — and the check that keeps it that way.
+order: 11
+---
+
+Everything a Trix site does is its own code. There is no Finsweet Attributes,
+jQuery, Swiper, Splide, GSAP, Lenis, Alpine, AOS, Isotope or MixItUp, and no
+script loaded from another site. A library is code nobody on the project
+wrote, sized for every site but this one, updated on someone else's schedule
+and loaded before the page can answer a click. The platform now does most of
+what those libraries were made for.
+
+## The order to reach for
+
+Use the first that holds the behaviour:
+
+| Reach for                        | For                                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **HTML**                         | a modal (`<dialog>`), an accordion (`<details name>`), a menu or tooltip (`popover`), a filter (`<form method="get">`)     |
+| **CSS**                          | state (`:has()`), a slider (scroll snap), reveals and parallax (scroll-driven animations), pinning (`position: sticky`)    |
+| **The build**                    | filtering, sorting, pagination and tables of contents of your content, done by Astro so search engines read the result     |
+| **The component's own `script`** | what's left: TypeScript set up with `mount`, importing only the framework's utilities, timelines on the Web Animations API |
+
+Use what is Baseline widely available — supported by every major browser for
+long enough. Anything newer goes behind `@supports` or feature detection, and
+the page still works without it. [The browser tests](/docs/guides/testing) run
+in Chrome, Firefox, WebKit and Safari.
+
+## Production code
+
+A component's script is held to the same standard as the framework's:
+
+- **Accessible first.** The right element or role, `aria-*` state kept
+  current, focus moved and returned, every control reachable by keyboard.
+- **The content is in the HTML.** Without JavaScript the page still reads and
+  every link works. Filter, sort and tab state lives in the URL
+  (`?category=design`), so a link can be shared, reloaded and gone back to.
+- **Smooth.** Motion animates `transform` and `opacity` only and respects
+  `prefers-reduced-motion`. Layout is read before it is written.
+- **Clean.** `mount`'s `signal` goes to every listener, observer and timer the
+  script adds outside its element, so nothing leaks between pages.
+
+## A filter, the Trix way
+
+[`Filter`](/docs/components/filter) is built like this. The list is rendered
+at build, so every item is in the page and search engines read them all. The
+controls are a form. Its script filters, sorts and pages in place, keeps the
+choice in the URL, and announces the count. It does everything Finsweet's List
+Filter, Sort and Load do, with no library.
+
+A list too long to send whole gets a page per category instead, made with
+`getStaticPaths`: filtered at build, with nothing to run in the browser.
+
+## Coming from Finsweet, Swiper or GSAP
+
+`/trix-migrate` rebuilds a source site's libraries rather than installing them:
+
+| On the old site                                | In Trix                                                                                                                                            |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finsweet CMS Filter, Sort                      | [`Filter`](/docs/components/filter)                                                                                                                |
+| Finsweet CMS Load More, pagination             | `Filter`'s `paging`; a list too long to send whole, `paginate()` and real `/blog/2` pages                                                          |
+| Finsweet CMS Nest, Combine                     | references between content collections, joined at build                                                                                            |
+| Finsweet Tabs, Accordion, Modal, custom select | [`Tabs`](/docs/components/tabs), [`Accordion`](/docs/components/accordion), [`Modal`](/docs/components/modal), [`Select`](/docs/components/select) |
+| Swiper, Splide, Slick                          | [`Slider`](/docs/components/slider)                                                                                                                |
+| GSAP, ScrollTrigger                            | scroll-driven animations, `position: sticky`, the Web Animations API                                                                               |
+| Lenis, Locomotive                              | native scrolling                                                                                                                                   |
+| jQuery                                         | the same logic in plain TypeScript                                                                                                                 |
+
+## Services and exceptions
+
+**Services are not behaviour.** Analytics, a tag manager, chat, a video or map
+embed and a form backend are services the owner chose. They load through
+[cookie consent](/docs/guides/cookie-consent) and the
+[Content Security Policy](/docs/guides/deploying#a-content-security-policy), never as a
+`<script>` in a component.
+
+**An exception is the owner's decision.** Something that can't reasonably be
+built — a WebGL scene, a Lottie animation the design ships — is allowed by
+name in `package.json`, with the reason:
+
+```json
+"trix": {
+  "allow": { "three": "3D hero on /product — approved by the client, 2026-11-24" }
+}
+```
+
+It is installed from npm, never loaded from a CDN, imported only by the
+component that needs it, and written into `PROJECT.md` → Decisions. The
+packages Trix itself uses need no entry: Astro, `@phosphor-icons/core` (icons
+inlined at build) and `@c15t/*` (the consent engine).
+
+## The check
+
+`npm run check` fails when anything in `src/` imports a package Trix doesn't
+use and `trix.allow` doesn't name, loads a `<script src>` from another site, or
+keeps a Finsweet `fs-` attribute. CI runs it on every push, so a library can't
+arrive by accident.

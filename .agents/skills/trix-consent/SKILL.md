@@ -42,6 +42,25 @@ React and none of its stock UI.
 Each question says what it decides and offers the default. Write each answer
 into `PROJECT.md` → **Consent** as it is given, with the date.
 
+Two questions come first, because they decide whether the rest applies:
+
+- **Does the site need consent?** Only if it loads something optional:
+  analytics, ads, a chat, an embed that sets cookies. A site with none needs
+  no banner. Record that under **Consent**, and stop.
+- **Which tool?** The default is c15t, which this skill sets up. It is open
+  source, the banner is the site's own component, and records are kept where
+  the owner chooses. If the owner or their legal team requires another
+  platform (Cookiebot, OneTrust, Usercentrics…), use theirs. It is a service
+  they chose:
+  - its script goes in `BaseHead` as the vendor documents;
+  - its host goes in `package.json` → `trix.allow` with the reason
+    (`"consent.cookiebot.com": "the client's required consent platform"`);
+  - the decision goes under **Decisions**.
+
+  The rest of this skill is c15t's. With another platform, still list what
+  the site loads (question 3) and confirm with the owner that their platform
+  holds each one.
+
 1. **Where the visitors are** decides the region rules. Default:
    - EEA, UK and Gibraltar are opt-in: nothing optional runs until the visitor
      accepts.

@@ -1,0 +1,917 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Button from "@/components/Button.astro";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Where the controls sit. */
+  variant?: "top" | "side";
+  /** An item shows when it meets every chosen field, or any one. */
+  match?: "all" | "any";
+  /** When the results update: as the visitor types and picks, or when they press Apply. */
+  on?: "input" | "submit";
+  /** How a long list is split. */
+  paging?: "none" | "more" | "infinite" | "pages";
+  /** Items per page. Defaults to `12`.
+   *
+   * @int
+   * @min 1 */
+  pageSize?: number;
+  /** Page numbers either side of the current one. Defaults to `1`.
+   *
+   * @int
+   * @min 0 */
+  siblings?: number;
+  /** Page numbers at each end. Defaults to `1`.
+   *
+   * @int
+   * @min 1 */
+  boundary?: number;
+  /** Keep the choice in the URL, so a shared or reloaded link shows the same results. Defaults to `true`. */
+  url?: boolean;
+  /** How results come in. */
+  animation?: "fade" | "slide" | "none";
+  /** The result count: `{results}` matching, `{total}` in all, `{shown}` on screen, `{from}` and `{to}` on this page. */
+  countText?: string;
+  /** Clear-all button text. Defaults to `Clear all`. */
+  clearText?: string;
+  /** Load-more button text. Defaults to `Load more`. */
+  moreText?: string;
+  /** Apply button text, when `on` is `submit`. Defaults to `Apply`. */
+  applyText?: string;
+};
+
+const {
+  render = true,
+  variant = "top",
+  match = "all",
+  on = "input",
+  paging = "none",
+  pageSize = 12,
+  siblings = 1,
+  boundary = 1,
+  url = true,
+  animation = "fade",
+  countText,
+  clearText = "Clear all",
+  moreText = "Load more",
+  applyText = "Apply",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const size = Math.max(1, Math.floor(pageSize));
+const config = {
+  match,
+  on,
+  paging,
+  pageSize: size,
+  siblings,
+  boundary,
+  url,
+  countText:
+    countText ??
+    (paging === "pages"
+      ? "Showing {from}–{to} of {results}"
+      : paging === "none"
+        ? "Showing {results} of {total}"
+        : "Showing {shown} of {results}"),
+};
+
+// Items past the first page are marked at build, so the page doesn't show
+// them all and then shrink once the script runs.
+// ponytail: reads FilterItem's own attribute in the rendered slot.
+let n = 0;
+const results = (await slotContent(Astro.slots)).replace(
+  / data-filter-item=/g,
+  (attr) =>
+    paging !== "none" && ++n > size ? ` data-filter-later${attr}` : attr,
+);
+---
+
+{
+  render && (
+    <div
+      class:list={[
+        "filter_wrap",
+        variant !== "top" && variant,
+        animation !== "none" && animation,
+        className,
+      ]}
+      data-filter={JSON.stringify(config)}
+      {...rest}
+    >
+      <search class="filter_controls">
+        <form class="filter_form" method="get">
+          <slot name="controls" />
+          {on === "submit" && (
+            <Button class="filter_apply" type="submit">
+              {applyText}
+            </Button>
+          )}
+        </form>
+      </search>
+
+      <div class="filter_main">
+        <div class="filter_bar">
+          <p class="filter_count text-style-main" role="status" />
+          <ul class="filter_tags" aria-label="Active filters" />
+          <button class="filter_clear text-style-small" type="button" hidden>
+            {clearText}
+          </button>
+        </div>
+
+        <div class="filter_results" tabindex="-1">
+          <Fragment set:html={results} />
+        </div>
+
+        <div class="filter_empty text-style-main" hidden>
+          <slot name="empty">
+            Nothing matches. Remove a filter or try another search.
+          </slot>
+        </div>
+
+        {(paging === "more" || paging === "infinite") && (
+          <div class="filter_paging" hidden>
+            <Button emphasis="secondary" data-filter-more>
+              {moreText}
+            </Button>
+          </div>
+        )}
+
+        {paging === "pages" && (
+          <nav class="filter_paging" aria-label="Pages" hidden>
+            <Button
+              variant="arrow"
+              emphasis="secondary"
+              direction="back"
+              label="Previous page"
+              data-filter-step="-1"
+            />
+            <ol class="filter_pages" />
+            <Button
+              variant="arrow"
+              emphasis="secondary"
+              label="Next page"
+              data-filter-step="1"
+            />
+          </nav>
+        )}
+      </div>
+    </div>
+  )
+}
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+  import {
+    compareBy,
+    matches,
+    pageRange,
+    parseSort,
+    type Condition,
+    type Fields,
+    type Operator,
+  } from "@/utils/filter.ts";
+
+  type Config = {
+    match: "all" | "any";
+    on: "input" | "submit";
+    paging: "none" | "more" | "infinite" | "pages";
+    pageSize: number;
+    siblings: number;
+    boundary: number;
+    url: boolean;
+    countText: string;
+  };
+  type Control = {
+    el: HTMLElement;
+    kind: "checkbox" | "radio" | "select" | "search" | "range" | "sort";
+    key: string;
+    label: string;
+    fields: string[];
+    op: Operator;
+    match: "any" | "all";
+    fuzzy?: boolean;
+    highlight?: boolean;
+    counts?: boolean;
+    empty?: "disable" | "hide";
+    type?: "number" | "date";
+  };
+  type Row = { el: HTMLElement; index: number; fields: Fields; text: string };
+  type Choice = HTMLInputElement | HTMLOptionElement;
+
+  // Typing waits this long for the next key before the results change.
+  const TYPING = 250;
+  // Newly shown items come in one after another, at most this many deep.
+  const STAGGER = 8;
+  const HIGHLIGHT = "filter-match";
+
+  mount(".filter_wrap", (wrap, signal) => {
+    // Set first: if anything below fails, every item stays on show.
+    wrap.classList.add("is-ready");
+
+    const config: Config = JSON.parse(wrap.dataset.filter ?? "{}");
+    const form = wrap.querySelector<HTMLFormElement>(".filter_form")!;
+    const results = wrap.querySelector<HTMLElement>(".filter_results")!;
+    const status = wrap.querySelector<HTMLElement>(".filter_count")!;
+    const tags = wrap.querySelector<HTMLElement>(".filter_tags")!;
+    const clearAll = wrap.querySelector<HTMLButtonElement>(".filter_clear")!;
+    const empty = wrap.querySelector<HTMLElement>(".filter_empty")!;
+    const paging = wrap.querySelector<HTMLElement>(".filter_paging");
+    const more = wrap.querySelector<HTMLButtonElement>("[data-filter-more]");
+    const numbers = wrap.querySelector<HTMLElement>(".filter_pages");
+    const steps = [
+      ...wrap.querySelectorAll<HTMLButtonElement>("[data-filter-step]"),
+    ];
+    const locale = document.documentElement.lang || undefined;
+    const prefix = wrap.id ? `${wrap.id}-` : "";
+
+    const rows: Row[] = [
+      ...results.querySelectorAll<HTMLElement>("[data-filter-item]"),
+    ].map((el, index) => ({
+      el,
+      index,
+      fields: JSON.parse(el.dataset.filterItem || "{}"),
+      text: el.textContent ?? "",
+    }));
+    const controls: Control[] = [
+      ...form.querySelectorAll<HTMLElement>("[data-filter-control]"),
+    ].map((el) => ({ el, ...JSON.parse(el.dataset.filterControl!) }));
+    const named = (name: string) =>
+      [
+        ...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+          "input, select",
+        ),
+      ].filter((el) => el.name === name);
+    const choicesOf = (c: Control): Choice[] =>
+      named(c.key).flatMap((el): Choice[] =>
+        el instanceof HTMLSelectElement
+          ? // Not the select's hidden prompt.
+            [...el.options].filter((o) => !(o.hidden && o.value === ""))
+          : el.type === "checkbox" || el.type === "radio"
+            ? [el]
+            : [],
+      );
+
+    // Each option's own words, for its tag and its count.
+    const labelOf = new Map<string, string>();
+    for (const c of controls)
+      for (const choice of choicesOf(c)) {
+        const text =
+          choice instanceof HTMLOptionElement
+            ? choice.text
+            : (choice.closest("label")?.querySelector(".form-choice_text")
+                ?.textContent ?? choice.value);
+        if (choice instanceof HTMLOptionElement) choice.dataset.label = text;
+        labelOf.set(`${c.key}\n${choice.value}`, text.trim());
+      }
+
+    const number = new Intl.NumberFormat(locale);
+    const date = new Intl.DateTimeFormat(locale, {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    });
+    const format = (c: Control, value: string) =>
+      c.type === "date" && !Number.isNaN(Date.parse(value))
+        ? date.format(Date.parse(value))
+        : c.type === "number" && value !== "" && !Number.isNaN(Number(value))
+          ? number.format(Number(value))
+          : value;
+
+    /** What the form says now, as conditions, each with its tag. */
+    const read = () => {
+      const data = new FormData(form);
+      const conditions: (Condition & { control: Control })[] = [];
+      for (const c of controls) {
+        if (c.kind === "sort") continue;
+        const base = { control: c, fields: c.fields, match: c.match };
+        if (c.kind === "range") {
+          for (const [end, op] of [
+            ["from", "greater-equal"],
+            ["to", "less-equal"],
+          ] as const) {
+            const value = String(data.get(`${c.key}-${end}`) ?? "").trim();
+            if (value)
+              conditions.push({
+                ...base,
+                key: `${c.key}-${end}`,
+                op,
+                values: [value],
+              });
+          }
+          continue;
+        }
+        const values = data
+          .getAll(c.key)
+          .map((v) => String(v).trim())
+          .filter(Boolean);
+        if (values.length)
+          conditions.push({
+            ...base,
+            key: c.key,
+            op: c.op,
+            values,
+            fuzzy: c.fuzzy,
+          });
+      }
+      return { conditions, sort: String(data.get("sort") ?? "") };
+    };
+
+    const tagText = (cond: Condition & { control: Control }, value: string) => {
+      const c = cond.control;
+      if (c.kind === "search") return `${c.label}: “${value}”`;
+      if (c.kind === "range")
+        return `${c.label} ${cond.op === "greater-equal" ? "≥" : "≤"} ${format(c, value)}`;
+      return `${c.label}: ${labelOf.get(`${c.key}\n${value}`) ?? value}`;
+    };
+
+    const clear = (name: string, value?: string) => {
+      for (const el of named(name)) {
+        if (el instanceof HTMLSelectElement) el.value = "";
+        else if (el.type === "checkbox")
+          el.checked &&= value !== undefined && el.value !== value;
+        else if (el.type === "radio") el.checked = el.value === "";
+        else el.value = "";
+      }
+    };
+    const clearControl = (c: Control) =>
+      c.kind === "range"
+        ? [`${c.key}-from`, `${c.key}-to`].forEach((name) => clear(name))
+        : clear(c.key);
+
+    // The URL: this filter's own keys, prefixed with its id if it has one.
+    const names = new Set(
+      [...form.querySelectorAll<HTMLInputElement>("[name]")].map(
+        (el) => el.name,
+      ),
+    );
+    const sortDefault =
+      named("sort")[0] instanceof HTMLSelectElement
+        ? (named("sort")[0] as HTMLSelectElement).value
+        : "";
+    const remember = (page: number) => {
+      if (!config.url) return;
+      const url = new URL(location.href);
+      for (const name of [...names, "page"])
+        url.searchParams.delete(prefix + name);
+      for (const [name, value] of new FormData(form)) {
+        if (value === "" || (name === "sort" && value === sortDefault))
+          continue;
+        url.searchParams.append(prefix + name, String(value));
+      }
+      if (page > 1) url.searchParams.set(`${prefix}page`, String(page));
+      if (url.href !== location.href)
+        history.replaceState(history.state, "", url);
+    };
+
+    let page = 1;
+    if (config.url) {
+      const params = new URL(location.href).searchParams;
+      for (const name of names) {
+        if (!params.has(prefix + name)) continue;
+        const asked = params.getAll(prefix + name);
+        for (const el of named(name)) {
+          if (
+            el instanceof HTMLInputElement &&
+            /^(checkbox|radio)$/.test(el.type)
+          )
+            el.checked = asked.includes(el.value);
+          else if (
+            !(el instanceof HTMLSelectElement) ||
+            [...el.options].some((o) => o.value === asked[0])
+          )
+            el.value = asked[0];
+        }
+      }
+      page = Math.max(1, Number(params.get(`${prefix}page`)) || 1);
+    }
+
+    // Highlighting: a shared highlight every filter on the page adds its own
+    // ranges to. Where the browser has none, nothing is marked.
+    const marking = "highlights" in CSS;
+    let marked: Range[] = [];
+    const unmark = () => {
+      const shared = marking ? CSS.highlights.get(HIGHLIGHT) : undefined;
+      for (const range of marked) shared?.delete(range);
+      marked = [];
+    };
+    signal.addEventListener("abort", unmark);
+    const mark = (conditions: Condition[], shown: Row[]) => {
+      if (!marking) return;
+      unmark();
+      const terms = conditions
+        .filter((c) => controls.some((x) => x.key === c.key && x.highlight))
+        .flatMap((c) => c.values.join(" ").toLowerCase().split(/\s+/))
+        .filter((term) => term.length > 1);
+      if (!terms.length) return;
+      for (const row of shown) {
+        const walker = document.createTreeWalker(row.el, NodeFilter.SHOW_TEXT);
+        // ponytail: matches the lowercased text, so a letter whose lowercase
+        // is longer (İ) can shift a mark; normalise per node if that matters.
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          const text = node.textContent!.toLowerCase();
+          for (const term of terms)
+            for (
+              let at = text.indexOf(term);
+              at !== -1;
+              at = text.indexOf(term, at + term.length)
+            ) {
+              const range = new Range();
+              range.setStart(node, at);
+              range.setEnd(node, at + term.length);
+              marked.push(range);
+            }
+        }
+      }
+      let shared = CSS.highlights.get(HIGHLIGHT);
+      if (!shared) CSS.highlights.set(HIGHLIGHT, (shared = new Highlight()));
+      for (const range of marked) shared.add(range);
+    };
+
+    // Sorting moves the items themselves, inside whatever holds them.
+    let order: Row[] = rows;
+    let sorted = "";
+    const arrange = (sort: string) => {
+      if (sort === sorted) return;
+      sorted = sort;
+      const by = parseSort(sort);
+      order = [...rows].sort(
+        (a, b) =>
+          (by ? compareBy(by.field, by.direction, locale)(a, b) : 0) ||
+          a.index - b.index,
+      );
+      for (const row of order) row.el.parentElement?.append(row.el);
+    };
+
+    let pages = 1;
+    const update = (focus?: "results" | HTMLElement) => {
+      const { conditions, sort } = read();
+      arrange(sort);
+      const found = order.filter((row) =>
+        matches(row, conditions, config.match),
+      );
+
+      const size = config.paging === "none" ? Infinity : config.pageSize;
+      pages = Math.max(1, Math.ceil(found.length / size));
+      page = Math.min(page, pages);
+      const start = config.paging === "pages" ? (page - 1) * size : 0;
+      const end = Math.min(found.length, page * size);
+      const shown = found.slice(start, end);
+      const visible = new Set(shown);
+      let arriving = 0;
+      let first: HTMLElement | undefined;
+      for (const row of order) {
+        const show = visible.has(row);
+        if (show && row.el.hidden) {
+          row.el.style.setProperty(
+            "--_i",
+            String(Math.min(arriving++, STAGGER)),
+          );
+          first ??= row.el;
+        }
+        row.el.hidden = !show;
+      }
+
+      // Counts, and the options that would leave nothing.
+      for (const c of controls) {
+        if (!c.counts && !c.empty) continue;
+        const others = conditions.filter((x) => x.control !== c);
+        const chosen = conditions.find((x) => x.control === c)?.values ?? [];
+        for (const choice of choicesOf(c)) {
+          const values =
+            c.match === "all"
+              ? [...new Set([...chosen, choice.value])]
+              : [choice.value];
+          const all = choice.value
+            ? [
+                ...others,
+                {
+                  key: c.key,
+                  fields: c.fields,
+                  op: c.op,
+                  values,
+                  match: c.match,
+                },
+              ]
+            : others;
+          const count = rows.filter((row) =>
+            matches(row, all, config.match),
+          ).length;
+          const on =
+            choice instanceof HTMLOptionElement
+              ? choice.selected
+              : choice.checked;
+          if (choice instanceof HTMLOptionElement) {
+            const label = choice.dataset.label ?? choice.text;
+            choice.text = c.counts
+              ? `${label} (${number.format(count)})`
+              : label;
+            choice.disabled = !on && !!choice.value && count === 0 && !!c.empty;
+            choice.hidden = choice.disabled && c.empty === "hide";
+          } else {
+            const box = choice.closest("label");
+            const counter = box?.querySelector("[data-filter-count]");
+            if (counter) counter.textContent = number.format(count);
+            const none = !on && !!choice.value && count === 0;
+            choice.disabled = none && c.empty === "disable";
+            if (box) box.hidden = none && c.empty === "hide";
+          }
+        }
+      }
+
+      // The bar: the count, a tag for each choice, clear all.
+      const fill = (text: string) =>
+        text.replace(/\{(\w+)\}/g, (all, key: string) => {
+          const value = {
+            results: found.length,
+            total: rows.length,
+            shown: shown.length,
+            from: shown.length ? start + 1 : 0,
+            to: end,
+          }[key];
+          return value === undefined ? all : number.format(value);
+        });
+      empty.hidden = found.length > 0;
+      status.textContent = found.length
+        ? fill(config.countText)
+        : (empty.textContent ?? "").trim();
+      tags.replaceChildren(
+        ...conditions.flatMap((cond) =>
+          (cond.control.kind === "search"
+            ? [cond.values.join(" ")]
+            : cond.values
+          ).map((value) => {
+            const li = document.createElement("li");
+            const button = document.createElement("button");
+            const text = tagText(cond, value);
+            button.type = "button";
+            button.className = "filter_tag text-style-small";
+            button.setAttribute("aria-label", `Remove ${text}`);
+            button.append(text);
+            button.addEventListener("click", () => {
+              const at = [...tags.children].indexOf(li);
+              clear(
+                cond.key,
+                cond.control.kind === "checkbox" ? value : undefined,
+              );
+              change();
+              // Focus stays in the tags: the one that took this one's place.
+              const left = tags.querySelectorAll("button");
+              (
+                left[Math.min(at, left.length - 1)] ??
+                form.querySelector<HTMLElement>("input, select")
+              )?.focus();
+            });
+            li.append(button);
+            return li;
+          }),
+        ),
+      );
+      clearAll.hidden = conditions.length === 0;
+      for (const c of controls) {
+        const active = conditions.some((x) => x.control === c);
+        c.el.classList.toggle("is-active", active);
+        const own = c.el.querySelector<HTMLElement>(".filter-field_clear");
+        if (own) own.hidden = !active;
+      }
+
+      // Paging.
+      if (paging) paging.hidden = pages <= 1 || (!!more && end >= found.length);
+      for (const step of steps) {
+        const to = page + Number(step.dataset.filterStep);
+        step.disabled = to < 1 || to > pages;
+      }
+      numbers?.replaceChildren(
+        ...pageRange(page, pages, config.siblings, config.boundary).map((p) => {
+          const li = document.createElement("li");
+          if (p === "…") {
+            li.className = "filter_gap";
+            li.textContent = "…";
+            li.setAttribute("aria-hidden", "true");
+          } else {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "filter_page text-style-main";
+            button.dataset.page = String(p);
+            button.textContent = number.format(p);
+            button.setAttribute("aria-label", `Page ${p}`);
+            if (p === page) button.setAttribute("aria-current", "page");
+            li.append(button);
+          }
+          return li;
+        }),
+      );
+
+      mark(conditions, shown);
+      remember(page);
+
+      if (focus === "results") results.focus({ preventScroll: true });
+      else if (focus && first) {
+        first.tabIndex = -1;
+        first.focus({ preventScroll: true });
+      }
+    };
+
+    // A change to the choice starts again from the first page.
+    const change = () => {
+      wrap.dataset.changed = "";
+      page = 1;
+      update();
+    };
+
+    const goTo = (to: number) => {
+      wrap.dataset.changed = "";
+      page = Math.max(1, Math.min(to, pages));
+      update("results");
+      if (results.getBoundingClientRect().top < 0)
+        results.scrollIntoView({
+          block: "start",
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "auto"
+            : "smooth",
+        });
+    };
+
+    const loadMore = (focus: boolean) => {
+      wrap.dataset.changed = "";
+      page++;
+      update(focus ? more! : undefined);
+    };
+
+    let typing: number | undefined;
+    signal.addEventListener("abort", () => window.clearTimeout(typing));
+    form.addEventListener("input", (event) => {
+      const target = event.target as HTMLInputElement;
+      if (config.on === "submit" && target.name !== "sort") return;
+      window.clearTimeout(typing);
+      if (
+        target.type === "checkbox" ||
+        target.type === "radio" ||
+        target.tagName === "SELECT"
+      )
+        change();
+      else typing = window.setTimeout(change, TYPING);
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      window.clearTimeout(typing);
+      change();
+    });
+    clearAll.addEventListener("click", () => {
+      controls.filter((c) => c.kind !== "sort").forEach(clearControl);
+      change();
+      form.querySelector<HTMLElement>("input, select")?.focus();
+    });
+    for (const c of controls)
+      c.el
+        .querySelector(".filter-field_clear")
+        ?.addEventListener("click", () => {
+          clearControl(c);
+          change();
+          c.el.querySelector<HTMLElement>("input, select")?.focus();
+        });
+    for (const step of steps)
+      step.addEventListener("click", () =>
+        goTo(page + Number(step.dataset.filterStep)),
+      );
+    numbers?.addEventListener("click", (event) => {
+      const button = (event.target as Element).closest<HTMLElement>(
+        "[data-page]",
+      );
+      if (button) goTo(Number(button.dataset.page));
+    });
+    more?.addEventListener("click", () => loadMore(true));
+
+    // Infinite: the next page loads as the button comes near, and the button
+    // stays for anyone who reaches it by keyboard.
+    if (config.paging === "infinite" && more) {
+      const near = new IntersectionObserver(
+        (entries) => {
+          if (!entries[0].isIntersecting || paging?.hidden) return;
+          loadMore(false);
+          // Still in view after loading (short items): look again.
+          near.unobserve(more);
+          near.observe(more);
+        },
+        { rootMargin: "0px 0px 50% 0px" },
+      );
+      near.observe(more);
+      signal.addEventListener("abort", () => near.disconnect());
+    }
+
+    update();
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .filter_wrap {
+      --_stagger: 50ms;
+      display: grid;
+      gap: var(--space-6);
+      width: 100%;
+
+      &.side {
+        @media (width >= 48rem) {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+          align-items: start;
+        }
+      }
+    }
+
+    .filter_form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: start;
+      gap: var(--space-5);
+      & > .filter-field {
+        flex: 1 1 14rem;
+      }
+      .filter_wrap.side & {
+        @media (width >= 48rem) {
+          flex-direction: column;
+          align-items: stretch;
+          & > .filter-field {
+            flex: none;
+          }
+        }
+      }
+    }
+
+    .filter_apply {
+      flex: none;
+      align-self: end;
+    }
+
+    .filter_main {
+      display: grid;
+      gap: var(--space-5);
+      min-width: 0;
+    }
+
+    .filter_bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .filter_count {
+      margin-inline-end: auto;
+      color: var(--text-2);
+    }
+
+    .filter_tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: 0;
+      list-style: none;
+      &:empty {
+        display: none;
+      }
+    }
+
+    .filter_tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.4em 0.9em;
+      background-color: var(--background-2);
+      border-radius: var(--radius-round);
+      transition: background-color var(--hover-duration) var(--hover-ease);
+      &::after {
+        content: "×";
+        font-size: 1.25em;
+        line-height: 1;
+      }
+      @media (hover: hover) {
+        &:hover {
+          background-color: var(--background-3);
+        }
+      }
+    }
+
+    .filter_clear {
+      padding: 0;
+      background: none;
+      color: var(--text-2);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      @media (hover: hover) {
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+
+    .filter_results {
+      scroll-margin-top: calc(var(--nav-height) + var(--space-4));
+      &:focus {
+        outline: 0;
+      }
+    }
+
+    .filter_item:focus-visible {
+      outline: var(--focus-width) solid var(--text);
+      outline-offset: var(--focus-offset);
+    }
+
+    .filter_empty {
+      padding-block: var(--space-6);
+      color: var(--text-2);
+      text-align: center;
+    }
+
+    .filter_paging {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .filter_pages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      padding: 0;
+      list-style: none;
+    }
+
+    .filter_page,
+    .filter_gap {
+      display: grid;
+      place-items: center;
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter_page {
+      padding-inline: 0.5em;
+      background: none;
+      border: var(--border-width) solid transparent;
+      border-radius: var(--radius-round);
+      transition:
+        background-color var(--hover-duration) var(--hover-ease),
+        color var(--hover-duration) var(--hover-ease);
+      &[aria-current] {
+        background-color: var(--text);
+        color: var(--background);
+      }
+      @media (hover: hover) {
+        &:not([aria-current]):hover {
+          border-color: var(--border);
+        }
+      }
+    }
+
+    .filter_gap {
+      color: var(--text-2);
+    }
+
+    ::highlight(filter-match) {
+      background-color: var(--text);
+      color: var(--background);
+    }
+
+    /* Before the script runs, the first page only; without scripts, the
+       controls can't work, so they're not shown and every item is. */
+    @media (scripting: enabled) {
+      .filter_wrap:not(.is-ready) [data-filter-later] {
+        display: none;
+      }
+    }
+
+    @media (scripting: none) {
+      .filter_controls,
+      .filter_bar {
+        display: none;
+      }
+    }
+
+    /* Items coming in, once the visitor has changed something — not on load. */
+    .filter_wrap:is(.fade, .slide)[data-changed] .filter_item {
+      /* In only: an item leaving goes at once, so the list never holds both. */
+      transition:
+        opacity var(--open-duration) var(--open-ease),
+        translate var(--open-duration) var(--open-ease);
+      transition-delay: calc(var(--_i, 0) * var(--_stagger));
+      @starting-style {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .filter_wrap.slide[data-changed] .filter_item {
+        @starting-style {
+          translate: 0 1rem;
+        }
+      }
+    }
+  }
+</style>

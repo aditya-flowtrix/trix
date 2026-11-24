@@ -146,10 +146,72 @@ the per-page rules, migration parity and the launch handoff.
 
 ## Color mode
 
-`COLOR_MODE` in `src/consts.ts`: `light` (default), `dark`, or `auto` — follow
-the visitor's system setting, remember a `ThemeToggle` choice, applied before
-first paint. Dark mode swaps the root to the dark theme; sections with an
-explicit `theme` keep theirs.
+`COLOR_MODE` in `src/consts.ts`: `auto` (default) — follow the visitor's
+system setting, remember the `ThemeToggle` choice in the nav, applied before
+first paint — or `light` / `dark` for a site designed in one mode, which hides
+the switch. Dark mode swaps the root to the dark theme; sections with an
+explicit `theme` keep theirs, and so does a page given a `theme` through the
+layout, so a site with the switch leaves pages unset.
+
+## Behaviour: our own code
+
+Everything a page does is Trix's own code. No Finsweet Attributes, jQuery,
+Swiper, Splide, Slick, GSAP, Lenis, Alpine, AOS, Isotope, MixItUp or any other
+UI library, and no `<script src>` from another site. Use the first of these
+that holds the behaviour:
+
+1. **HTML** — `<dialog>` for a modal, `<details name>` for an accordion,
+   `popover` for a menu or tooltip, `<form method="get">` for a filter, the
+   right `<input type>`, `loading="lazy"`.
+2. **CSS** — `:has()` for state, scroll snap for a slider, scroll-driven
+   animations (`animation-timeline: view()`) for reveals and parallax,
+   `position: sticky` for pinning, `@starting-style` for entry and exit,
+   container queries, `interpolate-size` to open to `auto`.
+3. **The build** — filtering, sorting, pagination, tables of contents and
+   search indexes of content happen in Astro (`getCollection`, `paginate()`,
+   a page per category), so they work without JavaScript and search engines
+   read them.
+4. **The component's own `<script>`** — TypeScript, set up with `mount`,
+   importing only the framework's own utilities. Sequenced animation uses the
+   Web Animations API (`element.animate`), not a library. A list visitors
+   filter, search, sort or page is `Filter`, with `FilterField`s and
+   `FilterItem`s: every Finsweet List Filter, Sort and Load feature, built in.
+
+Use what is Baseline widely available. Anything newer goes behind `@supports`
+or feature detection, and the page still works without it — Trix is tested in
+Chrome, Firefox, WebKit and Safari.
+
+A script is production code:
+
+- Keyboard and screen reader first: the right element or role, `aria-*`
+  state kept current, focus moved and returned.
+- The content is in the HTML. Without JavaScript the page still reads and
+  every link works; a filter is a form that submits. Filter, sort and tab state
+  lives in the URL (`?category=design`), so it can be shared, reloaded and gone
+  back to.
+- Motion animates `transform` and `opacity` only and respects
+  `prefers-reduced-motion`. Layout is read before it is written, never
+  interleaved.
+- It cleans up: `mount`'s `signal` goes to every listener, observer and timer
+  it adds outside its own element.
+
+**Services are not behaviour.** Analytics, tag managers, chat, video and map
+embeds and form backends are services the owner chose. They load through
+consent (`/trix-consent`) and the CSP, never as a `<script>` in a component.
+
+**An exception is a decision.** Where something cannot reasonably be built —
+a WebGL scene, a Lottie file the design ships, a consent platform the client
+requires — the owner allows its package, or its script's host, in
+`package.json` → `trix.allow`, with the reason:
+`"trix": { "allow": { "three": "3D hero on /product — approved by …" } }`.
+It is installed from npm, never loaded from a CDN, imported only by the
+component that needs it, and recorded in `PROJECT.md` → Decisions. The packages
+Trix itself uses need no entry: Astro and `@astrojs/*`, `@phosphor-icons/core`
+(icons inlined at build) and `@c15t/*` (the consent engine `/trix-consent`
+installs).
+
+`npm run check` fails on any other package imported in `src/`, a `<script src>`
+from another site, and a Finsweet `fs-` attribute.
 
 ## Content Security Policy
 
@@ -162,7 +224,8 @@ origin in `astro.config.mjs` → `security.csp.scriptDirective.resources`, and
 
 `npm run check` runs, in order: the generated files are in sync with the
 tokens; the conventions below hold (media queries on breakpoint tokens, no
-undefined `var()`, no `px` lengths); `astro check`. CI runs it on every push.
+undefined `var()`, no `px` lengths, no third-party package or script —
+see [Behaviour](#behaviour-our-own-code)); `astro check`. CI runs it on every push.
 
 ## The style guide and components pages
 
@@ -227,7 +290,7 @@ exception.
   custom class. Use regular html tags when a custom class is needed.
 - When custom styles or scripts are needed for a content block, name a content block for its role and variant — `HeroBlog`, `CtaMain`,
   `HeroTeam` — and place it in `src/components/content/`.
-- Wrap the whole section only when those styles or scripts act on the section itself such as a pinned full-height scrolltrigger section. Use the same naming pattern, but place it in `src/components/section/`.
+- Wrap the whole section only when those styles or scripts act on the section itself such as a pinned full-height scroll section. Use the same naming pattern, but place it in `src/components/section/`.
 - Forward props with `ComponentProps<typeof Section>` from `astro/types` rather than restating names and types. A section component passes up a `Pick` of `render`, `theme`, `paddingTop` and `paddingBottom`, and forwards `...rest` attributes.
 - A content component passes up content and accepts utility classes through `class`, but does not pass up styling props, so text sizes hold across instances. If passing a heading's `tag` up, set its `variant` yourself: `variant` defaults to `tag`, so the size would otherwise move with the level.
 - Text identical on every page stays written in the component; text that differs per instance is a prop.

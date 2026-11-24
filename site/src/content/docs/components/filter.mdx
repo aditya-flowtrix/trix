@@ -1,0 +1,207 @@
+---
+title: Filter
+description: Filter, search, sort and page any list — a content collection or items written by hand — with counts, tags, the choice in the URL, and no library.
+order: 57
+component: interactive/Filter
+---
+
+```astro live stage="stack"
+<Filter id="docs-filter" paging="pages" pageSize={3}>
+  <Fragment slot="controls">
+    <FilterField variant="search" fields={["title"]} fuzzy highlight />
+    <FilterField
+      variant="radio"
+      field="category"
+      options={["Design", "Code"]}
+      choice="chip"
+      counts
+    />
+    <FilterField
+      variant="sort"
+      options={[
+        { value: "", label: "Featured" },
+        { value: "price-asc", label: "Price, low to high" },
+        { value: "price-desc", label: "Price, high to low" },
+      ]}
+    />
+  </Fragment>
+  <Grid medium={3}>
+    <FilterItem fields={{ title: "Type scale", category: "Design", price: 40 }}>
+      <Card eyebrow="Design" heading="Type scale" text="From 40" />
+    </FilterItem>
+    <FilterItem
+      fields={{ title: "Color tokens", category: "Design", price: 25 }}
+    >
+      <Card eyebrow="Design" heading="Color tokens" text="From 25" />
+    </FilterItem>
+    <FilterItem
+      fields={{ title: "Astro starter", category: "Code", price: 90 }}
+    >
+      <Card eyebrow="Code" heading="Astro starter" text="From 90" />
+    </FilterItem>
+    <FilterItem fields={{ title: "Form backend", category: "Code", price: 60 }}>
+      <Card eyebrow="Code" heading="Form backend" text="From 60" />
+    </FilterItem>
+    <FilterItem fields={{ title: "Icon set", category: "Design", price: 15 }}>
+      <Card eyebrow="Design" heading="Icon set" text="From 15" />
+    </FilterItem>
+  </Grid>
+</Filter>
+```
+
+Three parts. `Filter` holds the list and does the work. `FilterField`s go in
+its `controls` slot. Each item is a `FilterItem`, which carries the `fields`
+it is filtered and sorted by. Items can sit inside anything: a `Grid`, a
+`<ul>` with `tag="li"`, or your own layout.
+
+Every item is in the page, so search engines read them all, and without
+JavaScript the list shows whole and the controls step aside. The script filters
+in place. It is the component's own code, with no library (see
+[Our own code](/docs/system/own-code)).
+
+## From a content collection
+
+```astro
+---
+import { getCollection } from "astro:content";
+const posts = await getCollection("blog");
+const categories = [...new Set(posts.map((p) => p.data.category))];
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+---
+
+<Filter variant="side" paging="pages" pageSize={12}>
+  <Fragment slot="controls">
+    <FilterField variant="search" fields={["title", "summary"]} />
+    <FilterField field="category" options={categories} counts empty="hide" />
+    <FilterField field="tags" options={tags} match="all" choice="chip" />
+    <FilterField variant="range" field="date" type="date" />
+    <FilterField
+      variant="sort"
+      options={[
+        { value: "date-desc", label: "Newest" },
+        { value: "title-asc", label: "A to Z" },
+      ]}
+    />
+  </Fragment>
+  <Grid medium={3}>
+    {
+      posts.map((post) => (
+        <FilterItem
+          fields={{
+            title: post.data.title,
+            summary: post.data.summary,
+            category: post.data.category,
+            tags: post.data.tags,
+            date: post.data.date,
+          }}
+        >
+          <Card heading={post.data.title} buttonHref={`/blog/${post.id}`} />
+        </FilterItem>
+      ))
+    }
+  </Grid>
+  <p slot="empty">No posts match. Try fewer filters.</p>
+</Filter>
+```
+
+A field's value is text, a number, a date, `true`, or a list of them, like
+tags. Dates compare as dates and numbers as numbers. Text matches whatever the
+case or accents: `cafe` finds `Café`.
+
+## The controls
+
+| `variant`  | Is                                                                          |
+| ---------- | --------------------------------------------------------------------------- |
+| `checkbox` | any number of options; `choice="chip"` or `"toggle"` for another look       |
+| `radio`    | one option, with an "All" first (`allLabel`)                                |
+| `select`   | one option from a list, "All" first                                         |
+| `search`   | the words typed, in `fields` or the item's whole text; `fuzzy`, `highlight` |
+| `range`    | a lower and an upper bound, `type="number"` or `"date"`                     |
+| `sort`     | the order: `field-asc` or `field-desc`; `""` keeps the page's order         |
+
+A single checkbox with `choice="toggle"` is an on/off switch:
+`<FilterField field="featured" options={[{ value: "true", label: "Featured only" }]} choice="toggle" />`.
+
+## How items are matched
+
+`operator` sets how a checkbox, radio or select compares an item's field with
+the option chosen. The default is `equal`; search uses `contain`.
+
+| `operator`                                       | An item matches when its field                  |
+| ------------------------------------------------ | ----------------------------------------------- |
+| `equal`, `not-equal`                             | is, or isn't, the option                        |
+| `contain`, `not-contain`                         | has, or hasn't, the words in it                 |
+| `exist`, `not-exist`                             | has any value, or none: "Has video", "No price" |
+| `greater`, `greater-equal`, `less`, `less-equal` | compares as a number or date: "Rating 4+"       |
+
+With several options checked, an item meets **any** of them; `match="all"` on
+the field asks for every one (posts tagged both `astro` and `css`). Across
+fields, an item must meet **all** of them; `match="any"` on the `Filter` shows
+items that meet any one.
+
+`counts` shows beside each option how many results it would leave. `empty`
+says what an option that would leave none does: `show` it, `disable` it, or
+`hide` it.
+
+## Paging
+
+| `paging`   | Shows                                                                         |
+| ---------- | ----------------------------------------------------------------------------- |
+| `none`     | every result                                                                  |
+| `more`     | `pageSize` results, then a "Load more" button adds the next page              |
+| `infinite` | the same, loading as the button comes near; the button stays for the keyboard |
+| `pages`    | numbered pages with previous and next; `siblings` and `boundary` set how many |
+
+Only the first page is on show before the script runs, so the list never
+loads long and then jumps short. After a page change, focus moves to the
+results; after "Load more", to the first new item.
+
+## The bar, and the URL
+
+Above the results, the count is announced to screen readers as it changes.
+`countText` sets its words: `{results}` matching, `{total}` in all, `{shown}`
+on screen, `{from}` and `{to}` on this page. Each choice gets a tag that
+removes it, and "Clear all" clears every choice but the sort. The `empty` slot
+shows when nothing matches.
+
+The choice is kept in the URL — `?category=design&sort=date-desc&page=2` — so
+a shared, reloaded or bookmarked link opens the same results. A `Filter` with
+an `id` prefixes its keys (`?journal-category=design`), so two on one page
+don't share. `url={false}` keeps the URL as it is.
+
+`on="submit"` waits for an Apply button instead of updating as the visitor
+types and picks. `animation` brings results in with a `fade` (default), a
+`slide` or `none`, one after another; reduced motion keeps only the fade.
+
+## Coming from Finsweet
+
+Everything Finsweet's List Filter, Sort and Load do on a Webflow page:
+
+| Finsweet                                        | Trix                                                           |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| the list and its items                          | `Filter` and `FilterItem`                                      |
+| fields and their values                         | `fields` on the item; `field` and `options` on the control     |
+| checkbox, radio, select, text and range filters | `FilterField` `variant`                                        |
+| operators; field match; conditions match        | `operator`; `match` on the field; `match` on the `Filter`      |
+| fuzzy search, highlighting                      | `fuzzy`, `highlight`                                           |
+| facet counts, empty facets                      | `counts`, `empty`                                              |
+| results, items and visible counts               | `countText`                                                    |
+| tags, clear buttons, the empty state            | the bar's tags and Clear all, `clear` on a field, `empty` slot |
+| filter on input or submit, debounce             | `on`                                                           |
+| the query in the URL                            | `url`, and `id` for a prefix                                   |
+| sort by a field, ascending or descending        | `variant="sort"`                                               |
+| load more, infinite, pagination, render all     | `paging="more"`, `"infinite"`, `"pages"`, `"none"`             |
+| page siblings and boundary                      | `siblings`, `boundary`                                         |
+| loading Webflow's next pages past 100 items     | nothing to do: Astro renders the whole collection              |
+
+## Filter props
+
+<Props of="interactive/Filter" />
+
+## FilterField props
+
+<Props of="interactive/FilterField" />
+
+## FilterItem props
+
+<Props of="interactive/FilterItem" />

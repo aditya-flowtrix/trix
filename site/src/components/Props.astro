@@ -1,5 +1,5 @@
 ---
-import { parseProps, type Prop } from "../../../scripts/props.ts";
+import { components, docHtml, propsOf, valuesOf } from "~/props.ts";
 
 interface Props {
   /** The component's file under src/components, without `.astro`: `Button`, `wrapper/Section`. */
@@ -8,63 +8,9 @@ interface Props {
 
 const { of } = Astro.props;
 
-// Read from the source at build, so the table is the API as it is today.
-const sources = import.meta.glob<string>("@/components/**/*.astro", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-});
-const tokenTypes = Object.values(
-  import.meta.glob<string>("@/styles/generated/tokens.ts", {
-    query: "?raw",
-    import: "default",
-    eager: true,
-  }),
-)[0];
-const file = Object.keys(sources).find((path) => path.endsWith(`/${of}.astro`));
-if (!file)
-  throw new Error(`<Props of="${of}">: no src/components/**/${of}.astro`);
-const source = sources[file];
-const { props } = parseProps(source);
-
-// Named unions — the component's own and the token scales — spelled out.
-const aliases = new Map<string, string>();
-for (const text of [tokenTypes, ...Object.values(sources)])
-  for (const m of text.matchAll(
-    /^(?:export )?type (\w+) =\s*((?:\|?\s*(?:"[^"]*"|[A-Z]\w*)\s*)+);/gm,
-  ))
-    if (!aliases.has(m[1]))
-      aliases.set(
-        m[1],
-        m[2]
-          .replace(/\s+/g, " ")
-          .replace(/^\|\s*/, "")
-          .trim(),
-      );
-// Twice, for a union of unions: `HeadingStyle = TextStyle | "inherit"`.
-const expand = (t: string) =>
-  t
-    .replace(/Exclude<(\w+),\s*("[^"]*")>/g, (_, from: string, drop: string) =>
-      (aliases.get(from) ?? from)
-        .split(/\s*\|\s*/)
-        .filter((v) => v !== drop)
-        .join(" | "),
-    )
-    .replace(/\b[A-Z]\w*\b/g, (name) => aliases.get(name) ?? name);
-const typeOf = (p: Prop) =>
-  [
-    ...new Set(p.types.flatMap((t) => expand(expand(t)).split(/\s*\|\s*/))),
-  ].join(" | ");
-
-const escape = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-// Doc comments are written in Markdown's inline code and bullets.
-const docHtml = (doc: string | null) =>
-  doc
-    ? escape(doc)
-        .replace(/`([^`]+)`/g, "<code>$1</code>")
-        .replace(/ - (?=<code>)/g, "<br>")
-    : "";
+if (!(of in components))
+  throw new Error(`<Props of="${of}">: no src/components/${of}.astro`);
+const props = propsOf(of);
 
 // The universal two last, as every component declares them.
 const rows = [
@@ -106,7 +52,7 @@ const rows = [
                 {!p.optional && <span class="props_required">required</span>}
               </th>
               <td>
-                <code class="props_type">{typeOf(p)}</code>
+                <code class="props_type">{valuesOf(p).join(" | ")}</code>
               </td>
               <td>{p.default ? <code>{p.default}</code> : "—"}</td>
               <td set:html={docHtml(p.doc)} />

@@ -16,7 +16,7 @@ export const NOINDEX_ROUTES: string[] = ["/404", "/style-guide", "/components"];
  * visitor's system setting, remembers a `ThemeToggle` choice, and adds a
  * small inline script to apply it before first paint.
  */
-export const COLOR_MODE: "light" | "dark" | "auto" = "light";
+export const COLOR_MODE: "light" | "dark" | "auto" = "auto";
 /**
  * A Content Security Policy on every page: scripts and stylesheets only from
  * this site. Turn it on once each third-party script the site loads — a tag
