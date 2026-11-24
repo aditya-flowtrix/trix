@@ -17,6 +17,12 @@
 - `write.ts` keeps an earlier run's redirects. A second run — another locale,
   another CSV — used to replace the whole redirect block with its own.
 - The launch checklists lower the DNS TTL a day before the switch.
+- Pages in other languages: `lang` and `alternates` on `BaseLayout` write
+  `<html lang>`, `og:locale` and `og:locale:alternate`, and an `hreflang`
+  link for each language, the page itself and `x-default`. Every imported
+  item keeps its CMS id as `cmsId` — the same in each Webflow locale — so a
+  locale's page finds its other languages; `--scaffold` gives a locale's
+  page its `lang`.
 
 - The style guide is on the docs site. A new page,
   [Style guide](https://trix.flowtrix.workers.dev/docs/system/style-guide),

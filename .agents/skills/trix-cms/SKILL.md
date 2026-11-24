@@ -66,7 +66,9 @@ From the platform, not the pages:
   the schemas.
 - **Locales** — a multi-language CMS is one import per locale
   (`import.ts webflow --locale fr-FR`); each locale's collections sit beside
-  the primary's (`blog-fr-fr`), under its URL prefix.
+  the primary's (`blog-fr-fr`), under its URL prefix, and its pages link to
+  each other's with `alternates`, matched by `cmsId`
+  (`references/webflow.md`).
 
 ## 2. Import
 

@@ -58,6 +58,11 @@ image whose alt the CMS left empty — only the rendered page shows them.
 - **image** — a 1200×630 social image when the page has its own.
 - **type** — `article` for posts.
 - **noindex** — for a page that must exist but not rank (thank-you pages).
+- **lang** and **alternates** — a page in another language:
+  `lang="fr-FR" alternates={{ "en-US": "/about" }}`. Writes `<html lang>`,
+  `og:locale` and an `hreflang` link for each language and the page itself;
+  `x-default` is the `SITE_LOCALE` page. Every language's page must name the
+  others, or search engines ignore the lot.
 - **One h1** per page, then headings in order — never skip a level.
 - **Alt text** on every `Img`; `alt=""` only for decoration. `TRIX.md` →
   Assets says what a good one is.

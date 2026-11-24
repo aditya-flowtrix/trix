@@ -19,6 +19,8 @@ const {
   type = "website",
   noindex,
   schema,
+  lang = SITE_LOCALE,
+  alternates,
 } = Astro.props;
 
 const path = pagePath(Astro.url);
@@ -50,6 +52,11 @@ const colorModeScript = `(() => {
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 const canonical = new URL(path, Astro.site);
 const socialImage = new URL(image, Astro.site);
+// hreflang: every language of this page names all the others and itself.
+const languages = alternates && { ...alternates, [lang]: path };
+if (languages && !languages["x-default"] && languages[SITE_LOCALE])
+  languages["x-default"] = languages[SITE_LOCALE];
+const ogLocale = (tag: string) => tag.replace("-", "_");
 ---
 
 <meta charset="utf-8" />
@@ -73,10 +80,24 @@ const socialImage = new URL(image, Astro.site);
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{
+  languages &&
+    Object.entries(languages).map(([tag, href]) => (
+      <link rel="alternate" hreflang={tag} href={new URL(href, Astro.site)} />
+    ))
+}
 {isNoindex && <meta name="robots" content="noindex, nofollow" />}
 
 <meta property="og:type" content={type} />
-<meta property="og:locale" content={SITE_LOCALE.replace("-", "_")} />
+<meta property="og:locale" content={ogLocale(lang)} />
+{
+  languages &&
+    Object.keys(languages)
+      .filter((tag) => tag !== lang && tag !== "x-default")
+      .map((tag) => (
+        <meta property="og:locale:alternate" content={ogLocale(tag)} />
+      ))
+}
 <meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={description} />

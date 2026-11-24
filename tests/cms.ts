@@ -665,6 +665,7 @@ try {
     "--no-assets",
     "--route",
     "postsFrFr=/fr/blog",
+    "--scaffold",
   ]);
   it("write, a second locale: beside the primary, every redirect kept", () => {
     assert.deepEqual(readdirSync(join(tmp, "src/content/posts-fr-fr")).sort(), [
@@ -682,6 +683,26 @@ try {
     assert.ok(
       redirects.includes(
         "/fr-fr/posts/hello-welcome /fr/blog/hello-welcome 301",
+      ),
+    );
+  });
+  it("write, a second locale: its page says its language, items share a cmsId", () => {
+    const id = (f: string) =>
+      readFileSync(join(tmp, f), "utf8").match(/^cmsId: (.+)$/m)?.[1];
+    assert.ok(id("src/content/posts/hello-welcome.md"));
+    assert.equal(
+      id("src/content/posts-fr-fr/hello-welcome.md"),
+      id("src/content/posts/hello-welcome.md"),
+    );
+    assert.ok(
+      readFileSync(
+        join(tmp, "src/pages/fr/blog/[slug].astro"),
+        "utf8",
+      ).includes('lang="fr-FR"'),
+    );
+    assert.ok(
+      !readFileSync(join(tmp, "src/pages/blog/[slug].astro"), "utf8").includes(
+        "lang=",
       ),
     );
   });

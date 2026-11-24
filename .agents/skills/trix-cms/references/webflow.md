@@ -79,8 +79,19 @@ prefix to keep every URL, or a new one and the redirects are written.
   puts them beside the primary's files and keeps every locale's redirects.
   A locale saved as JSON: `--json fr.json --locale fr-FR`. Then each
   locale's page reads its own collection (`src/pages/fr-fr/blog/[slug].astro`
-  → `getCollection("blogFrFr")`), and Astro's `i18n` routing in
-  `astro.config.mjs` handles the rest. `BaseHead` does not write `hreflang`
-  alternates: add them per page until it does.
+  → `getCollection("blogFrFr")`); `--scaffold` gives it `lang="fr-FR"`.
+  Every locale's copy of an item has the same `cmsId`, so each page names
+  its other languages for `hreflang` — both ways, or search engines ignore
+  it:
+
+  ```ts
+  // src/pages/fr-fr/blog/[slug].astro, in the frontmatter
+  const en = (await getCollection("blog")).find(
+    (e) => e.data.cmsId === entry.data.cmsId,
+  );
+  // then <Layout lang="fr-FR" alternates={en && { "en-US": `/blog/${en.id}` }}>,
+  // and the mirror in src/pages/blog/[slug].astro
+  ```
+
 - **Ecommerce** products and **Users/Memberships** are separate APIs; agree
   the approach before moving them.

@@ -131,6 +131,7 @@ export function cmsLoader(opts: CmsSource & { collection: string }): Loader {
           published: item.published,
           updated: item.updated,
           oldPath: item.oldPath,
+          cmsId: item.id,
           seo: item.seo,
           ...forSchema(item.data),
         };

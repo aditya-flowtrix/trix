@@ -208,6 +208,7 @@ export function schemaSource(c: Collection, remote = false): string {
     "published: z.coerce.date().optional()",
     "updated: z.coerce.date().optional()",
     "oldPath: z.string().optional()",
+    "cmsId: z.string().optional()",
     "seo: z.object({ title: z.string().optional(), description: z.string().optional(), image: z.string().optional() }).optional()",
     ...c.fields.map((f) => {
       const t = type(f);

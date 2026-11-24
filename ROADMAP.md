@@ -31,8 +31,8 @@
   BreadcrumbList, Article, FAQPage, LocalBusiness, Product; `JsonLd` and
   `Breadcrumbs` components.
 
-Still to come: hreflang for multilingual sites (with Astro i18n routing), and
-Core Web Vitals field data pulled from the CrUX API instead of lab values.
+Still to come: Core Web Vitals field data pulled from the CrUX API instead of
+lab values.
 
 ## Later
 
@@ -43,6 +43,5 @@ Core Web Vitals field data pulled from the CrUX API instead of lab values.
   the common shape as Sanity has: Storyblok, Contentful, Payload. EmDash
   next to them, reusing `htmlToBlocks()` — its pages read EmDash directly,
   and the site turns server-rendered.
-- `hreflang` alternates in `BaseHead`, for sites with locales.
 - Measuring toolkit: section-level theme detection (background/text pairs),
   motion inventory (durations and easings from the Web Animations API).

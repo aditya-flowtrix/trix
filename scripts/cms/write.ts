@@ -383,6 +383,8 @@ for (const c of headless ? [] : collections) {
       ...(item.published ? { published: item.published } : {}),
       ...(item.updated ? { updated: item.updated } : {}),
       ...(item.oldPath ? { oldPath: item.oldPath } : {}),
+      // The item's id in the CMS: Webflow gives every locale's copy the same one.
+      ...(item.id ? { cmsId: item.id } : {}),
       ...(seo && Object.values(seo).some(Boolean) ? { seo } : {}),
       ...data,
     };
@@ -609,7 +611,7 @@ const description = clip(entry.data.seo?.description${summary ? ` ?? ${at(summar
 
 <Layout
   title={entry.data.seo?.title ?? entry.data.title}
-  description={description}
+  description={description}${source && data.locale ? `\n  lang="${data.locale}"` : ""}
   type="article"
   schema={article({
     headline: entry.data.title,
