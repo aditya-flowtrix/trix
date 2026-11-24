@@ -162,6 +162,9 @@ Convert to the CMS's own format **once, at import** — never at render.
 
 - **Sample first.** Read the bodies of the richest collection and list every
   pattern in them; write one rule per pattern before converting the rest.
+  Look for what an editor did for want of a button: italic used for code,
+  a language name typed above a code block, a class used for a callout. A
+  rule can tell those apart; a count cannot.
 - **A pattern without a rule is lost, silently.** With no rule, a Webflow
   image figure is dropped and its caption becomes a paragraph, an embed
   disappears, and a heading style the schema does not list becomes a plain
@@ -184,7 +187,8 @@ Convert to the CMS's own format **once, at import** — never at render.
 
 | Webflow rich text                                               | Becomes                                                                   |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `<figure data-rt-type="image">` with `<img>` and `<figcaption>` | an image block with alt and caption                                       |
+| `<figure data-rt-type="image">` with `<img>` and `<figcaption>` | an image block with alt, caption and, when it is linked, its link         |
+| an `<img>` inside an `<a href>`                                 | an image block with its link                                              |
 | a bare `<img>`                                                  | an image block (Portable Text images are blocks, never inline)            |
 | `<figure data-rt-type="video">` (an embedded iframe)            | an embed block holding the iframe                                         |
 | `<div class="w-embed">`                                         | an embed block holding the HTML, its `<script>`s kept                     |
@@ -194,13 +198,19 @@ Convert to the CMS's own format **once, at import** — never at render.
 | external, `mailto:`, `tel:` and `#` links                       | links as they are                                                         |
 | an `<h1>` inside a body                                         | an `h2`, and every heading below it one down — the page's title is its h1 |
 | an empty paragraph (Webflow keeps a zero-width joiner)          | nothing                                                                   |
+| a class or a `style` on text (`<span class="highlight">`)       | the text, without the styling — listed in the warnings                    |
 
 - **Internal links resolve in the same run**: the map from each item's
   `oldPath` to its document ID comes from the common shape itself. Links on
   the old domain count as internal only with `--host old-site.com`.
-- **Counted, every run**: images, embeds and code blocks in each source body
-  against the blocks after conversion. `convert.ts` prints both per type and
-  exits 1, naming the item, when any is lost.
+- **Counted, every run**: images, linked images, embeds and code blocks in
+  each source body against the blocks after conversion. `convert.ts` prints
+  them per type and exits 1, naming the item, when any is lost.
+- **Styling is listed, not counted**: a class or an inline style on text has
+  no place in Portable Text, so the text stays and the styling goes. The
+  warnings name each one with how often it appears, per collection; give it a
+  rule in `scripts/cms/html-to-portable-text.ts` (a decorator, a block style)
+  or record in `PROJECT.md` that it goes.
 - **An embed block renders whatever HTML is in it.** Allow it only for the
   editors who need it, or remove the type once no document uses it.
 
@@ -291,6 +301,13 @@ value and has none — an asset that failed to upload, a reference that did not
 resolve; a rich-text image that did not arrive; any URL left on the old CMS.
 Fields the converter leaves out on purpose (SEO-only ones) are not counted
 as lost.
+
+It also warns, without failing, about what the source lacked too: items with
+no SEO description and images with no alt text. Fill them in before launch —
+editors in the Studio, or Sanity's Content Agent run on staging. A collection
+whose page template derives its description from a field (§4) needs none of
+its own; ignore that warning for it. Alt text is never derived: every
+missing one is filled in or the image is marked decorative.
 
 What it does not read, check by hand (Sanity's GROQ in Studio's Vision tool,
 or `npx sanity@latest documents query` — the CLI commands here take

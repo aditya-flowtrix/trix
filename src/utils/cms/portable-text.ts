@@ -42,7 +42,11 @@ export function portableTextToHtml(
         image: ({ value }) => {
           const src = urls.image(value);
           if (!src) return "";
-          const img = `<img src="${attr(src)}" alt="${attr(value.alt)}">`;
+          const link = String(value.link ?? "");
+          const img =
+            link && uriLooksSafe(link)
+              ? `<a href="${attr(link)}"><img src="${attr(src)}" alt="${attr(value.alt)}"></a>`
+              : `<img src="${attr(src)}" alt="${attr(value.alt)}">`;
           return value.caption
             ? `<figure>${img}<figcaption>${attr(value.caption)}</figcaption></figure>`
             : `<figure>${img}</figure>`;

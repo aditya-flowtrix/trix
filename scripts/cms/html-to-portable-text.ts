@@ -9,7 +9,7 @@
  * does not list becomes a paragraph. `countPatterns` and `countBlocks` let the
  * converter prove nothing was.
  *
- *   figure[data-rt-type=image], img      → image { url, alt, caption }
+ *   figure with one img, img             → image { url, alt, caption, link }
  *   figure[data-rt-type=video], .w-embed → embed { html }
  *   table                                → embed { html }  (no table type)
  *   pre                                  → code { code, language }
@@ -19,7 +19,10 @@
 import { htmlToPortableText } from "@portabletext/html";
 import { compileSchema, defineSchema } from "@portabletext/schema";
 import { JSDOM } from "jsdom";
-import { stripPlatformMarkup } from "../../src/utils/cms/model.ts";
+import {
+  PLATFORM_CLASS,
+  stripPlatformMarkup,
+} from "../../src/utils/cms/model.ts";
 
 export type Block = { _type: string; _key: string; [k: string]: unknown };
 
@@ -43,6 +46,7 @@ const schema = compileSchema(
           { name: "url", type: "string" },
           { name: "alt", type: "string" },
           { name: "caption", type: "string" },
+          { name: "link", type: "string" },
         ],
       },
       { name: "embed", fields: [{ name: "html", type: "string" }] },
@@ -93,6 +97,15 @@ export function htmlToBlocks(
     );
     el.replaceWith(marker);
   }
+  // A linked image gets a figure, which keeps its link: the bare image rule
+  // cannot see the <a> around it.
+  for (const img of doc.querySelectorAll("a[href] img")) {
+    const a = img.closest("a")!;
+    if (img.closest("figure") || a.textContent?.trim()) continue;
+    const figure = doc.createElement("figure");
+    a.replaceWith(figure);
+    figure.append(a);
+  }
   let k = 0; // keys count from zero per body: an unchanged body converts unchanged
   const blocks = htmlToPortableText(doc.body.innerHTML, {
     schema,
@@ -112,14 +125,18 @@ export function htmlToBlocks(
         deserialize(node, _next, block) {
           if (node.nodeType !== 1) return undefined;
           const el = node as Element;
-          if (el.matches('figure[data-rt-type="image"]')) {
-            const img = el.querySelector("img");
+          // Webflow's <figure data-rt-type="image">, WordPress's image block, a
+          // linked image: the image, its caption and its link.
+          if (el.matches("figure") && el.querySelectorAll("img").length === 1) {
+            const img = el.querySelector("img")!;
+            const link = img.closest("a[href]")?.getAttribute("href");
             return block({
               _type: "image",
-              url: img?.getAttribute("src") ?? "",
-              alt: img?.getAttribute("alt") ?? "",
+              url: img.getAttribute("src") ?? "",
+              alt: img.getAttribute("alt") ?? "",
               caption:
                 el.querySelector("figcaption")?.textContent?.trim() ?? "",
+              ...(link ? { link } : {}),
             });
           }
           const embed = el.getAttribute("data-trix-embed");
@@ -163,15 +180,44 @@ export function htmlToBlocks(
 /** What the source HTML holds that must not be lost. */
 export function countPatterns(html: string) {
   const doc = new JSDOM(html).window.document;
+  // An image inside an embed or a table stays in that embed's HTML.
+  const images = [...doc.querySelectorAll("img")].filter(
+    (i) => !i.closest(EMBED),
+  );
   return {
-    images: doc.querySelectorAll("img").length,
+    images: images.length,
+    links: images.filter((i) => i.closest("a[href]")).length,
     embeds: doc.querySelectorAll(EMBED).length,
     code: doc.querySelectorAll("pre").length,
   };
 }
 
+/**
+ * Styling Portable Text has no place for: a class or an inline style on text
+ * (`<span class="highlight">`, `<p style="…">`). The conversion keeps the text
+ * and drops the styling, so each is named for the owner to give a rule — a
+ * decorator, a block style — or let go. Embeds and code keep theirs.
+ */
+export function droppedStyling(html: string): string[] {
+  const doc = new JSDOM(html).window.document;
+  const found: string[] = [];
+  for (const el of doc.body.querySelectorAll("[class], [style]")) {
+    if (el.closest(`${EMBED}, pre`)) continue;
+    const tag = el.tagName.toLowerCase();
+    for (const c of el.classList)
+      if (!PLATFORM_CLASS.test(c)) found.push(`<${tag} class="${c}">`);
+    if (el.hasAttribute("style")) found.push(`<${tag} style>`);
+  }
+  return found;
+}
+
 /** The same counts after conversion. */
 export function countBlocks(blocks: Block[]) {
   const n = (t: string) => blocks.filter((b) => b._type === t).length;
-  return { images: n("image"), embeds: n("embed"), code: n("code") };
+  return {
+    images: n("image"),
+    links: blocks.filter((b) => b._type === "image" && b.link).length,
+    embeds: n("embed"),
+    code: n("code"),
+  };
 }
