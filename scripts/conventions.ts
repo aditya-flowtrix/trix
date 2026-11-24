@@ -175,8 +175,9 @@ for (const theme of model.themes) {
 }
 
 // 5. Our own code (TRIX.md → Behaviour: our own code)
+// @portabletext/to-html renders a CMS's rich text at build (cmsLoader), never in the browser.
 const trixUses =
-  /^(?:astro(?:$|[:/])|@astrojs\/|node:|@phosphor-icons\/core$|@c15t\/)/;
+  /^(?:astro(?:$|[:/])|@astrojs\/|node:|@phosphor-icons\/core$|@c15t\/|@portabletext\/to-html$)/;
 const allowed5 = new Set(
   Object.keys(JSON.parse(read("package.json")).trix?.allow ?? {}),
 );

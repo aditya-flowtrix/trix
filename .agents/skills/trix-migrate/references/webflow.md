@@ -834,7 +834,11 @@ it to the token or prop that is wrong rather than accepting it.
 **Where content lives**, decided before converting anything, by who edits the
 site: **Astro content collections** (typed, in git, no bill, no editor UI), **a
 headless CMS** (closest to what they are leaving, plus a subscription), or
-**Webflow as a headless backend** (least disruption, keeps the bill).
+**Webflow as a headless backend** (least disruption, keeps the bill). All three
+start from `/trix-cms`'s import; a new headless CMS — Sanity, Storyblok,
+Contentful, Payload — then follows its `references/headless-cms.md`: the
+model reviewed, IDs from Webflow's, assets uploaded, rich text converted, a
+content freeze.
 
 **Bindings.** Two are exact, one is not:
 

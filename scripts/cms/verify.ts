@@ -23,6 +23,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { posix } from "node:path";
 import { args, output } from "../measure/browser.ts";
 import type { CmsExport } from "../../src/utils/cms/model.ts";
+import { CMS_HOST } from "./compare.ts";
 
 const opts = args();
 const str = (k: string) =>
@@ -102,8 +103,6 @@ check(
 );
 
 // 3 + 4. What the content still points at
-const CMS_HOST =
-  /https?:\/\/[^\s"')]*(website-files\.com|webflow\.com|framerusercontent\.com|wixstatic\.com|squarespace-cdn\.com|ctfassets\.net|sanity\.io|i\d\.wp\.com|\/wp-content\/uploads\/)[^\s"')]*/gi;
 // The old site's own hosts: --old-host, and a WordPress source's domain.
 const oldHosts = new Set(
   [

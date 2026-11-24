@@ -1,5 +1,45 @@
 # Changelog
 
+## Unreleased
+
+- Moving into Sanity is built in. `node scripts/cms/convert.ts sanity`
+  turns the imported CMS into the NDJSON `sanity datasets import` takes and
+  the Studio schema those documents need: IDs from the source's, so every run
+  updates instead of duplicating; a stable `_key` on every array item; every
+  image and file uploaded with its alt text; references to drafts weak until
+  they are published; rich text as Portable Text with a rule for every
+  Webflow pattern — image figures, embeds with their scripts, videos,
+  tables, code, internal links — and a count that fails the run if one is
+  lost. `write.ts --headless --sanity <project>/<dataset>` then points the
+  site at the dataset through `cmsLoader({ source: "sanity" })`, which reads
+  the documents back into the shape files mode writes, so no page changes.
+- `convert.ts sanity --check <project>/<dataset>` proves an import: it reads
+  the dataset back as the build does and compares it with the source, item
+  by item — every published item there and nothing extra, titles and SEO
+  the same, every field that had a value still has one, every rich-text
+  image arrived, nothing left on Webflow's CDN. The comparison
+  (`scripts/cms/compare.ts`) works for any CMS with a reader.
+- A new docs page, [Headless CMS](https://trix.flowtrix.workers.dev/docs/guides/headless-cms): files,
+  Webflow-headless or a new CMS; the Sanity move step by step; what each
+  check proves; other CMSs and EmDash.
+  New dependencies: `@portabletext/to-html` for the build; `@portabletext/html`,
+  `@portabletext/schema` and `jsdom`, for the converter only, as dev
+  dependencies.
+- `/trix-cms` moves a site into a new headless CMS — Sanity, EmDash,
+  Storyblok, Contentful, Payload, Strapi, ButterCMS, BCMS — with Sanity built
+  in. Every other CMS is the same two adapters around the common shape, and
+  the reference says what each one's are. The import stays `import.ts`; the
+  new reference covers the rest: reviewing Webflow's model before copying it, IDs derived from Webflow's so every run
+  updates instead of duplicating, keyed arrays, assets uploaded with their
+  alt text, rich text converted with a rule for each Webflow pattern (a
+  pattern without one is dropped silently), staging before production, the
+  content freeze and cutover. It notes where Sanity's own Webflow course has
+  gone out of date.
+- `PROJECT.md` records which CMS a migration moved into and its content
+  freeze date.
+- The Webflow CMS reference no longer implies `import.ts` reads every
+  locale: it reads the primary one, and says how to bring the others.
+
 ## 0.8.0 — 2026-11-24
 
 A `Filter` that does everything Finsweet's list attributes did, a check that

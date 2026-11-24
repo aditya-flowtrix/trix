@@ -28,6 +28,17 @@ import {
 } from "../src/utils/cms/webflow.ts";
 import { csvCollection, inferType, parseCsv } from "../src/utils/cms/csv.ts";
 import { schemaSource, stripPlatformMarkup } from "../src/utils/cms/model.ts";
+import { compareCms } from "../scripts/cms/compare.ts";
+import {
+  fromSanity,
+  sanityType,
+  type SanityDoc,
+} from "../src/utils/cms/sanity.ts";
+import {
+  sanitySchema,
+  seoOnlyFields,
+  toSanity,
+} from "../scripts/cms/to-sanity.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const fixture = join(root, "tests/fixtures/cms/webflow.json");
@@ -180,6 +191,168 @@ it("CSV: Webflow system columns, drafts, references, body", () => {
   assert.equal(c.items[0].oldPath, "/notes/one");
 });
 
+/* ---------------- Sanity ---------------- */
+
+const sanity = toSanity(wf, { hosts: ["example.com"] });
+const doc = (id: string) => sanity.docs.find((d) => d._id === id)!;
+const p1 = doc("posts-p1");
+
+it("Sanity: ids from the source ids, the same on every run, a dot only for drafts", () => {
+  assert.equal(JSON.stringify(toSanity(wf).docs), JSON.stringify(sanity.docs));
+  for (const d of sanity.docs)
+    assert.match(d._id, /^(drafts\.)?[a-zA-Z0-9_-]+$/, d._id);
+  assert.ok(sanity.docs.some((d) => d._id.startsWith("drafts.")));
+});
+it("Sanity: every array item has a _key, unique in its array", () => {
+  const walk = (v: unknown, at: string): void => {
+    if (Array.isArray(v)) {
+      const keys = v.map((x) => (x as { _key?: string })?._key);
+      if (v.some((x) => x && typeof x === "object"))
+        assert.ok(keys.every(Boolean), `${at}: an item without a _key`);
+      assert.equal(new Set(keys).size, keys.length, `${at}: duplicate keys`);
+      v.forEach((x, i) => walk(x, `${at}[${i}]`));
+    } else if (v && typeof v === "object")
+      for (const [k, x] of Object.entries(v)) walk(x, `${at}.${k}`);
+  };
+  for (const d of sanity.docs) walk(d, d._id);
+});
+it("Sanity: images and files are imported by URL, with their alt text", () => {
+  assert.deepEqual(p1.mainImage, {
+    _type: "image",
+    _sanityAsset: "image@https://cdn.prod.website-files.com/aa/cc_main.webp",
+    alt: "Main",
+  });
+  assert.equal(
+    (p1.download as { _sanityAsset: string })._sanityAsset,
+    "file@https://cdn.prod.website-files.com/aa/ff_guide.pdf",
+  );
+  const img = (p1.body as Record<string, unknown>[]).find(
+    (b) => b._type === "image",
+  )!;
+  assert.equal(img.alt, "A photo");
+  assert.ok(!("url" in img));
+});
+it("Sanity: references by id; one to a draft waits for its publish", () => {
+  assert.deepEqual(p1.author, { _type: "reference", _ref: "authors-a1" });
+  const topics = p1.topics as Record<string, unknown>[];
+  assert.ok(topics.some((t) => t._ref === "topics-t1" && !t._weak));
+  assert.ok(topics.some((t) => t._weak && t._strengthenOnPublish));
+  const ids = new Set(sanity.docs.map((d) => d._id.replace(/^drafts\./, "")));
+  for (const t of topics) assert.ok(ids.has(String(t._ref)));
+  assert.ok(
+    sanity.warnings.some((w) => w.startsWith("topics-t-draft is a draft")),
+  );
+});
+it("Sanity: rich text keeps every pattern, links inside become references", () => {
+  assert.deepEqual(sanity.lost, []);
+  const body = p1.body as Record<string, unknown>[];
+  assert.equal(body[0].style, "h2");
+  assert.deepEqual(
+    (body[1].markDefs as Record<string, unknown>[])[0].reference,
+    { _type: "reference", _ref: "posts-p2" },
+  );
+});
+it("Sanity: an SEO-only field is the seo object, not a copy beside it", () => {
+  assert.equal(p1.metaDescription, undefined);
+  assert.equal(
+    (p1.seo as { description: string }).description,
+    "Meta for search.",
+  );
+});
+it("Sanity: the Studio schema defines every type the documents use", () => {
+  const schema = sanitySchema(wf);
+  for (const t of new Set(sanity.docs.map((d) => d._type)))
+    assert.ok(schema.includes(`name: ${JSON.stringify(t)}`), t);
+  for (const t of ['"blockContent"', '"embed"', '"code"', '"internalLink"'])
+    assert.ok(schema.includes(`name: ${t}`), t);
+  assert.ok(!schema.includes('name: "metaDescription"'));
+});
+// The import, simulated: published documents, assets on Sanity's CDN.
+const imported = JSON.parse(
+  JSON.stringify(sanity.docs.filter((d) => !d._id.startsWith("drafts."))),
+  (_, v) =>
+    v && typeof v === "object" && typeof v._sanityAsset === "string"
+      ? (({ _sanityAsset, ...rest }) => ({
+          ...rest,
+          asset: {
+            _ref: _sanityAsset.startsWith("image@")
+              ? "image-abc123-100x80-jpg"
+              : "file-def456-pdf",
+          },
+        }))(v)
+      : v,
+) as SanityDoc[];
+const sanityOpts = { projectId: "p1x", dataset: "production" };
+const back = fromSanity(imported, {
+  ...sanityOpts,
+  routes: { posts: "/blog" },
+});
+it("Sanity: read back at build, the site gets what files would give it", () => {
+  const item = back.collections
+    .find((c) => c.key === "posts")!
+    .items.find((i) => i.slug === "hello-welcome")!;
+  assert.equal(item.title, first.title);
+  assert.equal(item.oldPath, "/posts/hello-welcome");
+  assert.equal(item.data.author, first.data.author);
+  assert.deepEqual(item.data.topics, ["design", "code"]);
+  assert.equal(item.data.kind, "Guide");
+  assert.deepEqual(item.data.mainImage, {
+    url: "https://cdn.sanity.io/images/p1x/production/abc123-100x80.jpg",
+    alt: "Main",
+  });
+  assert.equal(
+    item.data.download,
+    "https://cdn.sanity.io/files/p1x/production/def456.pdf",
+  );
+  assert.equal(item.seo?.description, "Meta for search.");
+  assert.ok(
+    item.body!.startsWith(
+      '<h2>Hello</h2><p>Read <a href="/blog/second-post">the next one</a>.</p><figure><img src="https://cdn.sanity.io/images/p1x/production/abc123-100x80.jpg" alt="A photo">',
+    ),
+  );
+  assert.equal(item.data.pullQuote, "<p>Quote <strong>here</strong></p>");
+});
+it("Sanity: --check passes a complete import, and names what one lost", () => {
+  const compare = (docs: SanityDoc[]) =>
+    compareCms(wf, fromSanity(docs, sanityOpts), {
+      type: sanityType,
+      ownHost: "cdn.sanity.io",
+      omitted: seoOnlyFields,
+    });
+  const failed = (docs: SanityDoc[]) =>
+    compare(docs)
+      .filter((c) => !c.ok)
+      .map((c) => `${c.what}: ${c.detail}`);
+  assert.deepEqual(failed(imported), []);
+
+  // A document missing, an image field and a rich-text image whose uploads
+  // failed, a title changed, a URL left on Webflow's CDN.
+  const broken = structuredClone(imported).filter((d) => d._id !== "posts-p2");
+  const p1 = broken.find((d) => d._id === "posts-p1")!;
+  delete (p1.mainImage as Record<string, unknown>).asset;
+  delete (p1.body as Record<string, unknown>[]).find(
+    (b) => b._type === "image",
+  )!.asset;
+  p1.title = "Changed";
+  (p1.seo as Record<string, unknown>).title =
+    "https://cdn.prod.website-files.com/x/a.jpg";
+  const bad = failed(broken).join("\n");
+  assert.match(bad, /posts: 2 published, 1 in posts: second-post missing/);
+  assert.match(bad, /titles and SEO match: hello-welcome/);
+  assert.match(
+    bad,
+    /every field with a value has it in posts: hello-welcome\.mainImage/,
+  );
+  assert.match(
+    bad,
+    /every image in rich text arrived: hello-welcome \(\d+ → \d+\)/,
+  );
+  assert.match(
+    bad,
+    /nothing loads from the old CMS: https:\/\/cdn\.prod\.website-files\.com\/x\/a\.jpg/,
+  );
+});
+
 /* ---------------- the pipeline, in a throwaway project ---------------- */
 
 const tmp = mkdtempSync(join(tmpdir(), "trix-cms-"));
@@ -259,6 +432,33 @@ try {
   it("astro sync accepts every generated schema and file", () => {
     rmSync(join(root, "node_modules/.astro"), { recursive: true, force: true });
     execFileSync("npx", ["astro", "sync"], { cwd: tmp, stdio: "pipe" });
+  });
+
+  run([
+    "scripts/cms/write.ts",
+    "--input",
+    ".trix/cms/webflow.json",
+    "--headless",
+    "--sanity",
+    "p1x/production",
+    "--route",
+    "posts=/blog",
+  ]);
+  it("write --headless --sanity: the site reads Sanity, its images allowed", () => {
+    const ts = readFileSync(join(tmp, "src/content/collections.ts"), "utf8");
+    for (const line of [
+      'source: "sanity"',
+      'projectId: "p1x"',
+      'dataset: "production"',
+      'routes: { posts: "/blog", authors: "/authors", topics: "/topics" }',
+      'collection: "posts"',
+    ])
+      assert.ok(ts.includes(line), line);
+    assert.ok(
+      readFileSync(join(tmp, "astro.config.mjs"), "utf8").includes(
+        "cdn.sanity.io",
+      ),
+    );
   });
 } finally {
   rmSync(tmp, { recursive: true, force: true });

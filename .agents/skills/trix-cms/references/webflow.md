@@ -61,7 +61,10 @@ prefix to keep every URL, or a new one and the redirects are written.
 - **SEO settings of template pages** — the title and description bound to
   fields in the Designer. Fields named like `seo-title`, `meta-description`,
   `og-image` are picked up as `seo`; anything else, map by hand.
-- **Localization** — each CMS locale is its own read (`cmsLocaleId`), and
-  its own set of files.
+- **Localization** — `import.ts webflow --site` reads the primary locale
+  only. Each other CMS locale is its own read of the items with
+  `?cmsLocaleId=<id>` (the CMS locale id, not the site locale id): save each
+  locale's collections as JSON and import it with `--json`, one set of files
+  per locale.
 - **Ecommerce** products and **Users/Memberships** are separate APIs; agree
   the approach before moving them.

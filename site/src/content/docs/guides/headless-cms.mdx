@@ -1,0 +1,141 @@
+---
+title: Headless CMS
+description: Move Webflow content into Sanity or another headless CMS — converted, imported into staging, checked against the source, and read by the Astro site at build — without changing a page.
+order: 5.5
+badge: New
+---
+
+Where the content lives after a migration is the owner's choice. Trix supports
+three places, and the pages are the same in all of them: every collection
+reads into the same entries, so moving between them later never touches a
+page.
+
+|              | **Files** (default) | **Webflow, headless**               | **A new headless CMS**                 |
+| ------------ | ------------------- | ----------------------------------- | -------------------------------------- |
+| Content      | Markdown in git     | stays in Webflow                    | moves into Sanity, Contentful, EmDash… |
+| Editors      | edit files          | keep Webflow                        | learn the new CMS                      |
+| Webflow plan | cancelled           | kept                                | cancelled after cutover                |
+| Publishing   | a commit            | a Webflow publish and a deploy hook | a CMS publish and a deploy hook        |
+
+Files and Webflow-headless are in [Moving a CMS](/docs/guides/moving-a-cms).
+This page is the third.
+
+## How a move works
+
+```
+Webflow ─ import.ts ─▶ .trix/cms/webflow.json ─ convert.ts ─▶ import file ─ the CMS's importer ─▶ staging ─▶ production
+                                                   └── convert.ts --check: the CMS against the source ──┘
+Astro build ◀─ cmsLoader ◀─ production
+```
+
+- **Webflow is read once**, into one file. Everything after works from that
+  file: reviewed before anything is created, and run again as often as needed
+  until the content freeze, without touching Webflow.
+- **Every CMS is two pieces around that file**: a converter into it and a
+  reader back out of it. The reader gives the site exactly what files give
+  it. Sanity has both built in.
+- **Nothing is guessed.** Each step has a check that fails loudly — rich text
+  counted before the import, every document validated against the schema,
+  the imported content compared with the source item by item.
+
+## Into Sanity
+
+The owner provides a Sanity project in their own account, two datasets —
+`staging` and `production` — a write token for the import, and a read token
+for the build if the dataset is private. Tokens come only from the
+environment: `SANITY_IMPORT_TOKEN`, `SANITY_READ_TOKEN`.
+
+1. **Import and review.** `/trix-cms` reads Webflow, then goes through the
+   model with the owner before copying it: numbered fields and lists in one
+   text field become arrays, collections that are only a list of names become
+   option fields, a copy of the SEO description becomes the shared SEO object.
+
+   ```bash
+   node scripts/cms/import.ts webflow --site <site id>
+   ```
+
+2. **Convert.** The documents, and the Studio schema they need.
+
+   ```bash
+   node scripts/cms/convert.ts sanity --input .trix/cms/webflow.json --host old-site.com --schema studio/schemaTypes/migrated.ts
+   ```
+
+   IDs come from Webflow's, so every run updates instead of duplicating.
+   Every image and file is uploaded with its alt text. Rich text becomes
+   Portable Text with a rule for each Webflow pattern — image figures with
+   captions, embeds with their scripts, videos, tables, code, links to other
+   items. It stops if any image, embed or code block would be lost.
+
+3. **Validate, then import into staging**, with the CMS's webhooks off.
+
+   ```bash
+   npx sanity@latest documents validate --file ../.trix/cms/sanity.ndjson --level error   # in studio/
+   npx sanity@latest datasets import .trix/cms/sanity.ndjson -p <project id> -d staging --replace
+   ```
+
+4. **Check staging against the source**, then 10–20 items per collection in
+   the Studio beside their live pages.
+
+   ```bash
+   node scripts/cms/convert.ts sanity --input .trix/cms/webflow.json --check <project id>/staging
+   ```
+
+5. **Connect the site.** Each collection reads the dataset at build; Sanity's
+   image CDN is allowed, so Astro optimises its images.
+
+   ```bash
+   node scripts/cms/write.ts --input .trix/cms/webflow.json --headless --sanity <project id>/production --route posts=/blog
+   ```
+
+   A webhook in Sanity calls the host's deploy hook on every publish.
+
+6. **Cut over** at the content freeze: the same import into `production`,
+   `--check` against it, `verify.ts` and the SEO parity check on the build.
+   Then revoke the write token and turn the webhooks on. From here the new
+   CMS is the record — importing again would overwrite the editors' work.
+
+## What the checks prove
+
+| When               | Check                       | Proves                                                                                                     |
+| ------------------ | --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Converting         | `convert.ts`                | every image, embed and code block in rich text survived; every reference resolved or named                 |
+| Before the import  | `sanity documents validate` | every document fits the Studio schema, so editors can publish it                                           |
+| After each import  | `convert.ts --check`        | every published item is there with its title, SEO, every field and every image; nothing is left on Webflow |
+| After the build    | `verify.ts --dist dist`     | every item has its page, with its title                                                                    |
+| Before DNS changes | `/trix-seo` parity          | every old URL answers, with its title and description                                                      |
+
+A published item that refers to a draft is the one validation error by
+design: the reference stays weak until the draft is published, and the
+converter names each one.
+
+## Other headless CMSs
+
+The steps, the rules and the checks are the same for every CMS; only the
+converter and the reader change. Until a CMS has them built in, `/trix-cms`
+writes the converter in the project to the same rules and the pages read the
+CMS through its own API.
+
+| CMS        | Import                                   | Rich text                |
+| ---------- | ---------------------------------------- | ------------------------ |
+| Sanity     | built in: `convert.ts sanity`            | Portable Text            |
+| EmDash     | its seed file or `emdash content create` | Portable Text            |
+| Contentful | `contentful space import`                | Contentful Rich Text     |
+| Storyblok  | the Management API                       | Storyblok rich text      |
+| Payload    | the Local API or REST                    | Lexical                  |
+| Strapi     | the REST API                             | Blocks, or Markdown      |
+| ButterCMS  | the Write API                            | HTML, as it is           |
+| BCMS       | the hosted service's API                 | its own — check its docs |
+
+There is no product called BetterCMS today; the name usually means ButterCMS
+or BCMS.
+
+**EmDash** is Cloudflare's CMS, built on Astro — Astro itself has no CMS. It
+runs inside the site rather than beside it: the site becomes server-rendered,
+and pages read EmDash directly instead of through content collections. That
+makes it a different site, not only a different CMS, so it is the owner's
+decision before anything else.
+
+## What does not change
+
+URLs and redirects, SEO metadata, the sitemap, image optimisation and every
+page template. The CMS is where editors work; the site is still Trix.

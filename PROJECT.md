@@ -51,7 +51,10 @@ the source's names appear.
 
 Filled by `/trix-migrate`.
 
-- **CMS** — content collections / headless CMS, and why
+- **CMS** — content collections / the old CMS headless / a new headless CMS
+  (which, whose account, project and dataset), and why
+- **Content freeze** — the date the old CMS stops being edited; after it the
+  new one is the record and nothing is imported again
 - **Collections** — each one, and the route or component it landed in
 - **List filters and sorts** — per list
 - **Forms** — provider, and where submissions go

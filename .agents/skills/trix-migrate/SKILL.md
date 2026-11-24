@@ -146,8 +146,9 @@ table headers, `rel="noopener"` on `target="_blank"` links, and no
 - **CMS → content collections** with `/trix-cms`: every collection read
   through the platform's API (or its full export), written as typed
   collections with every image and file downloaded — or headless, if the
-  editors keep their CMS. Counts must match the source exactly
-  (`scripts/cms/verify.ts`).
+  editors keep their CMS, or into a new headless CMS such as Sanity. Counts
+  must match the source exactly (`scripts/cms/verify.ts`, or the new CMS's
+  own counts).
 - **Lists** — every filter, sort and limit, read from the platform (they are
   not in exports), written into `PROJECT.md`. Empty states, pagination and
   filter controls have no runtime in a static site: build them (`.filter()`

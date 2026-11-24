@@ -28,6 +28,8 @@
  *     --headless                             no files: the collections read the CMS at build
  *                                            through cmsLoader (src/utils/cms/loader.ts)
  *     --offline                              with --headless: read the saved export, not the live CMS
+ *     --sanity <project id>/<dataset>        with --headless: read the Sanity dataset the content moved
+ *                                            into (scripts/cms/convert.ts sanity), not the old CMS
  *
  * Image and file fields are always downloaded: the CMS holds them. Inside
  * rich text only files on the CMS's own hosts (Webflow, Framer, Wix,
@@ -51,6 +53,7 @@ import {
   type CmsExport,
   type Collection,
 } from "../../src/utils/cms/model.ts";
+import { sanityType } from "../../src/utils/cms/sanity.ts";
 
 const opts = args();
 const str = (k: string) =>
@@ -70,6 +73,11 @@ const routes = Object.fromEntries(
     .map((p) => p.split("=").map((s) => s.trim()) as [string, string]),
 );
 const headless = !!opts.headless;
+const [sanityProject, sanityDataset] = (str("sanity") ?? "").split("/");
+if (str("sanity") && (!headless || !sanityProject || !sanityDataset)) {
+  console.error("--sanity <project id>/<dataset> goes with --headless");
+  process.exit(1);
+}
 const assets = !opts["no-assets"] && !headless;
 const demote = !!opts["demote-headings"];
 const bodiesWithH1 = new Map<string, number>();
@@ -288,6 +296,20 @@ const write = (path: string, text: string | Uint8Array) => {
 
 /** How a headless collection reaches its CMS. */
 function loaderFor(c: Collection): string {
+  if (sanityProject && !opts.offline)
+    return `cmsLoader(${JSON.stringify({
+      source: "sanity",
+      projectId: sanityProject,
+      dataset: sanityDataset,
+      // Where each type's pages are, so rich-text links point at them.
+      routes: Object.fromEntries(
+        data.collections.flatMap((x) => {
+          const route = routes[x.folder] ?? routes[x.key] ?? x.route;
+          return route ? [[sanityType(x.key), route]] : [];
+        }),
+      ),
+      collection: sanityType(c.key),
+    })})`;
   const [kind, ...rest] = data.source.split(":");
   const id = rest.join(":");
   const src = opts.offline
@@ -425,8 +447,10 @@ await pool([...downloads], 6, async ([url, path]) => {
 // Headless images stay on the CMS's CDN: Astro optimises a remote image only
 // from a host it is told about.
 if (headless) {
-  const hosts = new Set<string>();
-  for (const c of collections)
+  const hosts = new Set<string>(
+    sanityProject && !opts.offline ? ["cdn.sanity.io"] : [],
+  );
+  for (const c of sanityProject && !opts.offline ? [] : collections)
     for (const i of c.items)
       for (const v of Object.values(i.data))
         for (const x of Array.isArray(v) ? v : [v])

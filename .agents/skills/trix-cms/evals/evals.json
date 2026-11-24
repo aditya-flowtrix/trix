@@ -40,6 +40,23 @@
         "The CMS image host is in image.domains in astro.config.mjs",
         "PROJECT.md records the headless decision and how publishing triggers a build"
       ]
+    },
+    {
+      "id": 3,
+      "name": "webflow-to-sanity",
+      "prompt": "We're leaving Webflow. Move the blog, authors and categories into Sanity so the marketing team edits there, and have the Astro site read from Sanity.",
+      "expected_output": "Collections read with import.ts (not new Webflow scripts); the model reviewed with the owner before copying; scripts/cms/convert.ts sanity (not a converter written for the project) producing NDJSON with <type>-<webflow id> IDs, keyed arrays, _sanityAsset images and Portable Text, and the Studio schema; validated against that schema and imported into a staging dataset with --replace; convert.ts --check run against staging and passing; the site connected with write.ts --headless --sanity, so pages read cmsLoader and stay as in files mode; tokens from the environment; the CMS choice and content freeze recorded in PROJECT.md.",
+      "files": [],
+      "assertions": [
+        "Webflow was read with scripts/cms/import.ts, not with new scripts against the Webflow API",
+        "The NDJSON and Studio schema came from scripts/cms/convert.ts sanity, not a converter written for this project",
+        "convert.ts exited 0: no rich-text image, embed or code block was lost",
+        "The import ran against a staging dataset before production, with webhooks off",
+        "convert.ts sanity --check ran against the imported dataset and every check passed",
+        "The site reads Sanity through cmsLoader, written by write.ts --headless --sanity; no page template was changed to query Sanity",
+        "No Sanity token appears in any committed file or command-line argument",
+        "PROJECT.md records the CMS, its project and dataset, and the content freeze date"
+      ]
     }
   ]
 }
