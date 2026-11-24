@@ -16,7 +16,20 @@ import { organization, website } from "@/utils/schema.ts";
 import { CREATE_COMMAND, REPO } from "@/consts.ts";
 import pkg from "../../../package.json";
 
-const features = [
+const features: {
+  icon: string;
+  title: string;
+  text: string;
+  href?: string;
+  span?: number;
+}[] = [
+  {
+    icon: "palette",
+    title: "A style guide that cannot drift",
+    text: "Every token on one page — type, color, themes, spacing, grid — rendered from the files the site is built from, never copied. On a migration it is measured against the old site and proven identical at every width.",
+    href: "/docs/system/style-guide",
+    span: 12,
+  },
   {
     icon: "squares-four",
     title: "A 12-column grid",
@@ -59,7 +72,9 @@ const features = [
     class="home-hero_wrap"
   >
     <Aurora slot="background" />
-    <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
+    <Eyebrow variant="tag">
+      <span class="text-transform-none">v{pkg.trix.version}</span>
+    </Eyebrow>
     <Heading tag="h1" variant="display" maxWidth={14} class="alignment-center">
       A design-ready framework for Astro
     </Heading>
@@ -84,13 +99,13 @@ const features = [
     <Row rowGap="8" animate>
       {
         features.map((f) => (
-          <Col span={4}>
+          <Col span={f.span ?? 4}>
             <div class="home-feature_wrap">
               <Icon name={f.icon} variant="medium" />
               <Heading tag="h2" variant="h6">
-                {f.title}
+                {f.href ? <a href={f.href}>{f.title}</a> : f.title}
               </Heading>
-              <Paragraph variant="small" class="color-faded">
+              <Paragraph variant="small" maxWidth={60} class="color-faded">
                 {f.text}
               </Paragraph>
             </div>
@@ -114,6 +129,7 @@ const features = [
       display: flex;
       flex-direction: column;
       gap: var(--space-2);
+      width: 100%;
       height: 100%;
       padding: var(--space-5);
       border: var(--border-width) solid var(--border);
@@ -121,6 +137,23 @@ const features = [
 
       > [class] {
         margin-block: 0;
+      }
+      /* A feature with a page: the whole card is its link. */
+      &:has(a) {
+        position: relative;
+      }
+      &:has(a:hover) {
+        border-color: var(--text-2);
+      }
+      a {
+        color: inherit;
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+        }
       }
     }
   }

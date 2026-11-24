@@ -1,0 +1,236 @@
+---
+import Grid from "@/components/wrapper/Grid.astro";
+import Row from "@/components/wrapper/Row.astro";
+import Col from "@/components/wrapper/Col.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import RichText from "@/components/typography/RichText.astro";
+import Button from "@/components/Button.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
+import { lengthLabel, model, px } from "@/utils/style-guide.ts";
+import { layoutGrid, toPx } from "@/utils/tokens.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const breakpointNote: Record<string, string> = {
+  small: "Webflow mobile landscape",
+  medium: "Webflow tablet",
+  large: "Webflow desktop",
+};
+const phoneWidth = toPx(model.breakpoints[0]?.value ?? "30rem") ?? 480;
+const grids = [375, 768, 992, 1440, 1920].map((frame) => ({
+  frame,
+  phone: frame < phoneWidth,
+  grid: layoutGrid(model, frame),
+}));
+type ColProps = {
+  text: string;
+  span?: number;
+  medium?: number;
+  offset?: number | "center";
+  order?: "first" | "last";
+};
+const rowExamples: { label: string; cols: ColProps[] }[] = [
+  {
+    label: "span={8} + span={4} — 6 + 6 on tablet, stacked on mobile",
+    cols: [
+      { text: "span 8", span: 8 },
+      { text: "span 4", span: 4 },
+    ],
+  },
+  {
+    label: "span={6} × 2",
+    cols: [
+      { text: "span 6", span: 6 },
+      { text: "span 6", span: 6 },
+    ],
+  },
+  {
+    label: "span={4} × 3 — 2 + 1 on tablet",
+    cols: [1, 2, 3].map(() => ({ text: "span 4", span: 4 })),
+  },
+  {
+    label: "span={3} × 4 — 2 × 2 on tablet and large phones",
+    cols: [1, 2, 3, 4].map(() => ({ text: "span 3", span: 3 })),
+  },
+  {
+    label: 'span={8} offset="center" — full width on tablet',
+    cols: [{ text: 'span 8 · offset "center"', span: 8, offset: "center" }],
+  },
+  {
+    label:
+      "span={5} + span={6} offset={1} — media and text with a column of air",
+    cols: [
+      { text: "span 5", span: 5 },
+      { text: "span 6 · offset 1", span: 6, offset: 1 },
+    ],
+  },
+  {
+    label:
+      'span={6} + span={6} order="first" — second in the markup, first on desktop',
+    cols: [
+      { text: "span 6 · first in the markup", span: 6 },
+      { text: 'span 6 · order "first"', span: 6, order: "first" },
+    ],
+  },
+  {
+    label:
+      "span={4} medium={12} + span={8} medium={12} — an override wins over the automatic stacking",
+    cols: [
+      { text: "span 4 · medium 12", span: 4, medium: 12 },
+      { text: "span 8 · medium 12", span: 8, medium: 12 },
+    ],
+  },
+];
+const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Breakpoints" variant="rows">
+        <StyleGuideItem label="xsmall">
+          <Paragraph variant="small">
+            Below {model.breakpoints[0]?.value} — Webflow mobile portrait. The
+            default; write it unqualified.
+          </Paragraph>
+        </StyleGuideItem>
+        {model.breakpoints.map((b) => (
+          <StyleGuideItem label={b.name}>
+            <Paragraph variant="small">
+              <code>@media (width &gt;= {b.value})</code> — {px(toPx(b.value))}{" "}
+              and up · {breakpointNote[b.name] ?? ""}
+            </Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Layout grid" variant="rows">
+        <StyleGuideItem
+          label={`--grid-columns: ${grids[0].grid.columns} · gutter --site-gutter · margin --site-margin · max width --max-width-main`}
+        >
+          <div class="flex-horizontal-wrap gap-3">
+            <Button data-grid-overlay-toggle aria-pressed="false">
+              Show grid overlay
+            </Button>
+            <Paragraph variant="small" class="margin-top-0">
+              Or press <kbd>Shift</kbd>+<kbd>G</kbd> on any page while
+              developing.
+            </Paragraph>
+          </div>
+        </StyleGuideItem>
+        <StyleGuideItem label="The columns at this screen width">
+          <Row>
+            {Array.from({ length: grids[0].grid.columns }, (_, i) => (
+              <Col
+                xsmall={1}
+                class="alignment-center background-skeleton radius-xsmall padding-block-2 text-style-xsmall"
+              >
+                {i + 1}
+              </Col>
+            ))}
+          </Row>
+        </StyleGuideItem>
+        <StyleGuideItem label="Figma layout grid, per frame">
+          <RichText variant="small">
+            <table>
+              <thead>
+                <tr>
+                  <th>Frame</th>
+                  <th>Design on</th>
+                  <th>Margin</th>
+                  <th>Gutter</th>
+                  <th>Column (of 12)</th>
+                  <th>Content width</th>
+                </tr>
+              </thead>
+              <tbody>
+                {grids.map(({ frame, phone, grid }) => (
+                  <tr>
+                    <td>{frame}</td>
+                    <td>
+                      {phone
+                        ? `4 columns (one = span 3)`
+                        : `${grid.columns} columns`}
+                    </td>
+                    <td>{px(grid.margin)}</td>
+                    <td>{px(grid.gutter)}</td>
+                    <td>{px(grid.column)}</td>
+                    <td>{px(grid.container)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </RichText>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Row and Col — layouts on the 12 columns"
+        variant="rows"
+      >
+        {rowExamples.map((example) => (
+          <StyleGuideItem label={example.label}>
+            <Row>
+              {example.cols.map(({ text, ...props }) => (
+                <Col
+                  {...props}
+                  class="background-skeleton radius-small padding-3 text-style-small"
+                >
+                  {text}
+                </Col>
+              ))}
+            </Row>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Grid — equal columns">
+        <StyleGuideItem label="Grid xsmall={1} small={2} medium={3} large={4}">
+          <Grid xsmall={1} small={2} medium={3} large={4} class="width-full">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((cell) => (
+              <div class="background-skeleton radius-small padding-3 text-style-small">
+                {cell}
+              </div>
+            ))}
+          </Grid>
+        </StyleGuideItem>
+        <StyleGuideItem label={'Grid variant="autofit" minColumnWidth={14}'}>
+          <Grid variant="autofit" minColumnWidth={14} class="width-full">
+            {[1, 2, 3, 4, 5].map((cell) => (
+              <div class="background-skeleton radius-small padding-3 text-style-small">
+                {cell}
+              </div>
+            ))}
+          </Grid>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Containers" variant="rows">
+        {["max-width-main", "max-width-small"].map((token) => (
+          <StyleGuideToken
+            token={token}
+            value={lengthLabel(token)}
+            variant="space"
+          />
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Aspect ratio" variant="tiles">
+        {ratios.map((ratio) => (
+          <StyleGuideItem label={`ratio-${ratio}`} variant="card">
+            <div
+              class={`ratio-${ratio} width-full radius-small background-skeleton`}
+            />
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+    </>
+  )
+}

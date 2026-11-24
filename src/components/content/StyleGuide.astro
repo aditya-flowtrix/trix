@@ -1,0 +1,73 @@
+---
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import Button from "@/components/Button.astro";
+import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
+import StyleGuideTitle from "@/components/content/StyleGuideTitle.astro";
+import StyleGuideBrand from "@/components/content/StyleGuideBrand.astro";
+import StyleGuideTypography from "@/components/content/StyleGuideTypography.astro";
+import StyleGuideColors from "@/components/content/StyleGuideColors.astro";
+import StyleGuideSpacing from "@/components/content/StyleGuideSpacing.astro";
+import StyleGuideLayout from "@/components/content/StyleGuideLayout.astro";
+import StyleGuideMotion from "@/components/content/StyleGuideMotion.astro";
+import StyleGuideIcons from "@/components/content/StyleGuideIcons.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Where "Open components" goes. */
+  componentsHref?: string;
+}
+
+const { render = true, componentsHref = "/components" } = Astro.props;
+
+const sections = [
+  { id: "brand", name: "Brand", Body: StyleGuideBrand },
+  { id: "typography", name: "Typography", Body: StyleGuideTypography },
+  { id: "colors", name: "Colors", Body: StyleGuideColors },
+  { id: "spacing", name: "Spacing", Body: StyleGuideSpacing },
+  { id: "layout", name: "Layout", Body: StyleGuideLayout },
+  { id: "motion", name: "Motion", Body: StyleGuideMotion },
+  { id: "icons", name: "Icons", Body: StyleGuideIcons },
+];
+---
+
+{
+  render && (
+    <>
+      <Section paddingBottom="none">
+        <Heading tag="h1">Style Guide</Heading>
+        <slot />
+        <nav aria-label="Style guide sections">
+          <ButtonWrapper marginTop="0">
+            {[...sections, { id: "components", name: "Components" }].map(
+              ({ id, name }) => (
+                <Button element="link" variant="link" href={`#${id}`}>
+                  {name}
+                </Button>
+              ),
+            )}
+          </ButtonWrapper>
+        </nav>
+      </Section>
+
+      {sections.map(({ id, name, Body }, i) => (
+        <Section id={id} gap="8" paddingTop={i ? "none" : undefined}>
+          <StyleGuideTitle>{name}</StyleGuideTitle>
+          <Body />
+        </Section>
+      ))}
+
+      <Section id="components" paddingTop="none">
+        <StyleGuideTitle>Components</StyleGuideTitle>
+        <Paragraph maxWidth={60}>
+          Every component and variant, with live examples.
+        </Paragraph>
+        <Button element="link" href={componentsHref}>
+          Open components
+        </Button>
+      </Section>
+    </>
+  )
+}

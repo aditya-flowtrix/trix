@@ -1,7 +1,7 @@
 {
   "background": {
     "$type": "color",
-    "$value": "{color.black}"
+    "$value": "{color.neutral.950}"
   },
   "background-2": {
     "$type": "color",

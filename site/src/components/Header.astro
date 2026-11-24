@@ -17,6 +17,11 @@ const links = [
     href: "/docs/components/section",
     active: path.startsWith("/docs/components"),
   },
+  {
+    label: "Style guide",
+    href: "/style-guide",
+    active: path === "/style-guide",
+  },
 ];
 ---
 
@@ -132,6 +137,7 @@ const links = [
       .site-header_search_label {
         position: absolute;
         width: 1px;
+        min-width: 0;
         height: 1px;
         overflow: hidden;
         clip-path: inset(50%);

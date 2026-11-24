@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+- The style guide is on the docs site. A new page,
+  [Style guide](https://trix.flowtrix.workers.dev/docs/system/style-guide),
+  says why it cannot drift and how a migration proves it, with Typography,
+  Colors and Spacing rendered live by the framework's own components; the
+  whole page is at
+  [/style-guide](https://trix.flowtrix.workers.dev/style-guide), indexable
+  there, and linked from the header and the homepage. Installation's "style
+  guide" link pointed at the Figma guide; it now points at the new page.
+- `/style-guide`'s sections are components in `src/components/content/`:
+  `StyleGuideBrand`, `StyleGuideTypography`, `StyleGuideColors`,
+  `StyleGuideSpacing`, `StyleGuideLayout`, `StyleGuideMotion` and
+  `StyleGuideIcons`, put together by `StyleGuide`, reading the design system
+  through `src/utils/style-guide.ts`. A project's page looks the same and is
+  still `noindex`; a project that changed its `style-guide.astro` moves those
+  changes into the section they belong to.
+- Default tokens that read as placeholders on the public style guide:
+  - The eyebrow is its own style instead of a copy of small text: 12 → 14px,
+    medium weight, uppercase, `--letter-spacing-wider`, `--line-height-large`.
+  - Headings on phones step by about 1.2× each: display 64 → 56, h1 48 → 44,
+    h2 40 → 36, h3 36 → 30, h4 28 → 26, h6 16 → 18 (and 18 → 20 on desktop,
+    so it no longer matches body text). Every other desktop size is unchanged.
+  - The dark theme's background is `--neutral-950` instead of pure black. The
+    docs' dark code blocks move to `--neutral-900` to stay apart from it.
+  - A project that wants the old values sets them back in its `tokens.css`
+    and `themes.css`.
+- The style guide shows `--brand-text` as text on the color the default theme
+  puts it on (`--button-background`), not as a second black tile; its samples
+  are real sentences instead of Lorem ipsum, with no brand in them; and the
+  logo mark fills its card like the logo.
+- `StyleGuideGroup`'s `grid` variant is now `tiles`. Its `grid` class also
+  matched `Grid`'s, which lost only because of stylesheet order. The rich
+  text sample has the space it was missing before "a link".
+
 - Moving into Sanity is built in. `node scripts/cms/convert.ts sanity`
   turns the imported CMS into the NDJSON `sanity datasets import` takes and
   the Studio schema those documents need: IDs from the source's, so every run

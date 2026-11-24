@@ -1,0 +1,48 @@
+---
+import Row from "@/components/wrapper/Row.astro";
+import Col from "@/components/wrapper/Col.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import { model } from "@/utils/style-guide.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const motion = model.tokens.filter((t) => /^(hover|open|reveal)-/.test(t.name));
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Tokens" variant="rows">
+        {motion.map((t) => (
+          <StyleGuideItem label={`--${t.name}`}>
+            <Paragraph variant="small">
+              <code>{t.value}</code>
+            </Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Reveal — animate on Section, Row, Col or Grid">
+        <StyleGuideItem label="<Row animate> — the columns fade up in turn the first time they scroll into view; skipped for reduced motion">
+          <Row animate>
+            {[1, 2, 3, 4].map((n) => (
+              <Col
+                span={3}
+                class="background-skeleton radius-small padding-3 text-style-small"
+              >
+                {n}
+              </Col>
+            ))}
+          </Row>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+    </>
+  )
+}

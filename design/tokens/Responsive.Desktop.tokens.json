@@ -45,7 +45,7 @@
     "h6": {
       "$type": "dimension",
       "$value": {
-        "value": 18,
+        "value": 20,
         "unit": "px"
       }
     },
@@ -87,7 +87,7 @@
     "eyebrow": {
       "$type": "dimension",
       "$value": {
-        "value": 16,
+        "value": 14,
         "unit": "px"
       }
     }
