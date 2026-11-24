@@ -5,7 +5,9 @@
  *
  * Usage
  *   node scripts/cms/import.ts webflow --site <site id>                (WEBFLOW_TOKEN in the environment)
- *   node scripts/cms/import.ts webflow --json export.json              (saved from the Webflow MCP or API)
+ *                                      [--locale fr-FR]              another Webflow Localization locale: one
+ *                                                                    run each, written beside the primary's
+ *   node scripts/cms/import.ts webflow --json export.json [--locale fr-FR]  (saved from the Webflow MCP or API)
  *   node scripts/cms/import.ts wordpress --url https://example.com [--types post,page] [--limit 20]
  *                                         [--user name]                (WP_APP_PASSWORD in the environment: drafts too)
  *   node scripts/cms/import.ts csv --file blog.csv --collection blog [--route /blog]
@@ -14,7 +16,10 @@
  *                                   [--types "Summary:text,Video:video"]
  *   node scripts/cms/import.ts json --file normalized.json             (any other CMS, already in the common shape)
  *
- *   --drafts   include unpublished items (they are written with `draft: true`)
+ *   --drafts             include unpublished items (they are written with `draft: true`)
+ *   --seo-from <origin>  read a few items' old pages to learn the template page's SEO
+ *                        bindings, and fill every item's title, description and image the same
+ *                        way (scripts/cms/seo-from-pages.ts)
  *
  * Tokens and passwords come only from the environment, never from arguments,
  * so they stay out of shell history.
@@ -22,7 +27,11 @@
 
 import { readFileSync } from "node:fs";
 import { args, output } from "../measure/browser.ts";
-import type { CmsExport, FieldType } from "../../src/utils/cms/model.ts";
+import {
+  slugify,
+  type CmsExport,
+  type FieldType,
+} from "../../src/utils/cms/model.ts";
 import {
   fetchWebflow,
   normalizeWebflow,
@@ -30,6 +39,7 @@ import {
 } from "../../src/utils/cms/webflow.ts";
 import { fetchWordPress } from "../../src/utils/cms/wordpress.ts";
 import { csvCollection } from "../../src/utils/cms/csv.ts";
+import { seoFromPages } from "./seo-from-pages.ts";
 
 const source = process.argv[2];
 const opts = args();
@@ -64,10 +74,20 @@ switch (source) {
         token,
         site: str("site")!,
         drafts: !!opts.drafts,
+        locale: str("locale"),
       });
     }
+    // A saved export of another locale says which one with --locale.
+    if (str("json") && str("locale") && !site.locale)
+      site.locale = {
+        tag: str("locale")!,
+        subdirectory: str("locale")!.toLowerCase(),
+      };
     data = normalizeWebflow(site);
-    name = "webflow";
+    name =
+      site.locale && !site.locale.primary
+        ? `webflow-${slugify(site.locale.tag)}`
+        : "webflow";
     break;
   }
   case "wordpress": {
@@ -124,6 +144,9 @@ if (!opts.drafts)
       );
     c.items = c.items.filter((i) => !i.draft);
   }
+
+if (str("seo-from"))
+  data.warnings.push(...(await seoFromPages(data, str("seo-from")!)));
 
 const file = output(`cms/${name}.json`, JSON.stringify(data, null, 2));
 console.log(`${data.source}\n`);

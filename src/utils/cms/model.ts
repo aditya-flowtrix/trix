@@ -78,6 +78,8 @@ export interface Collection {
 
 export interface CmsExport {
   source: string;
+  /** The locale read, when the CMS has several: its tag, like `fr-FR`. */
+  locale?: string;
   collections: Collection[];
   warnings: string[];
 }

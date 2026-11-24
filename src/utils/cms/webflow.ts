@@ -6,6 +6,7 @@
 
 import {
   camel,
+  slugify,
   type CmsExport,
   type Collection,
   type Field,
@@ -33,8 +34,19 @@ interface WfItem {
   createdOn?: string;
   fieldData: Record<string, unknown>;
 }
+/** One of a site's locales, as the Sites API lists it. */
+export interface WebflowLocale {
+  tag: string;
+  /** The locale's URL prefix: `fr-fr` in /fr-fr/blog/…; empty for the primary. */
+  subdirectory: string;
+  cmsLocaleId?: string;
+  displayName?: string;
+  primary?: boolean;
+}
 export interface WebflowSite {
   site?: string;
+  /** The locale these items were read in; absent is the primary. */
+  locale?: WebflowLocale;
   collections: {
     id: string;
     displayName: string;
@@ -71,6 +83,11 @@ export async function fetchWebflow(opts: {
   site: string;
   /** Include drafts (the staged items), not only what is published. */
   drafts?: boolean;
+  /**
+   * A locale other than the primary (Webflow Localization): its tag (`fr-FR`),
+   * subdirectory (`fr-fr`) or CMS locale id. Each locale is its own read.
+   */
+  locale?: string;
 }): Promise<WebflowSite> {
   const api = async (path: string): Promise<Record<string, unknown>> => {
     for (let attempt = 0; ; attempt++) {
@@ -90,6 +107,27 @@ export async function fetchWebflow(opts: {
       return (await r.json()) as Record<string, unknown>;
     }
   };
+  let locale: WebflowLocale | undefined;
+  if (opts.locale) {
+    const { locales } = (await api(`/sites/${opts.site}`)) as {
+      locales?: { primary?: WebflowLocale; secondary?: WebflowLocale[] };
+    };
+    const all = [
+      ...(locales?.primary ? [{ ...locales.primary, primary: true }] : []),
+      ...(locales?.secondary ?? []),
+    ];
+    const want = opts.locale.toLowerCase();
+    locale = all.find((l) =>
+      [l.tag, l.subdirectory, l.cmsLocaleId, l.displayName].some(
+        (v) => v?.toLowerCase() === want,
+      ),
+    );
+    if (!locale?.cmsLocaleId)
+      throw new Error(
+        `Webflow: no CMS locale "${opts.locale}" on this site (has ${all.map((l) => l.tag).join(", ") || "none: Localization is off"})`,
+      );
+  }
+  const inLocale = locale ? `&cmsLocaleId=${locale.cmsLocaleId}` : "";
   const list = (await api(`/sites/${opts.site}/collections`)) as {
     collections: { id: string }[];
   };
@@ -101,14 +139,14 @@ export async function fetchWebflow(opts: {
     const items: WfItem[] = [];
     for (let offset = 0; ; offset += 100) {
       const page = (await api(
-        `/collections/${id}/items${opts.drafts ? "" : "/live"}?limit=100&offset=${offset}`,
+        `/collections/${id}/items${opts.drafts ? "" : "/live"}?limit=100&offset=${offset}${inLocale}`,
       )) as { items: WfItem[]; pagination: { total: number } };
       items.push(...page.items);
       if (items.length >= page.pagination.total || !page.items.length) break;
     }
     collections.push({ ...details, items });
   }
-  return { site: opts.site, collections };
+  return { site: opts.site, ...(locale ? { locale } : {}), collections };
 }
 
 const SEO = {
@@ -120,6 +158,14 @@ const SEO = {
 export function normalizeWebflow(site: WebflowSite): CmsExport {
   const warnings: string[] = [];
   const byId = new Map(site.collections.map((c) => [c.id, c]));
+  // A secondary locale is its own set of collections — blog-fr-fr beside
+  // blog — under its own URL prefix, so the primary's files are never touched.
+  const other = site.locale && !site.locale.primary ? site.locale : undefined;
+  const prefix = other
+    ? `/${other.subdirectory || other.tag.toLowerCase()}`
+    : "";
+  const local = (slug: string) =>
+    other ? `${slug}-${slugify(other.subdirectory || other.tag)}` : slug;
   // Every item's slug by its id, across the site, for references.
   const slugOf = new Map<string, string>();
   for (const c of site.collections)
@@ -154,7 +200,7 @@ export function normalizeWebflow(site: WebflowSite): CmsExport {
                 : type,
             required: !!f.isRequired,
             options: f.validations?.options?.map((o) => o.name),
-            collection: target ? camel(target.slug) : undefined,
+            collection: target ? camel(local(target.slug)) : undefined,
           } satisfies Field,
         ];
       });
@@ -255,18 +301,18 @@ export function normalizeWebflow(site: WebflowSite): CmsExport {
             .filter((d): d is string => !!d)
             .sort()
             .at(-1),
-          oldPath: `/${c.slug}/${fd.slug}`,
+          oldPath: `${prefix}/${c.slug}/${fd.slug}`,
           seo: Object.keys(seo).length ? seo : undefined,
           body: bodyHtml,
           data,
         };
       });
     return {
-      key: camel(c.slug),
-      folder: c.slug,
+      key: camel(local(c.slug)),
+      folder: local(c.slug),
       label: c.displayName,
       source: `webflow:${c.id}`,
-      route: `/${c.slug}`,
+      route: `${prefix}/${c.slug}`,
       bodyField: body?.key,
       fields: fields.filter((f) => f !== body),
       items,
@@ -274,6 +320,7 @@ export function normalizeWebflow(site: WebflowSite): CmsExport {
   });
   return {
     source: `webflow${site.site ? `:${site.site}` : ""}`,
+    ...(site.locale ? { locale: site.locale.tag } : {}),
     collections,
     warnings,
   };

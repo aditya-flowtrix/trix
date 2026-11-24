@@ -47,9 +47,11 @@ Ask the owner in one message, record each answer under **Migration → CMS**:
   page builder (§4).
 - **Model changes** — the list from §2, each one approved.
 - **Drafts** — leave out (default), or bring them across as drafts.
-- **Locales** — one Webflow read per locale (`cmsLocaleId`). Choose the new
-  CMS's localisation model first (Sanity: a document per locale, or a field
-  per locale), then import into it.
+- **Locales** — one Webflow read per locale (`import.ts webflow --locale
+fr-FR`). Choose the new CMS's localisation model first. `convert.ts` gives
+  each locale's collection its own type (`blogFrFr`) — a document per
+  locale; for a field per locale, merge the locales' files before
+  converting.
 - **The content freeze** — the date Webflow stops being edited. Before it,
   Webflow is the record and the import runs as often as needed; after it, the
   new CMS is the record (§10).

@@ -8,7 +8,8 @@ Three ways, all giving the same result:
    API access → generate a token with CMS read access.
 
    ```bash
-   WEBFLOW_TOKEN=… node scripts/cms/import.ts webflow --site <site id> [--drafts]
+   WEBFLOW_TOKEN=… node scripts/cms/import.ts webflow --site <site id> [--drafts] \
+     [--locale fr-FR] [--seo-from https://www.old-site.com]
    ```
 
    Published items come from `/items/live`; `--drafts` reads the staged items
@@ -58,13 +59,28 @@ prefix to keep every URL, or a new one and the redirects are written.
 - **Collection list settings** — filters, sorting, limits, "show items
   from" — live in the Designer. Read each list there (or from the
   connector's element tools) and record it in `PROJECT.md`.
-- **SEO settings of template pages** — the title and description bound to
-  fields in the Designer. Fields named like `seo-title`, `meta-description`,
-  `og-image` are picked up as `seo`; anything else, map by hand.
-- **Localization** — `import.ts webflow --site` reads the primary locale
-  only. Each other CMS locale is its own read of the items with
-  `?cmsLocaleId=<id>` (the CMS locale id, not the site locale id): save each
-  locale's collections as JSON and import it with `--json`, one set of files
-  per locale.
+- **SEO settings of template pages** — the title, description and Open
+  Graph image bound to fields in the Designer; the Pages API does not say
+  which field. Fields named like `seo-title`, `meta-description`, `og-image`
+  are picked up as `seo` anyway. For the rest, add
+  `--seo-from https://www.old-site.com`: it reads three items' old pages,
+  finds the field each one's title, description and `og:image` came from,
+  and fills every item the same way. A title that is the item's name plus
+  the site's (`{title} | Acme`) stores nothing — the layout makes it. When
+  the pages do not agree (a template of two fields, a description typed by
+  hand on some items), it says so and leaves that one to map by hand.
+  Parity (`/trix-seo`) checks the result page by page.
+- **Localization** — `--site` reads the primary locale. Each other CMS locale
+  is one more run: `import.ts webflow --site <id> --locale fr-FR` (its tag,
+  subdirectory or CMS locale id; the error lists the site's locales). It
+  writes `.trix/cms/webflow-fr-fr.json`, whose collections are their own —
+  `blog-fr-fr` beside `blog`, routed under the locale's subdirectory
+  (`/fr-fr/blog`), references pointing inside the locale — so `write.ts`
+  puts them beside the primary's files and keeps every locale's redirects.
+  A locale saved as JSON: `--json fr.json --locale fr-FR`. Then each
+  locale's page reads its own collection (`src/pages/fr-fr/blog/[slug].astro`
+  → `getCollection("blogFrFr")`), and Astro's `i18n` routing in
+  `astro.config.mjs` handles the rest. `BaseHead` does not write `hreflang`
+  alternates: add them per page until it does.
 - **Ecommerce** products and **Users/Memberships** are separate APIs; agree
   the approach before moving them.

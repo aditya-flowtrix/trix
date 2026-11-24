@@ -143,6 +143,8 @@ domain (`--old-dir` of the export, `--new https://www.example.com`).
 ## 6. Launch handoff
 
 - [ ] `npm run seo -- --production` passes on the production build.
+- [ ] A day before the switch, the domain's DNS TTL is lowered to 300
+      seconds, so the cutover — and a rollback — reaches visitors in minutes.
 - [ ] Parity: no **lost** URLs; every **changed** one confirmed.
 - [ ] Search Console: domain property verified (DNS TXT), sitemap
       `sitemap-index.xml` submitted, the key pages inspected and requested.
