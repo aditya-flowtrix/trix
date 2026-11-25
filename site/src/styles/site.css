@@ -7,6 +7,8 @@
 @layer components {
   :root {
     --mono-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    /* The style guide's chapter bar sticks under this site's header. */
+    --style-guide-top: 3.5rem;
   }
 
   /* ---------- Shell ---------- */

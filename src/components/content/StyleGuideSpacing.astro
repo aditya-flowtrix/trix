@@ -14,47 +14,68 @@ const { render = true } = Astro.props;
 {
   render && (
     <>
-      <StyleGuideGroup title="Space scale" variant="rows">
+      <StyleGuideGroup
+        title="Space scale"
+        caption="The steps between things inside a section, from a hairline gap to a wide one. Each grows from phone to desktop."
+        variant="rows"
+      >
         {model.spaces.map((space) => {
           const n = space.slice(6);
           return (
             <StyleGuideToken
               token={space}
-              value={`${range(space)} · gap-${n}, padding-${n}, margin-top-${n}`}
+              value={range(space)}
+              note={`gap-${n}, padding-${n}, margin-top-${n}`}
               variant="space"
             />
           );
         })}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Section space" variant="rows">
+      <StyleGuideGroup
+        title="Section space"
+        caption="The space above and below a section."
+        variant="rows"
+      >
         {model.sectionSpaces.map((name) => (
           <StyleGuideToken
             token={`section-space-${name}`}
-            value={`${range(`section-space-${name}`)} · Section padding "${name.replace(/-/g, "")}"`}
+            value={range(`section-space-${name}`)}
+            note={`Section padding "${name.replace(/-/g, "")}"`}
             variant="space"
           />
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Site" variant="rows">
+      <StyleGuideGroup
+        title="Site"
+        caption="The space at the edges of the screen, and between columns."
+        variant="rows"
+      >
         <StyleGuideToken
           token="site-margin"
-          value={`${range("site-margin")} · padding-sitemargin`}
+          value={range("site-margin")}
+          note="padding-sitemargin"
           variant="space"
         />
         <StyleGuideToken
           token="site-gutter"
-          value={`${range("site-gutter")} · the layout grid gutter: Row and Grid gap`}
+          value={range("site-gutter")}
+          note="The layout grid gutter: Row and Grid gap"
           variant="space"
         />
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Radius" variant="tiles">
+      <StyleGuideGroup
+        title="Radius"
+        caption="How round corners are, from crisp to a full pill."
+        variant="tiles"
+      >
         {model.radii.map((name) => (
           <StyleGuideToken
             token={`radius-${name}`}
-            value={`${lengthLabel(`radius-${name}`)} · radius-${name}`}
+            value={lengthLabel(`radius-${name}`)}
+            note={`radius-${name}`}
             variant="radius"
           />
         ))}

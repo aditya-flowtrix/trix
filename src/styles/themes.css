@@ -120,7 +120,7 @@
 
   --button-background: var(--brand-text);
   --button-border: var(--button-background);
-  --button-text: var(--background);
+  --button-text: var(--white);
   --button-background-hover: var(--white);
   --button-border-hover: var(--button-background-hover);
   --button-text-hover: var(--black);

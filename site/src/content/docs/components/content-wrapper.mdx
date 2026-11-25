@@ -78,6 +78,12 @@ Put the media in the `column2` slot and choose the arrangement:
 `reverse` puts the second column first. The `/components` page of a new
 project shows every variant.
 
+A card is dark, so its text reads over a photo. `theme` sets another theme,
+and `theme="inherit"` lets the card follow the page's color mode, for a
+visual that changes with it. The homepage hero does that: its background
+SVG is inlined, so its colors come from the theme. The same file as an
+`<img>` stays dark.
+
 ## Props
 
 <Props of="wrapper/ContentWrapper" />

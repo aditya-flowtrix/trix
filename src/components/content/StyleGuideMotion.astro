@@ -1,10 +1,11 @@
 ---
+import Button from "@/components/Button.astro";
 import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
-import Paragraph from "@/components/typography/Paragraph.astro";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
 import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
 import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
-import { model } from "@/utils/style-guide.ts";
+import { model, value } from "@/utils/style-guide.ts";
 
 interface Props {
   /** Set to `false` to omit the component. */
@@ -13,25 +14,85 @@ interface Props {
 
 const { render = true } = Astro.props;
 
-const motion = model.tokens.filter((t) => /^(hover|open|reveal)-/.test(t.name));
+const about: Record<string, { title: string; text: string }> = {
+  hover: {
+    title: "Hover",
+    text: "A link, button or card answering the pointer.",
+  },
+  open: {
+    title: "Open",
+    text: "An accordion, dropdown or menu opening and closing.",
+  },
+  reveal: {
+    title: "Reveal",
+    text: "Content fading up the first time it scrolls into view.",
+  },
+};
+const motion = Object.entries(
+  Object.groupBy(
+    model.tokens.filter((t) => /^(hover|open|reveal)-/.test(t.name)),
+    (t) => t.name.split("-")[0],
+  ),
+).map(([kind, tokens]) => ({ kind, ...about[kind], tokens: tokens ?? [] }));
 ---
 
 {
   render && (
     <>
-      <StyleGuideGroup title="Tokens" variant="rows">
-        {motion.map((t) => (
-          <StyleGuideItem label={`--${t.name}`}>
-            <Paragraph variant="small">
-              <code>{t.value}</code>
-            </Paragraph>
-          </StyleGuideItem>
+      <StyleGuideGroup
+        title="Timing"
+        caption="How long each kind of movement takes and how it eases. Point at a demo, or press Play, to watch it."
+        variant="cards"
+      >
+        {motion.map(({ kind, title, text, tokens }) => (
+          <div class:list={["style-guide-motion_card", kind]}>
+            <div class="style-guide-motion_stage" aria-hidden="true">
+              <span class="style-guide-motion_dot" />
+            </div>
+            <div class="style-guide-motion_about">
+              <h4 class="text-style-h6">{title}</h4>
+              <p class="text-style-small">{text}</p>
+            </div>
+            <Button
+              size="small"
+              emphasis="secondary"
+              type="button"
+              class="style-guide-motion_play"
+              aria-label={`Play ${title.toLowerCase()}`}
+            >
+              Play
+            </Button>
+            <dl class="style-guide-motion_tokens">
+              {tokens.map((t) => (
+                <div>
+                  <dt>
+                    <StyleGuideCopy
+                      text={`var(--${t.name})`}
+                      label={`--${t.name}`}
+                    />
+                  </dt>
+                  <dd>
+                    {value(t.name)}
+                    {t.value.startsWith("var(") &&
+                      `, from ${t.value.slice(4, -1)}`}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Reveal — animate on Section, Row, Col or Grid">
-        <StyleGuideItem label="<Row animate> — the columns fade up in turn the first time they scroll into view; skipped for reduced motion">
-          <Row animate>
+      <StyleGuideGroup
+        title="Reveal"
+        caption="The animate prop on Section, Row, Col or Grid."
+      >
+        <StyleGuideItem
+          label="<Row animate>"
+          note="The columns fade up in turn the first time they scroll into view; skipped for reduced motion."
+          class="width-full"
+        >
+          <Row animate class="style-guide-motion_reveal">
             {[1, 2, 3, 4].map((n) => (
               <Col
                 span={3}
@@ -41,8 +102,196 @@ const motion = model.tokens.filter((t) => /^(hover|open|reveal)-/.test(t.name));
               </Col>
             ))}
           </Row>
+          <Button
+            size="small"
+            emphasis="secondary"
+            type="button"
+            class="style-guide-motion_replay"
+          >
+            Play again
+          </Button>
         </StyleGuideItem>
       </StyleGuideGroup>
     </>
   )
 }
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // Play runs a card's movement there and back, as a pointer does on its way
+  // in and out; Play again repeats the reveal.
+  mount(".style-guide-motion_play", (button, signal) => {
+    const card = button.closest<HTMLElement>(".style-guide-motion_card");
+    const dot = card?.querySelector(".style-guide-motion_dot");
+    if (!card || !dot) return;
+    let timer = 0;
+    button.addEventListener(
+      "click",
+      () => {
+        const ms = Math.max(
+          ...getComputedStyle(dot)
+            .transitionDuration.split(",")
+            .map((d) => parseFloat(d) * (d.trim().endsWith("ms") ? 1 : 1000)),
+        );
+        clearTimeout(timer);
+        card.setAttribute("data-play", "");
+        timer = window.setTimeout(
+          () => card.removeAttribute("data-play"),
+          ms + 600,
+        );
+      },
+      { signal },
+    );
+  });
+
+  mount(".style-guide-motion_replay", (button, signal) => {
+    const row = button.parentElement?.querySelector(
+      ".style-guide-motion_reveal",
+    );
+    if (!row) return;
+    button.addEventListener(
+      "click",
+      () => {
+        row.classList.remove("is-revealed");
+        void (row as HTMLElement).offsetWidth;
+        row.classList.add("is-revealed");
+      },
+      { signal },
+    );
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    /* The demo, then its name with Play beside it, then its tokens. */
+    .style-guide-motion_card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-content: start;
+      gap: var(--space-4) var(--space-3);
+      padding: var(--space-5);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+
+      > .style-guide-motion_stage,
+      > .style-guide-motion_tokens {
+        grid-column: 1 / -1;
+      }
+    }
+    .style-guide-motion_stage {
+      container-type: inline-size;
+      display: flex;
+      align-items: center;
+      height: 5rem;
+      padding-inline: var(--space-3);
+      border-radius: var(--radius-small);
+      background-color: var(--background-3);
+    }
+    .style-guide-motion_dot {
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-round);
+      background-color: var(--text-2);
+      transition: background-color var(--hover-duration) var(--hover-ease);
+    }
+    .style-guide-motion_card:is(
+        [data-play],
+        :has(.style-guide-motion_stage:hover)
+      )
+      .style-guide-motion_dot {
+      background-color: var(--button-background);
+    }
+    .style-guide-motion_card.open .style-guide-motion_dot {
+      width: 20%;
+      border-radius: var(--radius-xsmall);
+    }
+    .style-guide-motion_card.reveal .style-guide-motion_dot {
+      opacity: 0.3;
+    }
+    .style-guide-motion_card.reveal:is(
+        [data-play],
+        :has(.style-guide-motion_stage:hover)
+      )
+      .style-guide-motion_dot {
+      opacity: 1;
+    }
+
+    /* The movement itself, for visitors who haven't asked for less. */
+    @media (prefers-reduced-motion: no-preference) {
+      .style-guide-motion_card.hover .style-guide-motion_dot {
+        transition:
+          translate var(--hover-duration) var(--hover-ease),
+          background-color var(--hover-duration) var(--hover-ease);
+      }
+      .style-guide-motion_card.hover:is(
+          [data-play],
+          :has(.style-guide-motion_stage:hover)
+        )
+        .style-guide-motion_dot {
+        translate: calc(100cqw - 2rem) 0;
+      }
+      .style-guide-motion_card.open .style-guide-motion_dot {
+        transition:
+          width var(--open-duration) var(--open-ease),
+          background-color var(--open-duration) var(--open-ease);
+      }
+      .style-guide-motion_card.open:is(
+          [data-play],
+          :has(.style-guide-motion_stage:hover)
+        )
+        .style-guide-motion_dot {
+        width: 100%;
+      }
+      .style-guide-motion_card.reveal .style-guide-motion_dot {
+        translate: 0 var(--reveal-distance);
+        transition:
+          translate var(--reveal-duration) var(--reveal-ease),
+          opacity var(--reveal-duration) var(--reveal-ease),
+          background-color var(--reveal-duration) var(--reveal-ease);
+      }
+      .style-guide-motion_card.reveal:is(
+          [data-play],
+          :has(.style-guide-motion_stage:hover)
+        )
+        .style-guide-motion_dot {
+        translate: 0 0;
+      }
+    }
+    .style-guide-motion_play {
+      align-self: start;
+    }
+    .style-guide-motion_reveal {
+      width: 100%;
+    }
+    .style-guide-motion_about {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+
+      > * {
+        margin: 0;
+      }
+      p {
+        color: var(--text-2);
+      }
+    }
+    .style-guide-motion_tokens {
+      font-size: var(--text-small);
+      line-height: var(--text-small-line-height);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: 0;
+
+      dt {
+        font-weight: var(--primary-medium);
+      }
+      dd {
+        margin: 0;
+        color: var(--text-2);
+        overflow-wrap: anywhere;
+      }
+    }
+  }
+</style>

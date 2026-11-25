@@ -1,0 +1,170 @@
+---
+import Icon from "@/components/media/Icon.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** What a click copies — `var(--brand-500)`. */
+  text: string;
+  /** What the button shows — `50` in a ramp. Defaults to `text`; a screen
+      reader always hears `text`. */
+  label?: string;
+}
+
+const { render = true, text, label = text } = Astro.props;
+---
+
+{
+  render && text && (
+    <span class="style-guide-copy_wrap">
+      <button
+        type="button"
+        class="style-guide-copy_button"
+        data-copy={text}
+        aria-label={label === text ? undefined : `Copy ${text}`}
+      >
+        <span class="sr-only">Copy </span>
+        <span class="style-guide-copy_label">
+          {label.split(/(?<=[/=])/).flatMap((part) => [part, <wbr />])}
+        </span>
+        <Icon name="copy" class="style-guide-copy_icon" />
+        <Icon name="check" class="style-guide-copy_done" />
+      </button>
+      <span class="style-guide-copy_tip" role="status" />
+    </span>
+  )
+}
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // ponytail: a click listener, not invoker commands — the text is on the
+  // button itself, so there is no element to point `commandfor` at.
+  const timers = new WeakMap<Element, number>();
+  let last = "";
+
+  mount(".style-guide-copy_button", (button, signal) => {
+    const tip = button.nextElementSibling as HTMLElement;
+    button.addEventListener(
+      "click",
+      async () => {
+        let ok = true;
+        try {
+          await navigator.clipboard.writeText(
+            (button as HTMLElement).dataset.copy ?? "",
+          );
+        } catch {
+          ok = false;
+        }
+        clearTimeout(timers.get(button));
+        button.removeAttribute("data-copied");
+        button.removeAttribute("data-failed");
+        let message = ok ? "Copied" : "Copy failed";
+        // VoiceOver skips a message the same as the last one.
+        if (message === last) message += " ";
+        last = message;
+        tip.textContent = "";
+        button.setAttribute(ok ? "data-copied" : "data-failed", "");
+        requestAnimationFrame(() => (tip.textContent = message));
+        timers.set(
+          button,
+          window.setTimeout(() => {
+            button.removeAttribute("data-copied");
+            button.removeAttribute("data-failed");
+            tip.textContent = "";
+          }, 2000),
+        );
+      },
+      { signal },
+    );
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .style-guide-copy_wrap {
+      position: relative;
+      display: inline-flex;
+      max-width: 100%;
+    }
+    .style-guide-copy_button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      position: relative;
+      isolation: isolate;
+      max-width: 100%;
+      min-height: 1.5rem;
+      padding: 0.125rem 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: start;
+      overflow-wrap: anywhere;
+      cursor: copy;
+
+      /* The hover background reaches past the text without widening the
+         button: a negative margin would make the name wrap early. */
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0 -0.375rem;
+        z-index: -1;
+        border-radius: var(--radius-xsmall);
+        transition: background-color var(--hover-duration) var(--hover-ease);
+      }
+      &:hover::before {
+        background-color: color-mix(in lab, currentcolor 10%, transparent);
+      }
+    }
+    .style-guide-copy_icon,
+    .style-guide-copy_done {
+      flex: none;
+      width: 0.875em;
+      height: 0.875em;
+      opacity: 0;
+      transition: opacity var(--hover-duration) var(--hover-ease);
+    }
+    .style-guide-copy_done {
+      display: none;
+    }
+    .style-guide-copy_button:is(:hover, :focus-visible) .style-guide-copy_icon {
+      opacity: 0.7;
+    }
+    @media (hover: none) {
+      .style-guide-copy_icon {
+        opacity: 0.5;
+      }
+    }
+    .style-guide-copy_button[data-copied] {
+      .style-guide-copy_icon {
+        display: none;
+      }
+      .style-guide-copy_done {
+        display: block;
+        opacity: 1;
+      }
+    }
+    .style-guide-copy_tip {
+      position: absolute;
+      inset-block-end: calc(100% + var(--space-1));
+      inset-inline-start: 0;
+      z-index: 2;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-xsmall);
+      background-color: var(--text);
+      color: var(--background);
+      font-size: var(--text-xsmall);
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--hover-duration) var(--hover-ease);
+
+      &:not(:empty) {
+        opacity: 1;
+      }
+    }
+  }
+</style>

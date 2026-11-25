@@ -1,0 +1,91 @@
+---
+import Section from "@/components/wrapper/Section.astro";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Anchor the chapter index links to. */
+  id: string;
+  /** Chapter number, shown before the title — `02`. */
+  number: string;
+  /** Chapter title. */
+  title: string;
+  /** One sentence on what this is and what it does for the site. */
+  intro: string;
+}
+
+const { render = true, id, number, title, intro } = Astro.props;
+---
+
+{
+  render && (
+    <Section
+      id={id}
+      tabindex="-1"
+      class="style-guide-chapter_wrap"
+      gap="10"
+      aria-labelledby={`${id}-title`}
+    >
+      <header class="style-guide-chapter_head">
+        <h2 id={`${id}-title`} class="style-guide-chapter_title">
+          <span class="style-guide-chapter_number">{number}</span>
+          <span class="text-style-h2">{title}</span>
+        </h2>
+        <p class="style-guide-chapter_intro text-style-large">{intro}</p>
+      </header>
+      <slot />
+    </Section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-chapter_wrap {
+      /* Clear the site nav and the chapter index when a link lands here. */
+      scroll-margin-top: calc(var(--style-guide-top, var(--nav-height)) + 3rem);
+
+      &:focus {
+        outline: 0;
+      }
+      > .container {
+        padding-top: var(--space-5);
+        border-top: var(--border-width) solid var(--border);
+      }
+    }
+    .style-guide-chapter_head {
+      display: grid;
+      gap: var(--space-4) var(--site-gutter);
+      width: 100%;
+
+      @media (width >= 62rem) {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        align-items: end;
+      }
+    }
+    .style-guide-chapter_title {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: 0;
+
+      @media (width >= 62rem) {
+        grid-column: span 6;
+      }
+    }
+    .style-guide-chapter_number {
+      color: var(--text-2);
+      font-size: var(--text-small);
+      font-weight: var(--primary-medium);
+      font-variant-numeric: tabular-nums;
+    }
+    .style-guide-chapter_intro {
+      max-width: 34em;
+      margin: 0;
+      color: var(--text-2);
+
+      @media (width >= 62rem) {
+        grid-column: 7 / -1;
+      }
+    }
+  }
+</style>

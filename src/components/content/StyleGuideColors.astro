@@ -1,9 +1,12 @@
 ---
+import Button from "@/components/Button.astro";
+import Icon from "@/components/media/Icon.astro";
+import Select from "@/components/form/Select.astro";
 import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
 import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
 import StyleGuideTheme from "@/components/content/StyleGuideTheme.astro";
-import { model } from "@/utils/style-guide.ts";
-import { resolveColor, toHex } from "@/utils/tokens.ts";
+import { hex, ink, model } from "@/utils/style-guide.ts";
+import { contrast, levels, verdict } from "@/utils/contrast.ts";
 import type { Theme } from "@/styles/generated/tokens.ts";
 
 interface Props {
@@ -17,10 +20,7 @@ const paletteGroups = Object.entries(
   Object.groupBy(model.palette, (t) => t.name.replace(/-\d+$/, "")),
 ).map(([name, tokens]) => ({
   name,
-  tokens: (tokens ?? []).map((t) => ({
-    name: t.name,
-    hex: toHex(resolveColor(t.value, [model.byName]) ?? [0, 0, 0, 0]),
-  })),
+  tokens: (tokens ?? []).map((t) => ({ name: t.name, hex: hex(t.name) })),
 }));
 const singles = paletteGroups.filter((g) => g.tokens.length === 1);
 
@@ -35,27 +35,61 @@ const textOn = (name: string) => {
     }
 };
 const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
+
+// The contrast checker starts on the default button: its text on its color.
+const colors = Object.fromEntries(
+  paletteGroups.flatMap((g) => g.tokens).map((t) => [t.name, t.hex]),
+);
+const options = Object.entries(colors).map(([name, value]) => ({
+  value: name,
+  label: `--${name} (${value})`,
+}));
+const pick = (role: string, fallback: string) => {
+  const name = model.themes[0]?.tokens.get(role)?.match(/^var\(--(.+)\)$/)?.[1];
+  return name && name in colors ? name : fallback;
+};
+const pair = {
+  text: pick("button-text", Object.keys(colors).at(-1)!),
+  background: pick("button-background", Object.keys(colors)[0]),
+};
+const ratio = contrast(colors[pair.text], colors[pair.background]);
+const title = (name: string) => name[0].toUpperCase() + name.slice(1);
 ---
 
 {
   render && (
     <>
       {ramps.map((group) => (
-        <StyleGuideGroup title={group.name} variant="tiles">
-          {group.tokens.map((t) => (
-            <StyleGuideToken token={t.name} value={t.hex} />
-          ))}
+        <StyleGuideGroup
+          title={title(group.name)}
+          caption={`${group.tokens.length} steps from lightest to darkest, named --${group.tokens[0].name} to --${group.tokens.at(-1)!.name}.`}
+        >
+          <div class="style-guide-ramp_wrap">
+            {group.tokens.map((t) => (
+              <StyleGuideToken
+                token={t.name}
+                value={t.hex}
+                variant="step"
+                ink={ink(t.name)}
+              />
+            ))}
+          </div>
         </StyleGuideGroup>
       ))}
 
-      <StyleGuideGroup title="Base" variant="tiles">
+      <StyleGuideGroup
+        title="Base"
+        caption="Colors that stand alone: pure white and black, and the text color set on the brand."
+        variant="tiles"
+      >
         {singles.flatMap((g) =>
           g.tokens.map((t) => {
             const on = textOn(t.name);
             return on ? (
               <StyleGuideToken
                 token={t.name}
-                value={`${t.hex} · on ${on.replace(/^var\((.+)\)$/, "$1")}`}
+                value={t.hex}
+                note={`On ${on.replace(/^var\((.+)\)$/, "$1")}`}
                 variant="foreground"
                 on={on}
               />
@@ -66,11 +100,253 @@ const ramps = paletteGroups.filter((g) => g.tokens.length > 1);
         )}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Themes" variant="scroll">
+      <StyleGuideGroup
+        title="Themes"
+        caption="A theme sets the background, text, borders and buttons of a section at once, and any section can take any theme. Under each sample, the color each role takes."
+        variant="cards"
+        class="style-guide-themes"
+      >
         {model.themes.map((theme) => (
           <StyleGuideTheme theme={theme.name as Theme} />
         ))}
       </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Contrast"
+        caption="Whether text in one color can be read on another. Pick any two colors from the palette; body text needs 4.5 to 1, large text 3 to 1."
+      >
+        <div
+          class="style-guide-contrast_wrap"
+          data-colors={JSON.stringify(colors)}
+          style={`--_text: ${colors[pair.text]}; --_background: ${colors[pair.background]}`}
+        >
+          <div class="style-guide-contrast_pickers">
+            <Select
+              label="Text"
+              name="style-guide-contrast-text"
+              options={options}
+              value={pair.text}
+            />
+            <Select
+              label="Background"
+              name="style-guide-contrast-background"
+              options={options}
+              value={pair.background}
+            />
+            <Button size="small" emphasis="secondary" type="button">
+              Swap
+            </Button>
+          </div>
+          <div class="style-guide-contrast_preview">
+            <span class="style-guide-contrast_large">Large text</span>
+            <p class="text-style-main">
+              Body text, the size most of a page is read at.
+            </p>
+          </div>
+          <div class="style-guide-contrast_result">
+            <p class="style-guide-contrast_ratio">
+              <span class="text-style-h3" data-ratio aria-live="polite">
+                {ratio.toFixed(2)} to 1
+              </span>
+              <span class="text-style-small">Contrast ratio</span>
+            </p>
+            <p class="style-guide-contrast_verdict-line" data-verdict>
+              {verdict(ratio)}
+            </p>
+            <ul class="style-guide-contrast_levels" role="list">
+              {levels.map((level) => (
+                <li
+                  data-min={level.min}
+                  data-pass={ratio >= level.min || undefined}
+                >
+                  <Icon name="check" class="style-guide-contrast_pass" />
+                  <Icon name="x" class="style-guide-contrast_fail" />
+                  <span>{level.name}</span>
+                  <span class="style-guide-contrast_verdict">
+                    {ratio >= level.min ? "Pass" : "Fail"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </StyleGuideGroup>
     </>
   )
 }
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+  import { contrast, verdict } from "@/utils/contrast.ts";
+
+  mount(".style-guide-contrast_wrap", (wrap, signal) => {
+    const colors: Record<string, string> = JSON.parse(wrap.dataset.colors!);
+    const [text, background] = wrap.querySelectorAll("select");
+    const swap = wrap.querySelector("button");
+    const ratio = wrap.querySelector<HTMLElement>("[data-ratio]");
+    const summary = wrap.querySelector<HTMLElement>("[data-verdict]");
+    const levels = wrap.querySelectorAll<HTMLElement>("li[data-min]");
+    if (!text || !background || !swap || !ratio) return;
+
+    const update = () => {
+      const [a, b] = [colors[text.value], colors[background.value]];
+      const r = contrast(a, b);
+      wrap.style.setProperty("--_text", a);
+      wrap.style.setProperty("--_background", b);
+      ratio.textContent = `${r.toFixed(2)} to 1`;
+      if (summary) summary.textContent = verdict(r);
+      for (const level of levels) {
+        const pass = r >= Number(level.dataset.min);
+        level.toggleAttribute("data-pass", pass);
+        level.querySelector(".style-guide-contrast_verdict")!.textContent = pass
+          ? "Pass"
+          : "Fail";
+      }
+    };
+    wrap.addEventListener("change", update, { signal });
+    swap.addEventListener(
+      "click",
+      () => {
+        [text.value, background.value] = [background.value, text.value];
+        update();
+      },
+      { signal },
+    );
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .style-guide-contrast_wrap {
+      display: grid;
+      gap: var(--space-5) var(--site-gutter);
+      width: 100%;
+      padding: var(--space-5);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+
+      @media (width >= 62rem) {
+        grid-template-columns: 4fr 5fr 3fr;
+        align-items: stretch;
+      }
+    }
+    .style-guide-contrast_pickers {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-4);
+
+      > .field {
+        align-self: stretch;
+        margin: 0;
+      }
+    }
+    .style-guide-contrast_preview {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--space-3);
+      min-height: 12rem;
+      padding: var(--space-5);
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-small);
+      background-color: var(--_background);
+      color: var(--_text);
+
+      > p {
+        margin: 0;
+      }
+    }
+    .style-guide-contrast_large {
+      font-size: var(--h3);
+      font-weight: var(--h3-font-weight);
+      line-height: var(--h3-line-height);
+    }
+    .style-guide-contrast_result {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .style-guide-contrast_ratio {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+
+      > .text-style-small {
+        color: var(--text-2);
+      }
+    }
+    .style-guide-contrast_verdict-line {
+      margin: 0;
+      font-weight: var(--primary-medium);
+    }
+    .style-guide-contrast_levels {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: var(--text-small);
+      line-height: var(--text-small-line-height);
+
+      li {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-2);
+      }
+      .style-guide-contrast_verdict {
+        color: var(--text-2);
+      }
+      .style-guide-contrast_pass,
+      .style-guide-contrast_fail {
+        grid-area: 1 / 1;
+      }
+      li[data-pass] .style-guide-contrast_fail,
+      li:not([data-pass]) .style-guide-contrast_pass {
+        visibility: hidden;
+      }
+    }
+
+    /* The themes share the row between them, with no empty column. */
+    .style-guide-group_wrap.cards.style-guide-themes .style-guide-group_list {
+      grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    }
+    .style-guide-ramp_wrap {
+      display: grid;
+      width: 100%;
+      overflow: hidden;
+      border: var(--border-width) solid var(--border);
+      border-radius: var(--radius-main);
+
+      /* On a phone each step is a band, its name and value on one line. */
+      > .style-guide-token_wrap {
+        min-height: 3.5rem;
+        justify-content: center;
+
+        .style-guide-token_info {
+          flex-flow: row wrap;
+          justify-content: space-between;
+          align-items: baseline;
+          column-gap: var(--space-3);
+        }
+      }
+      @media (width >= 30rem) {
+        grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+
+        > .style-guide-token_wrap {
+          min-height: 8rem;
+          justify-content: end;
+
+          .style-guide-token_info {
+            flex-direction: column;
+            align-items: start;
+          }
+        }
+      }
+    }
+  }
+</style>
