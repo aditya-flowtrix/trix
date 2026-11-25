@@ -14,4 +14,12 @@ export interface SeoProps {
   noindex?: boolean;
   /** Structured data for this page, from `@/utils/schema.ts`. */
   schema?: Schema | Schema[];
+  /** The page's language, for `<html lang>` and `og:locale`. Defaults to `SITE_LOCALE`. */
+  lang?: string;
+  /**
+   * The same page in other languages, by language tag:
+   * `{ "fr-FR": "/fr-fr/about" }`. Writes `hreflang` links for them and this
+   * page; `x-default` is the `SITE_LOCALE` page unless given.
+   */
+  alternates?: Record<string, string>;
 }

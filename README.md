@@ -121,8 +121,8 @@ The measuring toolkit they share is in [`scripts/measure/`](scripts/measure/):
 
 ## Roadmap
 
-[ROADMAP.md](ROADMAP.md) — next: hreflang for multilingual sites, Core Web Vitals
-field data, and more headless CMS sources.
+[ROADMAP.md](ROADMAP.md) — next: Core Web Vitals field data, and more headless
+CMS sources.
 
 ## Credits
 

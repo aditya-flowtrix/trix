@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- Webflow Localization: `import.ts webflow --locale fr-FR` reads another CMS
+  locale (by tag, subdirectory or CMS locale id) into collections of its own,
+  `blog-fr-fr` beside `blog`, routed under the locale's subdirectory with
+  references inside the locale. `write.ts` puts them beside the primary's
+  files, and a headless site reads the same locale at build
+  (`cmsLoader({ source: "webflow", locale })`).
+- `import.ts --seo-from https://www.old-site.com` fills each item's SEO title,
+  description and image from the template page's bindings, learned from a few
+  live item pages — the Pages API does not say which field a template binds.
+  A title that is the item's name plus the site's stores nothing, since the
+  layout makes it; bindings the pages do not agree on are named, to map by
+  hand.
+- `write.ts` keeps an earlier run's redirects. A second run — another locale,
+  another CSV — used to replace the whole redirect block with its own.
+- The launch checklists lower the DNS TTL a day before the switch.
+- Pages in other languages: `lang` and `alternates` on `BaseLayout` write
+  `<html lang>`, `og:locale` and `og:locale:alternate`, and an `hreflang`
+  link for each language, the page itself and `x-default`. Every imported
+  item keeps its CMS id as `cmsId` — the same in each Webflow locale — so a
+  locale's page finds its other languages; `--scaffold` gives a locale's
+  page its `lang`.
+
 - The style guide is on the docs site. A new page,
   [Style guide](https://trix.flowtrix.workers.dev/docs/system/style-guide),
   says why it cannot drift and how a migration proves it, with Typography,

@@ -26,7 +26,12 @@ import { fetchWebflow, normalizeWebflow } from "./webflow.ts";
 import { fetchWordPress } from "./wordpress.ts";
 
 export type CmsSource =
-  | { source: "webflow"; site: string }
+  | {
+      source: "webflow";
+      site: string;
+      /** A secondary locale's tag (`fr-FR`): its own collections, blog-fr-fr. */
+      locale?: string;
+    }
   | {
       source: "wordpress";
       url: string;
@@ -62,7 +67,7 @@ function fetchSource(src: CmsSource): Promise<CmsExport> {
                 "cmsLoader: set WEBFLOW_TOKEN to read Webflow at build time",
               );
             return normalizeWebflow(
-              await fetchWebflow({ token, site: src.site }),
+              await fetchWebflow({ token, site: src.site, locale: src.locale }),
             );
           }
           case "wordpress":
@@ -126,6 +131,7 @@ export function cmsLoader(opts: CmsSource & { collection: string }): Loader {
           published: item.published,
           updated: item.updated,
           oldPath: item.oldPath,
+          cmsId: item.id,
           seo: item.seo,
           ...forSchema(item.data),
         };

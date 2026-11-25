@@ -187,7 +187,8 @@ it smoother: transform and opacity only, no layout thrash, and
 - [ ] Forms tested in production.
 - [ ] Analytics, consent and tag manager carried over.
 - [ ] 404 page; robots.txt allows indexing (only) in production.
-- [ ] DNS switched; the old site unpublished only after the new one is verified live.
+- [ ] DNS TTL lowered to 300 seconds a day before; DNS switched; the old site
+      unpublished only after the new one is verified live.
 - [ ] SEO: `/trix-seo` — `scripts/seo/parity.ts` from the live old site to
       staging shows no **lost** URL, every **changed** title or description
       confirmed; `npm run seo -- --production` passes.

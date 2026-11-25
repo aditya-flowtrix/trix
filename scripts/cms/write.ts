@@ -98,6 +98,8 @@ type Manifest = {
       loader?: string;
       items: number;
       route?: string;
+      /** Its items' old URLs → new, kept so a later run keeps them too. */
+      redirects?: string[];
     }
   >;
   assets: Record<string, string>;
@@ -315,7 +317,11 @@ function loaderFor(c: Collection): string {
   const src = opts.offline
     ? { source: "json", file: str("input") }
     : kind === "webflow" && id
-      ? { source: "webflow", site: id }
+      ? {
+          source: "webflow",
+          site: id,
+          ...(data.locale ? { locale: data.locale } : {}),
+        }
       : kind === "wordpress"
         ? {
             source: "wordpress",
@@ -377,6 +383,8 @@ for (const c of headless ? [] : collections) {
       ...(item.published ? { published: item.published } : {}),
       ...(item.updated ? { updated: item.updated } : {}),
       ...(item.oldPath ? { oldPath: item.oldPath } : {}),
+      // The item's id in the CMS: Webflow gives every locale's copy the same one.
+      ...(item.id ? { cmsId: item.id } : {}),
       ...(seo && Object.values(seo).some(Boolean) ? { seo } : {}),
       ...data,
     };
@@ -531,16 +539,21 @@ else if (!readFileSync(configPath, "utf8").includes("cmsCollections"))
 
 /* ---------------- redirects ---------------- */
 
-const redirectLines: string[] = [];
-for (const [key, c] of all) {
-  if (!c.route) continue;
-  const source = data.collections.find((x) => x.key === key);
-  for (const i of source?.items ?? []) {
-    const to = `${c.route.replace(/\/$/, "")}/${i.slug}`;
-    const from = i.oldPath?.replace(/(.)\/$/, "$1");
-    if (from && from !== to) redirectLines.push(`${from} ${to} 301`);
-  }
+// This run's collections are worked out again; an earlier run's (another
+// locale, another CSV) are kept from the manifest.
+for (const c of collections) {
+  const m = manifest.collections[c.key];
+  if (!m) continue;
+  const route = m.route?.replace(/\/$/, "");
+  m.redirects = route
+    ? c.items.flatMap((i) => {
+        const to = `${route}/${i.slug}`;
+        const from = i.oldPath?.replace(/(.)\/$/, "$1");
+        return from && from !== to ? [`${from} ${to} 301`] : [];
+      })
+    : [];
 }
+const redirectLines = all.flatMap(([, c]) => c.redirects ?? []);
 const redirectsPath = "public/_redirects";
 const existing = existsSync(redirectsPath)
   ? readFileSync(redirectsPath, "utf8")
@@ -598,7 +611,7 @@ const description = clip(entry.data.seo?.description${summary ? ` ?? ${at(summar
 
 <Layout
   title={entry.data.seo?.title ?? entry.data.title}
-  description={description}
+  description={description}${source && data.locale ? `\n  lang="${data.locale}"` : ""}
   type="article"
   schema={article({
     headline: entry.data.title,

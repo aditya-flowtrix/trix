@@ -37,7 +37,7 @@ const { theme = "inherit" } = seo;
 
 <!doctype html>
 <html
-  lang={SITE_LOCALE}
+  lang={seo.lang ?? SITE_LOCALE}
   class:list={[theme !== "inherit" && `theme-${theme}`]}
   data-mode={COLOR_MODE === "auto" ? undefined : COLOR_MODE}
 >

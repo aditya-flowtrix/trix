@@ -78,6 +78,8 @@ export interface Collection {
 
 export interface CmsExport {
   source: string;
+  /** The locale read, when the CMS has several: its tag, like `fr-FR`. */
+  locale?: string;
   collections: Collection[];
   warnings: string[];
 }
@@ -206,6 +208,7 @@ export function schemaSource(c: Collection, remote = false): string {
     "published: z.coerce.date().optional()",
     "updated: z.coerce.date().optional()",
     "oldPath: z.string().optional()",
+    "cmsId: z.string().optional()",
     "seo: z.object({ title: z.string().optional(), description: z.string().optional(), image: z.string().optional() }).optional()",
     ...c.fields.map((f) => {
       const t = type(f);

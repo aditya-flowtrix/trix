@@ -27,7 +27,12 @@ import {
   type WebflowSite,
 } from "../src/utils/cms/webflow.ts";
 import { csvCollection, inferType, parseCsv } from "../src/utils/cms/csv.ts";
-import { schemaSource, stripPlatformMarkup } from "../src/utils/cms/model.ts";
+import {
+  schemaSource,
+  stripPlatformMarkup,
+  type CmsExport,
+} from "../src/utils/cms/model.ts";
+import { seoFromPages } from "../scripts/cms/seo-from-pages.ts";
 import { compareCms } from "../scripts/cms/compare.ts";
 import {
   countBlocks,
@@ -405,6 +410,169 @@ it("Sanity: --check passes a complete import, and names what one lost", () => {
   );
 });
 
+/* ---------------- locales and template-page SEO ---------------- */
+
+it("Webflow, a second locale: its own collections, URLs and references", () => {
+  const fr = normalizeWebflow({
+    ...site,
+    locale: { tag: "fr-FR", subdirectory: "fr-fr" },
+  });
+  assert.equal(fr.locale, "fr-FR");
+  const posts = fr.collections.find((c) => c.key === "postsFrFr")!;
+  assert.equal(posts.folder, "posts-fr-fr");
+  assert.equal(posts.route, "/fr-fr/posts");
+  assert.equal(
+    posts.items.find((i) => i.slug === "hello-welcome")!.oldPath,
+    "/fr-fr/posts/hello-welcome",
+  );
+  assert.equal(
+    posts.fields.find((f) => f.key === "author")!.collection,
+    "authorsFrFr",
+  );
+  // The primary, even when asked for by name, is the collections as they are.
+  const en = normalizeWebflow({
+    ...site,
+    locale: { tag: "en-US", subdirectory: "", primary: true },
+  });
+  assert.equal(en.collections[0].folder, wf.collections[0].folder);
+});
+
+const realFetch = globalThis.fetch;
+const asked: string[] = [];
+const respond = (body: unknown, type = "application/json") =>
+  new Response(typeof body === "string" ? body : JSON.stringify(body), {
+    headers: { "content-type": type },
+  });
+globalThis.fetch = (async (input: string | URL | Request) => {
+  const url = String(input);
+  asked.push(url);
+  if (url.endsWith("/sites/s1"))
+    return respond({
+      locales: {
+        primary: { tag: "en-US", subdirectory: "", cmsLocaleId: "c-en" },
+        secondary: [
+          { tag: "fr-FR", subdirectory: "fr-fr", cmsLocaleId: "c-fr" },
+        ],
+      },
+    });
+  if (url.endsWith("/sites/s1/collections"))
+    return respond({ collections: [{ id: "col1" }] });
+  if (url.endsWith("/collections/col1"))
+    return respond({ ...site.collections[0], id: "col1" });
+  if (url.includes("/collections/col1/items"))
+    return respond({ items: [], pagination: { total: 0 } });
+  return new Response("", { status: 404 });
+}) as typeof fetch;
+const { fetchWebflow } = await import("../src/utils/cms/webflow.ts");
+const frSite = await fetchWebflow({ token: "t", site: "s1", locale: "fr-fr" });
+const unknownLocale = await fetchWebflow({
+  token: "t",
+  site: "s1",
+  locale: "de-DE",
+}).catch((e: Error) => e.message);
+it("fetchWebflow --locale: found by subdirectory, read with its CMS locale id", () => {
+  assert.equal(frSite.locale?.tag, "fr-FR");
+  assert.ok(
+    asked.some(
+      (u) => u.includes("/items/live?") && u.includes("cmsLocaleId=c-fr"),
+    ),
+  );
+  assert.match(String(unknownLocale), /no CMS locale "de-DE".*en-US, fr-FR/);
+});
+
+// Three items' old pages: titles are "{title} | Old Blog", descriptions are
+// the summary, og:image the cover. The fourth is filled without being read.
+const seoData: CmsExport = {
+  source: "test",
+  warnings: [],
+  collections: [
+    {
+      key: "posts",
+      folder: "posts",
+      label: "Posts",
+      source: "test",
+      fields: [
+        { key: "summary", label: "Summary", source: "summary", type: "text" },
+        { key: "cover", label: "Cover", source: "cover", type: "image" },
+      ],
+      items: ["one", "two", "three", "four"].map((slug) => ({
+        id: slug,
+        slug,
+        title: `Post ${slug}`,
+        draft: false,
+        oldPath: `/posts/${slug}`,
+        data: {
+          summary: `All about ${slug}.`,
+          cover: { url: `https://cdn.example.com/x/${slug}.jpg`, alt: "" },
+        },
+      })),
+    },
+    {
+      key: "cases",
+      folder: "cases",
+      label: "Cases",
+      source: "test",
+      fields: [
+        {
+          key: "headline",
+          label: "Headline",
+          source: "headline",
+          type: "text",
+        },
+      ],
+      items: ["a", "b", "c"].map((slug) => ({
+        id: slug,
+        slug,
+        title: `Case ${slug}`,
+        draft: false,
+        oldPath: `/cases/${slug}`,
+        // b's description is written by hand: the pages do not agree.
+        data: { headline: `How ${slug} grew` },
+      })),
+    },
+  ],
+};
+globalThis.fetch = (async (input: string | URL | Request) => {
+  const path = new URL(String(input)).pathname;
+  const [, kind, slug] = path.split("/");
+  const page = (title: string, description: string, image = "") =>
+    respond(
+      `<html><head><title>${title}</title><meta name="description" content="${description}"><meta property="og:image" content="${image}"></head></html>`,
+      "text/html",
+    );
+  if (kind === "posts")
+    return page(
+      `Post ${slug} | Old Blog`,
+      `All about ${slug}.`,
+      `https://cdn.example.com/x/${slug}.jpg`,
+    );
+  if (kind === "cases")
+    return page(
+      `How ${slug} grew — Old Co`,
+      slug === "b" ? "Written by hand" : `How ${slug} grew`,
+    );
+  return new Response("", { status: 404 });
+}) as typeof fetch;
+const seoNotes = await seoFromPages(seoData, "https://old.example.com/");
+globalThis.fetch = realFetch;
+it("--seo-from: the template page's bindings fill every item", () => {
+  const [posts, cases] = seoData.collections;
+  const four = posts.items[3];
+  // "{title} | Old Blog" is the layout's own: no title stored.
+  assert.equal(four.seo?.title, undefined);
+  assert.equal(four.seo?.description, "All about four.");
+  assert.equal(four.seo?.image, "https://cdn.example.com/x/four.jpg");
+  // "{headline} — Old Co" → the headline, without the site's name.
+  assert.equal(cases.items[0].seo?.title, "How a grew");
+  assert.equal(cases.items[1].seo?.description, undefined);
+  assert.ok(seoNotes.some((n) => /^posts: SEO from the template page/.test(n)));
+  assert.ok(
+    seoNotes.includes(
+      "cases: the old pages' descriptions do not come from one field — map them by hand",
+    ),
+  );
+});
+
 /* ---------------- the pipeline, in a throwaway project ---------------- */
 
 const tmp = mkdtempSync(join(tmpdir(), "trix-cms-"));
@@ -480,6 +648,63 @@ try {
       ),
     );
     assert.ok(existsSync(join(tmp, "src/pages/blog/[slug].astro")));
+  });
+
+  run([
+    "scripts/cms/import.ts",
+    "webflow",
+    "--json",
+    fixture,
+    "--locale",
+    "fr-FR",
+  ]);
+  run([
+    "scripts/cms/write.ts",
+    "--input",
+    ".trix/cms/webflow-fr-fr.json",
+    "--no-assets",
+    "--route",
+    "postsFrFr=/fr/blog",
+    "--scaffold",
+  ]);
+  it("write, a second locale: beside the primary, every redirect kept", () => {
+    assert.deepEqual(readdirSync(join(tmp, "src/content/posts-fr-fr")).sort(), [
+      "hello-welcome.md",
+      "second-post.md",
+    ]);
+    assert.ok(existsSync(join(tmp, "src/content/posts/hello-welcome.md")));
+    const ts = readFileSync(join(tmp, "src/content/collections.ts"), "utf8");
+    assert.ok(ts.includes("export const posts = "));
+    assert.ok(ts.includes("export const postsFrFr = "));
+    const redirects = readFileSync(join(tmp, "public/_redirects"), "utf8");
+    assert.ok(
+      redirects.includes("/posts/hello-welcome /blog/hello-welcome 301"),
+    );
+    assert.ok(
+      redirects.includes(
+        "/fr-fr/posts/hello-welcome /fr/blog/hello-welcome 301",
+      ),
+    );
+  });
+  it("write, a second locale: its page says its language, items share a cmsId", () => {
+    const id = (f: string) =>
+      readFileSync(join(tmp, f), "utf8").match(/^cmsId: (.+)$/m)?.[1];
+    assert.ok(id("src/content/posts/hello-welcome.md"));
+    assert.equal(
+      id("src/content/posts-fr-fr/hello-welcome.md"),
+      id("src/content/posts/hello-welcome.md"),
+    );
+    assert.ok(
+      readFileSync(
+        join(tmp, "src/pages/fr/blog/[slug].astro"),
+        "utf8",
+      ).includes('lang="fr-FR"'),
+    );
+    assert.ok(
+      !readFileSync(join(tmp, "src/pages/blog/[slug].astro"), "utf8").includes(
+        "lang=",
+      ),
+    );
   });
   it("astro sync accepts every generated schema and file", () => {
     rmSync(join(root, "node_modules/.astro"), { recursive: true, force: true });

@@ -31,8 +31,8 @@
   BreadcrumbList, Article, FAQPage, LocalBusiness, Product; `JsonLd` and
   `Breadcrumbs` components.
 
-Still to come: hreflang for multilingual sites (with Astro i18n routing), and
-Core Web Vitals field data pulled from the CrUX API instead of lab values.
+Still to come: Core Web Vitals field data pulled from the CrUX API instead of
+lab values.
 
 ## Later
 
@@ -43,9 +43,5 @@ Core Web Vitals field data pulled from the CrUX API instead of lab values.
   the common shape as Sanity has: Storyblok, Contentful, Payload. EmDash
   next to them, reusing `htmlToBlocks()` — its pages read EmDash directly,
   and the site turns server-rendered.
-- `import.ts webflow --locale`: Webflow's other CMS locales, read with
-  `cmsLocaleId`, instead of saving each locale as JSON by hand.
-- Template-page SEO read from Webflow's Pages API, so an item's title and
-  description bindings come across instead of being mapped by hand.
 - Measuring toolkit: section-level theme detection (background/text pairs),
   motion inventory (durations and easings from the Web Animations API).

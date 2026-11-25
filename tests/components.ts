@@ -254,6 +254,18 @@ try {
         .locator(".form-choice")
         .filter({ has: page.locator(`input[value="${value}"]`) });
 
+    await it("BaseHead: a page in another language names itself and its others", async () => {
+      const html = await (await fetch(`${origin}/test/hreflang`)).text();
+      for (const tag of [
+        /<html lang="fr-FR"/,
+        /hreflang="fr-FR" href="[^"]*\/test\/hreflang"/,
+        /hreflang="en-US" href="[^"]*\/test\/code"/,
+        /hreflang="x-default" href="[^"]*\/test\/code"/,
+        /property="og:locale" content="fr_FR"/,
+        /property="og:locale:alternate" content="en_US"/,
+      ])
+        assert.match(html, tag);
+    });
     await it("Filter: before its script, only the first page is on show", async () => {
       const html = await (await fetch(`${origin}/test/filter`)).text();
       assert.equal(

@@ -64,7 +64,11 @@ From the platform, not the pages:
   `PROJECT.md`.
 - **References between collections** — they decide the import order and
   the schemas.
-- **Locales** — a multi-language CMS is one import per locale.
+- **Locales** — a multi-language CMS is one import per locale
+  (`import.ts webflow --locale fr-FR`); each locale's collections sit beside
+  the primary's (`blog-fr-fr`), under its URL prefix, and its pages link to
+  each other's with `alternates`, matched by `cmsId`
+  (`references/webflow.md`).
 
 ## 2. Import
 
@@ -83,6 +87,9 @@ node scripts/cms/import.ts json --file normalized.json         # any other CMS, 
 
 Tokens and passwords come only from the environment, never arguments.
 Drafts are left out unless `--drafts`; archived items always are.
+`--seo-from <old site>` learns a template page's SEO bindings from a few live
+item pages and fills every item's title, description and image the same way
+([webflow.md](references/webflow.md#what-the-api-does-not-hold)).
 
 **Read the table it prints.** Every field with its type; the body field;
 every warning. Typical questions for the owner, all in one message:

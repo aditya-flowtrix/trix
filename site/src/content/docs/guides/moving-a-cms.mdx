@@ -29,6 +29,15 @@ node scripts/cms/verify.ts --dist dist     # counts, schemas, no old URLs, a pag
 Tokens and passwords come only from environment variables — `WEBFLOW_TOKEN`,
 `WP_APP_PASSWORD` — never arguments.
 
+A Webflow site with Localization is one import per locale: `--locale fr-FR`
+reads that locale's items into collections of its own (`blog-fr-fr`, routed
+under `/fr-fr`), written beside the primary's. Every locale's copy of an
+item keeps the same `cmsId`, so a page can name its other languages with
+`lang` and `alternates` — the `hreflang` tags. A template page's SEO bound to
+fields the import cannot name — `{Name} | Blog`, `{Summary}` — comes across
+with `--seo-from https://www.old-site.com`, which learns the bindings from a
+few live item pages and fills every item the same way.
+
 ## Files or headless
 
 |            | **Files** (default)                          | **Headless**                         |

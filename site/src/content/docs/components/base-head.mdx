@@ -22,7 +22,8 @@ component: utility/BaseHead
 | meta description                 | `description`, or `SITE_DESCRIPTION`                               |
 | canonical URL                    | the page's path on `SITE_URL`, without `.html` or a trailing slash |
 | `noindex`                        | `noindex`, or a route in `NOINDEX_ROUTES`                          |
-| Open Graph and Twitter cards     | title, description, `image`, `type`, `SITE_LOCALE`                 |
+| Open Graph and Twitter cards     | title, description, `image`, `type`, `lang` or `SITE_LOCALE`       |
+| `hreflang` links                 | `alternates`, this page and `x-default` (the `SITE_LOCALE` page)   |
 | JSON-LD                          | `schema` — see [SEO](/docs/guides/seo)                             |
 | fonts                            | every family in `astro.config.mjs`, the first preloaded            |
 | the color scheme                 | `COLOR_MODE`, or the page's pinned `theme`                         |
@@ -31,4 +32,12 @@ component: utility/BaseHead
 | the cascade layer order          | always first                                                       |
 
 Its props are the page's: `title`, `description`, `image`, `type`, `noindex`,
-`schema` and `theme`, which `BaseLayout` passes through.
+`schema`, `theme`, `lang` and `alternates`, which `BaseLayout` passes
+through. A page in another language names itself and its others:
+
+```astro
+<BaseLayout title="À propos" lang="fr-FR" alternates={{ "en-US": "/about" }} />
+```
+
+`lang` also sets `<html lang>`. Each language's page must list the others —
+search engines ignore links that are not returned.
