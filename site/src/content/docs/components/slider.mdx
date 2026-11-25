@@ -19,7 +19,9 @@ component: interactive/Slider
 
 It is a scrolling list with snap points, so touch, trackpad and keyboard
 scrolling all work, with or without JavaScript. The arrows and dots are
-buttons with labels.
+buttons with labels. Screen readers meet it as a carousel named by `label`,
+each slide named by its place — "2 of 5" — and hear "Slide 3 of 5" when the
+slides come to rest.
 
 `xsmall`, `small`, `medium` and `large` set how many slides show — fractions
 show part of the next one, to say there is more.
@@ -32,10 +34,16 @@ show part of the next one, to say there is more.
 
 ## Looping and autoplay
 
-`loop` wraps the arrows: past the last slide comes the first. `playback="auto"`
-moves one slide every six seconds and loops, as `Tabs` does — with a pause
-button, and holding still while a slide has focus, while the slider is off
-screen, or for visitors who prefer less motion.
+Past the last slide comes the first, and before the first the last: `loop`
+is on by default once there are three slides. With one slide in view the
+slider runs on round — the end slides move beside the one in view, so in the
+default `bleed` bounds the last slide shows before the first. With more in
+view, the arrows come back round from an end. `loop={false}` stops the arrows
+at the ends, where an arrow that turns off hands focus to the other one.
+
+`playback="auto"` moves one slide every six seconds and loops, as `Tabs` does
+— with a pause button, and holding still while a slide has focus, while the
+slider is off screen, or for visitors who prefer less motion.
 
 ```astro live stage="block"
 <Slider label="Clients" small={2} medium={3} playback="auto">
@@ -61,8 +69,8 @@ it. `markers={false}` drops the dots and keeps the arrows.
 </Slider>
 ```
 
-The controls stay after the slides in the page, so a keyboard reaches the
-slides first wherever the arrows are drawn.
+The controls come before the slides in the page, wherever they are drawn,
+so a keyboard reaches the arrows first and they always move what follows.
 
 ## Props
 

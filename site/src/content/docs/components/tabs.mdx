@@ -6,7 +6,7 @@ component: interactive/Tabs
 ---
 
 ```astro live stage="stack"
-<Tabs id="docs-tabs">
+<Tabs id="docs-tabs" label="How we work">
   <Fragment slot="links">
     <TabLink>Strategy</TabLink>
     <TabLink>Design</TabLink>
@@ -19,7 +19,19 @@ component: interactive/Tabs
 ```
 
 `TabLink`s go in the `links` slot; every other child is a panel, in the same
-order. Arrow keys move between tabs, Home and End to the first and last.
+order. `label` names the tab list for screen readers — say what the tabs
+choose between. Arrow keys move between tabs, Home and End to the first and
+last.
+
+The first tab is selected in the HTML, before any script runs. The other
+panels are `hidden="until-found"`: find-in-page still finds their text and
+selects their tab (Chrome and Firefox; Safari leaves hidden panels out of its
+search). Each panel sits in a wrapper of its own, so padding, borders and
+backgrounds stay on the panel and never show while it is hidden.
+
+The selected tab is underlined — down the side, marked by a bar at its start —
+as well as colored, and the mark is a border, which forced-colors mode keeps.
+A row of tabs too long for its space scrolls, its hidden ends faded.
 
 The selected tab is in the URL, so a link can open a page on the right panel:
 `?tab=design` names the tab by its text, in any language, and a tab with no
@@ -29,7 +41,7 @@ own place: its `id`, or for those without one, `tab` for the first and then
 
 | Prop              | Does                                                                                                              |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `variant="side"`  | the tab list runs down the side from 62rem                                                                        |
+| `variant="side"`  | the tab list runs down the side from 48rem                                                                        |
 | `playback="auto"` | advances on its own, with a pause control; holds while focused or off screen, and never moves with reduced motion |
 
 ## Tabs props

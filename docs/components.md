@@ -57,36 +57,36 @@ anywhere with `gridOverlay`.
 
 ## Media
 
-| Component       | Use it for                                 | Variants and key props                                                                                                                                                                                                                                                    |
-| --------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Media/Img`     | every image (optimised, responsive srcset) | `variant`: full-width, constrained, densities · `width` / `height` · `transparent` · `loading`, `fetchPriority`                                                                                                                                                           |
-| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto · `pauseButton` (on with `autoplay`; WCAG 2.2.2) · `pausePosition` (top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right) · `autoplay` loads and plays only on screen · `desktopOnly` |
-| `Media/Icon`    | icons                                      | `name` (a Phosphor icon) + `weight` (thin, light, regular, bold, fill, duotone), or `src` (an imported SVG) · `variant`: small, medium, large, full-width                                                                                                                 |
-| `Media/Overlay` | a tint over media                          | `variant`: solid, gradient                                                                                                                                                                                                                                                |
+| Component       | Use it for                                 | Variants and key props                                                                                                                                                                                                                                                                                                                              |
+| --------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Media/Img`     | every image (optimised, responsive srcset) | `variant`: full-width, constrained, densities · `width` / `height` · `transparent` · `loading`, `fetchPriority`                                                                                                                                                                                                                                     |
+| `Media/Video`   | video                                      | ratio: 2-1, 16-9, 3-2, 5-4, 1-1, 4-5, 2-3, custom, auto · `pauseButton` (on with `autoplay`, background videos too; WCAG 2.2.2) · `loading` (lazy) · captions as a `<track>` child · `pausePosition` (top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right) · `autoplay` loads and plays only on screen · `desktopOnly` |
+| `Media/Icon`    | icons                                      | `name` (a Phosphor icon) + `weight` (thin, light, regular, bold, fill, duotone), or `src` (an imported SVG) · `variant`: small, medium, large, full-width                                                                                                                                                                                           |
+| `Media/Overlay` | a tint over media                          | `variant`: solid, gradient                                                                                                                                                                                                                                                                                                                          |
 
 ## Interactive
 
-| Component                                 | Use it for               | Variants and key props                                                                                                                                                            |
-| ----------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Interactive/Accordion` + `AccordionItem` | FAQs, expandable details | native `<details>`                                                                                                                                                                |
-| `Interactive/Tabs` + `TabLink`            | switching between panels | `variant`: horizontal, side                                                                                                                                                       |
-| `Interactive/Slider`                      | carousels                | `variant`: bleed, crop-start, contained · slides per breakpoint · `loop` · `playback`: manual, auto (pause button) · `controls`: bottom, top (beside a `header` slot) · `markers` |
-| `Interactive/Modal`                       | dialogs                  | `variant`: small, side-panel, full-screen · native `<dialog>` · `openOnLoad`, `cooldownDays`                                                                                      |
-| `Interactive/Dropdown`                    | menus                    | native `<details>`, keyboard support · `variant`: default, menu, mega                                                                                                             |
-| `Interactive/Marquee`                     | logo strips, tickers     | `direction`: forwards, backwards · `pauseOnHover`                                                                                                                                 |
-| `Interactive/Compare`                     | before/after, two views  | `before` and `after` slots · `start` · native range input                                                                                                                         |
-| `Interactive/ThemeToggle`                 | light/dark switch        | renders only when `COLOR_MODE` is `auto`                                                                                                                                          |
+| Component                                 | Use it for               | Variants and key props                                                                                                                                                                            |
+| ----------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Interactive/Accordion` + `AccordionItem` | FAQs, expandable details | native `<details>` · `single` (one open at a time, off by default)                                                                                                                                |
+| `Interactive/Tabs` + `TabLink`            | switching between panels | `variant`: horizontal, side · `label` (names the tab list)                                                                                                                                        |
+| `Interactive/Slider`                      | carousels                | `variant`: bleed, crop-start, contained · slides per breakpoint · `loop` (on by default) · `playback`: manual, auto (pause button) · `controls`: bottom, top (beside a `header` slot) · `markers` |
+| `Interactive/Modal`                       | dialogs                  | `variant`: small, side-panel, full-screen · native `<dialog>` · `openOnLoad`, `cooldownDays`                                                                                                      |
+| `Interactive/Dropdown`                    | menus                    | a button and a popover · `variant`: default, menu, mega                                                                                                                                           |
+| `Interactive/Marquee`                     | logo strips, tickers     | `direction`: forwards, backwards · `pauseOnHover`                                                                                                                                                 |
+| `Interactive/Compare`                     | before/after, two views  | `before` and `after` slots · `start` · native range input                                                                                                                                         |
+| `Interactive/ThemeToggle`                 | light/dark switch        | renders only when `COLOR_MODE` is `auto`; back to the system's mode forgets the choice                                                                                                            |
 
 ## Forms
 
-| Component                     | Use it for                                       | Variants and key props                                  |
-| ----------------------------- | ------------------------------------------------ | ------------------------------------------------------- |
-| `Form/Form`                   | a form with its status messages                  | provider-agnostic `action`                              |
-| `Form/Fieldset`               | grouped fields                                   | `variant`: stack, columns, thirds, inline               |
-| `Form/Input`                  | text inputs with the right type and autocomplete | `variant`: text, first-name, last-name, email, phone, … |
-| `Form/Textarea`, `Form/Range` | long text, sliders                               |                                                         |
-| `Form/Select`                 | selects                                          | `variant`: list, month, day, year, state                |
-| `Form/Choice`                 | checkboxes and radios                            | `variant`: default, toggle, chip                        |
+| Component                     | Use it for                                       | Variants and key props                                            |
+| ----------------------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
+| `Form/Form`                   | a form with its status messages                  | provider-agnostic `action`                                        |
+| `Form/Fieldset`               | grouped fields                                   | `variant`: stack, columns, thirds, inline                         |
+| `Form/Input`                  | text inputs with the right type and autocomplete | `variant`: text, first-name, last-name, email, phone, … · `error` |
+| `Form/Textarea`, `Form/Range` | long text, sliders                               |                                                                   |
+| `Form/Select`                 | selects                                          | `variant`: list, month, day, year, state                          |
+| `Form/Choice`                 | checkboxes and radios                            | `variant`: default, toggle (a switch), chip                       |
 
 ## Global
 

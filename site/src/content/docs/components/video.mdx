@@ -11,14 +11,21 @@ component: media/Video
 
 By default a video autoplays, muted and looping, at 16:9 — the background
 video most sites use. `variant` sets the ratio: `2-1`, `16-9`, `3-2`, `5-4`,
-`1-1`, `4-5`, `2-3`, `custom` (with `ratio`), or `auto`.
+`1-1`, `4-5`, `2-3`, `custom` (with `ratio`), or `auto` — the video's own
+shape, which needs its `width` and `height` so the box holds its size before
+the video loads.
 
 ## Loading and playback
 
-An autoplaying video downloads nothing until it scrolls into view, plays while
-it is on screen and pauses when it leaves — a page of videos costs only the
-ones being watched. Give it a `poster`: that is what shows until then, and
-what shows without JavaScript.
+An autoplaying video downloads none of the video until it scrolls into view,
+plays while it is on screen and pauses when it leaves — a page of videos
+costs only the ones being watched. Give it a `poster`: that is what shows
+until then, and what shows without JavaScript.
+
+`loading` is `lazy` by default: in browsers that lazy-load video (Chrome and
+Edge) the poster and metadata wait until the video nears the screen too;
+others fetch the poster up front. A video above the fold — a hero — takes
+`loading="eager"`.
 
 `desktopOnly` keeps a heavy background video off phones and tablets: below
 the `large` breakpoint the poster stands alone and nothing downloads.
@@ -35,30 +42,46 @@ in any of nine places:
 
 `top-left`, `top`, `top-right`, `left`, `center`, `right`, `bottom-left`,
 `bottom` and `bottom-right` (default). With reduced motion the video starts
-paused. `pauseButton={false}` removes the button — for a video that stops
-within five seconds, and for a background video.
+paused, and the button is still there: reduced motion doesn't replace it, as
+visitors who haven't turned the setting on need to stop the video too.
+`pauseButton={false}` removes it — only for a video that stops within five
+seconds and doesn't loop.
 
 ## Background video
 
 A video behind a section's content goes in `Section`'s `background` slot,
-where it fills the section. It has no play/pause button unless the site's
-owner asks for one — ask, and the answer defaults to no:
+where it fills the section. It keeps its pause button, which stays clickable
+over the background:
 
 ```astro
 <Section theme="dark">
-  <Video
-    slot="background"
-    src="/video/demo.webm"
-    poster="/video/demo.jpg"
-    pauseButton={false}
-  />
+  <Video slot="background" src="/video/demo.webm" poster="/video/demo.jpg" />
   <Heading>Built to last</Heading>
 </Section>
 ```
 
-A looping video with no pause control doesn't meet WCAG 2.2.2 for visitors
-who haven't asked their device for reduced motion, so say so when asking.
-With the button, it stays clickable over the background.
+## Captions
+
+Anything inside `Video` goes inside the `<video>`, so a video with speech
+takes its captions as a `<track>`:
+
+```astro
+<Video
+  src="/video/tour.webm"
+  poster="/video/tour.jpg"
+  autoplay={false}
+  muted={false}
+  loop={false}
+  controls
+>
+  <track
+    kind="captions"
+    src="/video/tour.en.vtt"
+    srclang="en"
+    label="English"
+  />
+</Video>
+```
 
 ## Props
 

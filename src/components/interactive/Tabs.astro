@@ -1,11 +1,14 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import Button from "@/components/Button.astro";
-import { slotContent } from "@/utils/slots.ts";
+import { slotContent, topElements } from "@/utils/slots.ts";
+import { uid } from "@/utils/unique-id.ts";
 
 type Props = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
+  /** Accessible label. Defaults to `Tabs`. */
+  label?: string;
   /** Tab layout. */
   variant?: "horizontal" | "side";
   /** Panel playback. */
@@ -16,6 +19,7 @@ type Props = HTMLAttributes<"div"> & {
 
 const {
   render = true,
+  label = "Tabs",
   variant = "horizontal",
   playback = "manual",
   preview = false,
@@ -24,13 +28,27 @@ const {
 } = Astro.props;
 
 const auto = playback === "auto";
+const id = uid("tabs");
 
-const links = await slotContent(Astro.slots, "links");
-const panels = await slotContent(Astro.slots);
+/* The first tab is selected in the HTML, so the page reads right before any
+   script runs; the script moves the selection from the URL. */
+let tab = 0;
+const links = (await slotContent(Astro.slots, "links")).replaceAll(
+  "data-tab-link",
+  () => {
+    const i = tab++;
+    return `role="tab" id="${id}-${i}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}"`;
+  },
+);
+
+// Each panel gets a wrapper of its own: `hidden="until-found"` hides a box's
+// contents but not its padding or background, so those stay on the panel's
+// own element, inside it.
+const panels = topElements(await slotContent(Astro.slots));
 ---
 
 {
-  render && links && panels && (
+  render && links && panels.length > 0 && (
     <div
       class:list={[
         "tabs_wrap",
@@ -45,6 +63,7 @@ const panels = await slotContent(Astro.slots);
         <div
           class="tabs_links"
           role="tablist"
+          aria-label={label}
           aria-orientation={variant === "side" ? "vertical" : "horizontal"}
         >
           <Fragment set:html={links} />
@@ -52,7 +71,16 @@ const panels = await slotContent(Astro.slots);
       </div>
 
       <div class="tabs_panels">
-        <Fragment set:html={panels} />
+        {panels.map((panel, i) => (
+          <div
+            class="tabs_panel"
+            role="tabpanel"
+            aria-labelledby={`${id}-${i}`}
+            hidden={i > 0 ? "until-found" : undefined}
+          >
+            <Fragment set:html={panel} />
+          </div>
+        ))}
       </div>
 
       {auto && (
@@ -96,14 +124,13 @@ const panels = await slotContent(Astro.slots);
       grid-template-columns: none;
     }
     .tabs_panels {
+      display: grid;
       gap: var(--space-6);
       overflow: visible;
     }
-    .tabs_panels > * {
-      grid-area: auto;
-      opacity: 1;
-      visibility: visible;
-      translate: none;
+    .tabs_panel[hidden] {
+      display: block;
+      content-visibility: visible;
     }
   </style>
 </noscript>
@@ -113,26 +140,43 @@ const panels = await slotContent(Astro.slots);
   import { slug } from "@/utils/slug.ts";
 
   const INTERVAL = 6000;
-  const SLIDE = 500;
+  const FOCUSABLE =
+    'a[href], button, input, select, textarea, summary, iframe, [contenteditable], [tabindex]:not([tabindex="-1"])';
 
   mount(".tabs_wrap", (tabs, signal) => {
-    const links = [...tabs.querySelectorAll<HTMLButtonElement>(".tabs_link")];
-    const panelList = tabs.querySelector<HTMLElement>(".tabs_panels");
-    const panels = [...(panelList?.children ?? [])] as HTMLElement[];
-    if (links.length === 0 || links.length !== panels.length) return;
+    const bar = tabs.querySelector<HTMLElement>(
+      ":scope > .tabs_bar > .tabs_links",
+    );
+    const links = [
+      ...tabs.querySelectorAll<HTMLButtonElement>(
+        ":scope > .tabs_bar .tabs_link",
+      ),
+    ];
+    const panels = [
+      ...tabs.querySelectorAll<HTMLElement>(
+        ":scope > .tabs_panels > .tabs_panel",
+      ),
+    ];
+    if (!bar || links.length === 0 || links.length !== panels.length) return;
 
-    const uid = Math.random().toString(36).slice(2, 8);
     const auto = tabs.classList.contains("auto");
-    const toggle = tabs.querySelector<HTMLButtonElement>("[data-toggle]");
-    const bar = tabs.querySelector<HTMLElement>(".tabs_links");
+    const toggle = tabs.querySelector<HTMLButtonElement>(
+      ":scope > .tabs_controls [data-toggle]",
+    );
+    // A panel with nothing to focus is a tab stop itself, so a keyboard can
+    // reach it to scroll or read it.
+    const stops = panels.map((panel) => !panel.querySelector(FOCUSABLE));
 
+    // In view, clear of the faded ends: the bar's scroll padding is a fade.
     const keepInView = (link: HTMLElement) => {
-      if (!bar) return;
+      const pad =
+        parseFloat(getComputedStyle(bar).scrollPaddingInlineStart) || 0;
       const list = bar.getBoundingClientRect();
       const box = link.getBoundingClientRect();
-      if (box.left < list.left) bar.scrollBy({ left: box.left - list.left });
-      else if (box.right > list.right)
-        bar.scrollBy({ left: box.right - list.right });
+      if (box.left < list.left + pad)
+        bar.scrollBy({ left: box.left - list.left - pad });
+      else if (box.right > list.right - pad)
+        bar.scrollBy({ left: box.right - list.right + pad });
     };
 
     let current = 0;
@@ -157,16 +201,6 @@ const panels = await slotContent(Astro.slots);
       history.replaceState(history.state, "", url);
     };
 
-    links.forEach((link, i) => {
-      link.id = `tab-${uid}-${i}`;
-      link.setAttribute("role", "tab");
-      link.setAttribute("aria-controls", `panel-${uid}-${i}`);
-      panels[i].id = `panel-${uid}-${i}`;
-      panels[i].setAttribute("role", "tabpanel");
-      panels[i].setAttribute("aria-labelledby", link.id);
-      panels[i].tabIndex = 0;
-    });
-
     const restart = () => {
       window.clearTimeout(timer);
       if (!auto || paused) return;
@@ -181,25 +215,21 @@ const panels = await slotContent(Astro.slots);
 
     const show = (next: number, focus = false, share = true) => {
       const index = (next + links.length) % links.length;
-      if (index !== current) {
+      if (index !== current && tabs.classList.contains("is-ready")) {
         tabs.style.setProperty("--_dir", next > current ? "1" : "-1");
         tabs.dataset.moved = "";
-        const leaving = panels[current];
-        leaving.classList.add("is-leaving");
-        window.setTimeout(
-          () => leaving.classList.remove("is-leaving"),
-          SLIDE + 50,
-        );
       }
 
       links.forEach((link, i) => {
-        link.classList.toggle("is-active", i === index);
         link.setAttribute("aria-selected", String(i === index));
         link.tabIndex = i === index ? 0 : -1;
       });
-      panels.forEach((panel, i) =>
-        panel.classList.toggle("is-active", i === index),
-      );
+      panels.forEach((panel, i) => {
+        if (i === index) panel.removeAttribute("hidden");
+        else panel.setAttribute("hidden", "until-found");
+        if (i === index && stops[i]) panel.tabIndex = 0;
+        else panel.removeAttribute("tabindex");
+      });
 
       current = index;
       if (share) remember(index);
@@ -226,18 +256,42 @@ const panels = await slotContent(Astro.slots);
       });
     });
 
+    // Hidden panels stay findable: find-in-page shows one by selecting its tab.
+    panels[0].parentElement!.addEventListener("beforematch", (event) => {
+      const i = panels.indexOf(event.target as HTMLElement);
+      if (i !== -1) show(i);
+    });
+
     for (const step of tabs.querySelectorAll<HTMLButtonElement>(
-      "[data-step]",
+      ":scope > .tabs_controls [data-step]",
     )) {
       step.addEventListener("click", () =>
         show(current + Number(step.dataset.step)),
       );
     }
 
+    // Where scroll-driven animations aren't, the fades follow which ends of
+    // the bar have tabs out of view.
+    if (!CSS.supports("animation-timeline", "scroll()")) {
+      const ends = new IntersectionObserver(
+        (entries) => {
+          for (const { target, intersectionRatio } of entries)
+            bar.classList.toggle(
+              target === links[0] ? "more-start" : "more-end",
+              intersectionRatio < 1,
+            );
+        },
+        { root: bar, threshold: 1, rootMargin: "1px" },
+      );
+      ends.observe(links[0]);
+      ends.observe(links[links.length - 1]);
+      signal.addEventListener("abort", () => ends.disconnect());
+    }
+
     const setPaused = (value: boolean) => {
       paused = value;
       tabs.classList.toggle("is-paused", value);
-      toggle?.setAttribute("aria-pressed", String(!value));
+      toggle?.toggleAttribute("data-playing", !value);
       toggle?.setAttribute(
         "aria-label",
         value ? "Start automatic rotation" : "Pause automatic rotation",
@@ -245,12 +299,11 @@ const panels = await slotContent(Astro.slots);
       restart();
     };
 
-    tabs.classList.add("is-ready");
-
     const asked = new URLSearchParams(location.search).get(key);
     const wanted = asked ? slugs.indexOf(slug(asked)) : -1;
     show(wanted === -1 ? 0 : wanted, false, false);
     if (wanted !== -1) tabs.scrollIntoView({ block: "nearest" });
+    tabs.classList.add("is-ready");
 
     if (!auto) return;
 
@@ -297,6 +350,18 @@ const panels = await slotContent(Astro.slots);
 </script>
 
 <style is:global>
+  @property --_fade-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+  }
+
+  @property --_fade-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+  }
+
   @layer components {
     .tabs_wrap {
       --_dir: 1;
@@ -320,19 +385,73 @@ const panels = await slotContent(Astro.slots);
       min-width: 0;
     }
 
+    /* A row too long for its space scrolls, each end that has tabs beyond
+       it faded. The fades grow with the scroll position; the script sets
+       more-start and more-end where scroll-driven animations aren't. */
     .tabs_links {
+      --_fade-size: var(--space-7);
+      --_fade-dir: right;
+      --_fade-start-at: 0%;
+      --_fade-end-at: 100%;
       display: flex;
       min-width: 0;
       overflow-x: auto;
       scrollbar-width: none;
+      scroll-padding-inline: var(--_fade-size);
+      mask:
+        linear-gradient(black, black) no-clip subtract,
+        linear-gradient(to var(--_fade-dir), black, transparent)
+          var(--_fade-start-at) 0 / var(--_fade-start) 100% no-repeat no-clip,
+        linear-gradient(to var(--_fade-dir), transparent, black)
+          var(--_fade-end-at) 0 / var(--_fade-end) 100% no-repeat no-clip;
+      transition:
+        --_fade-start var(--hover-duration) var(--hover-ease),
+        --_fade-end var(--hover-duration) var(--hover-ease);
+
+      &:dir(rtl) {
+        --_fade-dir: left;
+        --_fade-start-at: 100%;
+        --_fade-end-at: 0%;
+      }
+      &.more-start {
+        --_fade-start: var(--_fade-size);
+      }
+      &.more-end {
+        --_fade-end: var(--_fade-size);
+      }
+      @supports (animation-timeline: scroll()) {
+        animation:
+          tabs-fade-start linear both,
+          tabs-fade-end linear both;
+        animation-timeline: scroll(self inline);
+        animation-range:
+          0 var(--_fade-size),
+          calc(100% - var(--_fade-size)) 100%;
+      }
+
       .tabs_wrap.side & {
         flex-direction: column;
         gap: var(--space-2);
         overflow-x: visible;
+        mask: none;
+        animation: none;
+      }
+    }
+
+    @keyframes tabs-fade-start {
+      to {
+        --_fade-start: var(--_fade-size);
+      }
+    }
+
+    @keyframes tabs-fade-end {
+      from {
+        --_fade-end: var(--_fade-size);
       }
     }
 
     .tabs_link {
+      position: relative;
       flex: 1;
       min-width: 8rem;
       padding-block: var(--space-3);
@@ -343,9 +462,17 @@ const panels = await slotContent(Astro.slots);
       transition:
         color var(--hover-duration) var(--hover-ease),
         border-color var(--hover-duration) var(--hover-ease);
-      &.is-active {
-        border-bottom-color: var(--text);
+      /* Selected is a line as well as a color, drawn as a border so forced
+         colors keep it, and laid over the tab so it never resizes it. */
+      &[aria-selected="true"] {
         color: var(--text);
+        &::after {
+          content: "";
+          position: absolute;
+          inset-inline: 0;
+          inset-block-end: calc(var(--border-width) * -1);
+          border-block-end: calc(var(--border-width) * 3) solid;
+        }
       }
       @media (hover: hover) {
         &:hover {
@@ -359,31 +486,30 @@ const panels = await slotContent(Astro.slots);
         border: var(--border-width) solid var(--border);
         border-radius: var(--radius-round);
         text-align: start;
-        &.is-active {
+        &[aria-selected="true"] {
           background-color: var(--text);
           color: var(--background);
+          &::after {
+            inset-block: var(--space-3);
+            inset-inline: var(--space-2) auto;
+            border-block-end: 0;
+            border-inline-start: calc(var(--border-width) * 3) solid;
+          }
         }
       }
     }
 
-    .tabs_wrap.auto:not(.side) {
-      & .tabs_link.is-active {
-        position: relative;
+    /* Rotating, the selected tab's line fills over the time it is shown. */
+    .tabs_wrap.auto.running:not(.side, .is-paused)
+      > .tabs_bar
+      .tabs_link[aria-selected="true"] {
+      @media (prefers-reduced-motion: no-preference) {
         &::after {
-          content: "";
-          position: absolute;
-          inset-inline: 0;
-          bottom: calc(var(--border-width) * -1);
-          height: var(--border-width);
-          background-color: var(--text);
           transform-origin: left;
-          scale: 0 1;
-        }
-      }
-      &.running:not(.is-paused) .tabs_link.is-active {
-        border-bottom-color: var(--border);
-        &::after {
           animation: tabs-progress var(--_interval) linear forwards;
+        }
+        &:dir(rtl)::after {
+          transform-origin: right;
         }
       }
     }
@@ -398,23 +524,33 @@ const panels = await slotContent(Astro.slots);
     }
 
     .tabs_panels {
-      display: grid;
       min-width: 0;
-      overflow: clip;
+      .tabs_wrap.auto > & {
+        overflow: clip;
+      }
     }
 
-    .tabs_panels > * {
-      grid-area: 1 / 1;
-      min-width: 0;
-      opacity: 0;
-      visibility: hidden;
-      transition:
-        opacity var(--open-duration) var(--open-ease),
-        visibility var(--open-duration) var(--open-ease);
-      .tabs_wrap:not(.is-ready) &:first-child,
-      &.is-active {
-        opacity: 1;
-        visibility: visible;
+    /* The panel coming in, once the selection has moved — never on load. */
+    .tabs_wrap[data-moved] > .tabs_panels > .tabs_panel:not([hidden]) {
+      animation: tabs-in var(--open-duration) var(--open-ease);
+    }
+
+    .tabs_wrap.auto[data-moved] > .tabs_panels > .tabs_panel:not([hidden]) {
+      @media (prefers-reduced-motion: no-preference) {
+        animation: tabs-slide var(--_slide) var(--open-ease);
+      }
+    }
+
+    @keyframes tabs-in {
+      from {
+        opacity: 0;
+      }
+    }
+
+    @keyframes tabs-slide {
+      from {
+        translate: calc(var(--_dir) * 100%) 0;
+        opacity: 0;
       }
     }
 
@@ -422,47 +558,16 @@ const panels = await slotContent(Astro.slots);
        `noscript` fallback above does, so every one can be edited. The bar
        stays put so the links can be edited too. */
     .stacki-designer .tabs_wrap.preview .tabs_panels {
+      display: grid;
       gap: var(--space-6);
       overflow: visible;
     }
 
-    .stacki-designer .tabs_wrap.preview .tabs_panels > * {
-      grid-area: auto;
-      opacity: 1;
-      visibility: visible;
-      translate: none;
+    .stacki-designer .tabs_wrap.preview .tabs_panel {
       animation: none;
-    }
-
-    .tabs_wrap.auto[data-moved] .tabs_panels > * {
-      &.is-active {
-        animation: tabs-in var(--_slide) var(--open-ease) both;
-      }
-      &.is-leaving {
-        visibility: visible;
-        animation: tabs-out var(--_slide) var(--open-ease) both;
-      }
-    }
-
-    @keyframes tabs-in {
-      from {
-        translate: calc(var(--_dir) * 100%) 0;
-        opacity: 0;
-      }
-      to {
-        translate: 0 0;
-        opacity: 1;
-      }
-    }
-
-    @keyframes tabs-out {
-      from {
-        translate: 0 0;
-        opacity: 1;
-      }
-      to {
-        translate: calc(var(--_dir) * -100%) 0;
-        opacity: 0;
+      &[hidden] {
+        display: block;
+        content-visibility: visible;
       }
     }
 

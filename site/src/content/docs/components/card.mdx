@@ -36,10 +36,16 @@ import background from "@/assets/shared/graphics/background.svg";
 </Grid>
 ```
 
-`heading`, `eyebrow` and `text` accept inline markup. A card with a button is
-clickable anywhere: the button's target covers the card, while other links
-inside stay on top of it. With `buttonHref` the button is a link; without it, a
-`<button>`. A card with neither content nor an image renders nothing.
+A card is an `<article>`. `heading`, `eyebrow` and `text` accept inline
+markup. A card with a button is clickable anywhere: the button's target covers
+the card, while other links inside stay on top of it. Its name is its label
+then the heading — "Read more: Stacked" — so a page of "Read more" links can
+be told apart in a screen reader's list. With `buttonHref` the button is a
+link; without it, a `<button>`. A card with neither content nor an image
+renders nothing.
+
+A card image loads lazily. One above the fold takes `imageLoading="eager"`,
+or `imageFetchPriority="high"` when it is the largest thing there.
 
 `theme="invert"` sets a card apart from the section around it.
 

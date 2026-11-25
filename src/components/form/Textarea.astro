@@ -1,6 +1,8 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import Icon from "@/components/media/Icon.astro";
 import { slug } from "@/utils/slug.ts";
+import { uid } from "@/utils/unique-id.ts";
 
 interface Props extends Omit<HTMLAttributes<"textarea">, "rows"> {
   /** Set to `false` to omit the component. */
@@ -13,6 +15,8 @@ interface Props extends Omit<HTMLAttributes<"textarea">, "rows"> {
   name?: string;
   /** Empty-field hint. */
   placeholder?: string;
+  /** Message shown when the field is left invalid. */
+  error?: string;
   /** Minimum visible lines. Defaults to `3`.
    *
    * @min 1
@@ -33,39 +37,52 @@ const {
   value,
   name,
   placeholder,
+  error,
   minLines = 3,
   maxLines = 12,
   required = false,
+  id,
   class: className,
   ...rest
 } = Astro.props;
+
+const fieldId = id ?? uid("field");
+const errorId = `${fieldId}-error`;
 ---
 
 {
   render && label && (
-    <label
+    <div
       class:list={["field", "form-textarea", className]}
       style={`--_min-lines: ${minLines}; --_max-lines: ${maxLines};`}
     >
-      <span class="field-label text-style-main">
+      <label class="field-label text-style-main" for={fieldId}>
         <span>{label}</span>
         {required && (
           <span class="field-star" aria-hidden="true">
             *
           </span>
         )}
-      </span>
+      </label>
       <textarea
         class="field-control form-textarea_field text-style-main"
+        id={fieldId}
         name={name ?? slug(label)}
         placeholder={placeholder}
         required={required || undefined}
         rows={minLines}
+        data-error={error ? errorId : undefined}
         {...rest}
       >
         {value}
       </textarea>
-    </label>
+      {error && (
+        <p class="field-error text-style-small" id={errorId}>
+          <Icon name="warning-circle" variant="small" aria-label="Error" />
+          {error}
+        </p>
+      )}
+    </div>
   )
 }
 

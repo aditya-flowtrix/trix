@@ -30,7 +30,7 @@ type Base = Omit<
   height?: number;
   /** Fit without cropping and remove the skeleton tint. */
   transparent?: boolean;
-  /** Loading behavior. */
+  /** Loading behavior. Defaults to `lazy`, or `eager` with `fetchPriority="high"`. */
   loading?: "lazy" | "eager";
   /** Fetch priority. */
   fetchPriority?: "auto" | "high" | "low";
@@ -70,13 +70,20 @@ const {
   sizes,
   quality = "high",
   transparent = false,
-  loading = "lazy",
+  loading: loadingProp,
   fetchPriority = "auto",
   class: className,
   ...attrs
 } = Astro.props as AllProps;
 
 const alt = altProp ?? "";
+const loading = loadingProp ?? (fetchPriority === "high" ? "eager" : "lazy");
+
+if (import.meta.env.DEV && fetchPriority === "high" && loading === "lazy") {
+  console.warn(
+    '[trix] <Img fetchPriority="high" loading="lazy"> waits to load the image it marks as most important. Drop `loading`: a high-priority image loads eagerly.',
+  );
+}
 
 if (import.meta.env.DEV && !src) {
   console.warn("[trix] <Img> rendered without a `src`; nothing was output.");

@@ -16,7 +16,10 @@ component: global/Breadcrumbs
 />
 ```
 
-The last item is the current page and needs no `href`. By default it also
+The last item is the current page. It stays a link, to its own URL unless
+you give it an `href`, marked `aria-current="page"`, so the trail reads the
+same all the way along. An item between without an `href` is plain text.
+By default the trail also
 writes a `BreadcrumbList` in JSON-LD, which search engines show in place of
 the URL in results. `schema={false}` turns that off — as above, since this
 page has its own.

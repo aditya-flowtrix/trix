@@ -57,7 +57,7 @@ type Kind =
       size?: Size;
       /** Accessible label. Defaults to `Play` or `Pause`. */
       label?: string;
-      /** Show the pause icon and pressed state. */
+      /** What it controls is playing: show the pause icon and label. */
       pressed?: boolean;
       direction?: never;
     }
@@ -146,7 +146,7 @@ const named = {
         className,
       ]}
       aria-label={isWritten ? undefined : (label ?? named[variant])}
-      aria-pressed={variant === "play" ? pressed : undefined}
+      data-playing={variant === "play" && pressed ? "" : undefined}
       {...tagAttrs}
       {...rest}
     >
@@ -266,7 +266,7 @@ const named = {
       &.play .button_pause {
         display: none;
       }
-      &.play[aria-pressed="true"] {
+      &.play[data-playing] {
         & .button_play {
           display: none;
         }

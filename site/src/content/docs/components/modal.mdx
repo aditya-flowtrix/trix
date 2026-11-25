@@ -26,8 +26,12 @@ component: interactive/Modal
 ```
 
 It is a native `<dialog>`: focus moves into it and stays there, the page
-behind is inert, and Escape closes it. When it closes, focus returns to what
-opened it.
+behind is inert and doesn't scroll under it, and Escape or a click outside
+the panel closes it. When it closes, focus returns to what opened it.
+
+Every modal needs a name for screen readers: `label`, or `aria-labelledby`
+pointing at its heading. In development a modal with neither warns in the
+console.
 
 Three ways to open one:
 

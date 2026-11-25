@@ -41,6 +41,8 @@ if (import.meta.env.DEV && render && content && !action) {
       class:list={["form_wrap", className]}
       data-state="idle"
       data-endpoint={action}
+      data-sent-text={successMessage}
+      data-failed-text={errorMessage}
     >
       <form
         class="form_fields"
@@ -52,12 +54,8 @@ if (import.meta.env.DEV && render && content && !action) {
         <Fragment set:html={content} />
       </form>
 
-      <p class="form_note form_note-sent text-style-main" role="status">
-        {successMessage}
-      </p>
-      <p class="form_note form_note-failed text-style-main" role="alert">
-        {errorMessage}
-      </p>
+      <p class="form_note text-style-main" role="status" />
+      <p class="form_announcer sr-only" aria-live="polite" />
     </div>
   )
 }
@@ -65,36 +63,143 @@ if (import.meta.env.DEV && render && content && !action) {
 <script>
   import { mount } from "@/utils/mount.ts";
 
-  mount(".form_wrap", (form) => {
+  type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+  const isField = (target: EventTarget | null): target is Field =>
+    target instanceof Element && target.matches("input, select, textarea");
+
+  // Text as a screen reader reads it: icons' text alternatives in, aria-hidden text out.
+  const spoken = (node: Element) => {
+    const copy = node.cloneNode(true) as Element;
+    copy.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+    copy
+      .querySelectorAll("[role='img'][aria-label]")
+      .forEach((n) => n.replaceWith(`${n.getAttribute("aria-label")}: `));
+    return (copy.textContent ?? "").replace(/\s+/g, " ").trim();
+  };
+
+  // The field's error (the id in data-error) is in aria-describedby only while
+  // it shows: text aria-describedby points at is read even when hidden.
+  const linkError = (field: Field, shown: boolean) => {
+    const id = field.dataset.error;
+    if (!id) return;
+    const ids = (field.getAttribute("aria-describedby") ?? "")
+      .split(/\s+/)
+      .filter((each) => each && each !== id);
+    if (shown) ids.push(id);
+    if (ids.length) field.setAttribute("aria-describedby", ids.join(" "));
+    else field.removeAttribute("aria-describedby");
+  };
+
+  mount(".form_wrap", (form, signal) => {
     const fields = form.querySelector<HTMLFormElement>(".form_fields");
-    if (!fields) return;
+    const note = form.querySelector<HTMLElement>(".form_note");
+    const announcer = form.querySelector<HTMLElement>(".form_announcer");
+    if (!fields || !note || !announcer) return;
 
     const submit = fields.querySelector<HTMLButtonElement | HTMLInputElement>(
       'button:not([type]), button[type="submit"], input[type="submit"]',
     );
 
+    // aria-invalid follows :user-invalid, and is "false" until it matches:
+    // Firefox and Safari call an empty required field invalid from page load.
+    let timer = 0;
+    let spokenField: Field | undefined;
+    const flagged = new WeakSet<Field>();
+    const announced = new WeakSet<Field>();
+    signal.addEventListener("abort", () => clearTimeout(timer));
+
+    const announce = (field: Field) => {
+      const error = document.getElementById(field.dataset.error ?? "");
+      if (!error) return;
+      const label = field.labels?.[0] ? `${spoken(field.labels[0])}: ` : "";
+      clearTimeout(timer);
+      announcer.textContent = "";
+      spokenField = field;
+      // After the screen reader has read the field that takes focus next.
+      timer = window.setTimeout(() => {
+        announcer.textContent = label + spoken(error);
+      }, 500);
+    };
+
+    const sync = (target: EventTarget | null, speak = false) => {
+      if (!isField(target)) return;
+      if (target.matches(":user-invalid")) {
+        if (speak && !announced.has(target)) {
+          announce(target);
+          announced.add(target);
+        }
+        target.setAttribute("aria-invalid", "true");
+        linkError(target, true);
+        flagged.add(target);
+      } else if (
+        flagged.has(target) ||
+        target.getAttribute("aria-invalid") !== "true"
+      ) {
+        target.setAttribute("aria-invalid", "false");
+        linkError(target, false);
+        flagged.delete(target);
+        announced.delete(target);
+        if (spokenField === target) {
+          clearTimeout(timer);
+          announcer.textContent = "";
+        }
+      }
+    };
+    const syncAll = () => {
+      for (const field of fields.elements) sync(field);
+    };
+
+    syncAll();
+    fields.addEventListener("blur", (event) => sync(event.target, true), true);
+    fields.addEventListener("input", (event) => {
+      if ((event.target as Element).hasAttribute("aria-invalid"))
+        sync(event.target);
+    });
+    fields.addEventListener(
+      "change",
+      (event) => sync(event.target, true),
+      true,
+    );
+    // A failed send flags every failing field; focus moving to the first one
+    // reads its error, so these are not announced.
+    fields.addEventListener(
+      "invalid",
+      (event) => {
+        if (isField(event.target)) announced.add(event.target);
+        sync(event.target);
+      },
+      true,
+    );
+    fields.addEventListener("reset", () => setTimeout(syncAll));
+
     fields.addEventListener("submit", async (event) => {
       const endpoint = form.dataset.endpoint;
 
       if (!fields.checkValidity()) return;
+      // A GET form asks for a page — a search, a filter — so the browser goes there.
+      if (endpoint && fields.method === "get") return;
 
       event.preventDefault();
       form.dataset.state = "sending";
+      note.textContent = "";
       if (submit) submit.disabled = true;
 
       try {
         if (endpoint) {
           const answer = await fetch(endpoint, {
-            method: fields.method || "post",
+            method: "post",
             body: new FormData(fields),
             headers: { Accept: "application/json" },
           });
           if (!answer.ok) throw new Error(String(answer.status));
         }
         form.dataset.state = "sent";
+        note.textContent = form.dataset.sentText ?? "";
         fields.reset();
       } catch {
         form.dataset.state = "failed";
+        note.textContent = form.dataset.failedText ?? "";
         if (submit) submit.disabled = false;
       }
     });
@@ -119,24 +224,18 @@ if (import.meta.env.DEV && render && content && !action) {
     }
 
     .form_note {
-      display: none;
       padding: var(--space-4) var(--space-5);
       border: var(--border-width) solid var(--border);
       border-radius: var(--radius-small);
-    }
-
-    .form_wrap[data-state="sent"] {
-      & .form_fields {
-        display: none;
-      }
-      & .form_note-sent {
-        display: block;
+      &:empty {
+        position: absolute;
+        padding: 0;
+        border: 0;
       }
     }
 
-    .form_wrap[data-state="failed"] .form_note-failed {
-      display: block;
-      color: var(--text);
+    .form_wrap[data-state="sent"] .form_fields {
+      display: none;
     }
   }
 </style>

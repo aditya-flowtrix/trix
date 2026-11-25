@@ -59,6 +59,7 @@ const handle = await slotContent(Astro.slots, "handle");
         max="100"
         value={start}
         aria-label={label}
+        aria-valuetext={`${start}%`}
         data-compare
       />
     </div>
@@ -69,8 +70,10 @@ const handle = await slotContent(Astro.slots, "handle");
   import { mount } from "@/utils/mount.ts";
 
   mount<HTMLInputElement>("[data-compare]", (range) => {
-    const update = () =>
+    const update = () => {
       range.parentElement?.style.setProperty("--_position", `${range.value}%`);
+      range.setAttribute("aria-valuetext", `${range.value}%`);
+    };
     range.addEventListener("input", update);
     update();
   });
@@ -138,6 +141,9 @@ const handle = await slotContent(Astro.slots, "handle");
       cursor: ew-resize;
       touch-action: pan-y;
       appearance: none;
+      /* The divider is drawn from the left, so the range runs left to right
+         on a right-to-left page too. */
+      direction: ltr;
 
       &::-webkit-slider-thumb {
         width: var(--_knob-size);

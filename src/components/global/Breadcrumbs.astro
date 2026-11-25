@@ -8,8 +8,8 @@ interface Props extends HTMLAttributes<"nav"> {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /**
-   * The trail from the home page to this page. The last item is this page;
-   * it needs no `href`.
+   * The trail from the home page to this page. The last item is this page:
+   * it links to its own URL unless `href` says otherwise.
    */
   items: { label: string; href?: string }[];
   /** Also emit the trail as BreadcrumbList structured data. Defaults to `true`. */
@@ -25,6 +25,7 @@ const {
 } = Astro.props;
 
 const last = items.length - 1;
+const here = pagePath(Astro.url);
 ---
 
 {
@@ -37,14 +38,20 @@ const last = items.length - 1;
       <ol class="breadcrumbs_list">
         {items.map((item, i) => (
           <li class="breadcrumbs_item">
-            {i < last && item.href ? (
+            {i === last ? (
+              <a
+                class="breadcrumbs_link"
+                href={item.href ?? here}
+                aria-current="page"
+              >
+                {item.label}
+              </a>
+            ) : item.href ? (
               <a class="breadcrumbs_link" href={item.href}>
                 {item.label}
               </a>
             ) : (
-              <span class="breadcrumbs_current" aria-current="page">
-                {item.label}
-              </span>
+              <span>{item.label}</span>
             )}
           </li>
         ))}
@@ -58,7 +65,7 @@ const last = items.length - 1;
       data={breadcrumbList(
         items.map((item) => ({
           name: item.label,
-          url: item.href ?? pagePath(Astro.url),
+          url: item.href ?? here,
         })),
       )}
     />
@@ -96,9 +103,10 @@ const last = items.length - 1;
           text-decoration-color: var(--link-border-hover);
         }
       }
-    }
-    .breadcrumbs_current {
-      color: var(--text-2);
+      &[aria-current="page"] {
+        color: var(--text-2);
+        text-decoration: none;
+      }
     }
   }
 </style>

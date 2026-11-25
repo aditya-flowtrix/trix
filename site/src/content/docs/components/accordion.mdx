@@ -1,6 +1,6 @@
 ---
 title: Accordion
-description: Questions and details that open in place — native disclosure elements, one open at a time if you like.
+description: Questions and details that open in place — native disclosure elements, one open at a time if you must.
 order: 50
 component: interactive/Accordion
 ---
@@ -17,8 +17,7 @@ component: interactive/Accordion
   </AccordionItem>
   <AccordionItem heading="Does it work without JavaScript?">
     <Paragraph
-      >Yes. Each item is a native details element; the script only adds the
-      animation and one-at-a-time behaviour.</Paragraph
+      >Yes. Each item is a native details element, so it opens without a script.</Paragraph
     >
   </AccordionItem>
 </Accordion>
@@ -26,7 +25,14 @@ component: interactive/Accordion
 
 Each `AccordionItem` is a `<details>`, so it opens with the keyboard and
 without JavaScript, and the browser's find-in-page opens the item that holds
-the match. `single` (the default) closes the others when one opens.
+the match. Its `heading` is the summary's text, in the `h5` style but not a
+heading: screen readers read a summary as a button and drop any heading inside
+it. The arrow sits right before it — pointing along the line while the item is
+closed, down while it is open — and with reduced motion items open at once.
+
+`single` closes the others when one opens. It is off by default: one item at
+a time stops visitors comparing two answers, and moves the page under anyone
+using a screen magnifier.
 
 A page of questions also wants FAQ structured data — `faqPage()` from
 `@/utils/schema.ts` (see [SEO](/docs/guides/seo)).

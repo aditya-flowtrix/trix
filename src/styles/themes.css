@@ -8,14 +8,16 @@
  *   theme-brand
  *   theme-invert  flips to the opposite of the theme around it
  *
- * Site-wide dark mode (`COLOR_MODE` in src/consts.ts) sets
- * `data-mode="dark"` on <html>, which applies the dark theme to everything
- * that has no theme of its own.
+ * Site-wide color mode (`COLOR_MODE` in src/consts.ts): <html> follows the
+ * visitor's system setting with no script — see Color mode, at the end.
+ * `data-mode="light"` or `"dark"` on <html> overrides it: a stored
+ * `ThemeToggle` choice, or a fixed `COLOR_MODE`. The mode selectors sit in
+ * :where(), so a page pinned with a `theme-*` class on <html> keeps its theme.
  *
  * Adding a theme: copy a block, rename the class, keep every token.
  */
 
-:root,
+:where(:root),
 .theme-light,
 .theme-dark .theme-invert,
 .theme-brand .theme-invert,
@@ -59,7 +61,8 @@
 
 .theme-dark,
 .theme-light .theme-invert,
-:root[data-mode="dark"] {
+:where(:root[data-mode="dark"]),
+:where(:root:not([data-mode="dark"])) .theme-invert {
   color-scheme: dark;
 
   --background: var(--neutral-950);
@@ -140,3 +143,14 @@
   background-color: var(--background);
   color: var(--text);
 }
+
+/* ---------- Color mode ---------- */
+
+:where(:root:not([data-mode])) {
+  color-scheme: light dark;
+}
+
+/* With the system set to dark and no light mode chosen, <html> takes the dark
+   theme from generated/color-mode.css: `npm run tokens` copies the block
+   above there, since CSS can't share one rule between a class and a media
+   query. */

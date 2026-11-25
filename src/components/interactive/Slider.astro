@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import Button from "@/components/Button.astro";
-import { slotContent } from "@/utils/slots.ts";
+import { slotContent, topElements } from "@/utils/slots.ts";
 
 type Props = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
@@ -30,7 +30,7 @@ type Props = HTMLAttributes<"div"> & {
    * @min 1
    * @max 12 */
   large?: number;
-  /** Wrap from the last slide to the first, and back. */
+  /** Wrap from the last slide to the first, and back, once there are three. Set to `false` to stop at the ends. */
   loop?: boolean;
   /** Slide playback. `auto` advances every six seconds and loops, with a pause button. */
   playback?: "manual" | "auto";
@@ -48,7 +48,7 @@ const {
   small,
   medium,
   large,
-  loop = false,
+  loop = true,
   playback = "manual",
   controls = "bottom",
   markers = true,
@@ -71,32 +71,36 @@ if (import.meta.env.DEV && invalid.length) {
 const set = (count: number | undefined) =>
   count !== undefined && Number.isFinite(count) && count > 0;
 
-const visible =
-  [
-    xsmall !== 1.02 && set(xsmall) && `--_visible-xs: ${xsmall}`,
-    set(small) && `--_visible-sm: ${small}`,
-    set(medium) && `--_visible-md: ${medium}`,
-    set(large) && `--_visible-lg: ${large}`,
-  ]
-    .filter(Boolean)
-    .join("; ") || undefined;
-
-const slides = await slotContent(Astro.slots);
+const slides = topElements(await slotContent(Astro.slots));
 const header = await slotContent(Astro.slots, "header");
+const auto = playback === "auto";
+
+const locals = [
+  `--_slides: ${slides.length}`,
+  xsmall !== 1.02 && set(xsmall) && `--_visible-xs: ${xsmall}`,
+  set(small) && `--_visible-sm: ${small}`,
+  set(medium) && `--_visible-md: ${medium}`,
+  set(large) && `--_visible-lg: ${large}`,
+]
+  .filter(Boolean)
+  .join("; ");
 ---
 
 {
-  render && slides && (
+  render && slides.length > 0 && (
     <div
       class:list={[
         "slider_wrap",
         variant !== "bleed" && variant,
         loop && "loop",
-        playback === "auto" && "auto",
+        auto && "auto",
         controls === "top" && "controls-top",
         className,
       ]}
-      style={visible}
+      style={locals}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={label}
       {...rest}
     >
       {header && (
@@ -104,10 +108,6 @@ const header = await slotContent(Astro.slots, "header");
           <Fragment set:html={header} />
         </div>
       )}
-      <div class="slider_list" role="group" aria-label={label} tabindex="0">
-        <Fragment set:html={slides} />
-      </div>
-
       <div class="slider_controls">
         {markers && <div class="slider_markers" />}
         <div class="slider_steps">
@@ -125,7 +125,7 @@ const header = await slotContent(Astro.slots, "header");
             data-step="1"
           />
         </div>
-        {playback === "auto" && (
+        {auto && (
           <Button
             variant="play"
             emphasis="secondary"
@@ -135,6 +135,19 @@ const header = await slotContent(Astro.slots, "header");
           />
         )}
       </div>
+      <div class="slider_list" role="group" aria-label="Slides" tabindex="0">
+        {slides.map((slide, i) => (
+          <div
+            class="slider_slide"
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${slides.length}`}
+          >
+            <Fragment set:html={slide} />
+          </div>
+        ))}
+      </div>
+      <p class="slider_status sr-only" role="status" />
     </div>
   )
 }
@@ -143,122 +156,215 @@ const header = await slotContent(Astro.slots, "header");
   import { mount } from "@/utils/mount.ts";
 
   const THRESHOLD = 4;
+  const INTERVAL = 6000;
 
   mount(".slider_wrap", (slider, signal) => {
-    const list = slider.querySelector<HTMLElement>(".slider_list");
-    const markers = slider.querySelector<HTMLElement>(".slider_markers");
-    const controls = slider.querySelector<HTMLElement>(".slider_controls");
+    const list = slider.querySelector<HTMLElement>(":scope > .slider_list");
+    const controls = slider.querySelector<HTMLElement>(
+      ":scope > .slider_controls",
+    );
+    const markers = controls?.querySelector<HTMLElement>(".slider_markers");
+    const status = slider.querySelector<HTMLElement>(":scope > .slider_status");
+    const toggle = controls?.querySelector<HTMLButtonElement>("[data-toggle]");
     const steps = [
-      ...slider.querySelectorAll<HTMLButtonElement>("[data-step]"),
+      ...(controls?.querySelectorAll<HTMLButtonElement>("[data-step]") ?? []),
     ];
     if (!list) return;
 
     const slides = [...list.children] as HTMLElement[];
     if (slides.length === 0) return;
 
-    slides.forEach((slide, i) => {
-      slide.setAttribute("role", "group");
-      slide.setAttribute("aria-label", `${i + 1} of ${slides.length}`);
-    });
-
     const auto = slider.classList.contains("auto");
-    const loop = auto || slider.classList.contains("loop");
+    // Looping needs three slides; automatic rotation always comes round.
+    const wraps =
+      auto || (slider.classList.contains("loop") && slides.length >= 3);
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    const behavior = () => (reduced.matches ? "auto" : "smooth");
+    const behavior = (): ScrollBehavior =>
+      reduced.matches ? "auto" : "smooth";
+    const rtl = getComputedStyle(list).direction === "rtl";
 
-    const stride = () => {
-      const first = slides[0].getBoundingClientRect();
-      if (slides.length < 2) return first.width;
-      return slides[1].getBoundingClientRect().left - first.left;
+    // Distances run along the inline axis, toward its end, whichever way
+    // the page reads.
+    const edge = (el: Element) => {
+      const box = el.getBoundingClientRect();
+      return rtl ? -box.right : box.left;
     };
+    const scrolled = () => Math.abs(list.scrollLeft);
+    const range = () => list.scrollWidth - list.clientWidth;
+    const scroll = (distance: number, how: ScrollBehavior) =>
+      list.scrollBy({ left: rtl ? -distance : distance, behavior: how });
+    const visual = () => [...slides].sort((a, b) => edge(a) - edge(b));
 
-    const view = () => {
-      const box = getComputedStyle(list);
-      return (
-        list.clientWidth -
-        parseFloat(box.paddingInlineStart) -
-        parseFloat(box.paddingInlineEnd)
+    // Where a slide comes to rest: its start on the scroll padding, as far
+    // as the track scrolls.
+    const restOf = (slide: HTMLElement) => {
+      const start =
+        edge(list) +
+        (parseFloat(getComputedStyle(list).scrollPaddingInlineStart) || 0);
+      return Math.min(Math.max(scrolled() + edge(slide) - start, 0), range());
+    };
+    const nearest = () =>
+      visual().reduce((best, slide) =>
+        Math.abs(restOf(slide) - scrolled()) <
+        Math.abs(restOf(best) - scrolled())
+          ? slide
+          : best,
       );
-    };
 
     const pages = () => {
-      const step = stride();
+      const box = getComputedStyle(list);
+      const step =
+        slides[0].getBoundingClientRect().width +
+        (parseFloat(box.columnGap) || 0);
+      const view =
+        list.clientWidth -
+        parseFloat(box.paddingInlineStart) -
+        parseFloat(box.paddingInlineEnd);
       if (step <= 0) return 1;
-      return Math.max(1, slides.length - Math.round(view() / step) + 1);
+      return Math.max(1, slides.length - Math.round(view / step) + 1);
     };
 
-    const current = () => {
-      const step = stride();
-      return step > 0 ? Math.round(list.scrollLeft / step) : 0;
+    // One slide in view: the end slides park beside it, so there is always
+    // one either way. More in view, looping comes round from an end instead.
+    const parks = () =>
+      wraps && slides.length >= 3 && pages() === slides.length;
+
+    // The slide a click asked for, until scrolling settles; where the track
+    // was then; and a step clicked while a marker's trip is on its way.
+    let pending: HTMLElement | null = null;
+    let from = 0;
+    let held = 0;
+    let settled = -1;
+    let pressed = false;
+
+    // Reordering moves what is on screen; scrolling back by as much in the
+    // same task keeps it still. Snapping is off meanwhile, or the browser
+    // snaps on to another slide, and so is overflow, or iOS paints the
+    // reorder for a frame.
+    const park = (value: string, anchor: HTMLElement, lock: boolean) => {
+      if (list.style.getPropertyValue("--_current") === value) return;
+      const before = edge(anchor);
+      list.style.scrollSnapType = "none";
+      if (lock) list.style.overflowX = "hidden";
+      if (value) list.style.setProperty("--_current", value);
+      else list.style.removeProperty("--_current");
+      scroll(edge(anchor) - before, "instant");
+      list.style.scrollSnapType = "";
+      if (lock)
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => (list.style.overflowX = "")),
+        );
     };
 
     let drawn = 0;
+    let marked = -1;
+    const mark = (index: number) => {
+      const at = Math.min(index, drawn - 1);
+      if (at === marked) return;
+      marked = at;
+      markers?.querySelectorAll(".slider_marker").forEach((marker, i) => {
+        if (i === at) marker.setAttribute("aria-current", "true");
+        else marker.removeAttribute("aria-current");
+      });
+    };
+
+    const go = (target: HTMLElement) => {
+      const distance = restOf(target) - scrolled();
+      if (Math.abs(distance) < 1) return false;
+      pending = target;
+      from = scrolled();
+      mark(slides.indexOf(target));
+      scroll(distance, behavior());
+      return true;
+    };
+
+    const step = (direction: number) => {
+      // On a marker's trip the slides are in page order, with no end parked
+      // to come round to: the step waits for the trip to end.
+      if (list.style.getPropertyValue("--_current") === "initial") {
+        held = direction;
+        return;
+      }
+      const order = visual();
+      let target = order[order.indexOf(pending ?? nearest()) + direction];
+      if (wraps && !parks()) {
+        if (direction > 0 && scrolled() >= range() - 1) target = order[0];
+        if (direction < 0 && scrolled() <= 1) target = order[order.length - 1];
+      }
+      if (target) go(target);
+    };
+
+    // Markers go the long way round, through the slides in page order.
+    const visit = (target: HTMLElement) => {
+      if (parks() && target !== (pending ?? nearest()))
+        park("initial", nearest(), false);
+      if (!go(target)) update();
+    };
 
     const draw = (total: number) => {
       if (!markers) return;
       drawn = total;
+      marked = -1;
       markers.replaceChildren(
         ...Array.from({ length: total }, (_, i) => {
           const marker = document.createElement("button");
           marker.type = "button";
           marker.className = "slider_marker";
           marker.setAttribute("aria-label", `Go to slide ${i + 1}`);
-          marker.addEventListener("click", () =>
-            list.scrollTo({ left: i * stride(), behavior: behavior() }),
-          );
+          marker.addEventListener("click", () => visit(slides[i]));
           return marker;
         }),
       );
     };
 
-    const sync = () => {
+    // Markers, buttons and parking, from where the track has come to rest.
+    const update = (lock = true) => {
+      const slide = nearest();
       const total = pages();
       if (total !== drawn) draw(total);
+      mark(slides.indexOf(slide));
 
-      const end = list.scrollWidth - list.clientWidth;
-      const atStart = list.scrollLeft <= 1;
-      const atEnd = list.scrollLeft >= end - 1;
-
-      for (const step of steps) {
-        step.disabled =
-          !loop && (Number(step.dataset.step) < 0 ? atStart : atEnd);
-      }
-
-      const index = current();
-      markers?.querySelectorAll(".slider_marker").forEach((marker, i) => {
-        marker.classList.toggle("is-active", i === index);
-        if (i === index) marker.setAttribute("aria-current", "true");
-        else marker.removeAttribute("aria-current");
-      });
-
+      const end = range();
       controls?.classList.toggle("is-empty", end <= 1);
+      const focused = steps.find((button) => button === document.activeElement);
+      for (const button of steps) {
+        button.disabled =
+          !wraps &&
+          (Number(button.dataset.step) < 0
+            ? scrolled() <= 1
+            : scrolled() >= end - 1);
+      }
+      // A button turning off would drop focus: it goes to the other one.
+      if (focused?.disabled) steps.find((button) => !button.disabled)?.focus();
+
+      if (!pending && !pressed)
+        park(parks() ? String(slides.indexOf(slide)) : "", slide, lock);
+      return slide;
     };
 
-    // One step either way; looping, past an end comes round to the other.
-    const go = (by: number) => {
-      const end = list.scrollWidth - list.clientWidth;
-      if (loop && by > 0 && list.scrollLeft >= end - 1)
-        list.scrollTo({ left: 0, behavior: behavior() });
-      else if (loop && by < 0 && list.scrollLeft <= 1)
-        list.scrollTo({ left: end, behavior: behavior() });
-      else list.scrollBy({ left: by * stride(), behavior: behavior() });
+    const settle = () => {
+      // Ending where the asked-for scroll began, it is an earlier one's end.
+      if (pressed || (pending && Math.abs(scrolled() - from) < 1)) return;
+      pending = null;
+      const index = slides.indexOf(update(!held));
+      if (status && settled !== -1 && index !== settled)
+        status.textContent = `Slide ${index + 1} of ${slides.length}`;
+      settled = index;
+      if (held) {
+        const direction = held;
+        held = 0;
+        step(direction);
+      }
     };
-
-    for (const step of steps) {
-      step.addEventListener("click", () => {
-        go(Number(step.dataset.step));
-        restart();
-      });
-    }
 
     // Auto: a step every six seconds, held while it is focused, off screen,
     // paused by its button, or the visitor prefers less motion — as Tabs.
-    const toggle = slider.querySelector<HTMLButtonElement>("[data-toggle]");
     let timer: number | undefined;
     let paused = !auto;
     const restart = () => {
       window.clearTimeout(timer);
-      if (!paused) timer = window.setTimeout(() => (go(1), restart()), 6000);
+      if (!paused)
+        timer = window.setTimeout(() => (step(1), restart()), INTERVAL);
     };
     const holds = {
       motion: reduced.matches,
@@ -266,50 +372,59 @@ const header = await slotContent(Astro.slots, "header");
       offscreen: false,
       asked: false,
     };
-    const settle = () => {
+    const hold = () => {
       paused = !auto || Object.values(holds).some(Boolean);
       slider.classList.toggle("is-paused", paused);
-      toggle?.setAttribute("aria-pressed", String(!holds.asked));
+      // While it turns by itself, the slides aren't announced as they come.
+      status?.setAttribute("aria-live", paused ? "polite" : "off");
+      toggle?.toggleAttribute("data-playing", !holds.asked);
       toggle?.setAttribute(
         "aria-label",
         holds.asked ? "Start automatic rotation" : "Pause automatic rotation",
       );
       restart();
     };
+
+    for (const button of steps) {
+      button.addEventListener("click", () => {
+        step(Number(button.dataset.step));
+        restart();
+      });
+    }
+
     if (auto) {
       toggle?.addEventListener("click", () => {
         holds.asked = !holds.asked;
-        settle();
+        hold();
       });
       reduced.addEventListener(
         "change",
         (event) => {
           holds.motion = event.matches;
-          settle();
+          hold();
         },
         { signal },
       );
       list.addEventListener("focusin", () => {
         holds.focus = true;
-        settle();
+        hold();
       });
       list.addEventListener("focusout", (event) => {
         if (list.contains(event.relatedTarget as Node)) return;
         holds.focus = false;
-        settle();
+        hold();
       });
       const seen = new IntersectionObserver((entries) => {
         holds.offscreen = !entries[0].isIntersecting;
-        settle();
+        hold();
       });
       seen.observe(slider);
       signal.addEventListener("abort", () => seen.disconnect());
-      settle();
+      hold();
     }
 
     let origin = 0;
-    let from = 0;
-    let pressed = false;
+    let start = 0;
     let dragged = false;
 
     const restore = () => {
@@ -322,7 +437,7 @@ const header = await slotContent(Astro.slots, "header");
       pressed = true;
       dragged = false;
       origin = event.clientX;
-      from = list.scrollLeft;
+      start = list.scrollLeft;
     });
 
     list.addEventListener("pointermove", (event) => {
@@ -334,19 +449,13 @@ const header = await slotContent(Astro.slots, "header");
         list.setPointerCapture(event.pointerId);
         list.classList.add("is-dragging");
       }
-      list.scrollLeft = from - shift;
+      list.scrollLeft = start - shift;
     });
 
     const release = () => {
       if (!pressed) return;
       pressed = false;
-      const step = stride();
-      if (dragged && step > 0) {
-        list.scrollTo({
-          left: Math.round(list.scrollLeft / step) * step,
-          behavior: behavior(),
-        });
-      }
+      if (dragged && !go(nearest())) settle();
       list.addEventListener("scrollend", restore, { once: true });
       setTimeout(restore, 400);
     };
@@ -365,26 +474,42 @@ const header = await slotContent(Astro.slots, "header");
       true,
     );
 
+    // The markers keep pace while it scrolls; the rest waits until it stops.
     let frame = 0;
     list.addEventListener(
       "scroll",
       () => {
+        if (pending) return;
         cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(sync);
+        frame = requestAnimationFrame(() => {
+          if (!pending) mark(slides.indexOf(nearest()));
+        });
       },
       { passive: true },
     );
 
+    let quiet = 0;
+    if ("onscrollend" in window) list.addEventListener("scrollend", settle);
+    else
+      list.addEventListener(
+        "scroll",
+        () => {
+          window.clearTimeout(quiet);
+          quiet = window.setTimeout(settle, 100);
+        },
+        { passive: true },
+      );
+
     slider.classList.add("is-ready");
 
-    const resize = new ResizeObserver(sync);
+    const resize = new ResizeObserver(() => update());
     resize.observe(list);
-
-    addEventListener("load", sync, { signal });
-    sync();
+    addEventListener("load", () => update(), { signal });
+    settled = slides.indexOf(update());
 
     signal.addEventListener("abort", () => {
       window.clearTimeout(timer);
+      window.clearTimeout(quiet);
       cancelAnimationFrame(frame);
       resize.disconnect();
     });
@@ -428,6 +553,7 @@ const header = await slotContent(Astro.slots, "header");
       margin-inline: calc(-1 * var(--_edge));
       padding-inline: var(--_edge);
       scroll-padding-inline: var(--_edge);
+      touch-action: manipulation;
 
       &::-webkit-scrollbar {
         display: none;
@@ -457,6 +583,19 @@ const header = await slotContent(Astro.slots, "header");
         scroll-snap-align: start;
       }
 
+      /* Looping, the end slides park beside the current one (`--_current`,
+         set by the script) so there is always a slide either way: the last
+         before the first near the start, the first after the last near the
+         end. Unset, nothing moves. */
+      & > :first-child {
+        order: clamp(0, var(--_current) - max(var(--_slides) - 3, 1), 1);
+      }
+      & > :last-child {
+        order: calc(
+          -1 * clamp(0, min(2, var(--_slides) - 2) - var(--_current), 1)
+        );
+      }
+
       .slider_wrap.crop-start & {
         margin-inline-start: 0;
         padding-inline-start: 0;
@@ -470,11 +609,20 @@ const header = await slotContent(Astro.slots, "header");
       }
     }
 
+    .slider_slide {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* First in the page, so the arrows come before the slides they move;
+       drawn after them. */
     .slider_controls {
+      order: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: var(--space-4);
+      touch-action: manipulation;
 
       .slider_wrap:not(.is-ready) &,
       &.is-empty {
@@ -486,8 +634,7 @@ const header = await slotContent(Astro.slots, "header");
       }
     }
 
-    /* Controls above the slides, at the end of the header's row — the DOM
-       keeps them after the slides, so they follow them in tab order. */
+    /* Controls above the slides, at the end of the header's row. */
     .slider_wrap.controls-top {
       grid-template-columns: minmax(0, 1fr) auto;
       & > .slider_header {
@@ -526,8 +673,9 @@ const header = await slotContent(Astro.slots, "header");
         border-radius: var(--radius-round);
         transition: background-color var(--hover-duration) var(--hover-ease);
       }
-      &.is-active::before {
-        background-color: var(--text);
+      /* Filled by its border, not a color alone, so forced colors keep it. */
+      &[aria-current="true"]::before {
+        border-width: 0.375rem;
       }
       @media (hover: hover) {
         &:hover::before {

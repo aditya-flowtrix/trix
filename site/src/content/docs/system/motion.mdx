@@ -31,6 +31,23 @@ straight away.
 `--open-ease` every accordion, dropdown and menu. One change in `tokens.css`
 retimes the site.
 
+## Reduced motion
+
+Each component switches on its own movement — a slide, a scale, a rotation, a
+stagger — inside `@media (prefers-reduced-motion: no-preference)`, in the same
+rule, so a visitor who asked for less motion gets the end state at once.
+Colour and opacity changes stay. There is no site-wide reset that cuts every
+duration to nothing: that makes some animations jump harder, not less. Write
+your own the same way:
+
+```css
+.card_image {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: scale var(--hover-duration) var(--hover-ease);
+  }
+}
+```
+
 ## Moving content can be paused
 
 WCAG 2.2.2: anything that moves for more than five seconds must be pausable.

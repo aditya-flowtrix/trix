@@ -22,17 +22,18 @@ const { render = true, overlap = false } = Astro.props;
         <a class="nav_logo" href="/" aria-label={SITE_NAME}>
           <Icon src={logo} variant="full-width" />
         </a>
-        <button
-          class="nav_toggle"
-          type="button"
-          aria-label="Menu"
-          aria-expanded="false"
-          aria-controls="nav-menu"
-        >
-          <span class="nav_toggle_icon" />
-        </button>
-        <nav class="nav_menu" id="nav-menu" aria-label="Main">
-          <div class="nav_menu_inner">
+        <nav aria-label="Main">
+          <button
+            class="nav_toggle"
+            type="button"
+            aria-label="Menu"
+            aria-expanded="false"
+            aria-controls="nav-menu"
+            popovertarget="nav-menu"
+          >
+            <span class="nav_toggle_icon" />
+          </button>
+          <div class="nav_menu" id="nav-menu" popover="auto">
             <ul class="nav_links">
               <NavLink href="/">Home</NavLink>
               <NavLink href="/style-guide">Style Guide</NavLink>
@@ -47,71 +48,38 @@ const { render = true, overlap = false } = Astro.props;
   )
 }
 
-{/* No-JS fallback */}
-<noscript>
-  <style>
-    .nav_toggle {
-      display: none;
-    }
-    .nav_menu {
-      grid-template-rows: 1fr;
-      visibility: visible;
-    }
-    .nav_menu_inner {
-      opacity: 1;
-    }
-  </style>
-</noscript>
-
 <script>
   import { mount } from "@/utils/mount.ts";
 
   mount(".nav_wrap", (nav, signal) => {
     const toggle = nav.querySelector<HTMLButtonElement>(".nav_toggle");
-    if (!toggle) return;
+    const menu = nav.querySelector<HTMLElement>(".nav_menu");
+    if (!toggle || !menu) return;
 
-    const setOpen = (open: boolean) => {
-      nav.classList.toggle("open", open);
-      toggle.setAttribute("aria-expanded", String(open));
+    // A popover only while the links are folded away; in the bar they are
+    // a plain list. Escape and a click outside are the popover's own.
+    const wide = matchMedia("(width >= 48rem)");
+    const layout = () => {
+      if (wide.matches) menu.removeAttribute("popover");
+      else menu.setAttribute("popover", "auto");
+      toggle.setAttribute("aria-expanded", "false");
     };
+    layout();
+    wide.addEventListener("change", layout, { signal });
 
-    toggle.addEventListener("click", () => {
-      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    menu.addEventListener("toggle", (event) => {
+      toggle.setAttribute("aria-expanded", String(event.newState === "open"));
     });
 
-    nav.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => setOpen(false));
+    menu.addEventListener("click", (event) => {
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest("a") &&
+        menu.matches(":popover-open")
+      )
+        menu.hidePopover();
     });
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (event.key === "Escape" && nav.classList.contains("open")) {
-          setOpen(false);
-          toggle.focus();
-        }
-      },
-      { signal },
-    );
-
-    document.addEventListener(
-      "click",
-      (event) => {
-        const target = event.target;
-        if (!nav.classList.contains("open") || !(target instanceof Node))
-          return;
-        if (!nav.contains(target)) setOpen(false);
-      },
-      { signal },
-    );
-
-    matchMedia("(width >= 48rem)").addEventListener(
-      "change",
-      (event) => {
-        if (event.matches) setOpen(false);
-      },
-      { signal },
-    );
   });
 </script>
 
@@ -127,6 +95,7 @@ const { render = true, overlap = false } = Astro.props;
       background-color: var(--background);
       color: var(--text);
       border-bottom: var(--border-width) solid var(--border);
+      anchor-name: --nav;
 
       &.overlap {
         position: fixed;
@@ -164,7 +133,7 @@ const { render = true, overlap = false } = Astro.props;
     .nav_toggle {
       --_icon-width: 1.5rem;
       --_bar-gap: 0.5rem;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       min-width: 2.75rem;
@@ -191,7 +160,9 @@ const { render = true, overlap = false } = Astro.props;
         inset-inline: 0;
         height: var(--border-width);
         background-color: currentcolor;
-        transition: transform var(--open-duration) var(--open-ease);
+        @media (prefers-reduced-motion: no-preference) {
+          transition: transform var(--open-duration) var(--open-ease);
+        }
       }
       &::before {
         top: 0;
@@ -201,7 +172,7 @@ const { render = true, overlap = false } = Astro.props;
       }
     }
 
-    .nav_wrap.open .nav_toggle_icon {
+    .nav_toggle[aria-expanded="true"] .nav_toggle_icon {
       &::before {
         transform: translateY(calc(var(--_bar-gap) / 2)) rotate(45deg);
       }
@@ -210,38 +181,49 @@ const { render = true, overlap = false } = Astro.props;
       }
     }
 
+    /* The phone menu: a popover hanging from the bar. Without anchor
+       positioning, `inset-block` holds it under a bar of the usual height. */
     .nav_menu {
-      position: absolute;
-      top: 100%;
+      --_from: 0 -0.5rem;
+      inset-block: var(--nav-height) auto;
+      inset-block-start: anchor(--nav bottom);
       inset-inline: 0;
-      display: grid;
-      grid-template-rows: 0fr;
-      visibility: hidden;
-      max-height: calc(100svh - var(--nav-height));
+      width: auto;
+      max-height: calc(100dvh - var(--nav-height));
+      margin: 0;
+      padding: 0;
       overflow-x: clip;
       overflow-y: auto;
       overscroll-behavior: contain;
       background-color: var(--background);
+      color: inherit;
+      border: 0;
       border-bottom: var(--border-width) solid var(--border);
-      transition:
-        grid-template-rows var(--open-duration) var(--open-ease),
-        visibility var(--open-duration) var(--open-ease);
-    }
-
-    .nav_menu_inner {
-      overflow: hidden;
       opacity: 0;
-      transition: opacity var(--open-duration) var(--open-ease);
-    }
+      transition-property: opacity, translate;
+      transition-duration: var(--open-duration);
+      transition-timing-function: var(--open-ease);
 
-    .nav_wrap.open .nav_menu {
-      grid-template-rows: 1fr;
-      visibility: visible;
-    }
+      @supports (overlay: auto) {
+        transition-property: opacity, translate, display, overlay;
+        transition-behavior: allow-discrete;
+      }
 
-    .nav_wrap.open .nav_menu_inner {
-      opacity: 1;
-      overflow-y: auto;
+      @media (prefers-reduced-motion: no-preference) {
+        translate: var(--_from);
+      }
+
+      &:popover-open {
+        opacity: 1;
+        translate: none;
+
+        @starting-style {
+          opacity: 0;
+          @media (prefers-reduced-motion: no-preference) {
+            translate: var(--_from);
+          }
+        }
+      }
     }
 
     .nav_links {
@@ -265,6 +247,7 @@ const { render = true, overlap = false } = Astro.props;
       transition: color var(--hover-duration) var(--hover-ease);
       &[aria-current="page"] {
         color: var(--text);
+        text-decoration: underline;
       }
       @media (hover: hover) {
         &:hover {
@@ -304,29 +287,23 @@ const { render = true, overlap = false } = Astro.props;
         display: none;
       }
 
-      .nav_menu_inner {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-      }
-
       .nav_theme {
         margin: 0;
       }
 
-      /* visible, or a Dropdown's panel is clipped by the bar */
+      /* In the bar. Shown here even while still a popover, before the
+         script runs or without it. */
       .nav_menu {
         position: static;
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        max-height: none;
         overflow: visible;
-        visibility: visible;
         background-color: transparent;
         border-bottom: 0;
-      }
-
-      .nav_menu_inner {
-        overflow: visible;
         opacity: 1;
+        translate: none;
       }
 
       .nav_links {
@@ -346,9 +323,14 @@ const { render = true, overlap = false } = Astro.props;
       }
 
       /* The links sit at the bar's end: open toward the middle. */
-      .nav_links .dropdown_content {
-        inset-inline: auto 0;
+      .nav_links .dropdown_wrap:not(.mega) .dropdown_content[popover] {
+        position-area: block-end span-inline-start;
         transform-origin: top right;
+      }
+
+      /* A mega panel hangs from the bar's bottom edge. */
+      .nav_links .mega .dropdown_content[popover] {
+        position-anchor: --nav;
       }
 
       .nav_sub {
@@ -360,9 +342,6 @@ const { render = true, overlap = false } = Astro.props;
 
       .nav_link {
         padding-block: 0;
-        &[aria-current="page"] {
-          text-decoration: underline;
-        }
       }
     }
   }

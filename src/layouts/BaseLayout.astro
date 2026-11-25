@@ -26,19 +26,20 @@ type Props = SeoProps & {
   gridOverlay?: boolean;
 };
 
+// `theme` stays in `seo`: BaseHead sets the page's color scheme from it.
 const {
-  theme = "inherit",
   overlap = false,
   gridOverlay = import.meta.env.DEV,
   ...seo
 } = Astro.props;
+const { theme = "inherit" } = seo;
 ---
 
 <!doctype html>
 <html
   lang={SITE_LOCALE}
   class:list={[theme !== "inherit" && `theme-${theme}`]}
-  data-mode={COLOR_MODE === "dark" ? "dark" : undefined}
+  data-mode={COLOR_MODE === "auto" ? undefined : COLOR_MODE}
 >
   <head>
     <BaseHead {...seo} />
@@ -47,7 +48,7 @@ const {
   <body>
     <SkipLink />
     <Nav overlap={overlap} />
-    <main id="main" tabindex="-1">
+    <main id="main">
       <slot />
     </main>
     <Footer />

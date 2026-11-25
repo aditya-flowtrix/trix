@@ -386,11 +386,9 @@ const bound = { min, max, step, autocomplete: "off" } as const;
       .form-choice.chip:has(:checked) & {
         color: inherit;
       }
-    }
-
-    .filter-field .form-choice:has(:disabled) {
-      opacity: 0.5;
-      cursor: not-allowed;
+      &:empty {
+        display: none;
+      }
     }
 
     .filter-field_clear {

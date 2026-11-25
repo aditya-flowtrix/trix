@@ -9,10 +9,19 @@ component: interactive/ThemeToggle
 <ThemeToggle />
 ```
 
-It renders only when `COLOR_MODE` in `src/consts.ts` is `auto`. The choice is
-saved in the browser and applied by an inline script in `BaseHead` before the
-first paint, so a dark-mode visitor never sees a white flash. Until someone
-chooses, it follows the system setting.
+It renders only when `COLOR_MODE` in `src/consts.ts` is `auto`. Until someone
+chooses, the site follows the system setting — in CSS, so the switch shows the
+right state before any script runs, and changes with the system.
+
+It has two states: the system's mode and its opposite. A click shows the
+opposite of what the page shows; when that is the system's mode again, the
+choice is forgotten and the site follows the system from then on. A choice is
+saved in the browser, applied by an inline script in `BaseHead` before the
+first paint, and carried to the visitor's other open tabs.
+
+Its accessible name is the action — "Switch to dark mode" while the page is
+light, "Switch to light mode" while it is dark — and in forced colors (Windows
+High Contrast) the thumb takes the system's button text color.
 
 The same switch is in this site's header.
 

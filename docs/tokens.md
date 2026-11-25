@@ -232,7 +232,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-main-line-height` | `var(--line-height-huge) → 1.5` | `var(--line-height-huge) → 1.5` |
 | `--text-main-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-main-text-transform` | `none` | `none` |
-| `--text-main-text-wrap` | `pretty` | `pretty` |
+| `--text-main-text-wrap` | `wrap` | `wrap` |
 | `--text-main-margin-top` | `var(--space-4)` | `var(--space-4)` |
 | `--text-main-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-main-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |

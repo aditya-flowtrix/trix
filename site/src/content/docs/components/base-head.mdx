@@ -25,8 +25,10 @@ component: utility/BaseHead
 | Open Graph and Twitter cards     | title, description, `image`, `type`, `SITE_LOCALE`                 |
 | JSON-LD                          | `schema` — see [SEO](/docs/guides/seo)                             |
 | fonts                            | every family in `astro.config.mjs`, the first preloaded            |
+| the color scheme                 | `COLOR_MODE`, or the page's pinned `theme`                         |
 | the color-mode script            | `COLOR_MODE` is `auto`                                             |
+| text scaling                     | always: the OS text size scales the page                           |
 | the cascade layer order          | always first                                                       |
 
-Its props are the page's: `title`, `description`, `image`, `type`, `noindex`
-and `schema`, which `BaseLayout` passes through.
+Its props are the page's: `title`, `description`, `image`, `type`, `noindex`,
+`schema` and `theme`, which `BaseLayout` passes through.
