@@ -33,7 +33,9 @@ const content = await slotContent(Astro.slots);
       ]}
       {...rest}
     >
-      <code class="style-guide-item_label text-style-small">{label}</code>
+      <code class="style-guide-item_label text-style-small">
+        {label.split(/(?<=[/=])/).flatMap((part) => [part, <wbr />])}
+      </code>
       <Fragment set:html={content} />
     </div>
   )

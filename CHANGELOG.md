@@ -20,9 +20,13 @@
 - Default tokens that read as placeholders on the public style guide:
   - The eyebrow is its own style instead of a copy of small text: 12 → 14px,
     medium weight, uppercase, `--letter-spacing-wider`, `--line-height-large`.
-  - Headings on phones step by about 1.2× each: display 64 → 56, h1 48 → 44,
-    h2 40 → 36, h3 36 → 30, h4 28 → 26, h6 16 → 18 (and 18 → 20 on desktop,
-    so it no longer matches body text). Every other desktop size is unchanged.
+  - Headings on phones step by about 1.2× each: h1 48 → 44, h2 40 → 36,
+    h3 36 → 30, h4 28 → 26, h6 16 → 18 (and 18 → 20 on desktop, so it no
+    longer matches body text). Every other desktop size is unchanged.
+  - Display on phones is 64 → 48. At 56 or more, "Framework" was wider than
+    the homepage's card at 320px and broke mid-word, and a ten-letter word
+    like "Components" broke on a plain 320px line. At 48 the homepage heading
+    fits its card, and words up to "Infrastructure" fit the line.
   - The dark theme's background is `--neutral-950` instead of pure black. The
     docs' dark code blocks move to `--neutral-900` to stay apart from it.
   - A project that wants the old values sets them back in its `tokens.css`
@@ -31,6 +35,13 @@
   puts it on (`--button-background`), not as a second black tile; its samples
   are real sentences instead of Lorem ipsum, with no brand in them; and the
   logo mark fills its card like the logo.
+- `/style-guide` at 320px: the 12-column demo hides its numbers below the
+  small breakpoint, where a column is narrower than "10"; the columns stay.
+  Item labels break after `/` and `=`, so `assets/logo/logo.svg` and
+  `weight="regular"` wrap whole instead of splitting a word.
+- `/components` uses real sentences instead of Lorem ipsum, as the style
+  guide does. The sticky-visual demo's text explains the variant and is
+  still long enough to scroll past its visual.
 - `StyleGuideGroup`'s `grid` variant is now `tiles`. Its `grid` class also
   matched `Grid`'s, which lost only because of stylesheet order. The rich
   text sample has the space it was missing before "a link".

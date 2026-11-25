@@ -132,7 +132,7 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
                 xsmall={1}
                 class="alignment-center background-skeleton radius-xsmall padding-block-2 text-style-xsmall"
               >
-                {i + 1}
+                <span class="style-guide-layout_number">{i + 1}</span>
               </Col>
             ))}
           </Row>
@@ -234,3 +234,14 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
     </>
   )
 }
+
+<style is:global>
+  @layer components {
+    .style-guide-layout_number {
+      display: none;
+      @media (width >= 30rem) {
+        display: inline;
+      }
+    }
+  }
+</style>

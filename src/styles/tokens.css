@@ -75,7 +75,7 @@
   --letter-spacing-wider: 0.1em;
 
   /* Text style — display */
-  --display-min: 56;
+  --display-min: 48;
   --display-max: 112;
   --display-font-family: var(--secondary-family);
   --display-font-weight: var(--primary-medium);

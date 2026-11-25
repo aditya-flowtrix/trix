@@ -43,6 +43,7 @@ import arrow from "@/assets/icons/arrow.svg";
 import play from "@/assets/icons/play.svg";
 import close from "@/assets/icons/close.svg";
 import check from "@/assets/icons/check.svg";
+import { sample } from "@/utils/style-guide.ts";
 
 const heading = "We build things that help people work smarter";
 const text =
@@ -58,8 +59,24 @@ const posts = [
   ["Development", "Filtering a list without a framework", "2026-11-12"],
   ["Strategy", "Writing the brief the team will use", "2026-05-08"],
 ] as const;
-const lorem =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+const about = {
+  strategy: "Finding the one thing worth building first, and why it matters.",
+  design: "Type, color and space that hold together on every page.",
+  development: "Fast pages that work before the script runs.",
+  research: "Talking to the people who use it before changing it.",
+  support: "Help after launch, from the people who built it.",
+};
+const scroll = [
+  sample.long,
+  "This column scrolls while the visual beside it stays in view, so a long explanation keeps its picture next to it the whole way down.",
+  "A product tour, a case study or a step-by-step guide all fit: every paragraph can point at the same picture without the reader scrolling back to find it.",
+  "The visual is held a site margin below the navigation and never grows taller than the screen, so it is always seen whole.",
+  "Headings, lists and buttons sit in this column as they would anywhere else. Only the visual's position changes.",
+  "Give each paragraph one idea. Short blocks with space between them are easier to follow beside a fixed picture than one long wall of text.",
+  "When the last paragraph passes, the visual lets go and scrolls away with the section.",
+  "On tablets and phones the two stack, and the visual scrolls with the page like any other block.",
+  "Use it when the text runs longer than the visual is tall. When the two are close, the columns variant reads better.",
+];
 ---
 
 <Layout title="Components" description="Every layout variant, side by side.">
@@ -201,34 +218,7 @@ const lorem =
     <ContentWrapper variant="sticky-visual">
       <Eyebrow>sticky-visual</Eyebrow>
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
-      <Paragraph
-        >Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque
-        faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi
-        pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-        tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-        Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit
-        semper vel class aptent taciti sociosqu. Ad litora torquent per conubia
-        nostra inceptos himenaeos. Lorem ipsum dolor sit amet consectetur
-        adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem
-        placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu
-        aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus
-        bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc
-        posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora
-        torquent per conubia nostra inceptos himenaeos. Lorem ipsum dolor sit
-        amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae
-        pellentesque sem placerat. In id cursus mi pretium tellus duis
-        convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus
-        fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada
-        lacinia integer nunc posuere. Ut hendrerit semper vel class aptent
-        taciti sociosqu. Ad litora torquent per conubia nostra inceptos
-        himenaeos. Lorem ipsum dolor sit amet consectetur adipiscing elit.
-        Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus
-        mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna
-        tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.
-        Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit
-        semper vel class aptent taciti sociosqu. Ad litora torquent per conubia
-        nostra inceptos himenaeos.</Paragraph
-      >
+      {scroll.map((paragraph) => <Paragraph>{paragraph}</Paragraph>)}
       <ButtonWrapper>
         <Button element="link" href="/style-guide">Button Text</Button>
       </ButtonWrapper>
@@ -260,13 +250,13 @@ const lorem =
     <Grid medium={3}>
       <Card
         heading="Heading"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.strategy}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Heading"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.design}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -274,7 +264,7 @@ const lorem =
       />
       <Card
         heading="Heading"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.development}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="stacked"
@@ -316,7 +306,7 @@ const lorem =
       <Col span={8} offset="center" class="alignment-center">
         <Eyebrow>row · span 8 offset center</Eyebrow>
         <Heading tag="h2" variant="h3">{heading}</Heading>
-        <Paragraph>{lorem}</Paragraph>
+        <Paragraph>{sample.long}</Paragraph>
       </Col>
     </Row>
   </Section>
@@ -326,8 +316,8 @@ const lorem =
       <Col span={8}>
         <RichText>
           <h3>Body copy on 8 columns</h3>
-          <p>{lorem}</p>
-          <p>{lorem}</p>
+          <p>{sample.long}</p>
+          <p>{text}</p>
         </RichText>
       </Col>
       <Col span={4} order="first">
@@ -500,7 +490,7 @@ const lorem =
       </Fragment>
       <Card
         heading="Strategy"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.strategy}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -509,7 +499,7 @@ const lorem =
       />
       <Card
         heading="Design"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.design}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -518,7 +508,7 @@ const lorem =
       />
       <Card
         heading="Development"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.development}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -596,7 +586,7 @@ const lorem =
               <Card
                 eyebrow={category}
                 heading={title}
-                text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                text="What we tried, what worked, and what we would change next time."
               />
             </FilterItem>
           ))
@@ -613,31 +603,31 @@ const lorem =
     <Slider label="Services" small={2} medium={3}>
       <Card
         heading="Strategy"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.strategy}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Design"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.design}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Development"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.development}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Research"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.research}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Support"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.support}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
@@ -658,7 +648,7 @@ const lorem =
     >
       <Card
         heading="Strategy"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.strategy}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -667,7 +657,7 @@ const lorem =
       />
       <Card
         heading="Design"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.design}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -676,7 +666,7 @@ const lorem =
       />
       <Card
         heading="Development"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.development}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -685,7 +675,7 @@ const lorem =
       />
       <Card
         heading="Research"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.research}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -694,7 +684,7 @@ const lorem =
       />
       <Card
         heading="Support"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.support}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
         variant="cover"
@@ -712,31 +702,31 @@ const lorem =
     <Slider variant="contained" label="Services" small={2} medium={3}>
       <Card
         heading="Strategy"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.strategy}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Design"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.design}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Development"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.development}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Research"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.research}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
       <Card
         heading="Support"
-        text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod."
+        text={about.support}
         buttonHref="/style-guide"
         buttonLabel="Button Text"
       />
@@ -861,19 +851,19 @@ const lorem =
       <Heading tag="h2" variant="h3" maxWidth={17}>{heading}</Heading>
       <Accordion slot="column2" openFirst={true}>
         <AccordionItem heading="This is some text inside of a div block.">
-          <Paragraph>{lorem}</Paragraph>
+          <Paragraph>{sample.long}</Paragraph>
         </AccordionItem>
         <AccordionItem heading="This is some text inside of a div block.">
-          <Paragraph>{lorem}</Paragraph>
+          <Paragraph>{sample.long}</Paragraph>
         </AccordionItem>
         <AccordionItem heading="This is some text inside of a div block.">
-          <Paragraph>{lorem}</Paragraph>
+          <Paragraph>{sample.long}</Paragraph>
         </AccordionItem>
         <AccordionItem heading="This is some text inside of a div block.">
-          <Paragraph>{lorem}</Paragraph>
+          <Paragraph>{sample.long}</Paragraph>
         </AccordionItem>
         <AccordionItem heading="This is some text inside of a div block.">
-          <Paragraph>{lorem}</Paragraph>
+          <Paragraph>{sample.long}</Paragraph>
         </AccordionItem>
       </Accordion>
     </ContentWrapper>

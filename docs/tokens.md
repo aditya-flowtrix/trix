@@ -82,7 +82,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--display` | 56px | 112px |
+| `--display` | 48px | 112px |
 | `--display-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--display-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--display-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
