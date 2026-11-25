@@ -1,9 +1,14 @@
 ---
+import Button from "@/components/Button.astro";
+import Input from "@/components/form/Input.astro";
+import Range from "@/components/form/Range.astro";
 import Paragraph from "@/components/typography/Paragraph.astro";
 import RichText from "@/components/typography/RichText.astro";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
 import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
 import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
-import { model, range, sample, value } from "@/utils/style-guide.ts";
+import { fontName, model, sample, sizes, value } from "@/utils/style-guide.ts";
+import { fluidAt } from "@/utils/tokens.ts";
 import type { TextStyle } from "@/styles/generated/tokens.ts";
 
 interface Props {
@@ -13,24 +18,43 @@ interface Props {
 
 const { render = true } = Astro.props;
 
+// Each font role with its own family: `secondary` often is `primary`.
+const families = model.families
+  .map((role) => ({ role, name: fontName(role) }))
+  .filter(
+    (f, i, all) => f.name && all.findIndex((g) => g.name === f.name) === i,
+  );
+
+// The width range fluid sizes grow across, for the screen width slider.
+const [viewportMin, viewportMax] = [
+  Number(value("viewport-min")) || 320,
+  Number(value("viewport-max")) || 1440,
+];
+
 const typeStyles = model.textStyles.map((name) => {
   const cls = name.replace(/^text-/, "");
-  const parts = [
-    range(name),
-    `line-height ${value(`${name}-line-height`)}`,
-    `letter-spacing ${value(`${name}-letter-spacing`)}`,
-    `weight ${value(`${name}-font-weight`)}`,
-  ];
+  const [min, max] = [viewportMin, viewportMax].map((w) =>
+    fluidAt(model, name, w),
+  );
+  const [phone, desktop] = sizes(name);
   const transform = value(`${name}-text-transform`);
-  if (transform && transform !== "none") parts.push(transform);
   return {
     cls,
+    min,
+    max,
     text: /^(display|h\d)$/.test(name)
       ? sample.heading
       : name === "eyebrow"
         ? sample.short
         : sample.long,
-    note: parts.join(" · "),
+    specs: [
+      [desktop ? "Phone" : "Size", phone],
+      ...(desktop ? [["Desktop", desktop]] : []),
+      ["Weight", value(`${name}-font-weight`)],
+      ["Line height", value(`${name}-line-height`)],
+      ["Letter spacing", value(`${name}-letter-spacing`)],
+      ...(transform && transform !== "none" ? [["Case", transform]] : []),
+    ],
   };
 });
 ---
@@ -38,20 +62,100 @@ const typeStyles = model.textStyles.map((name) => {
 {
   render && (
     <>
-      <StyleGuideGroup title="Text styles">
+      <StyleGuideGroup
+        title="Typeface"
+        caption="One family set at a few sizes and weights does the work of many."
+      >
+        <div class="style-guide-type_specimen">
+          {families.map(({ role, name }) => (
+            <div
+              class="style-guide-type_family"
+              style={`font-family: var(--${role}-family)`}
+            >
+              <span class="style-guide-type_glyphs" aria-hidden="true">
+                Aa
+              </span>
+              <div class="style-guide-type_family-info">
+                <span class="text-style-h3">{name}</span>
+                <span class="text-style-small">
+                  <StyleGuideCopy
+                    text={`var(--${role}-family)`}
+                    label={`--${role}-family`}
+                  />
+                </span>
+                <p class="style-guide-type_alphabet text-style-large">
+                  {sample.alphabet}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Text styles"
+        caption="Every heading, paragraph and label is one of these. Sizes grow smoothly between the phone and desktop values."
+        variant="rows"
+      >
+        <div class="style-guide-type_tools">
+          <Input
+            label="Preview text"
+            name="style-guide-preview"
+            placeholder="Type your own words"
+            autocomplete="off"
+          />
+          <Range
+            label="Screen width"
+            name="style-guide-width"
+            min={viewportMin}
+            max={viewportMax}
+            value={viewportMax}
+            unit="px"
+          />
+          <Button size="small" emphasis="secondary" type="button">
+            Reset
+          </Button>
+        </div>
         {typeStyles.map((style) => (
-          <StyleGuideItem label={`text-style-${style.cls} · ${style.note}`}>
-            <Paragraph tag="div" variant={style.cls as TextStyle} maxWidth={70}>
+          <div
+            class="style-guide-type_row"
+            data-min={style.min}
+            data-max={style.max}
+          >
+            <div class="style-guide-type_meta">
+              <StyleGuideCopy text={`text-style-${style.cls}`} />
+              <span class="style-guide-type_now" hidden />
+              <dl class="style-guide-type_specs">
+                {style.specs.map(([term, detail]) => (
+                  <div>
+                    <dt>{term}</dt>
+                    <dd>{detail}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <Paragraph
+              tag="div"
+              variant={style.cls as TextStyle}
+              maxWidth={70}
+              class="style-guide-type_sample"
+            >
               {style.text}
             </Paragraph>
-          </StyleGuideItem>
+          </div>
         ))}
-        <StyleGuideItem label="RichText">
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Rich text"
+        caption="Text written in a CMS or in Markdown: headings, emphasis, links, quotes and lists, styled as one."
+      >
+        <StyleGuideItem label="RichText" variant="card" class="width-full">
           <RichText>
             <h2>Heading 2</h2>
             <p>
-              A paragraph with <strong>bold</strong>, <em>emphasis</em>,{" "}
-              <a href="#typography">a link</a> and <code>inline code</code>.
+              A paragraph with <strong>bold</strong>, <em>emphasis</em>, a{" "}
+              <a href="#typography">link</a> and <code>inline code</code>.
             </p>
             <blockquote>Block quote</blockquote>
             <ul>
@@ -66,21 +170,34 @@ const typeStyles = model.textStyles.map((name) => {
         </StyleGuideItem>
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Weights" variant="scroll">
+      <StyleGuideGroup
+        title="Weights"
+        caption="How heavy the letters are."
+        variant="cards"
+      >
         {model.weights.map((weight) => (
           <StyleGuideItem
-            label={`weight-${weight} · ${value(`primary-${weight}`)}`}
+            label={`weight-${weight}`}
+            copy={`weight-${weight}`}
+            note={value(`primary-${weight}`)}
             variant="card"
           >
+            <span class={`style-guide-type_weight weight-${weight}`}>Aa</span>
             <Paragraph class={`weight-${weight}`}>{sample.short}</Paragraph>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Line height" variant="scroll">
+      <StyleGuideGroup
+        title="Line height"
+        caption="The space between lines: tight for headings, open for reading."
+        variant="cards"
+      >
         {model.lineHeights.map((name) => (
           <StyleGuideItem
-            label={`line-height-${name} · ${value(`line-height-${name}`)}`}
+            label={`line-height-${name}`}
+            copy={`line-height-${name}`}
+            note={value(`line-height-${name}`)}
             variant="card"
           >
             <Paragraph class={`line-height-${name}`}>{sample.long}</Paragraph>
@@ -88,10 +205,16 @@ const typeStyles = model.textStyles.map((name) => {
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Letter spacing" variant="scroll">
+      <StyleGuideGroup
+        title="Letter spacing"
+        caption="The space between letters: tighter for large type, wider for small capitals."
+        variant="cards"
+      >
         {model.letterSpacings.map((name) => (
           <StyleGuideItem
-            label={`letter-spacing-${name} · ${value(`letter-spacing-${name}`)}`}
+            label={`letter-spacing-${name}`}
+            copy={`letter-spacing-${name}`}
+            note={value(`letter-spacing-${name}`)}
             variant="card"
           >
             <Paragraph class={`letter-spacing-${name}`}>
@@ -101,22 +224,258 @@ const typeStyles = model.textStyles.map((name) => {
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Text transform, wrap and clamp" variant="scroll">
+      <StyleGuideGroup
+        title="Case and wrapping"
+        caption="Capitals, and how lines break: balanced for headings, without a lone last word for paragraphs."
+        variant="cards"
+      >
         {[
           "text-transform-uppercase",
           "text-transform-capitalize",
           "text-wrap-balance",
           "text-wrap-pretty",
-          "line-clamp-1",
-          "line-clamp-2",
-          "line-clamp-3",
-          "line-clamp-4",
         ].map((cls) => (
-          <StyleGuideItem label={cls} variant="card">
-            <Paragraph class={cls}>{sample.long}</Paragraph>
+          <StyleGuideItem label={cls} copy={cls} variant="card">
+            <Paragraph class={cls}>
+              {cls.startsWith("text-transform") ? sample.short : sample.long}
+            </Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Clamping"
+        caption="Long text cut to a set number of lines, ending in an ellipsis: for card text that must line up."
+        variant="cards"
+      >
+        {[1, 2, 3, 4].map((lines) => (
+          <StyleGuideItem
+            label={`line-clamp-${lines}`}
+            copy={`line-clamp-${lines}`}
+            variant="card"
+          >
+            <Paragraph class={`line-clamp-${lines}`}>{sample.long}</Paragraph>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
     </>
   )
 }
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // Preview text replaces every sample; the slider sets each sample to the
+  // size its style takes on a screen that wide, as the CSS would there.
+  mount(".style-guide-type_tools", (tools, signal) => {
+    const text = tools.querySelector<HTMLInputElement>("input[type=text]");
+    const width = tools.querySelector<HTMLInputElement>("input[type=range]");
+    const reset = tools.querySelector("button");
+    const rows = [
+      ...(tools.parentElement?.querySelectorAll<HTMLElement>(
+        ".style-guide-type_row",
+      ) ?? []),
+    ];
+    if (!text || !width || !reset) return;
+    const parts = rows.map((row) => ({
+      row,
+      sample: row.querySelector<HTMLElement>(".style-guide-type_sample")!,
+      now: row.querySelector<HTMLElement>(".style-guide-type_now")!,
+      words: row.querySelector(".style-guide-type_sample")!.textContent ?? "",
+    }));
+    const [min, max] = [Number(width.min), Number(width.max)];
+    const clamp = (w: number) => Math.min(max, Math.max(min, w));
+
+    const preview = () => {
+      for (const { sample, words } of parts)
+        sample.textContent = text.value.trim() || words;
+    };
+    // `set` is false while the samples follow this window, as they load.
+    const size = (set: boolean) => {
+      const w = Number(width.value);
+      const t = (w - min) / (max - min);
+      for (const { row, sample, now } of parts) {
+        const [a, b] = [Number(row.dataset.min), Number(row.dataset.max)];
+        const px = Math.round((a + (b - a) * t) * 10) / 10;
+        sample.style.fontSize = set ? `${px / 16}rem` : "";
+        now.textContent = `${px}px on a ${w}px screen`;
+        now.hidden = false;
+      }
+    };
+    const follow = () => {
+      width.value = String(clamp(innerWidth));
+      width.dispatchEvent(new Event("input"));
+    };
+
+    text.addEventListener("input", preview, { signal });
+    // A person's drag sets the sizes; this script's own updates don't.
+    width.addEventListener("input", (e) => size(e.isTrusted), { signal });
+    reset.addEventListener(
+      "click",
+      () => {
+        text.value = "";
+        preview();
+        follow();
+      },
+      { signal },
+    );
+    addEventListener(
+      "resize",
+      () => {
+        if (!parts[0]?.sample.style.fontSize) follow();
+      },
+      { signal },
+    );
+    follow();
+  });
+</script>
+
+<style is:global>
+  @layer components {
+    .style-guide-type_specimen {
+      display: grid;
+      gap: var(--site-gutter);
+      width: 100%;
+    }
+    .style-guide-type_family {
+      display: grid;
+      gap: var(--space-5) var(--site-gutter);
+      align-items: end;
+      padding: var(--space-6);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+
+      @media (width >= 48rem) {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+    }
+    .style-guide-type_glyphs {
+      font-size: calc(var(--display) * 2);
+      font-weight: var(--display-font-weight);
+      line-height: 0.8;
+      letter-spacing: var(--display-letter-spacing);
+    }
+    .style-guide-type_family-info {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-2);
+    }
+    .style-guide-type_alphabet {
+      max-width: 34em;
+      margin: var(--space-3) 0 0;
+      color: var(--text-2);
+      overflow-wrap: anywhere;
+    }
+
+    /* The controls: preview text, screen width and reset, on one line where
+       there is room. */
+    .style-guide-group_wrap.rows
+      .style-guide-group_list
+      > .style-guide-type_tools {
+      display: grid;
+      gap: var(--space-4) var(--site-gutter);
+      margin-block: var(--space-4);
+      padding: var(--space-5);
+      border: 0;
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+
+      /* Each field is a label above a control. Every label sits on one line
+         and every control on the next, with Reset beside them. */
+      .field {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-2) var(--space-3);
+        margin: 0;
+
+        > .field-control,
+        > .form-range_control {
+          grid-column: 1 / -1;
+        }
+      }
+      /* The width reads at the end of its label, not under the handle. */
+      .form-range_output {
+        grid-area: 1 / 2;
+        margin: 0;
+        padding: 0;
+        translate: none;
+        background: none;
+        font-weight: var(--primary-medium);
+        font-variant-numeric: tabular-nums;
+      }
+      > .button_wrap {
+        justify-self: start;
+      }
+
+      @media (width >= 48rem) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        row-gap: var(--space-2);
+
+        .field {
+          grid-row: span 2;
+          grid-template-rows: subgrid;
+        }
+        > .button_wrap {
+          grid-area: 2 / 3;
+          align-self: center;
+        }
+      }
+    }
+    .style-guide-type_now {
+      margin: 0;
+      color: var(--text-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .style-guide-type_row {
+      display: grid;
+      gap: var(--space-4) var(--site-gutter);
+      align-items: start;
+
+      @media (width >= 62rem) {
+        grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      }
+    }
+    .style-guide-type_meta {
+      font-size: var(--text-small);
+      line-height: var(--text-small-line-height);
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      gap: var(--space-2);
+
+      > .style-guide-copy_wrap {
+        font-weight: var(--primary-medium);
+      }
+    }
+    .style-guide-type_specs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+      gap: var(--space-1) var(--space-3);
+      width: 100%;
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+
+      @media (width >= 62rem) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      dt {
+        color: var(--text-2);
+      }
+      dd {
+        margin: 0;
+      }
+    }
+    .style-guide-type_sample {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+    .style-guide-type_weight {
+      font-size: var(--h1);
+      line-height: 1;
+    }
+  }
+</style>

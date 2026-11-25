@@ -17,60 +17,162 @@ const { render = true } = Astro.props;
 {
   render && (
     <>
-      <StyleGuideGroup title="Logo" variant="tiles">
-        <StyleGuideItem label="assets/logo/logo.svg" variant="card">
-          <Icon src={logo} variant="full-width" aria-label="Logo" />
+      <StyleGuideGroup
+        title="Logo"
+        caption="The full logo where there is room for it, the mark where space is tight."
+        variant="cards"
+      >
+        <StyleGuideItem
+          label="assets/logo/logo.svg"
+          note="On a light background"
+          variant="card"
+        >
+          <div class="style-guide-brand_visual">
+            <Icon src={logo} variant="full-width" aria-label="Logo" />
+          </div>
         </StyleGuideItem>
-        <StyleGuideItem label="assets/logo/logo.svg" variant="dark">
-          <Icon src={logo} variant="full-width" aria-label="Logo" />
+        <StyleGuideItem
+          label="assets/logo/logo.svg"
+          note="On a dark background"
+          variant="dark"
+        >
+          <div class="style-guide-brand_visual">
+            <Icon src={logo} variant="full-width" aria-label="Logo" />
+          </div>
         </StyleGuideItem>
-        <StyleGuideItem label="assets/logo/logo-icon.svg" variant="card">
-          <Icon src={logoIcon} variant="full-width" aria-label="Logo mark" />
+        <StyleGuideItem
+          label="assets/logo/logo-icon.svg"
+          note="The mark on its own"
+          variant="card"
+        >
+          <div class="style-guide-brand_visual mark">
+            <Icon src={logoIcon} variant="full-width" aria-label="Logo mark" />
+          </div>
         </StyleGuideItem>
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Site icons" variant="tiles">
-        <StyleGuideItem label="favicon.svg" variant="card">
-          <Img
-            src="/favicon.svg"
-            alt="Favicon"
-            width={32}
-            height={32}
-            variant="densities"
-            transparent
-          />
+      <StyleGuideGroup
+        title="Site icons"
+        class="style-guide-brand_icons"
+        caption="What stands for the site outside its pages: a browser tab, a phone's home screen, a link shared in a message. Each is shown at its real size."
+        variant="cards"
+      >
+        <StyleGuideItem
+          label="favicon.svg"
+          note="Browser tabs and bookmarks; a vector, shown at 32 × 32"
+          variant="card"
+        >
+          <div class="style-guide-brand_visual">
+            <Img
+              src="/favicon.svg"
+              alt="Favicon"
+              width={32}
+              height={32}
+              variant="densities"
+              transparent
+              class="style-guide-brand_favicon"
+            />
+          </div>
         </StyleGuideItem>
-        <StyleGuideItem label="favicon.ico · 32 × 32" variant="card">
-          <Img
-            src="/favicon.ico"
-            alt="Legacy favicon"
-            width={32}
-            height={32}
-            variant="densities"
-            transparent
-          />
+        <StyleGuideItem
+          label="favicon.ico"
+          note="32 × 32, for older browsers"
+          variant="card"
+        >
+          <div class="style-guide-brand_visual">
+            <Img
+              src="/favicon.ico"
+              alt="Legacy favicon"
+              width={32}
+              height={32}
+              variant="densities"
+              transparent
+              class="style-guide-brand_favicon"
+            />
+          </div>
         </StyleGuideItem>
-        <StyleGuideItem label="apple-touch-icon.png · 180 × 180" variant="card">
-          <Img
-            src="/apple-touch-icon.png"
-            alt="Webclip"
-            width={180}
-            height={180}
-            variant="densities"
-            transparent
-            class="radius-large"
-          />
+        <StyleGuideItem
+          label="apple-touch-icon.png"
+          note="180 × 180, on a phone's home screen"
+          variant="card"
+        >
+          <div class="style-guide-brand_visual">
+            <Img
+              src="/apple-touch-icon.png"
+              alt="Webclip"
+              width={180}
+              height={180}
+              variant="densities"
+              transparent
+              class="radius-large style-guide-brand_webclip"
+            />
+          </div>
         </StyleGuideItem>
-        <StyleGuideItem label="og-image.jpg · 1200 × 630" variant="card">
-          <Img
-            src="/og-image.jpg"
-            alt="Social sharing image"
-            width={1200}
-            height={630}
-            class="radius-small"
-          />
+        <StyleGuideItem
+          label="og-image.jpg"
+          note="1200 × 630, the preview of a shared link; smaller only where the screen is narrower"
+          variant="card"
+          class="style-guide-brand_share"
+        >
+          <div class="style-guide-brand_visual">
+            <Img
+              src="/og-image.jpg"
+              alt="Social sharing image"
+              width={1200}
+              height={630}
+              class="radius-small style-guide-brand_og"
+            />
+          </div>
         </StyleGuideItem>
       </StyleGuideGroup>
     </>
   )
 }
+
+<style is:global>
+  @layer components {
+    /* Three icons a row, and the 1200px sharing image on a row of its own. */
+    .style-guide-group_wrap.cards.style-guide-brand_icons
+      .style-guide-group_list {
+      @media (width >= 48rem) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    .style-guide-brand_share {
+      grid-column: 1 / -1;
+    }
+    .style-guide-brand_visual {
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+      min-height: 10rem;
+      padding: var(--space-4);
+
+      > .icon {
+        width: min(100%, 14rem);
+      }
+      &.mark > .icon {
+        width: min(100%, 5rem);
+      }
+      /* The sharing image is 1200px wide: it takes a row of its own. */
+      .style-guide-brand_share & {
+        padding-inline: 0;
+      }
+      /* Every file at its own size in px, as rem: nothing enlarged to fill
+         the card. */
+      .style-guide-brand_favicon {
+        width: 2rem;
+        height: auto;
+      }
+      .style-guide-brand_webclip {
+        width: 11.25rem;
+        height: auto;
+      }
+      .style-guide-brand_og {
+        width: 75rem;
+        max-width: 100%;
+        height: auto;
+      }
+    }
+  }
+</style>

@@ -117,7 +117,7 @@
   },
   "button-text": {
     "$type": "color",
-    "$value": "{background}"
+    "$value": "{color.white}"
   },
   "button-background-hover": {
     "$type": "color",

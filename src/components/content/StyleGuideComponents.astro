@@ -1,0 +1,365 @@
+---
+import Button from "@/components/Button.astro";
+import Eyebrow from "@/components/typography/Eyebrow.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import Choice from "@/components/form/Choice.astro";
+import Input from "@/components/form/Input.astro";
+import Select from "@/components/form/Select.astro";
+import Textarea from "@/components/form/Textarea.astro";
+import Range from "@/components/form/Range.astro";
+import Card from "@/components/item/Card.astro";
+import Icon from "@/components/media/Icon.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import image from "@/assets/shared/graphics/background.svg";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** Where "Open components" goes. */
+  componentsHref?: string;
+}
+
+const { render = true, componentsHref = "/components" } = Astro.props;
+
+const sizes = ["small", "main", "large"] as const;
+const emphases = ["primary", "secondary"] as const;
+const text =
+  "A short line on what this is, long enough to show how the text sits.";
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup
+        title="Buttons"
+        caption="One button per action. Primary for the main one, secondary beside it, a link for the quietest."
+        variant="rows"
+      >
+        {emphases.map((emphasis) => (
+          <StyleGuideItem
+            label={`<Button emphasis="${emphasis}">`}
+            note="small, main and large"
+          >
+            <div class="style-guide-components_row">
+              {sizes.map((size) => (
+                <Button emphasis={emphasis} size={size}>
+                  {size[0].toUpperCase() + size.slice(1)}
+                </Button>
+              ))}
+              <Button emphasis={emphasis} disabled>
+                Disabled
+              </Button>
+            </div>
+          </StyleGuideItem>
+        ))}
+        <StyleGuideItem label={'<Button variant="link">'} note="Text that acts">
+          <div class="style-guide-components_row">
+            <Button element="link" variant="link" href="#components">
+              Read the guide
+            </Button>
+          </div>
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'variant="arrow", "play" and "close"'}
+          note="Icon buttons, in both emphases; each has a spoken label"
+        >
+          <div class="style-guide-components_row">
+            {emphases.map((emphasis) => (
+              <>
+                <Button variant="arrow" direction="back" emphasis={emphasis} />
+                <Button variant="arrow" emphasis={emphasis} />
+                <Button variant="play" emphasis={emphasis} />
+                <Button variant="play" pressed emphasis={emphasis} />
+                <Button variant="close" emphasis={emphasis} />
+              </>
+            ))}
+          </div>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Eyebrow"
+        caption="A short line above a heading that says what the section is about."
+        variant="cards"
+      >
+        <StyleGuideItem label="<Eyebrow>" variant="card">
+          <Eyebrow>Our services</Eyebrow>
+        </StyleGuideItem>
+        <StyleGuideItem label={'<Eyebrow variant="tag">'} variant="card">
+          <Eyebrow variant="tag">New</Eyebrow>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Choices"
+        caption="Ticking, picking one of several, switching on and off."
+        variant="cards"
+      >
+        <StyleGuideItem label="<Choice>" note="Checkbox" variant="card">
+          <div class="style-guide-components_stack">
+            <Choice
+              label="Send me updates"
+              name="style-guide-updates"
+              checked
+            />
+            <Choice label="I agree to the terms" name="style-guide-terms" />
+          </div>
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'<Choice type="radio">'}
+          note="One of several"
+          variant="card"
+        >
+          <div class="style-guide-components_stack">
+            <Choice
+              type="radio"
+              name="style-guide-plan"
+              label="Monthly"
+              value="monthly"
+              checked
+            />
+            <Choice
+              type="radio"
+              name="style-guide-plan"
+              label="Yearly"
+              value="yearly"
+            />
+          </div>
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'<Choice variant="toggle">'}
+          note="On or off, at once"
+          variant="card"
+        >
+          <div class="style-guide-components_stack">
+            <Choice
+              variant="toggle"
+              label="Dark mode"
+              name="style-guide-dark"
+              checked
+            />
+            <Choice
+              variant="toggle"
+              label="Notifications"
+              name="style-guide-notify"
+            />
+          </div>
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'<Choice variant="chip">'}
+          note="Filters and tags"
+          variant="card"
+        >
+          <div class="style-guide-components_row">
+            <Choice
+              variant="chip"
+              label="Design"
+              name="style-guide-design"
+              checked
+            />
+            <Choice
+              variant="chip"
+              label="Development"
+              name="style-guide-development"
+            />
+          </div>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Fields"
+        caption="Each field has a visible label. An error shows once the visitor has filled it in or tried to send."
+        variant="cards"
+        class="style-guide-components_fields"
+      >
+        <StyleGuideItem label="<Input>" variant="card">
+          <Input
+            label="Full name"
+            name="style-guide-name"
+            placeholder="Jane Doe"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label={'<Input variant="email">'} variant="card">
+          <Input
+            variant="email"
+            name="style-guide-email"
+            placeholder="name@company.com"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label={'<Input variant="search">'} variant="card">
+          <Input
+            variant="search"
+            name="style-guide-search"
+            placeholder="Search"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem
+          label="<Input error>"
+          note="With its error message"
+          variant="card"
+          class="style-guide-components_invalid"
+        >
+          <Input
+            variant="email"
+            label="Work email"
+            name="style-guide-work-email"
+            value="name@"
+            error="Enter an email address, like name@company.com."
+            required
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label="<Select>" variant="card">
+          <Select
+            label="Project type"
+            name="style-guide-project"
+            options={["Website", "App", "Both"]}
+          />
+        </StyleGuideItem>
+        <StyleGuideItem label="<Range>" variant="card">
+          <Range label="Budget" name="style-guide-budget" value={60} unit="%" />
+        </StyleGuideItem>
+        <StyleGuideItem
+          label="<Textarea>"
+          variant="card"
+          class="style-guide-components_wide"
+        >
+          <Textarea
+            label="Message"
+            name="style-guide-message"
+            placeholder="Tell us about the project"
+          />
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Cards"
+        caption="A preview that leads somewhere: a service, a case study, an article."
+        variant="cards"
+      >
+        <StyleGuideItem label="<Card>" note="Text on a surface">
+          <Card
+            heading="Strategy"
+            text={text}
+            buttonLabel="Read more"
+            buttonHref="#components"
+            headingTag="h4"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'<Card variant="cover">'}
+          note="Text over an image"
+        >
+          <Card
+            variant="cover"
+            heading="Design"
+            text={text}
+            buttonLabel="Read more"
+            buttonHref="#components"
+            image={image}
+            headingTag="h4"
+          />
+        </StyleGuideItem>
+        <StyleGuideItem
+          label={'<Card variant="stacked">'}
+          note="An image above the text"
+        >
+          <Card
+            variant="stacked"
+            heading="Development"
+            text={text}
+            buttonLabel="Read more"
+            buttonHref="#components"
+            image={image}
+            headingTag="h4"
+          />
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup
+        title="Icon sizes"
+        caption="Small beside text, medium in buttons and lists, large on its own."
+        variant="tiles"
+      >
+        {(["small", "medium", "large"] as const).map((size) => (
+          <StyleGuideItem label={`<Icon variant="${size}">`} variant="card">
+            <span class="style-guide-components_icon">
+              <Icon name="star" variant={size} />
+            </span>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <div class="style-guide-components_more">
+        <div>
+          <h3 class="text-style-h5">Every other component</h3>
+          <Paragraph variant="small" class="margin-top-0">
+            Navigation, accordions, tabs, sliders, dialogs, filters and media,
+            each with live examples.
+          </Paragraph>
+        </div>
+        <Button element="link" href={componentsHref}>
+          Open components
+        </Button>
+      </div>
+    </>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-guide-components_row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .style-guide-components_stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    /* Four fields a row, so the wide textarea closes the second one. */
+    .style-guide-group_wrap.cards.style-guide-components_fields
+      .style-guide-group_list {
+      grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    }
+    .style-guide-components_wide {
+      @media (width >= 48rem) {
+        grid-column: span 2;
+      }
+    }
+    /* ponytail: the error example shows the state a field reaches after a
+       wrong entry (:user-invalid), without waiting for one. */
+    .style-guide-components_invalid {
+      .field-error {
+        display: flex;
+      }
+      :is(input, select, textarea) {
+        border-color: var(--text);
+        box-shadow: inset 0 0 0 var(--border-width) var(--text);
+      }
+    }
+    .style-guide-components_icon {
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+      min-height: 5rem;
+    }
+    .style-guide-components_more {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+      width: 100%;
+      padding: var(--space-6);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+
+      h3 {
+        margin: 0 0 var(--space-1);
+      }
+    }
+  }
+</style>

@@ -7,13 +7,16 @@ interface Props extends HTMLAttributes<"div"> {
   render?: boolean;
   /** Group title. */
   title: string;
-  /** Item layout. */
-  variant?: "list" | "rows" | "tiles" | "scroll";
+  /** One line under the title: what the group shows. */
+  caption?: string;
+  /** Item layout: a stack, rows divided by rules, small tiles, or wider cards. */
+  variant?: "list" | "rows" | "tiles" | "cards";
 }
 
 const {
   render = true,
   title,
+  caption,
   variant = "list",
   class: className,
   ...rest
@@ -32,13 +35,13 @@ const content = await slotContent(Astro.slots);
       ]}
       {...rest}
     >
-      <h3 class="style-guide-group_title text-style-h6">{title}</h3>
-      <div
-        class="style-guide-group_list"
-        {...(variant === "scroll"
-          ? { tabindex: 0, role: "region", "aria-label": title }
-          : {})}
-      >
+      <div class="style-guide-group_head">
+        <h3 class="style-guide-group_title text-style-h5">{title}</h3>
+        {caption && (
+          <p class="style-guide-group_caption text-style-small">{caption}</p>
+        )}
+      </div>
+      <div class="style-guide-group_list">
         <Fragment set:html={content} />
       </div>
     </div>
@@ -53,6 +56,19 @@ const content = await slotContent(Astro.slots);
       gap: var(--space-5);
       width: 100%;
 
+      .style-guide-group_head {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .style-guide-group_title,
+      .style-guide-group_caption {
+        margin: 0;
+      }
+      .style-guide-group_caption {
+        max-width: 60ch;
+        color: var(--text-2);
+      }
       .style-guide-group_list {
         display: flex;
         flex-direction: column;
@@ -60,25 +76,26 @@ const content = await slotContent(Astro.slots);
       }
 
       &.rows .style-guide-group_list {
-        gap: var(--space-3);
+        gap: 0;
+        border-top: var(--border-width) solid var(--border);
+
+        > * {
+          padding-block: var(--space-4);
+          border-bottom: var(--border-width) solid var(--border);
+        }
       }
 
-      &.tiles .style-guide-group_list {
+      &:is(.tiles, .cards) .style-guide-group_list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(14rem, 40%), 1fr));
-        gap: var(--space-5) var(--site-gutter);
-      }
-
-      &.scroll .style-guide-group_list {
-        display: grid;
-        grid-auto-flow: column;
-        grid-template-columns: minmax(15rem, 1fr);
-        grid-auto-columns: minmax(16rem, 1fr);
         gap: var(--site-gutter);
-        margin-inline: calc(var(--site-margin) * -1);
-        padding-inline: var(--site-margin);
-        overflow-x: auto;
-        scrollbar-color: var(--border) transparent;
+      }
+      &.tiles .style-guide-group_list {
+        grid-template-columns: repeat(auto-fill, minmax(min(11rem, 40%), 1fr));
+      }
+      /* Cards share the row between them, so a short group has no empty
+         column at its end. */
+      &.cards .style-guide-group_list {
+        grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
       }
     }
   }

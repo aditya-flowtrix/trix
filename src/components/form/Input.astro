@@ -49,6 +49,7 @@ const {
   required = false,
   labelHidden = false,
   id,
+  autocomplete,
   class: className,
   ...rest
 } = Astro.props;
@@ -150,7 +151,7 @@ if (import.meta.env.DEV && render && labelHidden) {
         name={name ?? slug(text)}
         placeholder={placeholder ?? text}
         inputmode={kind.mode}
-        autocomplete={kind.fill}
+        autocomplete={autocomplete ?? kind.fill}
         required={required || undefined}
         value={value}
         data-error={error ? errorId : undefined}

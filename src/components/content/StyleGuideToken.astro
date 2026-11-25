@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
 
 type Base = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
@@ -8,6 +9,8 @@ type Base = HTMLAttributes<"div"> & {
   token: string;
   /** Value shown under the token name. */
   value?: string;
+  /** A line under the value: what uses it. */
+  note?: string;
 };
 
 type Props = Base &
@@ -16,28 +19,47 @@ type Props = Base &
         /** Token kind. */
         variant?: "color" | "space" | "radius";
         on?: never;
+        ink?: never;
       }
     | {
         variant: "foreground";
         /** The color the text sits on. */
         on: string;
+        ink?: never;
+      }
+    | {
+        variant: "step";
+        on?: never;
+        /** The text color that reads on this step. */
+        ink: "black" | "white";
       }
   );
 
 type AllProps = Base & {
-  variant?: "color" | "space" | "radius" | "foreground";
+  variant?: "color" | "space" | "radius" | "foreground" | "step";
   on?: string;
+  ink?: "black" | "white";
 };
 
 const {
   render = true,
   token,
   value,
+  note,
   variant = "color",
   on,
+  ink,
   class: className,
   ...rest
 } = Astro.props as AllProps;
+
+const style = [
+  `--_token: var(--${token})`,
+  on && `--_on: ${on}`,
+  ink && `--_ink: var(--${ink})`,
+]
+  .filter(Boolean)
+  .join("; ");
 ---
 
 {
@@ -48,17 +70,27 @@ const {
         variant !== "color" && variant,
         className,
       ]}
-      style={`--_token: var(--${token});${on ? ` --_on: ${on};` : ""}`}
+      style={style}
       {...rest}
     >
-      <div class="style-guide-token_visual" aria-hidden="true">
-        {variant === "foreground" && "Aa"}
-      </div>
+      {variant !== "step" && (
+        <div class="style-guide-token_track" aria-hidden="true">
+          <div class="style-guide-token_visual">
+            {variant === "foreground" && "Aa"}
+          </div>
+        </div>
+      )}
       <div class="style-guide-token_info">
-        <code class="style-guide-token_name text-style-small">--{token}</code>
-        {value && (
-          <span class="style-guide-token_value text-style-xsmall">{value}</span>
-        )}
+        <StyleGuideCopy
+          text={`var(--${token})`}
+          label={
+            variant === "step"
+              ? token.slice(token.lastIndexOf("-") + 1)
+              : `--${token}`
+          }
+        />
+        {value && <span class="style-guide-token_value">{value}</span>}
+        {note && <span class="style-guide-token_note">{note}</span>}
       </div>
     </div>
   )
@@ -69,11 +101,11 @@ const {
     .style-guide-token_wrap {
       display: flex;
       flex-direction: column;
-      gap: var(--space-2);
+      gap: var(--space-3);
       min-width: 0;
 
       .style-guide-token_visual {
-        aspect-ratio: 3 / 2;
+        aspect-ratio: 4 / 3;
         border: var(--border-width) solid var(--border);
         border-radius: var(--radius-main);
         background-color: var(--_token);
@@ -81,28 +113,54 @@ const {
       .style-guide-token_info {
         display: flex;
         flex-direction: column;
-        gap: var(--space-1);
+        align-items: start;
+        gap: 0.125rem;
+        min-width: 0;
+        font-size: var(--text-small);
+        line-height: var(--text-small-line-height);
+        font-variant-numeric: tabular-nums;
+
+        > .style-guide-copy_wrap {
+          font-weight: var(--primary-medium);
+        }
       }
-      .style-guide-token_value {
+      .style-guide-token_value,
+      .style-guide-token_note {
         color: var(--text-2);
       }
 
+      /* A space: name and values, then a bar drawn to scale. */
       &.space {
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-3) var(--site-gutter);
         align-items: center;
-        gap: var(--space-4);
+
+        @media (width >= 48rem) {
+          grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+        }
         .style-guide-token_info {
-          flex: none;
           order: -1;
-          width: min(20rem, 60%);
+        }
+        /* On a wide screen, one line each: name, value, use, bar. */
+        @media (width >= 62rem) {
+          grid-template-columns:
+            minmax(0, 3fr) minmax(0, 2fr) minmax(0, 4fr)
+            minmax(0, 3fr);
+          .style-guide-token_info {
+            display: contents;
+          }
+          .style-guide-token_track {
+            order: 1;
+          }
         }
         .style-guide-token_visual {
-          flex: 0 1 var(--_token);
-          min-width: 0;
-          height: 1.5rem;
+          width: var(--_token);
+          max-width: 100%;
+          height: 1rem;
           aspect-ratio: auto;
           border: 0;
-          border-radius: 0;
+          border-radius: var(--radius-xsmall);
           background-color: var(--button-background);
         }
       }
@@ -117,11 +175,28 @@ const {
       }
 
       &.radius .style-guide-token_visual {
-        width: 5rem;
+        width: 100%;
+        max-width: 7rem;
         aspect-ratio: 1;
-        border-color: var(--text);
+        border: calc(var(--border-width) * 2) solid var(--text);
         border-radius: var(--_token);
         background-color: var(--background-2);
+      }
+
+      /* A step of a ramp: the swatch is the card, its step written on it;
+         the ramp's title names it. */
+      &.step {
+        justify-content: end;
+        min-height: 4rem;
+        padding: var(--space-3);
+        background-color: var(--_token);
+        color: var(--_ink);
+
+        .style-guide-token_value,
+        .style-guide-token_note {
+          color: inherit;
+          opacity: 0.75;
+        }
       }
     }
   }
