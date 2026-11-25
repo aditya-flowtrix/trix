@@ -28,9 +28,12 @@ each file for what it shows: `team-workshop.jpg`, not `IMG_2034.jpg`.
 
 `alt` says what the image shows that the page needs — for a logo, the
 company's name; for a chart or screenshot, what its text says. Leave it out
-for a decorative one: `Img` renders `alt=""`, which screen readers skip. The image above
-the fold — usually the hero — takes `loading="eager"` and
-`fetchPriority="high"`; everything else stays lazy.
+for a decorative one: `Img` renders `alt=""`, which screen readers skip.
+
+Images load lazily. The largest image above the fold — usually the hero —
+takes `fetchPriority="high"`, which also loads it eagerly; any other image
+above the fold takes `loading="eager"`. Keep `high` to one or two images a
+page.
 
 ## Props
 

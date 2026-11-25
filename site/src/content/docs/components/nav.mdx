@@ -7,7 +7,8 @@ component: global/Nav
 
 `Nav` is the project's own: `BaseLayout` renders it on every page, and you
 replace its links with the site's. On small screens the links fold into a menu
-button; on large ones they sit in the bar.
+button that opens them as a native popover — Escape or a tap outside closes
+it, and it works without JavaScript; on large ones they sit in the bar.
 
 ```astro
 <ul class="nav_links">
@@ -38,8 +39,9 @@ An announcement above the bar is a [`NavBanner`](/docs/components/nav-banner),
 placed just before `<Nav />` in `BaseLayout`.
 
 `NavLink` marks itself with `aria-current="page"` when its `href` is the page
-being shown — whatever the URL's trailing slash or `.html`. A `#` link, a
-placeholder or an anchor on the page, is never marked.
+being shown — whatever the URL's trailing slash or `.html` — and is underlined
+at every width, not told apart by color alone. A `#` link, a placeholder or an
+anchor on the page, is never marked.
 
 `overlap` (on `BaseLayout`) fixes the bar over the first section instead of
 above it — give that section `paddingTop="navoverlap"` to clear it.

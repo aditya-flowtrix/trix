@@ -80,6 +80,7 @@ if (import.meta.env.DEV && render && !Svg && !name) {
     <Svg
       class:list={["icon", variant, className]}
       aria-hidden={labelled ? undefined : "true"}
+      role={labelled ? "img" : undefined}
       {...rest}
     />
   )
@@ -92,6 +93,7 @@ if (import.meta.env.DEV && render && !Svg && !name) {
       fill="currentColor"
       class:list={["icon", variant, className]}
       aria-hidden={labelled ? undefined : "true"}
+      role={labelled ? "img" : undefined}
       {...rest}
       set:html={named.inner}
     />

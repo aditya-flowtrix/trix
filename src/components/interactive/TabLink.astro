@@ -14,7 +14,12 @@ const content = await slotContent(Astro.slots);
 
 {
   render && content && (
-    <button class:list={["tabs_link", className]} type="button" {...rest}>
+    <button
+      class:list={["tabs_link", className]}
+      type="button"
+      data-tab-link
+      {...rest}
+    >
       <span class="tabs_link_text text-style-trim">
         <Fragment set:html={content} />
       </span>

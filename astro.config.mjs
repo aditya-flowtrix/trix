@@ -83,9 +83,15 @@ const latinExt = [
 
 export default defineConfig({
   site: SITE_URL,
-  // Prefetch internal links on hover or focus, so the next page is ready on
-  // click. `true` alone only prefetches links marked data-astro-prefetch.
+  // Load the next page while the visitor hovers or focuses its link, so it
+  // is ready on click: prerendered through speculation rules where the
+  // browser has them (Chrome, Edge), prefetched everywhere else. Hover, not
+  // viewport — any of a page's links is about as likely as the next. A link
+  // that changes state on load (log out, add to cart) takes
+  // data-astro-prefetch="false"; with CSP on, Astro writes one rule for
+  // every link instead, which that doesn't reach.
   prefetch: { prefetchAll: true },
+  experimental: { clientPrerender: true },
   // One URL per page, no trailing slash — Webflow's and Framer's style, so
   // migrated URLs answer directly instead of through a redirect. Pages build
   // to `about.html`, which hosts serve at `/about`. A site whose old URLs end

@@ -80,6 +80,8 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
           step={step}
           value={start}
           required={required || undefined}
+          aria-valuetext={unit ? `${start} ${unit}` : undefined}
+          data-unit={unit}
           {...rest}
         />
         <span class="form-range_track" aria-hidden="true" />
@@ -112,6 +114,11 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
         String(max === min ? 0 : (at - min) / (max - min)),
       );
       if (shown) shown.textContent = input.value;
+      if (input.dataset.unit)
+        input.setAttribute(
+          "aria-valuetext",
+          `${input.value} ${input.dataset.unit}`,
+        );
     };
 
     input.addEventListener("input", update);
@@ -140,7 +147,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       position: relative;
       display: flex;
       align-items: center;
-      height: var(--_handle);
+      height: max(var(--_handle), 2.75rem);
     }
 
     .form-range_input {
@@ -186,7 +193,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
 
     .form-range_track {
       inset-inline-end: 0;
-      background-color: var(--border);
+      background-color: color-mix(in lab, var(--text) 50%, transparent);
     }
 
     .form-range_fill {

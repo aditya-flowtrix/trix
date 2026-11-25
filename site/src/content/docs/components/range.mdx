@@ -9,6 +9,10 @@ component: form/Range
 <Range label="Budget" min={0} max={100} step={5} unit="k" />
 ```
 
+The value shows beside the slider as it moves, with its `unit` — and screen
+readers hear the same, "50 k", through `aria-valuetext`. The slider takes
+2.75rem of height, so it is easy to grab.
+
 ## Props
 
 <Props of="form/Range" />

@@ -18,8 +18,12 @@ component: form/Choice
 ```
 
 `type="radio"` for one of several, a checkbox otherwise. Radios share a
-`name`; a checkbox's `name` defaults to its label's slug. Content inside a
-`Choice` follows its label: [`FilterField`](/docs/components/filter) puts its
+`name`; a checkbox's `name` defaults to its label's slug. `variant="toggle"` is
+a switch: a checkbox with the `switch` attribute and `role="switch"`, so screen
+readers call it on or off. `required` marks the label, as on
+[`Input`](/docs/components/input); a disabled `Choice` fades and shows it can't
+be clicked. Each is at least 2.75rem tall, so it is easy to hit. Content inside
+a `Choice` follows its label: [`FilterField`](/docs/components/filter) puts its
 count there.
 
 ## Props

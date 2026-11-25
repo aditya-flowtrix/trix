@@ -208,7 +208,7 @@
   --text-main-line-height: var(--line-height-huge);
   --text-main-letter-spacing: var(--letter-spacing-normal);
   --text-main-text-transform: none;
-  --text-main-text-wrap: pretty;
+  --text-main-text-wrap: wrap;
   --text-main-margin-top: var(--space-4);
   --text-main-margin-bottom: var(--space-4);
   --text-main-trim-top: var(--primary-trim-top);

@@ -141,7 +141,13 @@ items that meet any one.
 
 `counts` shows beside each option how many results it would leave. `empty`
 says what an option that would leave none does: `show` it, `disable` it, or
-`hide` it.
+`hide` it — never the one in focus, so unchecking an option doesn't lose the
+keyboard's place. The counts follow the results a moment later, worked out in
+slices, so a long list never holds up typing.
+
+Sorting moves the items themselves, in the order shown, so the keyboard and
+screen readers follow it. Where the browser can (`moveBefore`), a video or
+iframe in an item keeps playing as it moves.
 
 ## Paging
 
@@ -154,11 +160,12 @@ says what an option that would leave none does: `show` it, `disable` it, or
 
 Only the first page is on show before the script runs, so the list never
 loads long and then jumps short. After a page change, focus moves to the
-results; after "Load more", to the first new item.
+results, outlined for the keyboard; after "Load more", to the first new item.
 
 ## The bar, and the URL
 
-Above the results, the count is announced to screen readers as it changes.
+Above the results, the count is announced to screen readers as it changes,
+and a new sort with it: "Sorted by Price, low to high, Showing 1–12 of 40".
 `countText` sets its words: `{results}` matching, `{total}` in all, `{shown}`
 on screen, `{from}` and `{to}` on this page. Each choice gets a tag that
 removes it, and "Clear all" clears every choice but the sort. The `empty` slot
@@ -171,7 +178,8 @@ don't share. `url={false}` keeps the URL as it is.
 
 `on="submit"` waits for an Apply button instead of updating as the visitor
 types and picks. `animation` brings results in with a `fade` (default), a
-`slide` or `none`, one after another; reduced motion keeps only the fade.
+`slide` or `none`, one after another; reduced motion keeps only the fade, with
+every result coming in at once.
 
 ## Coming from Finsweet
 

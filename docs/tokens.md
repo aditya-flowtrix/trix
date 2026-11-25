@@ -232,7 +232,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 | `--text-main-line-height` | `var(--line-height-huge) → 1.5` | `var(--line-height-huge) → 1.5` |
 | `--text-main-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
 | `--text-main-text-transform` | `none` | `none` |
-| `--text-main-text-wrap` | `pretty` | `pretty` |
+| `--text-main-text-wrap` | `wrap` | `wrap` |
 | `--text-main-margin-top` | `var(--space-4)` | `var(--space-4)` |
 | `--text-main-margin-bottom` | `var(--space-4)` | `var(--space-4)` |
 | `--text-main-trim-top` | `var(--primary-trim-top) → 0.364em` | `var(--primary-trim-top) → 0.364em` |
@@ -433,7 +433,7 @@ column is exactly `span 3`.
 
 | Token | `theme-light` | `theme-dark` | `theme-brand` |
 | --- | --- | --- | --- |
-| `--background` | `#ffffff` | `#000000` | `#0fd375` |
+| `--background` | `#ffffff` | `#0a0a0a` | `#0fd375` |
 | `--background-2` | `#f5f5f5` | `#171717` | `#19bc69` |
 | `--background-3` | `#e5e5e5` | `#262626` | `#1ea55d` |
 | `--background-skeleton` | `#0000001a` | `#ffffff1a` | `#0000001a` |
@@ -442,21 +442,21 @@ column is exactly `span 3`.
 | `--border` | `#00000026` | `#ffffff33` | `#00000033` |
 | `--heading-accent` | `#018547` | `#0fd375` | `#333333` |
 | `--selection-background` | `#000000` | `#ffffff` | `#000000` |
-| `--selection-text` | `#ffffff` | `#000000` | `#0fd375` |
+| `--selection-text` | `#ffffff` | `#0a0a0a` | `#0fd375` |
 | `--tag-background` | `#000000` | `#ffffff` | `#000000` |
-| `--tag-text` | `#ffffff` | `#000000` | `#0fd375` |
+| `--tag-text` | `#ffffff` | `#0a0a0a` | `#0fd375` |
 | `--button-background` | `#0fd375` | `#0fd375` | `#000000` |
 | `--button-border` | `#0fd375` | `#0fd375` | `#000000` |
 | `--button-text` | `#000000` | `#000000` | `#0fd375` |
 | `--button-background-hover` | `#000000` | `#ffffff` | `#ffffff` |
 | `--button-border-hover` | `#000000` | `#ffffff` | `#ffffff` |
-| `--button-text-hover` | `#ffffff` | `#000000` | `#000000` |
+| `--button-text-hover` | `#ffffff` | `#0a0a0a` | `#000000` |
 | `--button-2-background` | `#00000000` | `#00000000` | `#00000000` |
 | `--button-2-border` | `#00000026` | `#ffffff33` | `#00000033` |
 | `--button-2-text` | `#000000` | `#ffffff` | `#000000` |
 | `--button-2-background-hover` | `#000000` | `#ffffff` | `#ffffff` |
 | `--button-2-border-hover` | `#000000` | `#ffffff` | `#ffffff` |
-| `--button-2-text-hover` | `#ffffff` | `#000000` | `#000000` |
+| `--button-2-text-hover` | `#ffffff` | `#0a0a0a` | `#000000` |
 | `--link-text` | `#000000` | `#ffffff` | `#000000` |
 | `--link-border` | `#00000026` | `#ffffff33` | `#00000033` |
 | `--link-text-hover` | `#000000` | `#ffffff` | `#000000` |

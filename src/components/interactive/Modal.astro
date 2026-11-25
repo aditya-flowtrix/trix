@@ -41,6 +41,19 @@ if (import.meta.env.DEV && render && content && !id) {
     "[trix] <Modal> rendered without an `id`, so nothing could open it and nothing was output.",
   );
 }
+
+if (
+  import.meta.env.DEV &&
+  render &&
+  content &&
+  id &&
+  !label &&
+  !rest["aria-labelledby"]
+) {
+  console.warn(
+    `[trix] <Modal id="${id}"> has no \`label\` or \`aria-labelledby\`, so screen readers announce it without a name.`,
+  );
+}
 ---
 
 {
@@ -93,6 +106,8 @@ if (import.meta.env.DEV && render && content && !id) {
             : null;
       if (scroll) scroll.scrollTop = 0;
       modal.showModal();
+      // Focus may have scrolled the dialog to the panel's entry offset.
+      modal.scrollTo(0, 0);
       modal.dispatchEvent(new CustomEvent("modal-open", { bubbles: true }));
     };
 
@@ -117,18 +132,24 @@ if (import.meta.env.DEV && render && content && !id) {
       modal.dispatchEvent(new CustomEvent("modal-close", { bubbles: true }));
     });
 
+    // Light dismiss. The dialog fills the viewport, so outside the panel is
+    // the dialog itself, where `closedby` never fires. Press and release
+    // both there, so a selection dragged out of the panel doesn't close it.
     let fromBackdrop = false;
 
-    modal.addEventListener("mousedown", (event) => {
+    modal.addEventListener("pointerdown", (event) => {
       fromBackdrop = event.target === modal;
+    });
+
+    modal.addEventListener("pointerup", (event) => {
+      if (fromBackdrop && event.target === modal) modal.close();
+      fromBackdrop = false;
     });
 
     modal.addEventListener("click", (event) => {
       const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (target.closest("[data-modal-close]")) modal.close();
-      else if (fromBackdrop && target === modal) modal.close();
-      fromBackdrop = false;
+      if (target instanceof Element && target.closest("[data-modal-close]"))
+        modal.close();
     });
 
     document.addEventListener(
@@ -159,10 +180,6 @@ if (import.meta.env.DEV && render && content && !id) {
 
 <style is:global>
   @layer components {
-    html:has(.modal_wrap[open]) {
-      overflow: hidden;
-    }
-
     .modal_wrap {
       --_leaving: calc(var(--open-duration) * 0.7);
       --_from: 0 2rem;
@@ -180,16 +197,25 @@ if (import.meta.env.DEV && render && content && !id) {
       background: none;
       border: 0;
       color: var(--text);
-      overflow: clip;
-      transition:
-        display var(--_leaving) allow-discrete,
-        overlay var(--_leaving) allow-discrete;
+      /* hidden, not clip: only a scroll container takes overscroll-behavior,
+         which keeps a scroll over the modal off the page behind it. */
+      overflow: hidden;
+      overscroll-behavior: contain;
 
       &[open] {
         display: flex;
-        transition:
-          display var(--open-duration) allow-discrete,
-          overlay var(--open-duration) allow-discrete;
+      }
+
+      /* Stays in the top layer while it fades out. Without `overlay`
+         (Safari, Firefox) it closes at once rather than fading in place. */
+      @supports (overlay: auto) {
+        transition-property: display, overlay;
+        transition-duration: var(--_leaving);
+        transition-behavior: allow-discrete;
+
+        &[open] {
+          transition-duration: var(--open-duration);
+        }
       }
 
       .stacki-designer &.preview,
@@ -204,6 +230,8 @@ if (import.meta.env.DEV && render && content && !id) {
       &::backdrop {
         background-color: var(--_backdrop);
         opacity: 0;
+        overflow: hidden;
+        overscroll-behavior: contain;
         transition: opacity var(--_leaving) var(--open-ease);
       }
 
@@ -245,10 +273,13 @@ if (import.meta.env.DEV && render && content && !id) {
       border-radius: var(--radius-main);
       overflow: hidden;
       opacity: 0;
-      translate: var(--_from);
       transition:
         opacity var(--_leaving) var(--open-ease),
         translate var(--_leaving) var(--open-ease);
+
+      @media (prefers-reduced-motion: no-preference) {
+        translate: var(--_from);
+      }
 
       .modal_wrap.side-panel & {
         max-width: var(--_panel);
@@ -274,7 +305,9 @@ if (import.meta.env.DEV && render && content && !id) {
       @starting-style {
         .modal_wrap[open] & {
           opacity: 0;
-          translate: var(--_from);
+          @media (prefers-reduced-motion: no-preference) {
+            translate: var(--_from);
+          }
         }
       }
     }
@@ -299,8 +332,11 @@ if (import.meta.env.DEV && render && content && !id) {
 
     .modal_body {
       padding: var(--_close) var(--space-6) var(--space-7);
-      translate: var(--_body);
       transition: translate var(--_leaving) var(--open-ease);
+
+      @media (prefers-reduced-motion: no-preference) {
+        translate: var(--_body);
+      }
 
       .modal_wrap.full-screen & {
         min-height: 100%;
@@ -316,7 +352,9 @@ if (import.meta.env.DEV && render && content && !id) {
 
       @starting-style {
         .modal_wrap[open] & {
-          translate: var(--_body);
+          @media (prefers-reduced-motion: no-preference) {
+            translate: var(--_body);
+          }
         }
       }
     }

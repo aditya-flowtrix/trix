@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slug } from "@/utils/slug.ts";
+import { uid } from "@/utils/unique-id.ts";
 import Icon from "@/components/media/Icon.astro";
 import arrow from "@/assets/icons/arrow.svg";
 
@@ -17,6 +18,8 @@ type Base = {
   name?: string;
   /** Prompt shown before selection. Defaults to the variant prompt. */
   placeholder?: string;
+  /** Message shown when the field is left invalid. */
+  error?: string;
   /** Require the field and mark its label. */
   required?: boolean;
   /** Visually hide the label. */
@@ -72,8 +75,10 @@ const {
   to,
   name,
   placeholder,
+  error,
   required = false,
   labelHidden = false,
+  id,
   class: className,
   ...rest
 } = Astro.props as AllProps;
@@ -163,13 +168,16 @@ const entries = choices.map((choice) =>
 
 const wording = WORDING[variant];
 const text = label ?? wording.label;
+const fieldId = id ?? uid("field");
+const errorId = `${fieldId}-error`;
 ---
 
 {
   render && entries.length > 0 && (
-    <label class:list={["field", "form-select", className]}>
-      <span
+    <div class:list={["field", "form-select", className]}>
+      <label
         class:list={["field-label text-style-main", labelHidden && "sr-only"]}
+        for={fieldId}
       >
         <span>{text}</span>
         {required && (
@@ -177,13 +185,15 @@ const text = label ?? wording.label;
             *
           </span>
         )}
-      </span>
+      </label>
 
       <span class="form-select_control">
         <select
           class="field-control form-select_field text-style-main"
+          id={fieldId}
           name={name ?? slug(text)}
           required={required || undefined}
+          data-error={error ? errorId : undefined}
           {...rest}
         >
           <option value="" disabled selected={value === undefined} hidden>
@@ -197,7 +207,13 @@ const text = label ?? wording.label;
         </select>
         <Icon class="form-select_mark" src={arrow} variant="small" />
       </span>
-    </label>
+      {error && (
+        <p class="field-error text-style-small" id={errorId}>
+          <Icon name="warning-circle" variant="small" aria-label="Error" />
+          {error}
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -247,7 +263,9 @@ const text = label ?? wording.label;
       }
 
       .form-select_mark {
-        transition: rotate var(--open-duration) var(--open-ease);
+        @media (prefers-reduced-motion: no-preference) {
+          transition: rotate var(--open-duration) var(--open-ease);
+        }
       }
 
       .form-select_field:open ~ .form-select_mark {
@@ -267,28 +285,44 @@ const text = label ?? wording.label;
         position-try-order: normal;
         overscroll-behavior: contain;
         background-color: var(--background-3);
-        border: 0;
+        border: var(--border-width) solid
+          color-mix(in lab, var(--text) 50%, transparent);
+        border-block-start: 0;
         border-radius: var(--radius-small);
         border-start-start-radius: 0;
         border-start-end-radius: 0;
         opacity: 0;
-        scale: 0.98;
         transition:
           opacity var(--open-duration) var(--open-ease),
-          scale var(--open-duration) var(--open-ease),
-          overlay var(--open-duration) var(--open-ease) allow-discrete,
-          display var(--open-duration) var(--open-ease) allow-discrete;
+          overlay var(--open-duration) var(--open-ease),
+          display var(--open-duration) var(--open-ease);
+        transition-behavior: allow-discrete;
       }
 
       .form-select_field:open::picker(select) {
         opacity: 1;
-        scale: 1;
       }
 
       @starting-style {
         .form-select_field:open::picker(select) {
           opacity: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .form-select_field::picker(select) {
           scale: 0.98;
+          transition-property: opacity, scale, overlay, display;
+        }
+
+        .form-select_field:open::picker(select) {
+          scale: 1;
+        }
+
+        @starting-style {
+          .form-select_field:open::picker(select) {
+            scale: 0.98;
+          }
         }
       }
 
@@ -307,7 +341,10 @@ const text = label ?? wording.label;
         &:hover,
         &:focus {
           background-color: var(--background-2);
-          outline: 0;
+        }
+        &:focus-visible {
+          outline: var(--focus-width) solid var(--text);
+          outline-offset: var(--focus-offset-inner);
         }
       }
 

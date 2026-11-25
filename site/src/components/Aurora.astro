@@ -34,6 +34,17 @@
         ),
         var(--background);
     }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-mode]) .aurora_wrap {
+        background:
+          radial-gradient(
+            60% 45% at 50% 100%,
+            color-mix(in srgb, var(--brand-300) 55%, transparent),
+            transparent 70%
+          ),
+          var(--background);
+      }
+    }
     .aurora_canvas {
       display: block;
       width: 100%;
@@ -147,7 +158,8 @@
       ];
     };
     const paint = () => {
-      const dark = document.documentElement.dataset.mode === "dark";
+      const dark =
+        getComputedStyle(document.documentElement).colorScheme === "dark";
       gl.uniform3fv(u("base"), rgb("var(--background)"));
       gl.uniform3fv(
         u("glow"),
@@ -168,6 +180,14 @@
       attributes: true,
       attributeFilter: ["data-mode"],
     });
+    // Following the system, the mode changes with no attribute to watch.
+    matchMedia("(prefers-color-scheme: dark)").addEventListener(
+      "change",
+      () => {
+        paint();
+        play();
+      },
+    );
 
     const resize = () => {
       const scale = Math.min(devicePixelRatio, 2);

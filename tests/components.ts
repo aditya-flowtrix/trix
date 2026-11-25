@@ -287,10 +287,12 @@ try {
       await choice("furniture").click();
       assert.equal(await count(), "Showing 1–3 of 5");
       assert.match(page.url(), /\?category=furniture$/);
-      assert.deepEqual(
-        await filter.locator("[data-filter-count]").allTextContents(),
-        ["5", "2", "2", "1", "0"],
-      );
+      // Counts come a moment after the results, between other work.
+      const counts = () =>
+        filter.locator("[data-filter-count]").allTextContents();
+      for (let i = 0; i < 40 && (await counts()).join() !== "5,2,2,1,0"; i++)
+        await page.waitForTimeout(25);
+      assert.deepEqual(await counts(), ["5", "2", "2", "1", "0"]);
       assert.ok(await choice("outdoor").isHidden());
       assert.deepEqual(await filter.locator(".filter_tag").allTextContents(), [
         "Category: furniture",
@@ -424,15 +426,17 @@ try {
       await page.waitForTimeout(800);
       assert.ok((await list.evaluate((l) => l.scrollLeft)) > before);
     });
-    await it("ClientRouter: Dropdown closes on Escape", async () => {
+    await it("ClientRouter: Dropdown opens, and closes on Escape", async () => {
       const dropdown = page.locator(".dropdown_wrap").first();
+      const open = () =>
+        dropdown
+          .locator(".dropdown_content")
+          .evaluate((c) => c.matches(":popover-open"));
       await dropdown.scrollIntoViewIfNeeded();
       await dropdown.locator(".dropdown_toggle").click();
+      assert.equal(await open(), true);
       await page.keyboard.press("Escape");
-      assert.equal(
-        await dropdown.evaluate((d: HTMLDetailsElement) => d.open),
-        false,
-      );
+      assert.equal(await open(), false);
     });
     await it("ClientRouter: Modal opens", async () => {
       const trigger = page.locator("[data-modal-open]").first();
@@ -489,10 +493,12 @@ try {
     await it("ClientRouter: Video's button pauses it", async () => {
       const button = page.locator("[data-video-toggle]").first();
       await button.scrollIntoViewIfNeeded();
-      const before = await button.getAttribute("aria-pressed");
+      const playing = () =>
+        button.evaluate((b) => b.hasAttribute("data-playing"));
+      const before = await playing();
       await button.click();
       await page.waitForTimeout(200);
-      assert.notEqual(await button.getAttribute("aria-pressed"), before);
+      assert.notEqual(await playing(), before);
     });
     await it("ClientRouter: Reveal shows content", async () => {
       const block = page.locator("[data-animate]").last();
@@ -518,12 +524,13 @@ try {
         await page.evaluate(() => document.documentElement.dataset.mode),
         mode,
       );
+      // The switch offers the other mode, by name.
+      const other = mode === "dark" ? "light" : "dark";
       assert.equal(
         await page
-          .locator(".theme-toggle_wrap")
-          .first()
-          .getAttribute("aria-pressed"),
-        String(mode === "dark"),
+          .getByRole("button", { name: `Switch to ${other} mode` })
+          .count(),
+        1,
       );
       // The page shows it, both ways: no page pins a theme the switch can't change.
       const scheme = () =>
@@ -531,16 +538,26 @@ try {
           () => getComputedStyle(document.documentElement).colorScheme,
         );
       assert.equal(await scheme(), mode);
+      // Back to the system's own mode: the choice is forgotten, and the page
+      // follows the system again.
       await page.locator(".theme-toggle_wrap").first().click();
-      assert.equal(await scheme(), mode === "dark" ? "light" : "dark");
+      assert.equal(
+        await page.evaluate(() => document.documentElement.dataset.mode),
+        undefined,
+      );
+      assert.equal(await scheme(), "light dark");
     });
     await it("ClientRouter: the phone menu opens", async () => {
       await page.setViewportSize({ width: 375, height: 800 });
       await page.evaluate(() => scrollTo(0, 0));
       await page.locator(".nav_toggle").click();
-      assert.equal(
-        await page.locator(".nav_toggle").getAttribute("aria-expanded"),
-        "true",
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector(".nav_toggle")
+            ?.getAttribute("aria-expanded") === "true",
+        null,
+        { timeout: 2000 },
       );
     });
 
@@ -600,13 +617,18 @@ try {
     });
     await it("CSP: the color mode script and the component scripts run", async () => {
       await csp.goto(`${origin}/test/tabs-scripts`);
-      assert.ok(
-        await csp.evaluate(() => document.documentElement.dataset.mode),
-      );
+      // The inline script applies a stored choice before the page paints.
+      await csp.evaluate(() => localStorage.setItem("trix-mode", "dark"));
+      await csp.reload();
       assert.equal(
-        await csp.locator(".tabs_link").first().getAttribute("aria-selected"),
-        "true",
+        await csp.evaluate(() => document.documentElement.dataset.mode),
+        "dark",
       );
+      await csp.evaluate(() => localStorage.removeItem("trix-mode"));
+      // The tabs' own script switches tabs.
+      const second = csp.locator(".tabs_link").nth(1);
+      await second.click();
+      assert.equal(await second.getAttribute("aria-selected"), "true");
     });
     await it("CSP: inline style attributes apply — components' props and code colors", async () => {
       await csp.goto(`${origin}/test/marquee-video`);

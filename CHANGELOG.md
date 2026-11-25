@@ -2,6 +2,83 @@
 
 ## Unreleased
 
+- Every component now follows Chrome's [Modern Web
+  Guidance](https://developer.chrome.com/docs/modern-web-guidance), checked
+  rule by rule against its guides:
+  - **Color mode needs no script.** `<meta name="color-scheme">` and CSS
+    follow the system setting, so there is no white flash and no wrong mode
+    with JavaScript off. The script only applies a stored choice and keeps
+    tabs in step. Clicking `ThemeToggle` back to the system's own mode
+    forgets the choice. A page pinned with `theme` keeps its theme in dark
+    mode. `theme-invert` flips at the top of a page too. The toggle shows in
+    forced colors and is right before its script runs. The dark theme for a
+    dark system is generated into `generated/color-mode.css` by
+    `npm run tokens`.
+  - **Reduced motion, case by case.** The global rule that cut every
+    duration to 0.01ms is gone. Each component switches on its own movement
+    inside `prefers-reduced-motion: no-preference` and keeps colour and
+    opacity changes.
+  - **Accordion:** no heading inside `<summary>`, which screen readers drop;
+    the marker sits beside the title; several items can be open at once by
+    default.
+  - **Tabs:** roles and selection are in the HTML. Tabs have a border
+    indicator that survives forced colors and a named tab list (`label`).
+    Hidden panels are found by find-in-page (`hidden="until-found"`), and a
+    row that scrolls fades at its edges.
+  - **Slider:** "Slide N of M" is announced. It's a named carousel of named
+    slides. Previous and Next come first in the reading order, and focus
+    moves to the other button at an end. It loops by default.
+  - **Dropdown and Nav:** a button and a popover. Escape and a click outside
+    are the browser's own, and the hand-written listeners and arrow keys are
+    gone. The phone menu is a popover. The current page is underlined at
+    every width.
+  - **Modal:** the page behind it no longer scrolls, without locking `<html>`
+    (no layout shift). A click outside closes it only if it began outside.
+    Every Modal needs a name; a dev warning says so.
+  - **Pause buttons** (Video, Marquee, Slider, Tabs) change their label, not
+    `aria-pressed` as well. A background video keeps its pause button.
+  - **Forms:**
+    - Fields, unchecked boxes and range tracks have 3:1 borders.
+    - Errors show after interaction (`:user-invalid`), with an `error`
+      message and `aria-invalid` kept in step.
+    - The sent and failed messages are announced.
+    - A `method="get"` form submits instead of failing.
+    - Labels point at their controls with `for`.
+    - The toggle Choice is a real switch, and targets are 44px.
+    - Range reads out its unit.
+    - Email, URL and search fields don't autocorrect.
+  - **Filter:** counts are worked out after the results, in slices, so typing
+    stays smooth on a long list. The option you're on is never disabled
+    under you, and paging focus is visible. Sorting is announced and keeps
+    embedded media playing (`moveBefore`).
+  - **Media and cards:**
+    - `Img` with `fetchPriority="high"` loads eagerly.
+    - `Video` loads lazily, takes captions as a `<track>` child, and `auto`
+      needs a width and height.
+    - Labelled icons are images.
+    - Breadcrumbs end in a link to this page.
+    - Cards are articles, and their link names the card.
+  - **Pages:**
+    - Pages prerender on hover through speculation rules, and prefetch
+      elsewhere.
+    - `<meta name="text-scale">` follows the system text size.
+    - Paragraphs stop at 60 characters a line.
+- **Upgrading** (`/trix-upgrade` does it):
+  - `AccordionItem` loses `headingTag`.
+  - `Accordion` `single` and `Slider` `loop` change their defaults.
+  - `ThemeToggle` takes `darkLabel` and `lightLabel` instead of `label`.
+  - CSS keyed on `[data-mode="dark"]` must also handle the system media
+    query.
+  - Dropdown is styled through `.dropdown_toggle[aria-expanded="true"]` and
+    `.dropdown_content:popover-open`, no longer `[open]` or `summary`.
+  - Input, Select and Textarea roots are a `div`.
+  - `.form_note-sent` and `.form_note-failed` are gone.
+  - `.breadcrumbs_current` is gone.
+  - Play buttons use `data-playing`.
+  - `Card` takes `imageLoading` and `imageFetchPriority`.
+  - A paragraph that should run wider takes `maxWidth` or
+    `.max-width-none`.
+
 - Moving into Sanity is built in. `node scripts/cms/convert.ts sanity`
   turns the imported CMS into the NDJSON `sanity datasets import` takes and
   the Studio schema those documents need: IDs from the source's, so every run

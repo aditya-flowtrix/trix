@@ -1,6 +1,5 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import Heading from "@/components/typography/Heading.astro";
 import Icon from "@/components/media/Icon.astro";
 import arrow from "@/assets/icons/arrow.svg";
 import { slotContent } from "@/utils/slots.ts";
@@ -10,8 +9,6 @@ type Props = HTMLAttributes<"details"> & {
   render?: boolean;
   /** Item heading. */
   heading?: string;
-  /** Heading level. */
-  headingTag?: "h2" | "h3" | "h4" | "h5" | "h6";
   /** Open on load. */
   open?: boolean;
 };
@@ -19,7 +16,6 @@ type Props = HTMLAttributes<"details"> & {
 const {
   render = true,
   heading,
-  headingTag = "h3",
   open = false,
   class: className,
   ...rest
@@ -37,10 +33,8 @@ const content = await slotContent(Astro.slots);
       {...rest}
     >
       <summary class="accordion_toggle">
-        <Heading tag={headingTag} variant="h5" class="accordion_title">
-          {heading}
-        </Heading>
         <Icon class="accordion_icon" src={arrow} variant="small" />
+        <span class="accordion_title text-style-h5">{heading}</span>
       </summary>
 
       <div class="accordion_body margin-trim">
@@ -66,8 +60,7 @@ const content = await slotContent(Astro.slots);
     .accordion_toggle {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: var(--space-4);
+      gap: var(--space-3);
       padding-block: var(--space-5);
       list-style: none;
       cursor: pointer;
@@ -80,23 +73,32 @@ const content = await slotContent(Astro.slots);
       margin-block: 0;
     }
 
+    /* Closed it points to the inline end, open it points down. */
     .accordion_icon {
-      rotate: 90deg;
-      transition: rotate var(--open-duration) var(--open-ease);
+      flex: none;
+      &:dir(rtl) {
+        rotate: 180deg;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        transition: rotate var(--open-duration) var(--open-ease);
+      }
     }
 
     .accordion_item:is([open], .stacki-opened) .accordion_icon,
     .stacki-designer .accordion_wrap.preview .accordion_icon {
-      rotate: -90deg;
+      rotate: 90deg;
     }
 
     .accordion_item::details-content {
       block-size: 0;
       overflow: hidden;
       content-visibility: hidden;
-      transition:
-        block-size var(--open-duration) var(--open-ease),
-        content-visibility var(--open-duration) var(--open-ease) allow-discrete;
+      @media (prefers-reduced-motion: no-preference) {
+        transition:
+          block-size var(--open-duration) var(--open-ease),
+          content-visibility var(--open-duration) var(--open-ease)
+            allow-discrete;
+      }
     }
 
     .accordion_item:is([open], .stacki-opened)::details-content,

@@ -126,7 +126,7 @@ const locals = `--_count: ${count}`;
 
     const setPlaying = (playing: boolean) => {
       marquee.dataset.state = playing ? "playing" : "paused";
-      toggle.setAttribute("aria-pressed", String(playing));
+      toggle.toggleAttribute("data-playing", playing);
       toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
     };
 
@@ -191,6 +191,14 @@ const locals = `--_count: ${count}`;
         animation-direction: reverse;
       }
 
+      /* Still for anyone who asked for less motion, at its start, until they
+         start it themselves with the toggle. */
+      @media (prefers-reduced-motion: reduce) {
+        .marquee_wrap:not([data-state="playing"]) & {
+          animation-play-state: paused;
+        }
+      }
+
       /* Held while something inside has focus, so a link can't travel out from
          under the person reading it. The toggle sits outside the track. */
       &:focus-within,
@@ -236,20 +244,6 @@ const locals = `--_count: ${count}`;
     @keyframes marquee {
       to {
         translate: calc(-50% - var(--_gap-size) / 2) 0;
-      }
-    }
-
-    /* The reset collapses every animation to a moment, which would snap the
-       track to its end. It holds still instead, and runs its full length only
-       for someone who starts it themselves. */
-    @media (prefers-reduced-motion: reduce) {
-      .marquee_track {
-        animation-name: none;
-      }
-
-      .marquee_wrap[data-state="playing"] .marquee_track {
-        animation-name: marquee;
-        animation-duration: var(--_duration) !important;
       }
     }
   }
