@@ -3,10 +3,10 @@
 ## 0.9.0 — 2026-11-25
 
 Every component follows Chrome's Modern Web Guidance, the style guide is
-public on the docs site, and a migration can move a site into Sanity, bring
-a Webflow site's other languages, and prove the import. Several components
-change their props or markup; the Upgrading list at the end says what, and
-`/trix-upgrade` does it.
+redesigned for showing clients and public on the docs site, and a migration
+can move a site into Sanity, bring a Webflow site's other languages, and
+prove the import. Several components change their props or markup; the
+Upgrading list at the end says what, and `/trix-upgrade` does it.
 
 - Webflow Localization: `import.ts webflow --locale fr-FR` reads another CMS
   locale (by tag, subdirectory or CMS locale id) into collections of its own,
@@ -97,12 +97,12 @@ change their props or markup; the Upgrading list at the end says what, and
     of its sizes, line height, letter spacing and weight beside the sample.
     Color ramps are swatches labelled by step, and bands on a phone. Each
     theme card lists the color its background, surfaces, text, border,
-    heading accent and button take. Spacing
-    reads name, value, use and a bar drawn to scale. Layout draws the
-    breakpoints as a track, each named by the screens it serves (phones,
-    tablets, laptops and desktops) rather than by Webflow's breakpoint names,
-    and lists the grid's columns, gutter, margin and width. Motion shows each timing with a demo that plays on hover, and only
-    moves without reduced motion.
+    heading accent and button take. Spacing reads name, value, use and a bar
+    drawn to scale. Layout draws the breakpoints as a track, each named by
+    the screens it serves (phones, tablets, laptops and desktops) rather
+    than by Webflow's breakpoint names, and lists the grid's columns,
+    gutter, margin and width. Motion shows each timing with a demo, and
+    only moves without reduced motion.
   - Things to try on the page: preview text and a screen width slider over
     the text styles, showing each style's size on a screen that wide; a
     contrast checker for any two palette colors, with the WCAG AA and AAA
@@ -251,7 +251,9 @@ change their props or markup; the Upgrading list at the end says what, and
   - `.breadcrumbs_current` is gone.
   - Play buttons use `data-playing`.
   - `Card` takes `imageLoading` and `imageFetchPriority`.
-  - `StyleGuideGroup` `variant="grid"` is `variant="tiles"`.
+  - `StyleGuideGroup` `variant="grid"` is `variant="tiles"`, and
+    `variant="scroll"` is `variant="cards"`.
+  - `StyleGuideTitle` is gone: a chapter heading is `StyleGuideChapter`.
   - A paragraph that should run wider takes `maxWidth` or
     `.max-width-none`.
 
