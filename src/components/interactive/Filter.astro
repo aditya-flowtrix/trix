@@ -117,7 +117,7 @@ const results = (await slotContent(Astro.slots)).replace(
       <div class="filter_main">
         <div class="filter_bar">
           <p class="filter_count text-style-main" role="status" />
-          <ul class="filter_tags" aria-label="Active filters" />
+          <ul class="filter_tags" role="list" aria-label="Active filters" />
           <button class="filter_clear text-style-small" type="button" hidden>
             {clearText}
           </button>
@@ -200,7 +200,14 @@ const results = (await slotContent(Astro.slots)).replace(
     empty?: "disable" | "hide";
     type?: "number" | "date";
   };
-  type Row = { el: HTMLElement; index: number; fields: Fields; text: string };
+  type Row = {
+    el: HTMLElement;
+    index: number;
+    fields: Fields;
+    text: string;
+    /** Its text nodes, each with its text lowercased, read once. */
+    nodes?: [Text, string][];
+  };
   type Choice = HTMLInputElement | HTMLOptionElement;
 
   // Typing waits this long for the next key before the results change.
@@ -208,6 +215,14 @@ const results = (await slotContent(Astro.slots)).replace(
   // Newly shown items come in one after another, at most this many deep.
   const STAGGER = 8;
   const HIGHLIGHT = "filter-match";
+  // Long work hands the main thread back this often.
+  const SLICE = 50;
+
+  const pause = () =>
+    "scheduler" in window && "yield" in scheduler
+      ? scheduler.yield()
+      : new Promise<void>((resolve) => setTimeout(resolve, 0));
+  const canMove = Object.hasOwn(Element.prototype, "moveBefore");
 
   mount(".filter_wrap", (wrap, signal) => {
     // Set first: if anything below fails, every item stays on show.
@@ -408,11 +423,18 @@ const results = (await slotContent(Astro.slots)).replace(
         .filter((term) => term.length > 1);
       if (!terms.length) return;
       for (const row of shown) {
-        const walker = document.createTreeWalker(row.el, NodeFilter.SHOW_TEXT);
+        if (!row.nodes) {
+          row.nodes = [];
+          const walker = document.createTreeWalker(
+            row.el,
+            NodeFilter.SHOW_TEXT,
+          );
+          for (let node = walker.nextNode(); node; node = walker.nextNode())
+            row.nodes.push([node as Text, node.textContent!.toLowerCase()]);
+        }
         // ponytail: matches the lowercased text, so a letter whose lowercase
         // is longer (İ) can shift a mark; normalise per node if that matters.
-        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-          const text = node.textContent!.toLowerCase();
+        for (const [node, text] of row.nodes) {
           for (const term of terms)
             for (
               let at = text.indexOf(term);
@@ -431,25 +453,105 @@ const results = (await slotContent(Astro.slots)).replace(
       for (const range of marked) shared.add(range);
     };
 
-    // Sorting moves the items themselves, inside whatever holds them.
+    // Sorting moves the items themselves, inside whatever holds them, keeping
+    // what plays inside them where the browser can.
     let order: Row[] = rows;
     let sorted = "";
     const arrange = (sort: string) => {
-      if (sort === sorted) return;
+      if (sort === sorted) return false;
       sorted = sort;
       const by = parseSort(sort);
-      order = [...rows].sort(
+      order = rows.toSorted(
         (a, b) =>
           (by ? compareBy(by.field, by.direction, locale)(a, b) : 0) ||
           a.index - b.index,
       );
-      for (const row of order) row.el.parentElement?.append(row.el);
+      for (const { el } of order) {
+        const parent = el.parentElement as
+          (HTMLElement & Pick<Document, "moveBefore">) | null;
+        if (canMove) parent?.moveBefore(el, null);
+        else parent?.append(el);
+      }
+      return true;
+    };
+
+    // Counts, and the options that would leave nothing: once the results are
+    // on screen, in slices, and dropped when a newer change has begun.
+    let run = 0;
+    const faceted = controls.filter((c) => c.counts || c.empty);
+    const facets = async (
+      conditions: (Condition & { control: Control })[],
+      generation: number,
+    ) => {
+      if (!faceted.length) return;
+      const stale = () => generation !== run || signal.aborted;
+      await pause();
+      if (stale()) return;
+      let deadline = performance.now() + SLICE;
+      const counted: [Control, Choice, number][] = [];
+      for (const c of faceted) {
+        const others = conditions.filter((x) => x.control !== c);
+        const chosen = conditions.find((x) => x.control === c)?.values ?? [];
+        for (const choice of choicesOf(c)) {
+          const values =
+            c.match === "all"
+              ? [...new Set([...chosen, choice.value])]
+              : [choice.value];
+          const all = choice.value
+            ? [
+                ...others,
+                {
+                  key: c.key,
+                  fields: c.fields,
+                  op: c.op,
+                  values,
+                  match: c.match,
+                },
+              ]
+            : others;
+          let count = 0;
+          for (const row of rows) {
+            if (matches(row, all, config.match)) count++;
+            if (performance.now() >= deadline) {
+              await pause();
+              if (stale()) return;
+              deadline = performance.now() + SLICE;
+            }
+          }
+          counted.push([c, choice, count]);
+        }
+      }
+      for (const [c, choice, count] of counted) {
+        const on =
+          choice instanceof HTMLOptionElement
+            ? choice.selected
+            : choice.checked;
+        // Never the option in focus: disabling or hiding it drops focus.
+        const none =
+          !on &&
+          !!choice.value &&
+          count === 0 &&
+          choice !== document.activeElement;
+        if (choice instanceof HTMLOptionElement) {
+          const label = choice.dataset.label ?? choice.text;
+          choice.text = c.counts ? `${label} (${number.format(count)})` : label;
+          choice.disabled = none && !!c.empty;
+          choice.hidden = choice.disabled && c.empty === "hide";
+        } else {
+          const box = choice.closest("label");
+          const counter = box?.querySelector("[data-filter-count]");
+          if (counter) counter.textContent = number.format(count);
+          choice.disabled = none && c.empty === "disable";
+          if (box) box.hidden = none && c.empty === "hide";
+        }
+      }
     };
 
     let pages = 1;
     const update = (focus?: "results" | HTMLElement) => {
+      const generation = ++run;
       const { conditions, sort } = read();
-      arrange(sort);
+      const resorted = arrange(sort);
       const found = order.filter((row) =>
         matches(row, conditions, config.match),
       );
@@ -475,53 +577,6 @@ const results = (await slotContent(Astro.slots)).replace(
         row.el.hidden = !show;
       }
 
-      // Counts, and the options that would leave nothing.
-      for (const c of controls) {
-        if (!c.counts && !c.empty) continue;
-        const others = conditions.filter((x) => x.control !== c);
-        const chosen = conditions.find((x) => x.control === c)?.values ?? [];
-        for (const choice of choicesOf(c)) {
-          const values =
-            c.match === "all"
-              ? [...new Set([...chosen, choice.value])]
-              : [choice.value];
-          const all = choice.value
-            ? [
-                ...others,
-                {
-                  key: c.key,
-                  fields: c.fields,
-                  op: c.op,
-                  values,
-                  match: c.match,
-                },
-              ]
-            : others;
-          const count = rows.filter((row) =>
-            matches(row, all, config.match),
-          ).length;
-          const on =
-            choice instanceof HTMLOptionElement
-              ? choice.selected
-              : choice.checked;
-          if (choice instanceof HTMLOptionElement) {
-            const label = choice.dataset.label ?? choice.text;
-            choice.text = c.counts
-              ? `${label} (${number.format(count)})`
-              : label;
-            choice.disabled = !on && !!choice.value && count === 0 && !!c.empty;
-            choice.hidden = choice.disabled && c.empty === "hide";
-          } else {
-            const box = choice.closest("label");
-            const counter = box?.querySelector("[data-filter-count]");
-            if (counter) counter.textContent = number.format(count);
-            const none = !on && !!choice.value && count === 0;
-            choice.disabled = none && c.empty === "disable";
-            if (box) box.hidden = none && c.empty === "hide";
-          }
-        }
-      }
-
       // The bar: the count, a tag for each choice, clear all.
       const fill = (text: string) =>
         text.replace(/\{(\w+)\}/g, (all, key: string) => {
@@ -535,9 +590,16 @@ const results = (await slotContent(Astro.slots)).replace(
           return value === undefined ? all : number.format(value);
         });
       empty.hidden = found.length > 0;
-      status.textContent = found.length
+      const said = found.length
         ? fill(config.countText)
         : (empty.textContent ?? "").trim();
+      // A new order the visitor chose is named once, with the result.
+      if (resorted && wrap.dataset.changed !== undefined) {
+        const how = document.createElement("span");
+        how.className = "sr-only";
+        how.textContent = `Sorted by ${labelOf.get(`sort\n${sort}`) ?? sort}, `;
+        status.replaceChildren(how, said);
+      } else status.textContent = said;
       tags.replaceChildren(
         ...conditions.flatMap((cond) =>
           (cond.control.kind === "search"
@@ -597,7 +659,7 @@ const results = (await slotContent(Astro.slots)).replace(
             button.className = "filter_page text-style-main";
             button.dataset.page = String(p);
             button.textContent = number.format(p);
-            button.setAttribute("aria-label", `Page ${p}`);
+            button.setAttribute("aria-label", `Page ${number.format(p)}`);
             if (p === page) button.setAttribute("aria-current", "page");
             li.append(button);
           }
@@ -613,6 +675,8 @@ const results = (await slotContent(Astro.slots)).replace(
         first.tabIndex = -1;
         first.focus({ preventScroll: true });
       }
+
+      void facets(conditions, generation);
     };
 
     // A change to the choice starts again from the first page.
@@ -810,9 +874,6 @@ const results = (await slotContent(Astro.slots)).replace(
 
     .filter_results {
       scroll-margin-top: calc(var(--nav-height) + var(--space-4));
-      &:focus {
-        outline: 0;
-      }
     }
 
     .filter_item:focus-visible {
@@ -894,20 +955,24 @@ const results = (await slotContent(Astro.slots)).replace(
       }
     }
 
-    /* Items coming in, once the visitor has changed something — not on load. */
+    /* Items coming in, once the visitor has changed something — not on load.
+       Reduced motion keeps the fade, all at once. */
     .filter_wrap:is(.fade, .slide)[data-changed] .filter_item {
       /* In only: an item leaving goes at once, so the list never holds both. */
-      transition:
-        opacity var(--open-duration) var(--open-ease),
-        translate var(--open-duration) var(--open-ease);
-      transition-delay: calc(var(--_i, 0) * var(--_stagger));
+      transition: opacity var(--open-duration) var(--open-ease);
       @starting-style {
         opacity: 0;
       }
+      @media (prefers-reduced-motion: no-preference) {
+        transition:
+          opacity var(--open-duration) var(--open-ease),
+          translate var(--open-duration) var(--open-ease);
+        transition-delay: calc(var(--_i, 0) * var(--_stagger));
+      }
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .filter_wrap.slide[data-changed] .filter_item {
+    .filter_wrap.slide[data-changed] .filter_item {
+      @media (prefers-reduced-motion: no-preference) {
         @starting-style {
           translate: 0 1rem;
         }

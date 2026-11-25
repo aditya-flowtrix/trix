@@ -403,7 +403,7 @@ const PAGE_FACTS = `async () => {
       .map((e) => e.tagName.toLowerCase() + "." + [...e.classList].join(".")),
     links: [...document.querySelectorAll("a[href]")].map((a) => a.href),
     has: Object.fromEntries(Object.entries({
-      nav: ".nav_toggle", accordion: "details.accordion_item", dropdown: "details.dropdown_wrap",
+      nav: ".nav_toggle", accordion: "details.accordion_item", dropdown: ".dropdown_toggle",
       tabs: '[role="tablist"] [role="tab"]', modal: "[data-modal-open]", slider: '.slider_controls button[data-step="1"]',
       marquee: "[data-marquee-toggle]", compare: "[data-compare]", video: "[data-video-toggle]", reveal: "[data-animate]",
       row: ".row", spacer: ".container > .spacer", overlay: ".grid-overlay_wrap",
@@ -568,13 +568,13 @@ async function testPage(driver: Driver, page: Page, path: string) {
   }
   if (has.dropdown) {
     await fresh();
-    await page.click("details.dropdown_wrap summary");
+    await page.click(".dropdown_toggle");
     check(
       where,
       "dropdown opens",
       await until(
         page,
-        `() => document.querySelector("details.dropdown_wrap").open`,
+        `() => document.querySelector(".dropdown_toggle").getAttribute("aria-expanded") === "true"`,
       ),
     );
   }
@@ -587,7 +587,7 @@ async function testPage(driver: Driver, page: Page, path: string) {
       `() => {
       const tabs = [...document.querySelector('[role="tablist"]').querySelectorAll('[role="tab"]')];
       const t = tabs[1];
-      const panel = document.getElementById(t.getAttribute("aria-controls"));
+      const panel = document.querySelector('[role="tabpanel"][aria-labelledby="' + t.id + '"]');
       return t.getAttribute("aria-selected") === "true" && tabs.filter((x) => x.getAttribute("aria-selected") === "true").length === 1 && panel && !panel.hidden && panel.checkVisibility();
     }`,
     );
@@ -712,15 +712,15 @@ async function testPage(driver: Driver, page: Page, path: string) {
     );
     await wait(300);
     const was = await page.evaluate<string>(
-      `() => document.querySelector('${selector}').getAttribute("aria-pressed")`,
+      `() => document.querySelector('${selector}').getAttribute("aria-label") + (document.querySelector('${selector}').hasAttribute("data-playing") ? " (playing)" : "")`,
     );
     await page.click(selector);
     await until(
       page,
-      `() => document.querySelector('${selector}').getAttribute("aria-pressed") !== ${JSON.stringify(was)}`,
+      `() => document.querySelector('${selector}').getAttribute("aria-label") + (document.querySelector('${selector}').hasAttribute("data-playing") ? " (playing)" : "") !== ${JSON.stringify(was)}`,
     );
     const now = await page.evaluate<string>(
-      `() => document.querySelector('${selector}').getAttribute("aria-pressed")`,
+      `() => document.querySelector('${selector}').getAttribute("aria-label") + (document.querySelector('${selector}').hasAttribute("data-playing") ? " (playing)" : "")`,
     );
     check(
       where,

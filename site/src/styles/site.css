@@ -276,6 +276,11 @@
   :root[data-mode="dark"] {
     --code-background: var(--neutral-900);
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-mode="light"]) {
+      --code-background: var(--neutral-900);
+    }
+  }
   pre.astro-code {
     overflow-x: auto;
     font-family: var(--mono-family);
@@ -288,6 +293,11 @@
   }
   :root[data-mode="dark"] :is(.astro-code, .astro-code span) {
     color: var(--shiki-dark);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-mode="light"]) :is(.astro-code, .astro-code span) {
+      color: var(--shiki-dark);
+    }
   }
   /* The box — the pre itself until the script wraps it, then the wrapper. */
   pre.astro-code,

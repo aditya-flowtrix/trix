@@ -13,7 +13,12 @@ component: form/Select
 `variant="list"` takes `options` — strings, or `{ label, value }`. `month`,
 `day`, `year` (with `from` and `to`) and `state` bring their own. It is the
 browser's own select, so it works with every keyboard, screen reader and
-phone picker.
+phone picker. Where the browser lets the list be styled, it fades in — and
+grows in only for visitors who allow motion — and the option under the
+keyboard has a focus ring.
+
+`error` is the message shown under the field once it is left without a
+choice, as on [`Input`](/docs/components/input).
 
 ## Props
 

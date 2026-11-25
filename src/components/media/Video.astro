@@ -20,8 +20,8 @@ type Tail = {
   /** Restart after playback. */
   loop?: boolean;
   /**
-   * Play while on screen. Requires `muted`. Nothing downloads until the
-   * video scrolls into view, and it pauses when it scrolls out.
+   * Play while on screen. Requires `muted`. The video downloads only once it
+   * scrolls into view, and pauses when it scrolls out.
    */
   autoplay?: boolean;
   /** Mute audio. */
@@ -31,11 +31,17 @@ type Tail = {
   /** Play only from the `large` breakpoint. Smaller screens keep the poster and download nothing. */
   desktopOnly?: boolean;
   /**
+   * Loading behavior. `lazy` holds the poster and metadata back until the
+   * video nears the screen, where the browser supports it. Set `eager` for a
+   * video above the fold.
+   */
+  loading?: "lazy" | "eager";
+  /**
    * Show a pause button over an autoplaying video. Defaults to `true` with
    * `autoplay`: moving content that plays for more than five seconds must be
-   * pausable (WCAG 2.2.2). Off for a section's background video unless the
-   * owner asks for one, and for a video of five seconds or less that does
-   * not loop.
+   * pausable (WCAG 2.2.2), a section's background video included, and reduced
+   * motion doesn't replace the button. Off only for a video of five seconds
+   * or less that does not loop.
    */
   pauseButton?: boolean;
   /** Where the pause button sits over the video. Defaults to `bottom-right`. */
@@ -66,6 +72,22 @@ type Props = Head &
     | {
         variant: "auto";
         ratio?: never;
+        /**
+         * Video width in pixels. Required with `auto`, so the box keeps its
+         * size before the video loads.
+         *
+         * @min 1
+         * @int
+         */
+        width: number;
+        /**
+         * Video height in pixels. Required with `auto`, so the box keeps its
+         * size before the video loads.
+         *
+         * @min 1
+         * @int
+         */
+        height: number;
       }
   ) &
   Tail;
@@ -87,6 +109,7 @@ const {
   muted = true,
   transparent = false,
   desktopOnly = false,
+  loading = "lazy",
   pauseButton = autoplay,
   pausePosition = "bottom-right",
   class: className,
@@ -107,6 +130,16 @@ if (import.meta.env.DEV && render) {
   if (variant === "custom" && !ratio) {
     console.warn(
       '[trix] <Video variant="custom"> has no `ratio`, so no aspect ratio is applied. Set one, or pick a preset variant.',
+    );
+  }
+  if (variant === "auto" && (!rest.width || !rest.height)) {
+    console.warn(
+      '[trix] <Video variant="auto"> needs `width` and `height`: without them the box is 300×150 until the video loads, so the page shifts and a lazy video may never load.',
+    );
+  }
+  if (autoplay && loop && !pauseButton) {
+    console.warn(
+      "[trix] <Video autoplay loop pauseButton={false}> moves for more than five seconds with no way to stop it (WCAG 2.2.2). Keep the pause button.",
     );
   }
 }
@@ -141,13 +174,16 @@ const pauseMargins = {
       ]}
       style={isCustom && ratio ? `aspect-ratio: ${ratio};` : undefined}
       loop={loop}
-      preload={autoplay ? "none" : undefined}
+      preload={autoplay ? "none" : "metadata"}
       muted={muted}
       playsinline
+      {...{ loading: loading === "lazy" ? "lazy" : undefined }}
       data-video-autoplay={autoplay ? "" : undefined}
       data-video-desktop-only={desktopOnly ? "" : undefined}
       {...rest}
-    />
+    >
+      <slot />
+    </video>
   )
 }
 {
@@ -200,7 +236,7 @@ const pauseMargins = {
     )
       return;
     const show = (playing: boolean) => {
-      toggle.setAttribute("aria-pressed", String(playing));
+      toggle.toggleAttribute("data-playing", playing);
       toggle.setAttribute("aria-label", playing ? "Pause video" : "Play video");
     };
     show(!reduced.matches);

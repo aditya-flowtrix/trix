@@ -9,8 +9,12 @@ import {
 import JsonLd from "@/components/utility/JsonLd.astro";
 import { isNoindexRoute, pagePath } from "@/utils/seo.ts";
 import type { SeoProps } from "@/types.ts";
+import type { Theme } from "@/styles/generated/tokens.ts";
 
-type Props = SeoProps;
+type Props = SeoProps & {
+  /** The page's theme from `BaseLayout`. A pinned theme fixes the color scheme. */
+  theme?: "inherit" | Theme;
+};
 
 const {
   title,
@@ -19,6 +23,7 @@ const {
   type = "website",
   noindex,
   schema,
+  theme = "inherit",
   lang = SITE_LOCALE,
   alternates,
 } = Astro.props;
@@ -35,18 +40,35 @@ const fontPreload = (
   ) ?? firstFiles[0]
 )?.src[0]?.url;
 
-/* Applies the saved or system color mode before first paint, and again
-   after each page swap: Astro's ClientRouter replaces the root's attributes
-   with the next page's, which leave the mode out. */
+/* The color scheme the browser paints before the CSS loads: the system's,
+   the fixed mode, or a pinned page theme's (any theme but `dark` counts as
+   light). CSS follows the system on its own; the script only applies a
+   stored ThemeToggle choice — before first paint, after each ClientRouter
+   swap (which resets the root's attributes) and when another tab changes
+   it. A pinned page keeps its scheme. */
+const scheme =
+  theme !== "inherit"
+    ? theme === "dark"
+      ? "dark"
+      : "light"
+    : COLOR_MODE === "auto"
+      ? "light dark"
+      : COLOR_MODE;
 const colorModeScript = `(() => {
+  const root = document.documentElement;
   const apply = () => {
-    let saved;
-    try { saved = localStorage.getItem("trix-mode"); } catch {}
-    const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.mode = dark ? "dark" : "light";
+    let mode;
+    try { mode = localStorage.getItem("trix-mode"); } catch {}
+    if (mode) root.dataset.mode = mode;
+    else delete root.dataset.mode;
+    if (!root.matches('[class*="theme-"]'))
+      document.querySelector('meta[name="color-scheme"]').content = mode || "light dark";
   };
   apply();
   document.addEventListener("astro:after-swap", apply);
+  addEventListener("storage", (e) => {
+    if (e.key === "trix-mode" || e.key === null) apply();
+  });
 })();`;
 
 const pageTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
@@ -64,6 +86,9 @@ const ogLocale = (tag: string) => tag.replace("-", "_");
   @layer base, patterns, components, utilities;
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="text-scale" content="scale" />
+<meta name="color-scheme" content={scheme} />
+{COLOR_MODE === "auto" && <script is:inline set:html={colorModeScript} />}
 {fonts.map((cssVariable) => <Font cssVariable={cssVariable} />)}
 {
   fontPreload && (
@@ -76,7 +101,6 @@ const ogLocale = (tag: string) => tag.replace("-", "_");
     />
   )
 }
-{COLOR_MODE === "auto" && <script is:inline set:html={colorModeScript} />}
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />

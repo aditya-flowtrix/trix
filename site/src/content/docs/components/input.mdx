@@ -17,13 +17,29 @@ component: form/Input
 | `first-name`, `last-name`             | `given-name`, `family-name` autofill   |
 | `email`                               | email keyboard, `email` autofill       |
 | `phone`                               | phone keypad, `tel` autofill           |
-| `date`                                | the native date picker                 |
+| `date`                                | the native date picker, no autofill    |
 | `zip-code`                            | numeric keypad, `postal-code` autofill |
 | `number`, `search`, `url`, `password` | their native types                     |
 
 The label defaults to the variant's name, `name` to the label's slug.
-`required` marks the label and the browser enforces it. `labelHidden` hides the
-label visually and keeps it for screen readers.
+`email`, `url` and `search` are typed as they are: no autocorrect, capitals or
+spellcheck. `required` marks the label and the browser enforces it.
+`labelHidden` hides the label visually and keeps it for screen readers —
+`astro dev` warns about it, since the placeholder left on screen goes as soon
+as someone types.
+
+`error` is the message shown under the field once it is left invalid, starting
+with an icon read as "Error". Say how to fix it: "Enter an email address like
+you@example.com." Inside a [`Form`](/docs/components/form) it is read with the
+field and announced.
+
+```astro live stage="stack"
+<Input
+  variant="email"
+  required
+  error="Enter an email address like you@example.com."
+/>
+```
 
 ## Props
 

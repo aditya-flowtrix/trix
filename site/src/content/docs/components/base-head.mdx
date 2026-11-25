@@ -26,12 +26,14 @@ component: utility/BaseHead
 | `hreflang` links                 | `alternates`, this page and `x-default` (the `SITE_LOCALE` page)   |
 | JSON-LD                          | `schema` — see [SEO](/docs/guides/seo)                             |
 | fonts                            | every family in `astro.config.mjs`, the first preloaded            |
+| the color scheme                 | `COLOR_MODE`, or the page's pinned `theme`                         |
 | the color-mode script            | `COLOR_MODE` is `auto`                                             |
+| text scaling                     | always: the OS text size scales the page                           |
 | the cascade layer order          | always first                                                       |
 
 Its props are the page's: `title`, `description`, `image`, `type`, `noindex`,
-`schema`, `lang` and `alternates`, which `BaseLayout` passes through. A page
-in another language names itself and its others:
+`schema`, `theme`, `lang` and `alternates`, which `BaseLayout` passes
+through. A page in another language names itself and its others:
 
 ```astro
 <BaseLayout title="À propos" lang="fr-FR" alternates={{ "en-US": "/about" }} />

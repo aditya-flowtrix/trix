@@ -1,6 +1,8 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import Icon from "@/components/media/Icon.astro";
 import { slug } from "@/utils/slug.ts";
+import { uid } from "@/utils/unique-id.ts";
 
 type InputVariant =
   | "text"
@@ -28,6 +30,8 @@ interface Props extends Omit<HTMLAttributes<"input">, "type"> {
   name?: string;
   /** Empty-field hint. Defaults to the variant name. */
   placeholder?: string;
+  /** Message shown when the field is left invalid. */
+  error?: string;
   /** Require the field and mark its label. */
   required?: boolean;
   /** Visually hide the label. */
@@ -41,8 +45,10 @@ const {
   variant = "text",
   name,
   placeholder,
+  error,
   required = false,
   labelHidden = false,
+  id,
   class: className,
   ...rest
 } = Astro.props;
@@ -56,6 +62,7 @@ const KINDS: Record<
     type: NonNullable<InputAttrs["type"]>;
     mode: NonNullable<InputAttrs["inputmode"]>;
     fill: NonNullable<InputAttrs["autocomplete"]>;
+    literal?: boolean;
   }
 > = {
   text: { label: "Text", type: "text", mode: "text", fill: "on" },
@@ -71,9 +78,15 @@ const KINDS: Record<
     mode: "text",
     fill: "family-name",
   },
-  email: { label: "Email", type: "email", mode: "email", fill: "email" },
+  email: {
+    label: "Email",
+    type: "email",
+    mode: "email",
+    fill: "email",
+    literal: true,
+  },
   phone: { label: "Phone", type: "tel", mode: "tel", fill: "tel" },
-  date: { label: "Date", type: "date", mode: "text", fill: "bday" },
+  date: { label: "Date", type: "date", mode: "text", fill: "off" },
   "zip-code": {
     label: "Zip Code",
     type: "text",
@@ -81,25 +94,47 @@ const KINDS: Record<
     fill: "postal-code",
   },
   number: { label: "Number", type: "number", mode: "numeric", fill: "off" },
-  search: { label: "Search", type: "search", mode: "search", fill: "off" },
+  search: {
+    label: "Search",
+    type: "search",
+    mode: "search",
+    fill: "off",
+    literal: true,
+  },
   password: {
     label: "Password",
     type: "password",
     mode: "text",
     fill: "current-password",
   },
-  url: { label: "URL", type: "url", mode: "url", fill: "url" },
+  url: { label: "URL", type: "url", mode: "url", fill: "url", literal: true },
 };
 
 const kind = KINDS[variant];
 const text = label ?? kind.label;
+const fieldId = id ?? uid("field");
+const errorId = `${fieldId}-error`;
+const literal = kind.literal
+  ? ({
+      autocorrect: "off",
+      autocapitalize: "none",
+      spellcheck: "false",
+    } as const)
+  : {};
+
+if (import.meta.env.DEV && render && labelHidden) {
+  console.warn(
+    `[trix] <Input label="${text}" labelHidden> leaves only its placeholder on screen, and that goes as soon as someone types. Show the label, or name the field in visible text nearby.`,
+  );
+}
 ---
 
 {
   render && (
-    <label class:list={["field", "form-input", className]}>
-      <span
+    <div class:list={["field", "form-input", className]}>
+      <label
         class:list={["field-label text-style-main", labelHidden && "sr-only"]}
+        for={fieldId}
       >
         <span>{text}</span>
         {required && (
@@ -107,9 +142,10 @@ const text = label ?? kind.label;
             *
           </span>
         )}
-      </span>
+      </label>
       <input
         class="field-control text-style-main"
+        id={fieldId}
         type={kind.type}
         name={name ?? slug(text)}
         placeholder={placeholder ?? text}
@@ -117,8 +153,16 @@ const text = label ?? kind.label;
         autocomplete={kind.fill}
         required={required || undefined}
         value={value}
+        data-error={error ? errorId : undefined}
+        {...literal}
         {...rest}
       />
-    </label>
+      {error && (
+        <p class="field-error text-style-small" id={errorId}>
+          <Icon name="warning-circle" variant="small" aria-label="Error" />
+          {error}
+        </p>
+      )}
+    </div>
   )
 }

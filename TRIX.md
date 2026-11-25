@@ -147,11 +147,18 @@ the per-page rules, migration parity and the launch handoff.
 ## Color mode
 
 `COLOR_MODE` in `src/consts.ts`: `auto` (default) — follow the visitor's
-system setting, remember the `ThemeToggle` choice in the nav, applied before
-first paint — or `light` / `dark` for a site designed in one mode, which hides
-the switch. Dark mode swaps the root to the dark theme; sections with an
-explicit `theme` keep theirs, and so does a page given a `theme` through the
-layout, so a site with the switch leaves pages unset.
+system setting, in CSS with no script, and let the `ThemeToggle` in the nav
+override it — or `light` / `dark` for a site designed in one mode, which hides
+the switch. The switch shows the system's mode or its opposite; switching back
+to the system's mode forgets the choice, so the site follows the system again.
+A choice is stored in the browser and set as `data-mode="light"` or `"dark"` on
+`<html>` before first paint; a fixed mode is written there at build. CSS that
+differs by mode reads both — `:root[data-mode="dark"]`, and
+`:root:not([data-mode="light"])` inside `@media (prefers-color-scheme: dark)` —
+never `data-mode` alone, which is unset while a visitor follows the system.
+Dark mode swaps the root to the dark theme; sections with an explicit `theme`
+keep theirs, and so does a page given a `theme` through the layout, so a site
+with the switch leaves pages unset.
 
 ## Behaviour: our own code
 
@@ -189,8 +196,11 @@ A script is production code:
   every link works; a filter is a form that submits. Filter, sort and tab state
   lives in the URL (`?category=design`), so it can be shared, reloaded and gone
   back to.
-- Motion animates `transform` and `opacity` only and respects
-  `prefers-reduced-motion`. Layout is read before it is written, never
+- Motion animates `transform` and `opacity` only. Movement — a slide,
+  scale, rotation or stagger — is switched on inside the rule's own
+  `@media (prefers-reduced-motion: no-preference)`, so reduced motion gets the
+  end state at once; colour and opacity changes stay. There is no global
+  reset that zeroes every duration. Layout is read before it is written, never
   interleaved.
 - It cleans up: `mount`'s `signal` goes to every listener, observer and timer
   it adds outside its own element.
@@ -266,13 +276,12 @@ and 1440 before calling it done:
   element or its children — see [Custom components](#custom-components).
 - Put the page's images, graphics and logos in its own folder,
   `src/assets/pages/<page>/`, each with its alt text — see [Assets](#assets).
-- A video behind a section's content goes in `Section`'s `background` slot
-  with no play/pause button: `<Video slot="background" pauseButton={false} />`.
-  Then ask the owner — "The background video loops with no way to pause it
-  (WCAG 2.2.2 asks for one). Add a play/pause button?" — default no, and record
-  the answer in `PROJECT.md` → Decisions. Visitors who ask for reduced motion
-  get it paused either way. A video in the content, not behind it, keeps its
-  button.
+- A video behind a section's content goes in `Section`'s `background` slot:
+  `<Video slot="background" autoplay loop />`. It keeps its play/pause button —
+  anything that moves for more than five seconds must be pausable (WCAG
+  2.2.2), and reduced motion doesn't replace the control; `pausePosition`
+  moves it out of the way. Only a clip of five seconds or less that doesn't
+  loop may drop it with `pauseButton={false}`.
 
 ## Custom components
 

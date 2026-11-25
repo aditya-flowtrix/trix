@@ -56,11 +56,18 @@ It is then reported, not failed — the decision is written down.
 
 `COLOR_MODE` in `src/consts.ts`:
 
-- `auto` (default) — follow the visitor's system setting, remember a
-  [`ThemeToggle`](/docs/components/theme-toggle) choice, and apply it before
-  the first paint, so there is no flash. The switch is in the nav.
+- `auto` (default) — follow the visitor's system setting, in CSS, so it
+  works with no script and changes when the system does. A
+  [`ThemeToggle`](/docs/components/theme-toggle) choice overrides it, applied
+  before the first paint, so there is no flash. The switch is in the nav.
 - `light` or `dark` — fixed, for a site designed in one mode only. The switch
   disappears.
+
+A choice, or a fixed mode, is `data-mode="light"` or `"dark"` on `<html>`;
+while the visitor follows the system there is none. A color that differs by
+mode is a theme token. Anything else that must — an image, a filter — reads
+both `:root[data-mode="dark"]` and, inside
+`@media (prefers-color-scheme: dark)`, `:root:not([data-mode="light"])`.
 
 Dark mode swaps the root to the dark theme. Sections with their own `theme`
 keep it, and so does a page given one through the layout's `theme` — the switch

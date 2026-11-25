@@ -11,7 +11,7 @@ import type { Theme } from "@/styles/generated/tokens.ts";
 
 type ImageSource = ImageMetadata | string;
 
-type Base = HTMLAttributes<"div"> & {
+type Base = HTMLAttributes<"article"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
   /** Eyebrow text. Supports inline markup. */
@@ -38,6 +38,8 @@ type Props = Base &
         variant?: "default";
         image?: never;
         imageAlt?: never;
+        imageLoading?: never;
+        imageFetchPriority?: never;
       }
     | {
         variant: "cover";
@@ -45,6 +47,10 @@ type Props = Base &
         image?: ImageSource;
         /** Image alt text. Omit for decorative images. */
         imageAlt?: string;
+        /** Image loading behavior. Defaults to `lazy`, or `eager` with `imageFetchPriority="high"`. */
+        imageLoading?: "lazy" | "eager";
+        /** Image fetch priority. `high` for the largest image above the fold. */
+        imageFetchPriority?: "auto" | "high" | "low";
       }
     | {
         variant: "stacked";
@@ -54,12 +60,18 @@ type Props = Base &
         image?: ImageSource;
         /** Image alt text. Omit for decorative images. */
         imageAlt?: string;
+        /** Image loading behavior. Defaults to `lazy`, or `eager` with `imageFetchPriority="high"`. */
+        imageLoading?: "lazy" | "eager";
+        /** Image fetch priority. `high` for the largest image above the fold. */
+        imageFetchPriority?: "auto" | "high" | "low";
       }
   );
 
 type AllProps = Base & {
   image?: ImageSource;
   imageAlt?: string;
+  imageLoading?: "lazy" | "eager";
+  imageFetchPriority?: "auto" | "high" | "low";
 };
 
 const {
@@ -74,6 +86,8 @@ const {
   theme = "inherit",
   image,
   imageAlt,
+  imageLoading,
+  imageFetchPriority,
   class: className,
   ...rest
 } = Astro.props as AllProps;
@@ -81,6 +95,9 @@ const {
 const hasImage = variant !== "default" && !!image;
 const hasContent = !!(eyebrow || heading || text || buttonLabel);
 const hasTheme = variant !== "stacked" && theme !== "inherit";
+/* The heading without its markup, to name the button after: a link inside
+   the button's name would nest one link in another. */
+const headingText = heading?.replace(/<[^>]*>/g, " ");
 
 /* The button each variant closes with, so a set of cards reads as one system.
    A link carries no emphasis of its own, so the two are picked together. */
@@ -110,7 +127,7 @@ if (import.meta.env.DEV && render) {
 
 {
   render && (hasContent || hasImage) && (
-    <div
+    <article
       class:list={[
         "card_wrap",
         variant !== "default" && variant,
@@ -121,7 +138,12 @@ if (import.meta.env.DEV && render) {
     >
       {hasImage && (
         <div class="card_visual">
-          <Img src={image!} alt={imageAlt} />
+          <Img
+            src={image!}
+            alt={imageAlt}
+            loading={imageLoading}
+            fetchPriority={imageFetchPriority}
+          />
           {variant === "cover" && <Overlay variant="gradient" />}
         </div>
       )}
@@ -140,14 +162,26 @@ if (import.meta.env.DEV && render) {
             {buttonHref ? (
               <Button element="link" href={buttonHref} {...buttonKind}>
                 {buttonLabel}
+                {buttonLabel && heading && (
+                  <span class="sr-only">
+                    : <Fragment set:html={headingText} />
+                  </span>
+                )}
               </Button>
             ) : (
-              <Button {...buttonKind}>{buttonLabel}</Button>
+              <Button {...buttonKind}>
+                {buttonLabel}
+                {buttonLabel && heading && (
+                  <span class="sr-only">
+                    : <Fragment set:html={headingText} />
+                  </span>
+                )}
+              </Button>
             )}
           </ButtonWrapper>
         </div>
       )}
-    </div>
+    </article>
   )
 }
 
@@ -246,11 +280,10 @@ if (import.meta.env.DEV && render) {
         z-index: 1;
       }
 
-      .image {
-        transition: scale calc(var(--hover-duration) * 2) var(--hover-ease);
-      }
-
-      @media (hover: hover) {
+      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+        .image {
+          transition: scale calc(var(--hover-duration) * 2) var(--hover-ease);
+        }
         &:hover .image {
           scale: 1.04;
         }

@@ -6,7 +6,7 @@ import { uid } from "@/utils/unique-id.ts";
 type Props = HTMLAttributes<"div"> & {
   /** Set to `false` to omit the component. */
   render?: boolean;
-  /** Keep only one item open. */
+  /** Keep only one item open. Off by default, so visitors can compare answers. */
   single?: boolean;
   /** Open the first item on load. */
   openFirst?: boolean;
@@ -16,7 +16,7 @@ type Props = HTMLAttributes<"div"> & {
 
 const {
   render = true,
-  single = true,
+  single = false,
   openFirst = false,
   preview = false,
   class: className,

@@ -12,16 +12,20 @@ component: interactive/Dropdown
 </Dropdown>
 ```
 
-A native `<details>`, so it works without JavaScript. The script adds the
-rest: arrow keys move between its links, Escape closes it and returns focus to
-the button, and a click outside closes it.
+A button and a native popover, so it opens without JavaScript. Escape or a
+click outside closes it, Escape returns focus to the button, and tabbing past
+its last link closes it too. Its links stay in the Tab order: it is
+navigation, not a menu, so there are no arrow keys. The panel opens under the
+button and flips above it, or to its other side, when there is no room on
+the screen.
 
 ## In a nav
 
 `variant="menu"` is for a dropdown in `Nav`. Below the `medium` breakpoint it
-opens in the flow of the mobile menu, pushing the links under it down — a
-floating panel would be clipped by the menu's scroll box. From `medium` up it
-floats like the default.
+opens in the flow of the mobile menu, pushing the links under it down: there
+it is a plain disclosure rather than a popover, which would float over the
+menu. From `medium` up it floats like the default, toward the middle of the
+page.
 
 ```astro
 <li>
@@ -35,8 +39,8 @@ floats like the default.
 ```
 
 `variant="mega"` opens in the mobile menu the same way, and from `medium` up
-spans the nav's full width, its content as wide as the page — room for
-columns of links:
+hangs from the nav's bottom edge across its full width, its content as wide
+as the page — room for columns of links:
 
 ```astro
 <li>

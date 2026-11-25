@@ -3,6 +3,7 @@ import type { HTMLAttributes } from "astro/types";
 import Icon from "@/components/media/Icon.astro";
 import check from "@/assets/icons/check.svg";
 import { slug } from "@/utils/slug.ts";
+import { uid } from "@/utils/unique-id.ts";
 
 type Base = {
   /** Set to `false` to omit the component. */
@@ -28,7 +29,7 @@ type Kind =
     };
 
 type Settings = {
-  /** Control style. */
+  /** Control style. `toggle` is a switch. */
   variant?: "default" | "toggle" | "chip";
   /** Start selected. */
   checked?: boolean;
@@ -53,23 +54,33 @@ const {
   variant = "default",
   checked = false,
   required = false,
+  id,
   class: className,
   ...rest
 } = Astro.props as AllProps;
+
+const fieldId = id ?? uid("choice");
+const toggle =
+  variant === "toggle" && type === "checkbox"
+    ? ({ switch: true, role: "switch" } as const)
+    : {};
 ---
 
 {
   render && label && (
     <label
       class:list={["form-choice", variant !== "default" && variant, className]}
+      for={fieldId}
     >
       <input
         class="form-choice_input"
+        id={fieldId}
         type={type}
         name={name ?? slug(label)}
         value={value}
         checked={checked || undefined}
         required={required || undefined}
+        {...toggle}
         {...rest}
       />
       <span class="form-choice_mark" aria-hidden="true">
@@ -79,7 +90,14 @@ const {
           <Icon class="form-choice_tick" src={check} variant="small" />
         )}
       </span>
-      <span class="form-choice_text text-style-main">{label}</span>
+      <span class="form-choice_text text-style-main">
+        {label}
+        {required && (
+          <span class="field-star" aria-hidden="true">
+            *
+          </span>
+        )}
+      </span>
       <slot />
     </label>
   )
@@ -91,7 +109,12 @@ const {
       display: inline-flex;
       align-items: center;
       gap: 0.75em;
+      min-block-size: 2.75rem;
       cursor: pointer;
+      &:has(.form-choice_input:disabled) {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     }
 
     .form-choice_input {
@@ -114,7 +137,8 @@ const {
       width: 1.5em;
       height: 1.5em;
       background-color: var(--_mark);
-      border: var(--border-width) solid transparent;
+      border: var(--border-width) solid
+        color-mix(in lab, var(--text) 50%, transparent);
       border-radius: var(--radius-small);
       transition:
         background-color var(--hover-duration) var(--hover-ease),
@@ -137,12 +161,15 @@ const {
       background-color: var(--_ink);
       border-radius: var(--radius-round);
       scale: 0;
-      transition: scale var(--hover-duration) var(--hover-ease);
+      @media (prefers-reduced-motion: no-preference) {
+        transition: scale var(--hover-duration) var(--hover-ease);
+      }
     }
 
     .form-choice:has(:checked) {
       & .form-choice_mark {
         background-color: var(--_mark-chosen);
+        border-color: var(--_mark-chosen);
       }
       & .form-choice_tick {
         opacity: 1;
@@ -153,7 +180,9 @@ const {
     }
 
     @media (hover: hover) {
-      .form-choice:hover .form-choice_input:not(:checked) ~ .form-choice_mark {
+      .form-choice:hover
+        .form-choice_input:not(:checked, :disabled)
+        ~ .form-choice_mark {
         background-color: var(--_mark-hover);
       }
     }
@@ -181,9 +210,14 @@ const {
         height: 1.1em;
         border-radius: var(--radius-round);
         background-color: var(--text);
-        transition:
-          translate var(--hover-duration) var(--hover-ease),
-          background-color var(--hover-duration) var(--hover-ease);
+        transition: background-color var(--hover-duration) var(--hover-ease);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        & .form-choice_mark::after {
+          transition:
+            translate var(--hover-duration) var(--hover-ease),
+            background-color var(--hover-duration) var(--hover-ease);
+        }
       }
       &:has(:checked) .form-choice_mark::after {
         translate: 1.2em 0;
@@ -208,7 +242,7 @@ const {
         --_ink: var(--text);
       }
       @media (hover: hover) {
-        &:hover:not(:has(:checked)) {
+        &:hover:not(:has(:checked, :disabled)) {
           background-color: var(--background-3);
         }
       }

@@ -75,6 +75,8 @@ const fonts = (trix.fonts ?? []).map((font) => ({
 export default defineConfig({
   site: SITE_URL,
   prefetch: { prefetchAll: true },
+  // Prerendered through speculation rules where the browser has them.
+  experimental: { clientPrerender: true },
   trailingSlash: "never",
   build: { format: "file" },
   integrations: [mdx(), sitemap()],

@@ -24,7 +24,7 @@ props. Read the section you need before writing.
 What follows are the places where **Trix disagrees with ordinary web
 practice** — the ones where doing the normal thing works but is wrong here.
 
-## Ten places Trix diverges
+## Eleven places Trix diverges
 
 **1. Compose from components; text is a component too.** A section is
 `Section` → layout (`Row`/`Col`, `Grid` or `ContentWrapper`) → `Eyebrow`,
@@ -73,17 +73,19 @@ property.
 
 **9. Motion is built in.** Scroll-in reveals are the `animate` prop on
 `Section`, `Row`, `Col` or `Grid` — not a hand-written observer. Hovers use
-`--hover-duration` and `--hover-ease`. Everything respects reduced motion.
+`--hover-duration` and `--hover-ease`. Movement (a slide, scale, rotation or
+stagger) goes inside the rule's own `@media (prefers-reduced-motion:
+no-preference)`; colour and opacity changes stay. There is no global reset.
 
 **10. Media carry their accessibility.** `Img` (optimised; `alt` always,
 `""` only for decoration). Its file goes in the page's own folder,
 `src/assets/pages/<page>/images|graphics|logos/`, named for what it shows —
 `shared/` once a second page uses it, never one folder for the whole site
 (`TRIX.md` → Assets, which also says how to write the alt). An autoplaying
-`Video` in the content keeps its pause button (`pausePosition` moves it); a
-background video — in `Section`'s `background` slot — has none
-(`pauseButton={false}`) until the owner asks for one: ask, default no
-(`TRIX.md` → Building a page). `Icon name` for Phosphor icons.
+`Video` keeps its pause button, in the content or in `Section`'s `background`
+slot (`pausePosition` moves it); only a clip of five seconds or less that
+doesn't loop drops it (`TRIX.md` → Building a page). `Icon name` for Phosphor
+icons.
 
 **11. Behaviour is our own code, never a library.** No Finsweet, jQuery,
 Swiper, GSAP, Lenis or any other UI script. A tab, filter, slider, reveal or

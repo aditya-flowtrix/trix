@@ -26,12 +26,18 @@ component: form/Form
 `action` is the endpoint — Formspree, Basin, Web3Forms, a Cloudflare Worker,
 your own API. The form posts its fields there as `FormData` with
 `Accept: application/json`, then shows `successMessage` or `errorMessage` in
-place. Without `action` it validates and shows the message without sending,
-which is how it is designed and tested before a provider is chosen — and
-`astro dev` warns about it, so it isn't launched that way.
+place, in one status message that screen readers announce. Without `action` it
+validates and shows the message without sending, which is how it is designed
+and tested before a provider is chosen — and `astro dev` warns about it, so it
+isn't launched that way. `method="get"` is for a search or a filter: the
+browser goes to `action` with the fields in its address, as a link would.
 
-The browser validates first: required fields, email format, patterns. Without
-JavaScript it is an ordinary form posting to `action`.
+The browser validates first: required fields, email format, patterns. A field
+looks invalid only once someone has left it that way, or tried to send — and
+its `aria-invalid` says so at the same moment, so screen readers don't call an
+untouched field invalid. A field's `error` message shows then, is read with
+the field, and is announced once when it appears. Without JavaScript it is an
+ordinary form posting to `action`.
 
 ## Props
 
