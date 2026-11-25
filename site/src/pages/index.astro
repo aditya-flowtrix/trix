@@ -10,57 +10,58 @@ import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
 import Icon from "@/components/media/Icon.astro";
 import Aurora from "~/components/Aurora.astro";
+import WhyTrix from "~/components/WhyTrix.astro";
 import { Code } from "astro:components";
 import { codeThemes } from "~/code-theme.ts";
 import { organization, website } from "@/utils/schema.ts";
 import { CREATE_COMMAND, REPO } from "@/consts.ts";
 import pkg from "../../../package.json";
 
-const features: {
-  icon: string;
-  title: string;
-  text: string;
-  href?: string;
-  span?: number;
-}[] = [
-  {
-    icon: "palette",
-    title: "A style guide that cannot drift",
-    text: "Every token on one page — type, color, themes, spacing, grid — rendered from the files the site is built from, never copied. On a migration it is measured against the old site and proven identical at every width.",
-    href: "/docs/system/style-guide",
-    span: 12,
-  },
-  {
-    icon: "squares-four",
-    title: "A 12-column grid",
-    text: "Row and Col on the grid the designer draws on: spans, offsets and order, stacking on tablet and phone without a line of CSS.",
-  },
-  {
-    icon: "arrows-out-line-horizontal",
-    title: "Fluid by default",
-    text: "Every size is two numbers, phone and desktop. Type and spacing scale smoothly between them and with the reader's font size.",
-  },
-  {
-    icon: "figma-logo",
-    title: "One token system with Figma",
-    text: "Tokens export as Figma variables and import back from them, so design and code share every name and value.",
-  },
-  {
-    icon: "stack",
-    title: "Components",
-    text: "Sections, layouts, typography, media, forms and interactive components that already know how to be accessible.",
-  },
-  {
-    icon: "arrows-left-right",
-    title: "Moves a site in",
-    text: "Agent skills migrate Webflow, Framer and WordPress sites — pages, CMS collections, assets and redirects — and prove it.",
-  },
-  {
-    icon: "check-circle",
-    title: "Tested everywhere",
-    text: "Every page in every browser engine — Chromium, Firefox and WebKit — against WCAG 2.2 AA, every week and before a release.",
-  },
-];
+const features: { icon: string; title: string; text: string; span?: number }[] =
+  [
+    {
+      icon: "palette",
+      title: "A style guide that cannot drift",
+      text: "Every token on one page — type, color, themes, spacing, grid — rendered from the files the site is built from, never copied, and ready to show a client. On a migration it is measured against the old site and proven identical at every width.",
+      span: 6,
+    },
+    {
+      icon: "arrows-left-right",
+      title: "Moves a site in",
+      text: "Agent skills bring a Webflow, Framer, WordPress, Wix or Squarespace site across — pages, CMS collections, other languages, assets, redirects and SEO — into content collections or a headless CMS like Sanity, and check the result against the source.",
+      span: 6,
+    },
+    {
+      icon: "squares-four",
+      title: "A 12-column grid",
+      text: "Row and Col on the grid the designer draws on: spans, offsets and order, stacking on tablet and phone without a line of CSS.",
+    },
+    {
+      icon: "arrows-out-line-horizontal",
+      title: "Fluid by default",
+      text: "Every size is two numbers, phone and desktop. Type and spacing scale smoothly between them and with the reader's font size.",
+    },
+    {
+      icon: "figma-logo",
+      title: "One token system with Figma",
+      text: "Tokens export as Figma variables and import back from them, so design and code share every name and value.",
+    },
+    {
+      icon: "stack",
+      title: "Components, no libraries",
+      text: "Sections, forms, tabs, sliders, filters and modals that already know how to be accessible — HTML, CSS and Trix's own scripts, with no jQuery, GSAP, Swiper or Finsweet.",
+    },
+    {
+      icon: "rocket-launch",
+      title: "Ready to launch",
+      text: "Metadata and structured data on every page, a cookie banner that holds every tracker until the visitor allows it, light and dark mode, and a Content Security Policy one switch away.",
+    },
+    {
+      icon: "check-circle",
+      title: "Tested everywhere",
+      text: "Every page in Chromium, Firefox and WebKit, checked against WCAG 2.2 AA every week.",
+    },
+  ];
 ---
 
 <Layout schema={[organization(), website()]}>
@@ -103,7 +104,7 @@ const features: {
             <div class="home-feature_wrap">
               <Icon name={f.icon} variant="medium" />
               <Heading tag="h2" variant="h6">
-                {f.href ? <a href={f.href}>{f.title}</a> : f.title}
+                {f.title}
               </Heading>
               <Paragraph variant="small" maxWidth={60} class="color-faded">
                 {f.text}
@@ -114,6 +115,7 @@ const features: {
       }
     </Row>
   </Section>
+  <WhyTrix />
 </Layout>
 
 <style is:global>
@@ -137,23 +139,6 @@ const features: {
 
       > [class] {
         margin-block: 0;
-      }
-      /* A feature with a page: the whole card is its link. */
-      &:has(a) {
-        position: relative;
-      }
-      &:has(a:hover) {
-        border-color: var(--text-2);
-      }
-      a {
-        color: inherit;
-
-        &::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-        }
       }
     }
   }
