@@ -155,3 +155,12 @@ select:has(option[value=""]:checked) {
     margin-bottom: calc(-0.5lh + var(--_trim-bottom));
   }
 }
+/* First in a list item, the top trim is a margin: a block before the first
+   line would put the item's marker on a line of its own. */
+li > :is(h1, h2, h3, h4, h5, h6, p, [class*="text-style-"]):first-child {
+  display: block;
+  margin-top: calc(-0.5lh + var(--_trim-top));
+  &::before {
+    content: none;
+  }
+}

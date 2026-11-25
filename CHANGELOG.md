@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- A list item that starts with a paragraph or heading has its marker level
+  with the first line. The leading trim put an empty block before that line,
+  so the bullet or number sat on a line of its own above the text.
+- Docs: lists have their bullets and numbers back, paragraphs and code
+  inside a list item are spaced instead of overlapping, code blocks in a
+  list lose the inline-code border, and an aside's title has room above its
+  text.
+
 ## 0.9.0 — 2026-11-25
 
 Every component follows Chrome's Modern Web Guidance, the style guide is
