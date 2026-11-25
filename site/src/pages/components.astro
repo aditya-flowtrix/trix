@@ -1,0 +1,23 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import ComponentGallery from "@/components/content/ComponentGallery.astro";
+---
+
+<Layout
+  title="Components"
+  description="Every Trix component and layout variant at its defaults, side by side — the page every project has at /components."
+>
+  <Section paddingBottom="none" gap="5">
+    <Heading tag="h1">Components</Heading>
+    <Paragraph variant="large" maxWidth={60}>
+      Every component and layout variant at Trix's defaults, side by side. Every
+      project has this page at <code>/components</code>, in its own brand. <a
+        href="/docs/components/section">The component docs</a
+      >
+    </Paragraph>
+  </Section>
+  <ComponentGallery />
+</Layout>

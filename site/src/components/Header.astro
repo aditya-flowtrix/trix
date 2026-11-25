@@ -10,12 +10,12 @@ const links = [
   {
     label: "Docs",
     href: "/docs",
-    active: path.startsWith("/docs") && !path.startsWith("/docs/components"),
+    active: path.startsWith("/docs"),
   },
   {
     label: "Components",
-    href: "/docs/components/section",
-    active: path.startsWith("/docs/components"),
+    href: "/components",
+    active: path === "/components",
   },
   {
     label: "Style guide",
