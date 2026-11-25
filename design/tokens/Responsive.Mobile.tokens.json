@@ -3,7 +3,7 @@
     "display": {
       "$type": "dimension",
       "$value": {
-        "value": 56,
+        "value": 48,
         "unit": "px"
       }
     },
