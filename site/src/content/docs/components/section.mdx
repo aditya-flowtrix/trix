@@ -29,7 +29,9 @@ a nav fixed over the page). The default is `medium`.
 ## Background
 
 Anything in the `background` slot fills the band behind the content: an image,
-a video, an overlay.
+a video, an overlay. An `Overlay` tints toward the section's theme, so a
+section that inherits the page's theme follows light and dark mode;
+`theme="dark"`, as here, keeps it dark in both.
 
 ```astro
 <Section fullHeight theme="dark">

@@ -37,21 +37,24 @@ const {
 
 <style is:global>
   @layer components {
+    /* Tints toward the theme's background, so the theme's text reads on
+       top: darkens in a dark section or card, lightens in a light one. */
     .overlay {
+      --_tint: var(--background);
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       background-color: color-mix(
         in srgb,
-        black calc(var(--_strength, 50) / 100 * 80%),
+        var(--_tint) calc(var(--_strength, 50) / 100 * 80%),
         transparent
       );
 
       &.gradient {
         background-color: color-mix(
           in srgb,
-          black calc(var(--_strength, 50) / 100 * 60%),
+          var(--_tint) calc(var(--_strength, 50) / 100 * 60%),
           transparent
         );
         background-image: linear-gradient(
@@ -59,7 +62,7 @@ const {
           transparent,
           color-mix(
               in srgb,
-              black calc(var(--_strength, 50) / 100 * 62%),
+              var(--_tint) calc(var(--_strength, 50) / 100 * 62%),
               transparent
             )
             84%
