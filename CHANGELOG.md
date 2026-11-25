@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- The `/components` page's content is `ComponentGallery`
+  (`src/components/content/`), as the style guide's is `StyleGuide`: the page
+  itself is the layout and one tag, and renders exactly as before. A site
+  that added its own demos to `src/pages/components.astro` keeps them there,
+  beside `<ComponentGallery />`.
+- Docs: Components in the header opens the components page, as Style guide
+  opens the style guide, and the style guide's link goes there too.
 - A list item that starts with a paragraph or heading has its marker level
   with the first line. The leading trim put an empty block before that line,
   so the bullet or number sat on a line of its own above the text.
