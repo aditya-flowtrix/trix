@@ -28,7 +28,10 @@ type Base = HTMLAttributes<"article"> & {
   buttonHref?: string;
   /** Card layout. */
   variant?: "default" | "cover" | "stacked";
-  /** Color theme of element and its children. */
+  /**
+   * Color theme of element and its children. Defaults to `dark` on a cover
+   * card with an image, whose overlay darkens it, and `inherit` otherwise.
+   */
   theme?: "inherit" | Theme | "invert";
 };
 
@@ -83,7 +86,7 @@ const {
   buttonLabel,
   buttonHref,
   variant = "default",
-  theme = "inherit",
+  theme: themeProp,
   image,
   imageAlt,
   imageLoading,
@@ -93,6 +96,9 @@ const {
 } = Astro.props as AllProps;
 
 const hasImage = variant !== "default" && !!image;
+/* A cover card's overlay darkens its image, so its text is light by default. */
+const theme =
+  themeProp ?? (variant === "cover" && hasImage ? "dark" : "inherit");
 const hasContent = !!(eyebrow || heading || text || buttonLabel);
 const hasTheme = variant !== "stacked" && theme !== "inherit";
 /* The heading without its markup, to name the button after: a link inside
