@@ -51,8 +51,19 @@
     fits its card, and words up to "Infrastructure" fit the line.
   - The dark theme's background is `--neutral-950` instead of pure black. The
     docs' dark code blocks move to `--neutral-900` to stay apart from it.
+  - The brand theme's button text is `--white` instead of the section's own
+    green, which made the black button look cut out of the section.
   - A project that wants the old values sets them back in its `tokens.css`
     and `themes.css`.
+- The homepage hero follows the color mode. In light mode it is a pale brand
+  tint with the green glow rising from below and dark text, where it was a
+  black card on a white page. `ContentWrapper variant="card"` takes `theme`:
+  `dark` by default, or `inherit` to follow the page. The shared
+  `background.svg` takes its colors from the tokens when inlined, and draws
+  dark as before when used as an `<img>`.
+- `Input` takes the `autocomplete` it is given. It wrote its variant's value
+  and then the one passed in, and a browser keeps the first, so
+  `autocomplete="off"` was ignored.
 - The style guide shows `--brand-text` as text on the color the default theme
   puts it on (`--button-background`), not as a second black tile; its samples
   are real sentences instead of Lorem ipsum, with no brand in them; and the
@@ -67,6 +78,56 @@
 - `StyleGuideGroup`'s `grid` variant is now `tiles`. Its `grid` class also
   matched `Grid`'s, which lost only because of stylesheet order. The rich
   text sample has the space it was missing before "a link".
+- `/style-guide` is redesigned to be shown to a client, with everything it
+  showed before still on it:
+  - It opens on a brand board — the logo, the typeface, the brand color with
+    its hex, and the brand ramp — then eight numbered chapters, each with a
+    sentence on what it is for. A chapter bar sticks under the nav and marks
+    the chapter in view (`scroll-target-group`, with an observer where that
+    is missing); it scrolls sideways on a phone.
+  - Every token and class name copies on click, with a "Copied" note a
+    screen reader hears.
+  - Typography shows each family as a specimen, and each text style as a row
+    of its sizes, line height, letter spacing and weight beside the sample.
+    Color ramps are swatches labelled by step, and bands on a phone. Each
+    theme card lists the color its background, surfaces, text, border,
+    heading accent and button take. Spacing
+    reads name, value, use and a bar drawn to scale. Layout draws the
+    breakpoints as a track, each named by the screens it serves (phones,
+    tablets, laptops and desktops) rather than by Webflow's breakpoint names,
+    and lists the grid's columns, gutter, margin and width. Motion shows each timing with a demo that plays on hover, and only
+    moves without reduced motion.
+  - Things to try on the page: preview text and a screen width slider over
+    the text styles, showing each style's size on a screen that wide; a
+    contrast checker for any two palette colors, with the WCAG AA and AAA
+    results in plain words; the breakpoint your screen is in, marked as the
+    window is resized; Play on each motion card, and Play again on the
+    reveal. A motion demo plays when the pointer is on the demo itself, not
+    anywhere on its card, so pressing Play shows something.
+  - Aspect ratios are one frame that takes each shape in turn, in front of
+    the dashed outlines of the others, with a picture inside cropped as
+    `object-fit: cover` crops one; under it, the class, what the shape suits
+    and its size at 1200px wide. The shapes take turns while the frame is in
+    view, until a visitor picks one or presses pause, and start paused for
+    reduced motion.
+  - Card groups share their row, so a group of three or five has no empty
+    column; Case and wrapping is apart from Clamping; Containers show
+    `1440px` instead of the formula behind it, and lengths read
+    `4px (0.25rem)`.
+  - Site icons are shown at their real size: the favicons at 32 × 32, the
+    touch icon at 180 × 180, and the sharing image at 1200 × 630 on a row of
+    its own, smaller only on a narrower screen.
+  - A new chapter, Components, shows the variants: buttons in each emphasis
+    and size, disabled, link, arrow, play and close; the eyebrow and tag;
+    checkbox, radio, toggle and chip; text, email and search inputs, one in
+    its error state, select, range and textarea; the three card variants;
+    icon sizes. `StyleGuide`'s `componentsHref` links to the rest.
+  - `StyleGuideGroup` has a `caption`, and its `scroll` variant is now
+    `cards`. `StyleGuideItem` takes `copy` and `note`; `StyleGuideToken`
+    takes `note` and a `step` variant. New parts: `StyleGuideChapter`,
+    `StyleGuideIndex`, `StyleGuideCopy`, `StyleGuideComponents`.
+    `StyleGuideTitle` is gone. On the docs site, `--style-guide-top` sets
+    where the chapter bar sticks.
 - Every component now follows Chrome's [Modern Web
   Guidance](https://developer.chrome.com/docs/modern-web-guidance), checked
   rule by rule against its guides:

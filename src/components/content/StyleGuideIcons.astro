@@ -44,29 +44,58 @@ const customIcons = Object.entries(
 {
   render && (
     <>
-      <StyleGuideGroup title="Phosphor — <Icon name>" variant="tiles">
+      <StyleGuideGroup
+        title="Phosphor"
+        caption="Icons from the Phosphor set, by name: <Icon name>. Any of its icons can be used."
+        variant="tiles"
+      >
         {phosphor.map((name) => (
-          <StyleGuideItem label={name} variant="card">
-            <Icon name={name} variant="large" />
+          <StyleGuideItem label={name} copy={name} variant="card">
+            <span class="style-guide-icons_cell">
+              <Icon name={name} variant="large" />
+            </span>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Phosphor weights" variant="tiles">
+      <StyleGuideGroup
+        title="Phosphor weights"
+        caption="Each icon comes in six weights, to sit with lighter or heavier type."
+        variant="tiles"
+      >
         {weights.map((weight) => (
           <StyleGuideItem label={`weight="${weight}"`} variant="card">
-            <Icon name="star" weight={weight} variant="large" />
+            <span class="style-guide-icons_cell">
+              <Icon name="star" weight={weight} variant="large" />
+            </span>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Custom — <Icon src>" variant="tiles">
+      <StyleGuideGroup
+        title="Custom"
+        caption="Icons drawn for the site, from assets/icons: <Icon src>."
+        variant="tiles"
+      >
         {customIcons.map((icon) => (
           <StyleGuideItem label={`assets/icons/${icon.name}`} variant="card">
-            <Icon src={icon.src} variant="large" />
+            <span class="style-guide-icons_cell">
+              <Icon src={icon.src} variant="large" />
+            </span>
           </StyleGuideItem>
         ))}
       </StyleGuideGroup>
     </>
   )
 }
+
+<style is:global>
+  @layer components {
+    .style-guide-icons_cell {
+      display: grid;
+      place-items: center;
+      align-self: stretch;
+      min-height: 5rem;
+    }
+  }
+</style>

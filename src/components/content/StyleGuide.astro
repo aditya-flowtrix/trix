@@ -1,10 +1,10 @@
 ---
 import Section from "@/components/wrapper/Section.astro";
 import Heading from "@/components/typography/Heading.astro";
-import Paragraph from "@/components/typography/Paragraph.astro";
-import Button from "@/components/Button.astro";
-import ButtonWrapper from "@/components/wrapper/ButtonWrapper.astro";
-import StyleGuideTitle from "@/components/content/StyleGuideTitle.astro";
+import Icon from "@/components/media/Icon.astro";
+import StyleGuideIndex from "@/components/content/StyleGuideIndex.astro";
+import StyleGuideChapter from "@/components/content/StyleGuideChapter.astro";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
 import StyleGuideBrand from "@/components/content/StyleGuideBrand.astro";
 import StyleGuideTypography from "@/components/content/StyleGuideTypography.astro";
 import StyleGuideColors from "@/components/content/StyleGuideColors.astro";
@@ -12,6 +12,9 @@ import StyleGuideSpacing from "@/components/content/StyleGuideSpacing.astro";
 import StyleGuideLayout from "@/components/content/StyleGuideLayout.astro";
 import StyleGuideMotion from "@/components/content/StyleGuideMotion.astro";
 import StyleGuideIcons from "@/components/content/StyleGuideIcons.astro";
+import StyleGuideComponents from "@/components/content/StyleGuideComponents.astro";
+import { fontName, hex, model } from "@/utils/style-guide.ts";
+import logo from "@/assets/logo/logo.svg";
 
 interface Props {
   /** Set to `false` to omit the component. */
@@ -22,52 +25,227 @@ interface Props {
 
 const { render = true, componentsHref = "/components" } = Astro.props;
 
-const sections = [
-  { id: "brand", name: "Brand", Body: StyleGuideBrand },
-  { id: "typography", name: "Typography", Body: StyleGuideTypography },
-  { id: "colors", name: "Colors", Body: StyleGuideColors },
-  { id: "spacing", name: "Spacing", Body: StyleGuideSpacing },
-  { id: "layout", name: "Layout", Body: StyleGuideLayout },
-  { id: "motion", name: "Motion", Body: StyleGuideMotion },
-  { id: "icons", name: "Icons", Body: StyleGuideIcons },
+const chapters = [
+  {
+    id: "brand",
+    name: "Brand",
+    intro:
+      "The logo, and the icons that stand for the site in browser tabs, on home screens and in shared links.",
+    Body: StyleGuideBrand,
+  },
+  {
+    id: "typography",
+    name: "Typography",
+    intro:
+      "The typeface and the text styles every heading, paragraph and label uses. Each style grows smoothly from phone to desktop.",
+    Body: StyleGuideTypography,
+  },
+  {
+    id: "colors",
+    name: "Colors",
+    intro:
+      "Every color on the site comes from these swatches. Themes pick from them for backgrounds, text and buttons, so a change here reaches every page.",
+    Body: StyleGuideColors,
+  },
+  {
+    id: "spacing",
+    name: "Spacing",
+    intro:
+      "The steps of space between and around things, and how round corners are. Keeping to these steps keeps every page in rhythm.",
+    Body: StyleGuideSpacing,
+  },
+  {
+    id: "layout",
+    name: "Layout",
+    intro:
+      "How pages adapt to the screen: the breakpoints, the 12-column grid, and the containers and shapes that hold content.",
+    Body: StyleGuideLayout,
+  },
+  {
+    id: "motion",
+    name: "Motion",
+    intro:
+      "How long things take to move, and how they ease. Visitors who ask their device for less motion see the end at once.",
+    Body: StyleGuideMotion,
+  },
+  {
+    id: "icons",
+    name: "Icons",
+    intro:
+      "The icon set in each of its weights, and the icons drawn for the site.",
+    Body: StyleGuideIcons,
+  },
+  {
+    id: "components",
+    name: "Components",
+    intro:
+      "The building blocks of every page — buttons, fields, cards — in each of their variants.",
+    Body: StyleGuideComponents,
+  },
+];
+
+// The brand color is what the default theme fills a button with.
+const brandToken =
+  model.themes[0]?.tokens
+    .get("button-background")
+    ?.match(/^var\(--([\w-]+)\)$/)?.[1] ?? "button-background";
+const ramp = model.palette.filter(
+  (t) => t.name.replace(/-\d+$/, "") === brandToken.replace(/-\d+$/, ""),
+);
+const families = [
+  ...new Set(model.families.map((role) => fontName(role)).filter(Boolean)),
 ];
 ---
 
 {
   render && (
-    <>
-      <Section paddingBottom="none">
-        <Heading tag="h1">Style Guide</Heading>
-        <slot />
-        <nav aria-label="Style guide sections">
-          <ButtonWrapper marginTop="0">
-            {[...sections, { id: "components", name: "Components" }].map(
-              ({ id, name }) => (
-                <Button element="link" variant="link" href={`#${id}`}>
-                  {name}
-                </Button>
-              ),
-            )}
-          </ButtonWrapper>
-        </nav>
+    <div class="style-guide_wrap">
+      <Section paddingBottom="small" gap="10">
+        <div class="style-guide_intro">
+          <Heading tag="h1">Style guide</Heading>
+          <slot />
+        </div>
+
+        <div
+          class="style-guide-board_wrap"
+          role="group"
+          aria-label="At a glance"
+        >
+          <div class="style-guide-board_tile style-guide-board_logo">
+            <Icon src={logo} variant="full-width" aria-label="Logo" />
+          </div>
+          <div class="style-guide-board_tile style-guide-board_type">
+            <span class="style-guide-board_label text-style-small">
+              Typeface
+            </span>
+            <span class="style-guide-board_glyphs" aria-hidden="true">
+              Aa
+            </span>
+            <span class="text-style-h5">{families.join(" and ")}</span>
+          </div>
+          <div class="style-guide-board_tile style-guide-board_color">
+            <span class="style-guide-board_label text-style-small">
+              Brand color
+            </span>
+            <span class="style-guide-board_hex text-style-h5">
+              {hex(brandToken)}
+            </span>
+            <span class="text-style-small">
+              <StyleGuideCopy
+                text={`var(--${brandToken})`}
+                label={`--${brandToken}`}
+              />
+            </span>
+          </div>
+          {ramp.length > 1 && (
+            <div class="style-guide-board_ramp" aria-hidden="true">
+              {ramp.map((t) => (
+                <span style={`background-color: var(--${t.name})`} />
+              ))}
+            </div>
+          )}
+        </div>
       </Section>
 
-      {sections.map(({ id, name, Body }, i) => (
-        <Section id={id} gap="8" paddingTop={i ? "none" : undefined}>
-          <StyleGuideTitle>{name}</StyleGuideTitle>
-          <Body />
-        </Section>
+      <StyleGuideIndex chapters={chapters} />
+
+      {chapters.map(({ id, name, intro, Body }, i) => (
+        <StyleGuideChapter
+          id={id}
+          number={String(i + 1).padStart(2, "0")}
+          title={name}
+          intro={intro}
+        >
+          {id === "components" ? (
+            <StyleGuideComponents componentsHref={componentsHref} />
+          ) : (
+            <Body />
+          )}
+        </StyleGuideChapter>
       ))}
-
-      <Section id="components" paddingTop="none">
-        <StyleGuideTitle>Components</StyleGuideTitle>
-        <Paragraph maxWidth={60}>
-          Every component and variant, with live examples.
-        </Paragraph>
-        <Button element="link" href={componentsHref}>
-          Open components
-        </Button>
-      </Section>
-    </>
+    </div>
   )
 }
+
+<style is:global>
+  @layer components {
+    .style-guide_intro {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+
+      > * {
+        margin: 0;
+      }
+    }
+
+    /* The cover: the brand at a glance — logo, typeface, color, palette. */
+    .style-guide-board_wrap {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--site-gutter);
+      width: 100%;
+
+      @media (width >= 48rem) {
+        grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+      }
+    }
+    .style-guide-board_tile {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      min-width: 0;
+      padding: var(--space-5);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+    }
+    .style-guide-board_label {
+      margin-bottom: auto;
+      color: var(--text-2);
+    }
+    .style-guide-board_logo {
+      grid-column: 1 / -1;
+      align-items: center;
+      justify-content: center;
+      min-height: 12rem;
+
+      @media (width >= 48rem) {
+        grid-column: auto;
+        min-height: 20rem;
+      }
+      > .icon {
+        width: min(100%, 18rem);
+      }
+    }
+    .style-guide-board_glyphs {
+      font-size: var(--display);
+      font-weight: var(--display-font-weight);
+      line-height: 1;
+      letter-spacing: var(--display-letter-spacing);
+    }
+    .style-guide-board_color {
+      background-color: var(--button-background);
+      color: var(--button-text);
+
+      .style-guide-board_label {
+        color: inherit;
+        opacity: 0.75;
+      }
+    }
+    .style-guide-board_hex {
+      text-transform: uppercase;
+      font-variant-numeric: tabular-nums;
+    }
+    .style-guide-board_ramp {
+      grid-column: 1 / -1;
+      display: flex;
+      height: 3rem;
+      overflow: hidden;
+      border-radius: var(--radius-main);
+
+      > span {
+        flex: 1;
+      }
+    }
+  }
+</style>

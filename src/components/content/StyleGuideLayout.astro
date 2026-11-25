@@ -3,11 +3,11 @@ import Grid from "@/components/wrapper/Grid.astro";
 import Row from "@/components/wrapper/Row.astro";
 import Col from "@/components/wrapper/Col.astro";
 import Paragraph from "@/components/typography/Paragraph.astro";
-import RichText from "@/components/typography/RichText.astro";
 import Button from "@/components/Button.astro";
 import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
 import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
 import StyleGuideToken from "@/components/content/StyleGuideToken.astro";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
 import { lengthLabel, model, px } from "@/utils/style-guide.ts";
 import { layoutGrid, toPx } from "@/utils/tokens.ts";
 
@@ -19,9 +19,9 @@ interface Props {
 const { render = true } = Astro.props;
 
 const breakpointNote: Record<string, string> = {
-  small: "Webflow mobile landscape",
-  medium: "Webflow tablet",
-  large: "Webflow desktop",
+  small: "Phones on their side",
+  medium: "Tablets",
+  large: "Laptops and desktops",
 };
 const phoneWidth = toPx(model.breakpoints[0]?.value ?? "30rem") ?? 480;
 const grids = [375, 768, 992, 1440, 1920].map((frame) => ({
@@ -88,33 +88,111 @@ const rowExamples: { label: string; cols: ColProps[] }[] = [
     ],
   },
 ];
-const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
+// Each ratio, what it suits, and its width and height for the stage.
+const ratios = [
+  { name: "16-9", use: "Video, and wide hero images." },
+  { name: "1-1", use: "Avatars, logos and product shots." },
+  { name: "3-2", use: "Photos as most cameras take them." },
+  { name: "2-3", use: "Portrait photos and posters." },
+  { name: "2-1", use: "Banners and wide panoramas." },
+  { name: "5-4", use: "Large photos that are nearly square." },
+  { name: "4-5", use: "Portrait posts for social media." },
+].map((r) => {
+  const [w, h] = r.name.split("-").map(Number);
+  return { ...r, w, h, size: `1200 × ${Math.round((1200 * h) / w)} px` };
+});
+
+const zones = [
+  {
+    name: "xsmall",
+    range: `Below ${px(toPx(model.breakpoints[0]?.value ?? "30rem"))}`,
+    note: "Phones held upright",
+    query: "The default; write it unqualified.",
+  },
+  ...model.breakpoints.map((b) => ({
+    name: b.name,
+    range: `${px(toPx(b.value))} and up`,
+    note: breakpointNote[b.name] ?? "",
+    query: `@media (width >= ${b.value})`,
+  })),
+];
 ---
 
 {
   render && (
     <>
-      <StyleGuideGroup title="Breakpoints" variant="rows">
-        <StyleGuideItem label="xsmall">
-          <Paragraph variant="small">
-            Below {model.breakpoints[0]?.value} — Webflow mobile portrait. The
-            default; write it unqualified.
-          </Paragraph>
-        </StyleGuideItem>
-        {model.breakpoints.map((b) => (
-          <StyleGuideItem label={b.name}>
-            <Paragraph variant="small">
-              <code>@media (width &gt;= {b.value})</code> — {px(toPx(b.value))}{" "}
-              and up · {breakpointNote[b.name] ?? ""}
-            </Paragraph>
-          </StyleGuideItem>
-        ))}
+      <StyleGuideGroup
+        title="Breakpoints"
+        caption="The screen widths where a layout changes: columns stack on a phone and spread out on a desktop. Sizes don't jump at them; they grow smoothly."
+      >
+        <p class="style-guide-breakpoints_now" hidden />
+        <ol class="style-guide-breakpoints_wrap">
+          {zones.map((zone, i) => (
+            <li
+              class="style-guide-breakpoints_zone"
+              style={`--_step: ${(i + 1) / zones.length}`}
+              data-zone={zone.name}
+              data-query={i ? zone.query.replace(/^@media /, "") : undefined}
+            >
+              <span class="style-guide-breakpoints_here" aria-hidden="true">
+                Your screen
+              </span>
+              <span class="style-guide-breakpoints_name text-style-h6">
+                {zone.name}
+              </span>
+              <span class="style-guide-breakpoints_range text-style-small">
+                {zone.range}
+              </span>
+              <span class="text-style-small">{zone.note}</span>
+              <code class="text-style-xsmall">{zone.query}</code>
+            </li>
+          ))}
+        </ol>
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Layout grid" variant="rows">
-        <StyleGuideItem
-          label={`--grid-columns: ${grids[0].grid.columns} · gutter --site-gutter · margin --site-margin · max width --max-width-main`}
-        >
+      <StyleGuideGroup
+        title="Layout grid"
+        caption="Twelve columns with a gutter between them and a margin at each edge. Designs in Figma use the same grid, frame by frame."
+      >
+        <div class="style-guide-grid_card">
+          <dl class="style-guide-grid_facts">
+            <div>
+              <dt>Columns</dt>
+              <dd>
+                <StyleGuideCopy
+                  text="var(--grid-columns)"
+                  label={`--grid-columns: ${grids[0].grid.columns}`}
+                />
+              </dd>
+            </div>
+            <div>
+              <dt>Gutter</dt>
+              <dd>
+                <StyleGuideCopy
+                  text="var(--site-gutter)"
+                  label="--site-gutter"
+                />
+              </dd>
+            </div>
+            <div>
+              <dt>Margin</dt>
+              <dd>
+                <StyleGuideCopy
+                  text="var(--site-margin)"
+                  label="--site-margin"
+                />
+              </dd>
+            </div>
+            <div>
+              <dt>Max width</dt>
+              <dd>
+                <StyleGuideCopy
+                  text="var(--max-width-main)"
+                  label="--max-width-main"
+                />
+              </dd>
+            </div>
+          </dl>
           <div class="flex-horizontal-wrap gap-3">
             <Button data-grid-overlay-toggle aria-pressed="false">
               Show grid overlay
@@ -124,7 +202,7 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
               developing.
             </Paragraph>
           </div>
-        </StyleGuideItem>
+        </div>
         <StyleGuideItem label="The columns at this screen width">
           <Row>
             {Array.from({ length: grids[0].grid.columns }, (_, i) => (
@@ -137,23 +215,28 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
             ))}
           </Row>
         </StyleGuideItem>
-        <StyleGuideItem label="Figma layout grid, per frame">
-          <RichText variant="small">
+        <StyleGuideItem label="Figma layout grid, per frame" class="width-full">
+          <div
+            class="style-guide-grid_table"
+            tabindex="0"
+            role="region"
+            aria-label="Figma layout grid, per frame"
+          >
             <table>
               <thead>
                 <tr>
-                  <th>Frame</th>
-                  <th>Design on</th>
-                  <th>Margin</th>
-                  <th>Gutter</th>
-                  <th>Column (of 12)</th>
-                  <th>Content width</th>
+                  <th scope="col">Frame</th>
+                  <th scope="col">Design on</th>
+                  <th scope="col">Margin</th>
+                  <th scope="col">Gutter</th>
+                  <th scope="col">Column (of 12)</th>
+                  <th scope="col">Content width</th>
                 </tr>
               </thead>
               <tbody>
                 {grids.map(({ frame, phone, grid }) => (
                   <tr>
-                    <td>{frame}</td>
+                    <th scope="row">{frame}</th>
                     <td>
                       {phone
                         ? `4 columns (one = span 3)`
@@ -167,31 +250,39 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
                 ))}
               </tbody>
             </table>
-          </RichText>
+          </div>
         </StyleGuideItem>
       </StyleGuideGroup>
 
       <StyleGuideGroup
-        title="Row and Col — layouts on the 12 columns"
+        title="Row and Col"
+        caption="Layouts on the 12 columns: blocks that span a number of them. Each stacks on a phone unless told otherwise."
         variant="rows"
       >
-        {rowExamples.map((example) => (
-          <StyleGuideItem label={example.label}>
-            <Row>
-              {example.cols.map(({ text, ...props }) => (
-                <Col
-                  {...props}
-                  class="background-skeleton radius-small padding-3 text-style-small"
-                >
-                  {text}
-                </Col>
-              ))}
-            </Row>
-          </StyleGuideItem>
-        ))}
+        {rowExamples.map((example) => {
+          const [code, note] = example.label.split(" — ");
+          return (
+            <StyleGuideItem label={code} note={note}>
+              <Row>
+                {example.cols.map(({ text, ...props }) => (
+                  <Col
+                    {...props}
+                    class="background-skeleton radius-small padding-3 text-style-small"
+                  >
+                    {text}
+                  </Col>
+                ))}
+              </Row>
+            </StyleGuideItem>
+          );
+        })}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Grid — equal columns">
+      <StyleGuideGroup
+        title="Grid"
+        caption="Equal columns, for repeated items of the same size: cards, logos, team members."
+        variant="rows"
+      >
         <StyleGuideItem label="Grid xsmall={1} small={2} medium={3} large={4}">
           <Grid xsmall={1} small={2} medium={3} large={4} class="width-full">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((cell) => (
@@ -212,7 +303,11 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
         </StyleGuideItem>
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Containers" variant="rows">
+      <StyleGuideGroup
+        title="Containers"
+        caption="How wide content can get: the page, and narrower text."
+        variant="rows"
+      >
         {["max-width-main", "max-width-small"].map((token) => (
           <StyleGuideToken
             token={token}
@@ -222,21 +317,455 @@ const ratios = ["1-1", "16-9", "3-2", "2-3", "2-1", "5-4", "4-5"];
         ))}
       </StyleGuideGroup>
 
-      <StyleGuideGroup title="Aspect ratio" variant="tiles">
-        {ratios.map((ratio) => (
-          <StyleGuideItem label={`ratio-${ratio}`} variant="card">
-            <div
-              class={`ratio-${ratio} width-full radius-small background-skeleton`}
+      <StyleGuideGroup
+        title="Aspect ratio"
+        caption="Shapes for images and video, so they hold their space before they load. Pick one, or watch them take turns; the dashed outlines are the others, for scale."
+      >
+        <div
+          class="style-guide-ratio_wrap"
+          style={`--w: ${ratios[0].w}; --h: ${ratios[0].h}`}
+        >
+          <div class="style-guide-ratio_bar">
+            <fieldset class="style-guide-ratio_picker">
+              <legend class="sr-only">Aspect ratio</legend>
+              {ratios.map((r, i) => (
+                <label>
+                  <input
+                    class="sr-only"
+                    type="radio"
+                    name="style-guide-ratio"
+                    value={r.name}
+                    checked={i === 0}
+                    data-w={r.w}
+                    data-h={r.h}
+                  />
+                  {r.w}:{r.h}
+                </label>
+              ))}
+            </fieldset>
+            <Button
+              variant="play"
+              emphasis="secondary"
+              size="small"
+              label="Stop the shapes taking turns"
+              pressed
+              class="style-guide-ratio_toggle"
             />
-          </StyleGuideItem>
-        ))}
+          </div>
+          <div class="style-guide-ratio_stage" aria-hidden="true">
+            {ratios.map((r) => (
+              <span
+                class="style-guide-ratio_outline"
+                style={`--w: ${r.w}; --h: ${r.h}`}
+              />
+            ))}
+            <div class="style-guide-ratio_frame">
+              <div class="style-guide-ratio_scene">
+                <span class="style-guide-ratio_sun" />
+                <span class="style-guide-ratio_hill back" />
+                <span class="style-guide-ratio_hill" />
+              </div>
+            </div>
+          </div>
+          {ratios.map((r, i) => (
+            <div
+              class="style-guide-ratio_info"
+              data-ratio={r.name}
+              hidden={i > 0}
+            >
+              <StyleGuideCopy text={`ratio-${r.name}`} />
+              <span>{r.use}</span>
+              <span class="style-guide-ratio_size">{r.size}</span>
+            </div>
+          ))}
+        </div>
       </StyleGuideGroup>
     </>
   )
 }
 
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // "Your screen is 1440px wide": the width, and the layout it gets.
+  mount(".style-guide-breakpoints_now", (now, signal) => {
+    const zones = [
+      ...(now.nextElementSibling?.querySelectorAll<HTMLElement>(
+        "[data-zone]",
+      ) ?? []),
+    ];
+    const show = () => {
+      const zone = zones.findLast(
+        (z) => !z.dataset.query || matchMedia(z.dataset.query).matches,
+      );
+      now.textContent = `Your screen is ${innerWidth}px wide, so it gets the ${zone?.dataset.zone} layout. Resize the window to watch it change.`;
+      now.hidden = false;
+    };
+    show();
+    addEventListener("resize", show, { signal });
+  });
+
+  // The shapes take turns while the stage is in view, until a visitor picks
+  // one or stops them; they start stopped for visitors who asked for less
+  // motion. Programmatic `checked` fires no change, so a change is a pick.
+  mount(".style-guide-ratio_wrap", (wrap, signal) => {
+    const inputs = [
+      ...wrap.querySelectorAll<HTMLInputElement>("input[type=radio]"),
+    ];
+    const infos = wrap.querySelectorAll<HTMLElement>("[data-ratio]");
+    const picker = wrap.querySelector("fieldset");
+    const stage = wrap.querySelector(".style-guide-ratio_stage");
+    const toggle = wrap.querySelector<HTMLElement>(".style-guide-ratio_toggle");
+    if (!inputs.length || !picker || !stage || !toggle) return;
+
+    const show = (input: HTMLInputElement) => {
+      wrap.style.setProperty("--w", input.dataset.w!);
+      wrap.style.setProperty("--h", input.dataset.h!);
+      for (const info of infos)
+        info.hidden = info.dataset.ratio !== input.value;
+    };
+    const step = () => {
+      const next =
+        inputs[(inputs.findIndex((i) => i.checked) + 1) % inputs.length];
+      next.checked = true;
+      show(next);
+    };
+    let timer = 0;
+    let stopped = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const holds = { offscreen: true, focus: false };
+    const run = () => {
+      clearInterval(timer);
+      toggle.toggleAttribute("data-playing", !stopped);
+      toggle.setAttribute(
+        "aria-label",
+        stopped ? "Let the shapes take turns" : "Stop the shapes taking turns",
+      );
+      if (!stopped && !holds.offscreen && !holds.focus)
+        timer = window.setInterval(step, 2500);
+    };
+    signal.addEventListener("abort", () => clearInterval(timer));
+
+    picker.addEventListener(
+      "change",
+      (event) => {
+        show(event.target as HTMLInputElement);
+        stopped = true;
+        run();
+      },
+      { signal },
+    );
+    picker.addEventListener("focusin", () => ((holds.focus = true), run()), {
+      signal,
+    });
+    picker.addEventListener("focusout", () => ((holds.focus = false), run()), {
+      signal,
+    });
+    toggle.addEventListener(
+      "click",
+      () => {
+        stopped = !stopped;
+        if (!stopped) step();
+        run();
+      },
+      { signal },
+    );
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        holds.offscreen = !entry.isIntersecting;
+        run();
+      },
+      { threshold: 0.5 },
+    );
+    seen.observe(stage);
+    signal.addEventListener("abort", () => seen.disconnect());
+  });
+</script>
+
 <style is:global>
   @layer components {
+    .style-guide-breakpoints_wrap {
+      display: grid;
+      gap: var(--space-1);
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      @media (width >= 48rem) {
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+        gap: var(--border-width);
+      }
+    }
+    .style-guide-breakpoints_now {
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    /* The zone this screen is in is tinted and badged, by the same media
+       queries the site uses. ponytail: one zone per breakpoint token, named
+       as the tokens are; a new breakpoint needs its pair of rules here. */
+    .style-guide-breakpoints_zone {
+      --_on: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      padding: var(--space-4);
+      border-top: var(--space-2) solid
+        color-mix(
+          in lab,
+          var(--button-background) calc(var(--_step) * 100%),
+          var(--background-3)
+        );
+      background-color: color-mix(
+        in lab,
+        var(--button-background) calc(var(--_on) * 18%),
+        var(--background-2)
+      );
+
+      &[data-zone="xsmall"] {
+        --_on: 1;
+      }
+      @media (width >= 30rem) {
+        &[data-zone="xsmall"] {
+          --_on: 0;
+        }
+        &[data-zone="small"] {
+          --_on: 1;
+        }
+      }
+      @media (width >= 48rem) {
+        &[data-zone="small"] {
+          --_on: 0;
+        }
+        &[data-zone="medium"] {
+          --_on: 1;
+        }
+      }
+      @media (width >= 62rem) {
+        &[data-zone="medium"] {
+          --_on: 0;
+        }
+        &[data-zone="large"] {
+          --_on: 1;
+        }
+      }
+      code {
+        margin-top: var(--space-2);
+        color: var(--text-2);
+      }
+    }
+    .style-guide-breakpoints_here {
+      position: absolute;
+      inset-block-start: var(--space-3);
+      inset-inline-end: var(--space-3);
+      padding: 0.125rem 0.5rem;
+      border-radius: var(--radius-round);
+      background-color: var(--button-background);
+      color: var(--button-text);
+      font-size: var(--text-xsmall);
+      line-height: var(--text-xsmall-line-height);
+      opacity: var(--_on);
+    }
+    /* Aspect ratio: one frame takes each shape in turn, in front of the
+       dashed outlines of all of them, which share its bottom edge. */
+    .style-guide-ratio_wrap {
+      display: grid;
+      gap: var(--space-5);
+      width: 100%;
+      padding: var(--space-5);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+    }
+    .style-guide-ratio_bar {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+    .style-guide-ratio_picker {
+      display: flex;
+      flex-wrap: wrap;
+      min-width: 0;
+      gap: var(--space-1);
+      margin: 0;
+      padding: var(--space-1);
+      border: 0;
+      border-radius: var(--radius-small);
+      background-color: var(--background-3);
+      font-size: var(--text-small);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+
+      label {
+        position: relative;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-xsmall);
+        cursor: pointer;
+        transition: background-color var(--hover-duration) var(--hover-ease);
+
+        &:hover {
+          background-color: color-mix(
+            in lab,
+            var(--background) 50%,
+            transparent
+          );
+        }
+        &:has(:checked) {
+          background-color: var(--background);
+          font-weight: var(--primary-medium);
+        }
+        &:has(:focus-visible) {
+          outline: var(--focus-width) solid var(--text);
+          outline-offset: var(--focus-offset);
+        }
+      }
+    }
+    .style-guide-ratio_stage {
+      container-type: size;
+      display: grid;
+      place-items: end center;
+      block-size: 16rem;
+
+      @media (width >= 48rem) {
+        block-size: 24rem;
+      }
+      > * {
+        grid-area: 1 / 1;
+      }
+    }
+    /* As large as the stage allows at its own width to height. */
+    .style-guide-ratio_outline,
+    .style-guide-ratio_frame {
+      width: min(100cqw, 100cqh * var(--w) / var(--h));
+      height: min(100cqh, 100cqw * var(--h) / var(--w));
+      border-radius: var(--radius-small);
+    }
+    .style-guide-ratio_outline {
+      border: var(--border-width) dashed var(--border);
+    }
+    .style-guide-ratio_frame {
+      display: grid;
+      grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+      overflow: hidden;
+      container-type: size;
+
+      @media (prefers-reduced-motion: no-preference) {
+        transition:
+          width var(--reveal-duration) var(--reveal-ease),
+          height var(--reveal-duration) var(--reveal-ease);
+      }
+    }
+    /* A 3:2 picture, cropped to the frame as object-fit: cover crops one:
+       the sun leaves a tall frame first. */
+    .style-guide-ratio_scene {
+      position: relative;
+      place-self: center;
+      width: max(100cqw, 100cqh * 1.5);
+      aspect-ratio: 3 / 2;
+      background-image: linear-gradient(var(--brand-100), var(--brand-50));
+    }
+    .style-guide-ratio_sun {
+      position: absolute;
+      inset-block-start: 20%;
+      inset-inline-start: 64%;
+      width: 13%;
+      aspect-ratio: 1;
+      border-radius: var(--radius-round);
+      background-color: var(--brand-400);
+    }
+    .style-guide-ratio_hill {
+      position: absolute;
+      inset-inline: 30% -25%;
+      inset-block-end: -40%;
+      height: 75%;
+      border-radius: 50%;
+      background-color: var(--brand-700);
+
+      &.back {
+        inset-inline: -20% 35%;
+        inset-block-end: -30%;
+        height: 70%;
+        background-color: var(--brand-300);
+      }
+    }
+    .style-guide-ratio_info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-1) var(--space-4);
+      font-size: var(--text-small);
+      line-height: var(--text-small-line-height);
+
+      &[hidden] {
+        display: none;
+      }
+      .style-guide-copy_wrap {
+        font-weight: var(--primary-medium);
+      }
+    }
+    .style-guide-ratio_size {
+      color: var(--text-2);
+      font-variant-numeric: tabular-nums;
+
+      @media (width >= 48rem) {
+        margin-inline-start: auto;
+      }
+    }
+    .style-guide-breakpoints_range {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .style-guide-grid_card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      width: 100%;
+      padding: var(--space-5);
+      border-radius: var(--radius-main);
+      background-color: var(--background-2);
+    }
+    .style-guide-grid_facts {
+      font-size: var(--text-small);
+      line-height: var(--text-small-line-height);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+      gap: var(--space-3) var(--site-gutter);
+      margin: 0;
+
+      dt {
+        color: var(--text-2);
+      }
+      dd {
+        margin: 0;
+        font-weight: var(--primary-medium);
+      }
+    }
+    .style-guide-grid_table {
+      width: 100%;
+      font-size: var(--text-small);
+      overflow-x: auto;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      th,
+      td {
+        padding: var(--space-2) var(--space-3);
+        border-bottom: var(--border-width) solid var(--border);
+        text-align: start;
+        white-space: nowrap;
+      }
+      thead th {
+        color: var(--text-2);
+        font-weight: var(--primary-regular);
+      }
+      tbody th {
+        font-weight: var(--primary-medium);
+      }
+    }
+
     .style-guide-layout_number {
       display: none;
       @media (width >= 30rem) {

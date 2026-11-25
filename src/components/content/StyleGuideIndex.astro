@@ -1,0 +1,199 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"nav"> {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+  /** The chapters, in order: each `id` is the section it links to. */
+  chapters: { id: string; name: string }[];
+}
+
+const { render = true, chapters, class: className, ...rest } = Astro.props;
+---
+
+{
+  render && chapters.length > 0 && (
+    <nav
+      class:list={["style-guide-index_wrap", className]}
+      aria-label="Style guide chapters"
+      {...rest}
+    >
+      <ol class="style-guide-index_list">
+        {chapters.map(({ id, name }, i) => (
+          <li>
+            <a class="style-guide-index_link" href={`#${id}`}>
+              <span class="style-guide-index_number">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {name}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+<script>
+  import { mount } from "@/utils/mount.ts";
+
+  // The chapter in view is marked by the browser (`scroll-target-group`)
+  // where it can, and by an observer elsewhere; either way `aria-current`
+  // says it to a screen reader.
+  mount(".style-guide-index_list", (list, signal) => {
+    const links = [...list.querySelectorAll("a")];
+    const mark = (current?: Element | null) => {
+      // An empty `aria-current` means false, so it needs a value.
+      for (const link of links)
+        if (link === current) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      // Keep the current chapter in view in a bar that scrolls sideways,
+      // without scrolling the page (`scrollIntoView` would).
+      const li = current?.parentElement;
+      if (li && list.scrollWidth > list.clientWidth)
+        list.scrollTo({
+          left: li.offsetLeft - (list.clientWidth - li.offsetWidth) / 2,
+        });
+    };
+
+    if (CSS.supports("scroll-target-group: auto")) {
+      // `:target-current` settles a frame after the scroll ends.
+      const sync = () =>
+        requestAnimationFrame(() =>
+          mark(list.querySelector("a:target-current")),
+        );
+      sync();
+      document.addEventListener("scrollend", sync, { signal });
+      return;
+    }
+
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const { target, isIntersecting } of entries)
+          isIntersecting ? visible.add(target) : visible.delete(target);
+        const first = links.find((link) =>
+          visible.has(document.getElementById(link.hash.slice(1))!),
+        );
+        if (first) mark(first);
+      },
+      { rootMargin: "-40% 0px -55% 0px" },
+    );
+    for (const link of links) {
+      const target = document.getElementById(link.hash.slice(1));
+      if (target) observer.observe(target);
+    }
+    signal.addEventListener("abort", () => observer.disconnect());
+  });
+</script>
+
+<style is:global>
+  @property --style-guide-fade-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+  }
+  @property --style-guide-fade-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+  }
+
+  @layer components {
+    .style-guide-index_wrap {
+      position: sticky;
+      top: var(--style-guide-top, var(--nav-height));
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      padding-inline: var(--site-margin);
+      border-bottom: var(--border-width) solid var(--border);
+      background-color: var(--background);
+      color: var(--text);
+    }
+    .style-guide-index_list {
+      --fade-size: 2rem;
+      display: flex;
+      gap: var(--space-1);
+      width: var(--site-width);
+      max-width: var(--max-width-main);
+      margin: 0;
+      padding: var(--space-2) 0;
+      list-style: none;
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-target-group: auto;
+      scroll-padding-inline: var(--fade-size);
+      mask:
+        linear-gradient(black, black) no-clip subtract,
+        linear-gradient(to right, black, transparent) 0 0 /
+          var(--style-guide-fade-start) 100% no-repeat no-clip,
+        linear-gradient(to right, transparent, black) 100% 0 /
+          var(--style-guide-fade-end) 100% no-repeat no-clip;
+      animation:
+        style-guide-fade-start linear both,
+        style-guide-fade-end linear both;
+      animation-timeline: scroll(self inline);
+      animation-range:
+        0 var(--fade-size),
+        calc(100% - var(--fade-size)) 100%;
+
+      > li {
+        flex: none;
+      }
+    }
+    .style-guide-index_link {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-small);
+      color: var(--text-2);
+      font-size: var(--text-small);
+      text-decoration: none;
+      white-space: nowrap;
+      transition:
+        color var(--hover-duration) var(--hover-ease),
+        background-color var(--hover-duration) var(--hover-ease);
+
+      &:hover {
+        color: var(--text);
+      }
+      /* The browser marks the chapter in view where it can; elsewhere the
+         script's aria-current does. Styling both would mark two while
+         aria-current waits for the scroll to end. */
+      &:target-current {
+        background-color: var(--background-2);
+        color: var(--text);
+        font-weight: var(--primary-medium);
+        box-shadow: inset 0 calc(var(--border-width) * -2) 0
+          var(--button-background);
+      }
+      @supports not selector(:target-current) {
+        &[aria-current] {
+          background-color: var(--background-2);
+          color: var(--text);
+          font-weight: var(--primary-medium);
+          box-shadow: inset 0 calc(var(--border-width) * -2) 0
+            var(--button-background);
+        }
+      }
+    }
+    .style-guide-index_number {
+      color: var(--text-2);
+      font-size: var(--text-xsmall);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  @keyframes style-guide-fade-start {
+    to {
+      --style-guide-fade-start: 2rem;
+    }
+  }
+  @keyframes style-guide-fade-end {
+    from {
+      --style-guide-fade-end: 2rem;
+    }
+  }
+</style>

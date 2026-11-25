@@ -1,6 +1,9 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import Button from "@/components/Button.astro";
+import StyleGuideCopy from "@/components/content/StyleGuideCopy.astro";
+import { model } from "@/utils/style-guide.ts";
+import { resolveColor, toHex } from "@/utils/tokens.ts";
 import type { Theme } from "@/styles/generated/tokens.ts";
 
 interface Props extends HTMLAttributes<"div"> {
@@ -11,6 +14,38 @@ interface Props extends HTMLAttributes<"div"> {
 }
 
 const { render = true, theme, class: className, ...rest } = Astro.props;
+
+// The roles a section's content reads, and the palette color each one takes
+// in this theme.
+const roles = [
+  "background",
+  "background-2",
+  "background-3",
+  "text",
+  "text-2",
+  "border",
+  "heading-accent",
+  "button-background",
+  "button-text",
+];
+const tokens = model.themes.find((t) => t.name === theme)?.tokens;
+
+const color = (c: string) => {
+  const ref = c.match(/^var\((--[\w-]+)\)$/);
+  return ref ? ref[1] : c === "currentcolor" ? "--text" : c;
+};
+// A palette color by name; `--text at 70%` for a see-through mix; the hex of
+// any other mix.
+const source = (role: string) => {
+  const value = tokens?.get(role) ?? "";
+  const mix = value.match(
+    /^color-mix\(in \w+,\s*(.+?)\s+([\d.]+)%,\s*transparent\)$/,
+  );
+  if (mix) return `${color(mix[1])} at ${mix[2]}%`;
+  if (!value.startsWith("color-mix")) return color(value);
+  const rgba = resolveColor(value, [tokens!, model.byName]);
+  return rgba ? toHex(rgba) : value;
+};
 ---
 
 {
@@ -19,23 +54,38 @@ const { render = true, theme, class: className, ...rest } = Astro.props;
       class:list={["style-guide-theme_wrap", `theme-${theme}`, className]}
       {...rest}
     >
-      <code class="style-guide-theme_name text-style-small">theme-{theme}</code>
-      <p class="text-style-h4">Aa</p>
-      <p class="text-style-main">Text on the theme background.</p>
-      <p class="text-style-small style-guide-theme_muted">
-        Secondary text — --text-2
-      </p>
-      <a href="#colors">Text link</a>
-      <div class="style-guide-theme_buttons">
-        <Button>Button</Button>
-        <Button emphasis="secondary">Secondary</Button>
-      </div>
-      <div class="style-guide-theme_surface text-style-small">
-        --background-2
-        <div class="style-guide-theme_surface text-style-small">
-          --background-3
+      <div class="style-guide-theme_sample">
+        <span class="style-guide-theme_name">
+          <StyleGuideCopy text={`theme-${theme}`} />
+        </span>
+        <p class="text-style-h4">Heading</p>
+        <p class="text-style-main">Body text on the theme's background.</p>
+        <p class="text-style-small style-guide-theme_muted">
+          Secondary text, for captions and details.
+        </p>
+        <a href="#colors">Text link</a>
+        <div class="style-guide-theme_buttons">
+          <Button size="small">Primary</Button>
+          <Button size="small" emphasis="secondary">
+            Secondary
+          </Button>
         </div>
       </div>
+      <dl class="style-guide-theme_roles">
+        {roles.map((role) => (
+          <div>
+            <dt>
+              <span
+                class="style-guide-theme_swatch"
+                style={`background-color: var(--${role})`}
+                aria-hidden="true"
+              />
+              <StyleGuideCopy text={`var(--${role})`} label={`--${role}`} />
+            </dt>
+            <dd>{source(role)}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }
@@ -45,12 +95,26 @@ const { render = true, theme, class: className, ...rest } = Astro.props;
     .style-guide-theme_wrap {
       display: flex;
       flex-direction: column;
-      align-items: start;
-      gap: var(--space-3);
-      padding: var(--space-4);
+      height: 100%;
+      overflow: hidden;
       border: var(--border-width) solid var(--border);
       border-radius: var(--radius-main);
 
+      .style-guide-theme_sample {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        gap: var(--space-3);
+        padding: var(--space-5);
+
+        > p {
+          margin: 0;
+        }
+      }
+      .style-guide-theme_name {
+        font-size: var(--text-small);
+        font-weight: var(--primary-medium);
+      }
       .style-guide-theme_muted {
         color: var(--text-2);
       }
@@ -58,19 +122,45 @@ const { render = true, theme, class: className, ...rest } = Astro.props;
         display: flex;
         flex-wrap: wrap;
         gap: var(--space-2);
+        margin-top: var(--space-2);
       }
-      .style-guide-theme_surface {
+
+      /* Each role on a line: its color, its name, and where it comes from. */
+      .style-guide-theme_roles {
         display: flex;
         flex-direction: column;
         gap: var(--space-2);
-        align-self: stretch;
-        padding: var(--space-2) var(--space-3);
-        border: var(--border-width) solid var(--border);
-        border-radius: var(--radius-small);
+        flex-grow: 1;
+        margin: 0;
+        padding: var(--space-4) var(--space-5) var(--space-5);
+        border-top: var(--border-width) solid var(--border);
         background-color: var(--background-2);
-        & .style-guide-theme_surface {
-          background-color: var(--background-3);
+        font-size: var(--text-small);
+        line-height: var(--text-small-line-height);
+
+        > div {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr);
+          align-items: center;
+          gap: var(--space-3);
         }
+        dt {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+        }
+        dd {
+          margin: 0;
+          color: var(--text-2);
+          text-align: end;
+        }
+      }
+      .style-guide-theme_swatch {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-xsmall);
       }
     }
   }
