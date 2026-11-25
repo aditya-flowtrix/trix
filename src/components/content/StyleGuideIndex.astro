@@ -179,8 +179,9 @@ const { render = true, chapters, class: className, ...rest } = Astro.props;
         }
       }
     }
+    /* The link is already faded: --text-2 here would fade it twice, below
+       AA in the light theme. */
     .style-guide-index_number {
-      color: var(--text-2);
       font-size: var(--text-xsmall);
       font-variant-numeric: tabular-nums;
     }

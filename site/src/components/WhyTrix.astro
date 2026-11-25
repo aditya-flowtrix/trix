@@ -132,14 +132,14 @@ const others = "Most Astro frameworks";
       td {
         color: var(--text-2);
       }
-      /* The Trix column: tinted, full strength, its own heading in the accent. */
+      /* The Trix column: tinted and at full strength. The accent is for large
+         text; on this small heading it falls below AA in the light theme. */
       :is(th, td):last-child {
         background-color: var(--_trix);
         color: var(--text);
       }
       thead th:last-child {
         border-radius: var(--radius-main) var(--radius-main) 0 0;
-        color: var(--heading-accent);
         font-weight: var(--primary-semibold);
       }
       tbody tr:last-child td:last-child {

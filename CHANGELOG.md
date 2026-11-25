@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Card:** a cover card with an image takes the dark theme unless `theme`
+  says otherwise. Its overlay darkens the image, so in a light page its text
+  was dark on dark.
+- **Compare** fills the width of its container, as an image does, instead of
+  shrinking to its content at the left.
+- `/components`: the full-height hero over an image is dark, so its text
+  reads in light mode too.
+- Style guide: the index's section numbers no longer fade twice, which put
+  them below AA in light mode.
 - The `/components` page's content is `ComponentGallery`
   (`src/components/content/`), as the style guide's is `StyleGuide`: the page
   itself is the layout and one tag, and renders exactly as before. A site
@@ -19,7 +28,8 @@
 - Docs homepage: the feature cards show what Trix does now (migration from
   five platforms into collections or a headless CMS, no libraries, launch
   features) and none is a link, and a "Why Trix" table shows where Trix leads
-  the other Astro frameworks, with its agent skills listed under it.
+  the other Astro frameworks, with its agent skills listed under it. Its
+  "Trix" column heading is in the text color, which passes AA in both modes.
 
 ## 0.9.0 — 2026-11-25
 
