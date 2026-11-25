@@ -2,13 +2,23 @@
 
 ## Unreleased
 
-- **Card:** a cover card with an image takes the dark theme unless `theme`
-  says otherwise. Its overlay darkens the image, so in a light page its text
-  was dark on dark.
+- The placeholder graphic (`src/assets/shared/graphics/background.svg`)
+  follows the color mode as an `<img>` too, not only inlined: light in a
+  light section or card, dark in a dark one. Chrome and Firefox
+  draw an image in the color scheme of the element it sits in; Safari
+  doesn't pass it into images yet, so there it can show the light one in
+  dark mode.
+- The demo video (`public/video/demo.webm`) loses the grey band baked into
+  the bottom of every frame.
+- **Overlay** tints toward the theme's background instead of always toward
+  black, so the theme's text reads on top: it still darkens in a dark
+  section or card, and lightens in a light one. Before, text over an image
+  in a light section or cover card was dark on dark. A section or card that
+  should stay dark in light mode takes `theme="dark"`, as before.
 - **Compare** fills the width of its container, as an image does, instead of
   shrinking to its content at the left.
-- `/components`: the full-height hero over an image is dark, so its text
-  reads in light mode too.
+- `/components`: the hero, the card wrapper and the cover cards follow light
+  and dark mode, as the homepage does.
 - Style guide: the index's section numbers no longer fade twice, which put
   them below AA in light mode.
 - The `/components` page's content is `ComponentGallery`

@@ -1,15 +1,19 @@
 <svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Inlined, it takes the page's palette and color mode: black with the
-       glow in dark mode, a pale brand tint with the glow fading to it in
-       light mode. As an <img> the tokens aren't there, and every fallback
-       draws it dark, as before. -->
+  <!-- Black with the glow in dark mode, a pale brand tint with the glow
+       fading to it in light mode. Inlined, it takes the page's tokens and
+       color mode. As an <img> the tokens aren't there: it draws from the
+       fallbacks, in the color scheme of the element it sits in (a dark
+       section or card gets the dark one). -->
+  <style>
+    svg:root { color-scheme: light dark; }
+  </style>
   <defs>
     <!-- The brand green rising from below. -->
     <radialGradient id="glow" cx="0.5" cy="1" r="0.75" gradientTransform="translate(0.5 1) scale(1 0.62) translate(-0.5 -1)">
       <stop offset="0" style="stop-color: var(--brand-300, #0fd375)"/>
       <stop offset="0.32" style="stop-color: var(--brand-300, #0fd375)" stop-opacity="0.8"/>
-      <stop offset="0.7" style="stop-color: light-dark(color-mix(in lab, var(--brand-300, #00542a) 30%, var(--background, #00542a)), var(--brand-800, #00542a))" stop-opacity="0.25"/>
-      <stop offset="1" style="stop-color: light-dark(var(--background, #00542a), var(--brand-800, #00542a))" stop-opacity="0"/>
+      <stop offset="0.7" style="stop-color: light-dark(color-mix(in lab, var(--brand-300, #0fd375) 30%, var(--background, #fff)), var(--brand-800, #00542a))" stop-opacity="0.25"/>
+      <stop offset="1" style="stop-color: light-dark(var(--background, #fff), var(--brand-800, #00542a))" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="side" cx="0.88" cy="0.78" r="0.42">
       <stop offset="0" style="stop-color: var(--brand-400, #04bd67)" stop-opacity="0.45"/>
@@ -21,7 +25,7 @@
       <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0 0 0 -0.32"/>
     </filter>
   </defs>
-  <rect width="1920" height="1080" style="fill: light-dark(color-mix(in lab, var(--brand-300, #000) 8%, var(--background, #000)), var(--black, #000))"/>
+  <rect width="1920" height="1080" style="fill: light-dark(color-mix(in lab, var(--brand-300, #0fd375) 8%, var(--background, #fff)), var(--black, #000))"/>
   <rect width="1920" height="1080" fill="url(#glow)"/>
   <rect width="1920" height="1080" fill="url(#side)"/>
   <rect width="1920" height="1080" filter="url(#grain)" opacity="0.12"/>

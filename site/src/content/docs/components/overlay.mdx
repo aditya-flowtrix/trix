@@ -13,8 +13,12 @@ component: media/Overlay
 </Section>
 ```
 
-`solid` darkens evenly; `gradient` darkens more toward the bottom, where the
-text usually sits. `strength` is how dark, as a percentage.
+The overlay tints toward the theme's background, so the theme's text reads on
+top: it darkens in a dark section or card and lightens in a light one. A
+section or card that inherits the page's theme follows light and dark mode
+with it; `theme="dark"` keeps one dark in both. `solid` tints evenly;
+`gradient` tints more toward the bottom, where the text usually sits.
+`strength` is how strong, as a percentage.
 
 ## Props
 

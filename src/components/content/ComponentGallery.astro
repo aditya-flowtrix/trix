@@ -287,7 +287,7 @@ const scroll = [
       </Section>
       {/* card */}
       <Section paddingTop="small" paddingBottom="large">
-        <ContentWrapper variant="card" mediaOpacity={50}>
+        <ContentWrapper variant="card" theme="inherit" mediaOpacity={50}>
           <Eyebrow variant="tag">card</Eyebrow>
           <Heading tag="h2" variant="h3" maxWidth={17}>
             {heading}
@@ -899,12 +899,7 @@ const scroll = [
         </Compare>
       </Section>
       {/* hero */}
-      <Section
-        theme="dark"
-        paddingTop="small"
-        paddingBottom="small"
-        fullHeight={true}
-      >
+      <Section paddingTop="small" paddingBottom="small" fullHeight={true}>
         <Img src={background} slot="background" />
         <Overlay slot="background" />
         <ContentWrapper centered={true}>
