@@ -55,6 +55,12 @@
     green, which made the black button look cut out of the section.
   - A project that wants the old values sets them back in its `tokens.css`
     and `themes.css`.
+- The homepage hero follows the color mode. In light mode it is a pale brand
+  tint with the green glow rising from below and dark text, where it was a
+  black card on a white page. `ContentWrapper variant="card"` takes `theme`:
+  `dark` by default, or `inherit` to follow the page. The shared
+  `background.svg` takes its colors from the tokens when inlined, and draws
+  dark as before when used as an `<img>`.
 - `Input` takes the `autocomplete` it is given. It wrote its variant's value
   and then the one passed in, and a browser keeps the first, so
   `autocomplete="off"` was ignored.

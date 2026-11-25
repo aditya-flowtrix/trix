@@ -3,8 +3,7 @@ import Layout from "@/layouts/BaseLayout.astro";
 import Section from "@/components/wrapper/Section.astro";
 import Heading from "@/components/typography/Heading.astro";
 import Eyebrow from "@/components/typography/Eyebrow.astro";
-import Img from "@/components/media/Img.astro";
-import background from "@/assets/shared/graphics/background.svg";
+import Background from "@/assets/shared/graphics/background.svg";
 import Icon from "@/components/media/Icon.astro";
 import logo_icon from "@/assets/logo/logo-icon.svg";
 import ContentWrapper from "@/components/wrapper/ContentWrapper.astro";
@@ -20,19 +19,24 @@ import pkg from "../../package.json";
     class="flex-grow"
     style="min-height: calc(100svh - var(--nav-height));"
   >
-    <ContentWrapper class="flex-grow" variant="card" mediaOpacity={100}>
+    <ContentWrapper
+      class="flex-grow"
+      variant="card"
+      theme="inherit"
+      mediaOpacity={100}
+    >
       <Icon src={logo_icon} variant="large" />
       <Heading variant="display" tag="h1" class="margin-block-8"
         >Trix Framework</Heading
       >
       <Eyebrow variant="tag">v{pkg.trix.version}</Eyebrow>
-      <Img
+      {/* Inlined, so it draws in the page's theme colors. */}
+      <Background
         slot="column2"
-        src={background}
-        width={1920}
-        height={1080}
-        loading="eager"
-        fetchPriority="high"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
       />
     </ContentWrapper>
   </Section>

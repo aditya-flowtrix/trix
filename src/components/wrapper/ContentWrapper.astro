@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { slotContent } from "@/utils/slots.ts";
+import type { Theme } from "@/styles/generated/tokens.ts";
 
 type ContentWrapperVariant =
   | "stack"
@@ -36,6 +37,7 @@ type Props = Base &
         /** Fill the parent's height: the first block at the top, the last at the bottom. */
         distribute?: boolean;
         mediaOpacity?: never;
+        theme?: never;
       }
     | {
         variant: "auto-width";
@@ -43,6 +45,7 @@ type Props = Base &
         centered?: never;
         distribute?: never;
         mediaOpacity?: never;
+        theme?: never;
       }
     | {
         variant: "columns" | "breakout" | "contain";
@@ -51,6 +54,7 @@ type Props = Base &
         centered?: never;
         distribute?: never;
         mediaOpacity?: never;
+        theme?: never;
       }
     | {
         variant: "sticky-content" | "sticky-visual";
@@ -58,6 +62,7 @@ type Props = Base &
         centered?: never;
         distribute?: never;
         mediaOpacity?: never;
+        theme?: never;
       }
     | {
         variant: "card";
@@ -72,6 +77,8 @@ type Props = Base &
          * @int
          */
         mediaOpacity?: number;
+        /** Color theme of the card. Defaults to `dark`, for text over a picture; `inherit` follows the page. */
+        theme?: "inherit" | Theme;
       }
   ) &
   ColumnClasses;
@@ -83,6 +90,7 @@ type AllProps = Base &
     centered?: boolean;
     distribute?: boolean;
     mediaOpacity?: number;
+    theme?: "inherit" | Theme;
   };
 
 const {
@@ -92,6 +100,7 @@ const {
   centered = false,
   distribute = false,
   mediaOpacity,
+  theme = "dark",
   column1Class,
   column2Class,
   class: className,
@@ -125,7 +134,7 @@ const variantClasses =
   variant === "stack"
     ? []
     : variant === "card"
-      ? ["card-layout", "theme-dark"]
+      ? ["card-layout", theme !== "inherit" && `theme-${theme}`]
       : [variant];
 
 const column1 = await slotContent(Astro.slots);
