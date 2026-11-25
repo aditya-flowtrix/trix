@@ -225,9 +225,30 @@
     > :is(ul, ol) {
       padding-left: 1.25em;
 
+      li::marker {
+        color: var(--text-2);
+      }
       li + li {
         margin-top: var(--space-1);
       }
+      /* An item can hold paragraphs and code: space them like the page's. */
+      li > * + * {
+        margin-top: var(--space-3);
+      }
+      &:has(> li > :is(p, .code_wrap, pre)) > li + li {
+        margin-top: var(--space-4);
+      }
+    }
+    /* base.css takes the markers off every list; prose puts them back. */
+    > ul {
+      list-style-type: disc;
+    }
+    > :is(ul, ol) ul {
+      list-style-type: circle;
+    }
+    > ol,
+    > :is(ul, ol) ol {
+      list-style-type: decimal;
     }
     > :is(p, ul, ol, table, .aside_wrap) a {
       color: var(--link-text);
@@ -238,7 +259,7 @@
         text-decoration-color: currentcolor;
       }
     }
-    > :is(p, ul, ol, table, .aside_wrap, h2, h3) code {
+    > :is(p, ul, ol, table, .aside_wrap, h2, h3) code:not(pre code) {
       padding: 0.0625em 0.3em;
       border: var(--border-width) solid var(--border);
       border-radius: var(--radius-xsmall);
@@ -461,7 +482,7 @@
     background-color: var(--background-2);
 
     > * + * {
-      margin-top: var(--space-1);
+      margin-top: var(--space-2);
     }
     &.tip {
       border-left-color: var(--heading-accent);
