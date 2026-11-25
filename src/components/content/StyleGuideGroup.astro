@@ -8,7 +8,7 @@ interface Props extends HTMLAttributes<"div"> {
   /** Group title. */
   title: string;
   /** Item layout. */
-  variant?: "list" | "rows" | "grid" | "scroll";
+  variant?: "list" | "rows" | "tiles" | "scroll";
 }
 
 const {
@@ -63,7 +63,7 @@ const content = await slotContent(Astro.slots);
         gap: var(--space-3);
       }
 
-      &.grid .style-guide-group_list {
+      &.tiles .style-guide-group_list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(14rem, 40%), 1fr));
         gap: var(--space-5) var(--site-gutter);

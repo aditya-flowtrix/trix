@@ -82,7 +82,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--display` | 64px | 112px |
+| `--display` | 56px | 112px |
 | `--display-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--display-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--display-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
@@ -98,7 +98,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--h1` | 48px | 80px |
+| `--h1` | 44px | 80px |
 | `--h1-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h1-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--h1-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
@@ -114,7 +114,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--h2` | 40px | 64px |
+| `--h2` | 36px | 64px |
 | `--h2-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h2-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--h2-line-height` | `var(--line-height-small) → 1` | `var(--line-height-small) → 1` |
@@ -130,7 +130,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--h3` | 36px | 48px |
+| `--h3` | 30px | 48px |
 | `--h3-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h3-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--h3-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
@@ -146,7 +146,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--h4` | 28px | 32px |
+| `--h4` | 26px | 32px |
 | `--h4-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h4-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--h4-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
@@ -178,7 +178,7 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--h6` | 16px | 18px |
+| `--h6` | 18px | 20px |
 | `--h6-font-family` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` | `var(--secondary-family) → var(--font-inter, Arial, sans-serif)` |
 | `--h6-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
 | `--h6-line-height` | `var(--line-height-medium) → 1.1` | `var(--line-height-medium) → 1.1` |
@@ -274,12 +274,12 @@ Fluid values interpolate between **Mobile** (320px viewport) and **Desktop** (14
 
 | Token | Mobile | Desktop |
 | --- | --- | --- |
-| `--eyebrow` | 14px | 16px |
+| `--eyebrow` | 12px | 14px |
 | `--eyebrow-font-family` | `var(--primary-family) → var(--font-inter, Arial, sans-serif)` | `var(--primary-family) → var(--font-inter, Arial, sans-serif)` |
-| `--eyebrow-font-weight` | `var(--primary-regular) → 400` | `var(--primary-regular) → 400` |
-| `--eyebrow-line-height` | `var(--line-height-huge) → 1.5` | `var(--line-height-huge) → 1.5` |
-| `--eyebrow-letter-spacing` | `var(--letter-spacing-normal) → 0em` | `var(--letter-spacing-normal) → 0em` |
-| `--eyebrow-text-transform` | `none` | `none` |
+| `--eyebrow-font-weight` | `var(--primary-medium) → 500` | `var(--primary-medium) → 500` |
+| `--eyebrow-line-height` | `var(--line-height-large) → 1.3` | `var(--line-height-large) → 1.3` |
+| `--eyebrow-letter-spacing` | `var(--letter-spacing-wider) → 0.1em` | `var(--letter-spacing-wider) → 0.1em` |
+| `--eyebrow-text-transform` | `uppercase` | `uppercase` |
 | `--eyebrow-text-wrap` | `pretty` | `pretty` |
 | `--eyebrow-margin-top` | `var(--space-4)` | `var(--space-4)` |
 | `--eyebrow-margin-bottom` | `var(--space-4)` | `var(--space-4)` |

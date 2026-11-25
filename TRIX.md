@@ -248,7 +248,8 @@ and 1440 before calling it done:
 - Inside each section the blocks — title, text, buttons, demos — sit its
   `gap` apart, and the sections sit evenly apart down the page. No heading,
   paragraph, button or demo touches the one above or below it.
-- Remapping the spacing scale includes the values written on these pages:
+- Remapping the spacing scale includes the values written on these pages
+  and in the style guide's sections (`src/components/content/StyleGuide*`):
   `gap`, `rowGap`, `marginTop`, spacing and radius utilities.
 - Changing a component's default — `Section`'s `gap` or padding — changes
   every page that relied on it. Write the old value in where it was relied on

@@ -143,14 +143,15 @@ export function textOf(html: string): string {
  * `data-rt-*` attributes, WordPress's block and image-id classes. Used for
  * files and for the live loader alike, so both render the same HTML.
  */
+/** A class the platform added for its own styling, not the editor's. */
+export const PLATFORM_CLASS = /^(w-|wp-image-\d+|wp-block-)/;
+
 export function stripPlatformMarkup(html: string): string {
   return html
     .replace(/\s(?:data-rt-[\w-]+|data-w-id|data-wf-[\w-]+)="[^"]*"/g, "")
     .replace(/\sid="w-node-[^"]*"/g, "")
     .replace(/\sclass="([^"]*)"/g, (_, cls: string) => {
-      const kept = cls
-        .split(/\s+/)
-        .filter((c) => c && !/^(w-|wp-image-\d+|wp-block-)/.test(c));
+      const kept = cls.split(/\s+/).filter((c) => c && !PLATFORM_CLASS.test(c));
       return kept.length ? ` class="${kept.join(" ")}"` : "";
     });
 }

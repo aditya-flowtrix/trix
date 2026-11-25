@@ -1,0 +1,122 @@
+---
+import Paragraph from "@/components/typography/Paragraph.astro";
+import RichText from "@/components/typography/RichText.astro";
+import StyleGuideGroup from "@/components/content/StyleGuideGroup.astro";
+import StyleGuideItem from "@/components/content/StyleGuideItem.astro";
+import { model, range, sample, value } from "@/utils/style-guide.ts";
+import type { TextStyle } from "@/styles/generated/tokens.ts";
+
+interface Props {
+  /** Set to `false` to omit the component. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const typeStyles = model.textStyles.map((name) => {
+  const cls = name.replace(/^text-/, "");
+  const parts = [
+    range(name),
+    `line-height ${value(`${name}-line-height`)}`,
+    `letter-spacing ${value(`${name}-letter-spacing`)}`,
+    `weight ${value(`${name}-font-weight`)}`,
+  ];
+  const transform = value(`${name}-text-transform`);
+  if (transform && transform !== "none") parts.push(transform);
+  return {
+    cls,
+    text: /^(display|h\d)$/.test(name)
+      ? sample.heading
+      : name === "eyebrow"
+        ? sample.short
+        : sample.long,
+    note: parts.join(" · "),
+  };
+});
+---
+
+{
+  render && (
+    <>
+      <StyleGuideGroup title="Text styles">
+        {typeStyles.map((style) => (
+          <StyleGuideItem label={`text-style-${style.cls} · ${style.note}`}>
+            <Paragraph tag="div" variant={style.cls as TextStyle} maxWidth={70}>
+              {style.text}
+            </Paragraph>
+          </StyleGuideItem>
+        ))}
+        <StyleGuideItem label="RichText">
+          <RichText>
+            <h2>Heading 2</h2>
+            <p>
+              A paragraph with <strong>bold</strong>, <em>emphasis</em>,{" "}
+              <a href="#typography">a link</a> and <code>inline code</code>.
+            </p>
+            <blockquote>Block quote</blockquote>
+            <ul>
+              <li>Unordered item</li>
+              <li>Unordered item</li>
+            </ul>
+            <ol>
+              <li>Ordered item</li>
+              <li>Ordered item</li>
+            </ol>
+          </RichText>
+        </StyleGuideItem>
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Weights" variant="scroll">
+        {model.weights.map((weight) => (
+          <StyleGuideItem
+            label={`weight-${weight} · ${value(`primary-${weight}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`weight-${weight}`}>{sample.short}</Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Line height" variant="scroll">
+        {model.lineHeights.map((name) => (
+          <StyleGuideItem
+            label={`line-height-${name} · ${value(`line-height-${name}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`line-height-${name}`}>{sample.long}</Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Letter spacing" variant="scroll">
+        {model.letterSpacings.map((name) => (
+          <StyleGuideItem
+            label={`letter-spacing-${name} · ${value(`letter-spacing-${name}`)}`}
+            variant="card"
+          >
+            <Paragraph class={`letter-spacing-${name}`}>
+              {sample.short}
+            </Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+
+      <StyleGuideGroup title="Text transform, wrap and clamp" variant="scroll">
+        {[
+          "text-transform-uppercase",
+          "text-transform-capitalize",
+          "text-wrap-balance",
+          "text-wrap-pretty",
+          "line-clamp-1",
+          "line-clamp-2",
+          "line-clamp-3",
+          "line-clamp-4",
+        ].map((cls) => (
+          <StyleGuideItem label={cls} variant="card">
+            <Paragraph class={cls}>{sample.long}</Paragraph>
+          </StyleGuideItem>
+        ))}
+      </StyleGuideGroup>
+    </>
+  )
+}

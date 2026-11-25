@@ -1,0 +1,108 @@
+---
+title: Style guide
+description: Every token on one page — type, color, themes, spacing, layout, motion, icons — rendered from the files the site is built from, so it cannot drift from the code.
+order: 2.5
+badge: New
+---
+
+import StyleGuideTypography from "@/components/content/StyleGuideTypography.astro";
+import StyleGuideColors from "@/components/content/StyleGuideColors.astro";
+import StyleGuideSpacing from "@/components/content/StyleGuideSpacing.astro";
+
+Every Trix site has a style guide at `/style-guide`: its type, colors, themes,
+spacing, layout grid, motion, icons and brand assets on one page, each sample
+labelled with the token or class that makes it. The sections on this page are
+Trix's own, rendered live by the same components.
+[See the whole thing](/style-guide).
+
+## It cannot drift
+
+A style guide is usually a second copy of the design system, kept in step by
+hand until the day it isn't. Trix's has nothing to keep in step. The page reads
+`src/styles/tokens.css` and `themes.css` at build and renders every value from
+them — each swatch's hex, each fluid size at 320 and 1440, each theme's roles.
+No value is typed into the page, and none is a screenshot.
+
+Change a token and the next build shows it here, in the utilities, in the prop
+types, in the Figma variables and in the token reference — all
+[generated from the same two files](/docs/system/tokens).
+
+## It is proven on a migration
+
+When a site moves onto Trix, `/trix-style-guide` measures the source as a
+browser renders it — every visible element, at seven widths from 320 to 1920 —
+and writes the system it finds into the tokens, under Trix names. Nothing is
+read from class or variable names, so it works the same on Webflow, Framer,
+WordPress or a site that never had a style guide.
+
+Then `scripts/measure/verify.ts` opens the rebuilt `/style-guide` at the same
+widths and measures it the same way: every text style's size, line height,
+letter spacing and weight, every spacing step, and the grid's margin, gutter
+and content width. Anything more than half a pixel off fails. The style guide
+is done when every check is identical — on phone (375), tablet (768) and
+desktop (1440), and every width measured between.
+
+## Typography
+
+<Example stage="sections">
+  <StyleGuideTypography />
+</Example>
+
+## Colors
+
+The palette defines the themes; components only read the roles a theme sets —
+`--background`, `--text`, `--button-*`. Each theme card is the same markup
+with one class.
+
+<Example stage="sections">
+  <StyleGuideColors />
+</Example>
+
+## Spacing and radius
+
+<Example stage="sections">
+  <StyleGuideSpacing />
+</Example>
+
+## The full page
+
+[The full style guide](/style-guide) shows Trix's defaults — what every new
+project starts from:
+
+| Section    | What                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Brand      | the logo on light and dark, favicon, touch icon and social image                                                         |
+| Typography | every text style with its fluid range, line height, letter spacing and weight; rich text; weights, transforms and clamps |
+| Colors     | every palette ramp, and each theme's backgrounds, text, links and buttons                                                |
+| Spacing    | the space scale, section space, site margin and gutter, radius                                                           |
+| Layout     | breakpoints, the 12 columns at each Figma frame width, `Row` and `Col` patterns, `Grid`, containers, aspect ratios       |
+| Motion     | the duration and easing tokens, and a live reveal                                                                        |
+| Icons      | Phosphor icons and weights, and the project's own SVGs                                                                   |
+
+## With Figma
+
+The same two files generate the Figma variables in `design/tokens/` —
+Primitives, Responsive (Desktop and Mobile modes), Text Styles, Theme (Light,
+Dark, Brand) and Components — with the code's names: `--space-6` is
+`space/6`, `text-style-h2` is the H2 text style. A designer checks a frame
+against the style guide by name, not by eye. When the designer changes the
+variables, `/trix-design-system` reads them back into the tokens and the style
+guide follows on the next build.
+
+Open `/style-guide` beside the Figma file at 375 and 1440 and press
+
+<kbd>Shift</kbd> <kbd>G</kbd>: the grid overlay shows the same columns the frame
+is drawn on. [Designers and Figma](/docs/guides/designers-and-figma) has the
+rest of the handoff.
+
+## Every client site gets its own
+
+A project started with `npm create trix-astro` has this page from the first
+`npm run dev`. `/trix-style-guide` (measuring an old site) or
+`/trix-design-system` (from a Figma file, or by asking) then replaces the
+tokens with the client's brand: the page is the same, the values are theirs.
+
+There it is `noindex`, with `/components` — `NOINDEX_ROUTES` in
+`src/consts.ts`. It is the working reference for the people building and
+designing the site, not a page for search results. Only Trix's own style guide
+is public.

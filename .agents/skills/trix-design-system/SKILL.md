@@ -118,7 +118,7 @@ Edit `tokens.css` and `themes.css` group by group; the comment headings are
 the groups — keep them. Where each kind of value goes is the table in
 `/trix-import-figma` step 5. In short:
 
-- A fluid value is two plain numbers in px: `--h2-min: 40;` and
+- A fluid value is two plain numbers in px: `--h2-min: 36;` and
   `--h2-max: 64;`. Never write a `clamp()`.
 - Line height is unitless (`1.1`), letter spacing in `em` (`-0.02em`).
 - A text style is a group of twelve properties — change the ones the design

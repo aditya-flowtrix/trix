@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+- The style guide is on the docs site. A new page,
+  [Style guide](https://trix.flowtrix.workers.dev/docs/system/style-guide),
+  says why it cannot drift and how a migration proves it, with Typography,
+  Colors and Spacing rendered live by the framework's own components; the
+  whole page is at
+  [/style-guide](https://trix.flowtrix.workers.dev/style-guide), indexable
+  there, and linked from the header and the homepage. Installation's "style
+  guide" link pointed at the Figma guide; it now points at the new page.
+- `/style-guide`'s sections are components in `src/components/content/`:
+  `StyleGuideBrand`, `StyleGuideTypography`, `StyleGuideColors`,
+  `StyleGuideSpacing`, `StyleGuideLayout`, `StyleGuideMotion` and
+  `StyleGuideIcons`, put together by `StyleGuide`, reading the design system
+  through `src/utils/style-guide.ts`. A project's page looks the same and is
+  still `noindex`; a project that changed its `style-guide.astro` moves those
+  changes into the section they belong to.
+- Default tokens that read as placeholders on the public style guide:
+  - The eyebrow is its own style instead of a copy of small text: 12 → 14px,
+    medium weight, uppercase, `--letter-spacing-wider`, `--line-height-large`.
+  - Headings on phones step by about 1.2× each: display 64 → 56, h1 48 → 44,
+    h2 40 → 36, h3 36 → 30, h4 28 → 26, h6 16 → 18 (and 18 → 20 on desktop,
+    so it no longer matches body text). Every other desktop size is unchanged.
+  - The dark theme's background is `--neutral-950` instead of pure black. The
+    docs' dark code blocks move to `--neutral-900` to stay apart from it.
+  - A project that wants the old values sets them back in its `tokens.css`
+    and `themes.css`.
+- The style guide shows `--brand-text` as text on the color the default theme
+  puts it on (`--button-background`), not as a second black tile; its samples
+  are real sentences instead of Lorem ipsum, with no brand in them; and the
+  logo mark fills its card like the logo.
+- `StyleGuideGroup`'s `grid` variant is now `tiles`. Its `grid` class also
+  matched `Grid`'s, which lost only because of stylesheet order. The rich
+  text sample has the space it was missing before "a link".
 - Every component now follows Chrome's [Modern Web
   Guidance](https://developer.chrome.com/docs/modern-web-guidance), checked
   rule by rule against its guides:
@@ -85,32 +117,38 @@
   updates instead of duplicating; a stable `_key` on every array item; every
   image and file uploaded with its alt text; references to drafts weak until
   they are published; rich text as Portable Text with a rule for every
-  Webflow pattern — image figures, embeds with their scripts, videos,
-  tables, code, internal links — and a count that fails the run if one is
-  lost. `write.ts --headless --sanity <project>/<dataset>` then points the
-  site at the dataset through `cmsLoader({ source: "sanity" })`, which reads
-  the documents back into the shape files mode writes, so no page changes.
+  Webflow pattern — image figures with their captions and links, embeds with
+  their scripts, videos, tables, code, internal links — and a count that
+  fails the run if one is lost. Styling Portable Text has no place for (a
+  class or an inline style on text) is listed, so the owner gives it a rule
+  or lets it go. `write.ts --headless --sanity <project>/<dataset>` then
+  points the site at the dataset through `cmsLoader({ source: "sanity" })`,
+  which reads the documents back into the shape files mode writes, so no
+  page changes. New dependencies: `@portabletext/to-html` for the build;
+  `@portabletext/html`, `@portabletext/schema` and `jsdom`, for the
+  converter only, as dev dependencies.
 - `convert.ts sanity --check <project>/<dataset>` proves an import: it reads
   the dataset back as the build does and compares it with the source, item
   by item — every published item there and nothing extra, titles and SEO
   the same, every field that had a value still has one, every rich-text
-  image arrived, nothing left on Webflow's CDN. The comparison
+  image arrived, nothing left on Webflow's CDN. It also warns, without
+  failing, about what the source lacked too — items with no SEO description,
+  images with no alt text — to fill in before launch. The comparison
   (`scripts/cms/compare.ts`) works for any CMS with a reader.
-- A new docs page, [Headless CMS](https://trix.flowtrix.workers.dev/docs/guides/headless-cms): files,
-  Webflow-headless or a new CMS; the Sanity move step by step; what each
-  check proves; other CMSs and EmDash.
-  New dependencies: `@portabletext/to-html` for the build; `@portabletext/html`,
-  `@portabletext/schema` and `jsdom`, for the converter only, as dev
-  dependencies.
+- A new docs page,
+  [Headless CMS](https://trix.flowtrix.workers.dev/docs/guides/headless-cms):
+  files, Webflow-headless or a new CMS; the Sanity move step by step; what
+  each check proves; other CMSs and EmDash.
 - `/trix-cms` moves a site into a new headless CMS — Sanity, EmDash,
   Storyblok, Contentful, Payload, Strapi, ButterCMS, BCMS — with Sanity built
   in. Every other CMS is the same two adapters around the common shape, and
   the reference says what each one's are. The import stays `import.ts`; the
-  new reference covers the rest: reviewing Webflow's model before copying it, IDs derived from Webflow's so every run
-  updates instead of duplicating, keyed arrays, assets uploaded with their
-  alt text, rich text converted with a rule for each Webflow pattern (a
-  pattern without one is dropped silently), staging before production, the
-  content freeze and cutover. It notes where Sanity's own Webflow course has
+  new reference covers the rest: reviewing Webflow's model before copying
+  it, IDs derived from Webflow's so every run updates instead of
+  duplicating, keyed arrays, assets uploaded with their alt text, rich text
+  converted with a rule for each Webflow pattern (a pattern without one is
+  dropped silently), staging before production, the content freeze and
+  cutover. It notes where Sanity's own Webflow course has
   gone out of date.
 - `PROJECT.md` records which CMS a migration moved into and its content
   freeze date.

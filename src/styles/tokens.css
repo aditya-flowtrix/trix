@@ -75,7 +75,7 @@
   --letter-spacing-wider: 0.1em;
 
   /* Text style — display */
-  --display-min: 64;
+  --display-min: 56;
   --display-max: 112;
   --display-font-family: var(--secondary-family);
   --display-font-weight: var(--primary-medium);
@@ -89,7 +89,7 @@
   --display-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — h1 */
-  --h1-min: 48;
+  --h1-min: 44;
   --h1-max: 80;
   --h1-font-family: var(--secondary-family);
   --h1-font-weight: var(--primary-medium);
@@ -103,7 +103,7 @@
   --h1-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — h2 */
-  --h2-min: 40;
+  --h2-min: 36;
   --h2-max: 64;
   --h2-font-family: var(--secondary-family);
   --h2-font-weight: var(--primary-medium);
@@ -117,7 +117,7 @@
   --h2-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — h3 */
-  --h3-min: 36;
+  --h3-min: 30;
   --h3-max: 48;
   --h3-font-family: var(--secondary-family);
   --h3-font-weight: var(--primary-medium);
@@ -131,7 +131,7 @@
   --h3-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — h4 */
-  --h4-min: 28;
+  --h4-min: 26;
   --h4-max: 32;
   --h4-font-family: var(--secondary-family);
   --h4-font-weight: var(--primary-medium);
@@ -159,8 +159,8 @@
   --h5-trim-bottom: var(--primary-trim-bottom);
 
   /* Text style — h6 */
-  --h6-min: 16;
-  --h6-max: 18;
+  --h6-min: 18;
+  --h6-max: 20;
   --h6-font-family: var(--secondary-family);
   --h6-font-weight: var(--primary-medium);
   --h6-line-height: var(--line-height-medium);
@@ -242,15 +242,14 @@
   --text-xsmall-trim-top: var(--primary-trim-top);
   --text-xsmall-trim-bottom: var(--primary-trim-bottom);
 
-  /* Text style — eyebrow
-     Eyebrows default to text-small's look until a design differs. */
-  --eyebrow-min: 14;
-  --eyebrow-max: 16;
+  /* Text style — eyebrow */
+  --eyebrow-min: 12;
+  --eyebrow-max: 14;
   --eyebrow-font-family: var(--primary-family);
-  --eyebrow-font-weight: var(--primary-regular);
-  --eyebrow-line-height: var(--line-height-huge);
-  --eyebrow-letter-spacing: var(--letter-spacing-normal);
-  --eyebrow-text-transform: none;
+  --eyebrow-font-weight: var(--primary-medium);
+  --eyebrow-line-height: var(--line-height-large);
+  --eyebrow-letter-spacing: var(--letter-spacing-wider);
+  --eyebrow-text-transform: uppercase;
   --eyebrow-text-wrap: pretty;
   --eyebrow-margin-top: var(--space-4);
   --eyebrow-margin-bottom: var(--space-4);

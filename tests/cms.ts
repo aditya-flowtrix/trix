@@ -30,6 +30,13 @@ import { csvCollection, inferType, parseCsv } from "../src/utils/cms/csv.ts";
 import { schemaSource, stripPlatformMarkup } from "../src/utils/cms/model.ts";
 import { compareCms } from "../scripts/cms/compare.ts";
 import {
+  countBlocks,
+  countPatterns,
+  droppedStyling,
+  htmlToBlocks,
+} from "../scripts/cms/html-to-portable-text.ts";
+import { portableTextToHtml } from "../src/utils/cms/portable-text.ts";
+import {
   fromSanity,
   sanityType,
   type SanityDoc,
@@ -312,6 +319,43 @@ it("Sanity: read back at build, the site gets what files would give it", () => {
   );
   assert.equal(item.data.pullQuote, "<p>Quote <strong>here</strong></p>");
 });
+it("Sanity: a linked image keeps its link; styling with nowhere to go is named", () => {
+  const cdn = "https://cdn.prod.website-files.com/x";
+  const html =
+    `<figure data-rt-type="image"><a href="https://example.com/a"><div><img src="${cdn}/a.jpg" alt="A"></div></a><figcaption>Cap</figcaption></figure>` +
+    `<p>See <a href="/blog/b"><img src="${cdn}/b.jpg" alt="B"></a></p>` +
+    `<div class="w-embed"><img src="${cdn}/c.gif"></div>`;
+  const blocks = htmlToBlocks(html);
+  assert.deepEqual(
+    blocks
+      .filter((b) => b._type === "image")
+      .map((b) => [b.url, b.link, b.caption]),
+    [
+      [`${cdn}/a.jpg`, "https://example.com/a", "Cap"],
+      [`${cdn}/b.jpg`, "/blog/b", ""],
+    ],
+  );
+  assert.deepEqual(countPatterns(html), countBlocks(blocks));
+  assert.deepEqual(countBlocks(blocks), {
+    images: 2,
+    links: 2,
+    embeds: 1,
+    code: 0,
+  });
+  assert.ok(
+    portableTextToHtml(blocks as never, {
+      image: (v) => String(v.url),
+      link: () => undefined,
+    }).includes(`<a href="https://example.com/a"><img src="${cdn}/a.jpg"`),
+  );
+  assert.deepEqual(
+    droppedStyling(
+      '<p class="lead w-richtext">Hi <span class="highlight">there</span> <em style="color: red">x</em></p>' +
+        '<div class="w-embed"><span class="kept">e</span></div><pre><code class="language-js">x</code></pre>',
+    ),
+    ['<p class="lead">', '<span class="highlight">', "<em style>"],
+  );
+});
 it("Sanity: --check passes a complete import, and names what one lost", () => {
   const compare = (docs: SanityDoc[]) =>
     compareCms(wf, fromSanity(docs, sanityOpts), {
@@ -319,11 +363,19 @@ it("Sanity: --check passes a complete import, and names what one lost", () => {
       ownHost: "cdn.sanity.io",
       omitted: seoOnlyFields,
     });
-  const failed = (docs: SanityDoc[]) =>
+  const failed = (docs: SanityDoc[], warn = false) =>
     compare(docs)
-      .filter((c) => !c.ok)
+      .filter((c) => !c.ok && !c.warn === !warn)
       .map((c) => `${c.what}: ${c.detail}`);
   assert.deepEqual(failed(imported), []);
+  // What the source lacked too is a warning to fill before launch, not a loss.
+  const gaps = failed(imported, true);
+  assert.ok(
+    gaps.includes("posts: every image has alt text: hello-welcome (1)"),
+  );
+  assert.ok(
+    gaps.includes("posts: every item has an SEO description: second-post"),
+  );
 
   // A document missing, an image field and a rich-text image whose uploads
   // failed, a title changed, a URL left on Webflow's CDN.

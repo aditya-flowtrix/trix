@@ -10,6 +10,13 @@
  *   every image in its rich text arrived (an asset that failed to upload
  *     renders nothing)
  *   nothing loads from the old CMS
+ *
+ * And, as warnings that do not fail it — thin in the source too, so not a
+ * loss, but filled in before launch (by editors, or Sanity's Content Agent on
+ * staging):
+ *
+ *   every item has an SEO description
+ *   every image has alt text
  */
 
 import type { CmsExport, Collection, Item } from "../../src/utils/cms/model.ts";
@@ -23,6 +30,8 @@ export interface CmsCheck {
   what: string;
   /** What failed, the first few. */
   detail: string;
+  /** A gap to fill before launch, not a loss: it does not fail the check. */
+  warn?: boolean;
 }
 
 export interface CompareOptions {
@@ -40,13 +49,14 @@ export function compareCms(
   opts: CompareOptions,
 ): CmsCheck[] {
   const checks: CmsCheck[] = [];
-  const add = (what: string, bad: string[]) =>
+  const add = (what: string, bad: string[], warn = false) =>
     checks.push({
       ok: bad.length === 0,
       what,
       detail:
         bad.slice(0, 5).join(", ") +
         (bad.length > 5 ? `, and ${bad.length - 5} more` : ""),
+      ...(warn ? { warn } : {}),
     });
   const filled = (v: unknown) =>
     v !== undefined &&
@@ -55,6 +65,16 @@ export function compareCms(
     !(Array.isArray(v) && v.length === 0);
   const images = (i: Item) =>
     JSON.stringify([i.body ?? "", i.data]).match(/<img\b/g)?.length ?? 0;
+  // An image field ({ url, alt }) or an <img> in rich text with no alt text.
+  const noAlt = (v: unknown): number =>
+    typeof v === "string"
+      ? (v.match(/<img\b[^>]*>/g) ?? []).filter(
+          (t) => !/\balt="[^"]*\S[^"]*"/.test(t),
+        ).length
+      : v && typeof v === "object"
+        ? ("url" in v && !(v as { alt?: string }).alt ? 1 : 0) +
+          Object.values(v).reduce((n: number, x) => n + noAlt(x), 0)
+        : 0;
   // A published item's reference to a draft is not read back: not a loss.
   const drafts = new Map(
     source.collections.map((c) => [
@@ -127,6 +147,21 @@ export function compareCms(
       pairs
         .filter(([a, b]) => images(a) !== images(b))
         .map(([a, b]) => `${a.slug} (${images(a)} → ${images(b)})`),
+    );
+
+    const published = [...there.values()];
+    add(
+      `${c.key}: every item has an SEO description`,
+      published.filter((i) => !i.seo?.description).map((i) => i.slug),
+      true,
+    );
+    add(
+      `${c.key}: every image has alt text`,
+      published.flatMap((i) => {
+        const n = noAlt([i.body ?? "", i.data]);
+        return n ? [`${i.slug} (${n})`] : [];
+      }),
+      true,
     );
   }
 
