@@ -9,6 +9,10 @@
   inside a list item are spaced instead of overlapping, code blocks in a
   list lose the inline-code border, and an aside's title has room above its
   text.
+- Docs homepage: the feature cards show what Trix does now (migration from
+  five platforms into collections or a headless CMS, no libraries, launch
+  features) and none is a link, and a "Why Trix" table shows where Trix leads
+  the other Astro frameworks, with its agent skills listed under it.
 
 ## 0.9.0 — 2026-11-25
 

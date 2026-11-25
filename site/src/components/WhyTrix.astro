@@ -1,0 +1,243 @@
+---
+/**
+ * The homepage's comparison: what the main Astro frameworks leave to whoever
+ * builds the site, and what Trix does instead. A row is here only where Trix
+ * leads every one of them. Checked on 25 November 2026 against Lumos for
+ * Astro 1.0.5, Mast for Astro (main), Starwind UI 3.6 and Accessible Astro
+ * (starter 6.0.5, components 5.9); check again before changing a row. Fluid
+ * sizing, native components and automated accessibility tests were left out:
+ * at least one of them matches Trix there.
+ */
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import Icon from "@/components/media/Icon.astro";
+
+// The skills, read from .agents/skills at build, so the count stays true.
+const skills = Object.keys(import.meta.glob("@/../.agents/skills/*/SKILL.md"))
+  .map((path) => path.split("/").at(-2) ?? "")
+  .filter(Boolean)
+  .sort();
+
+const rows: [topic: string, others: string, trix: string][] = [
+  [
+    "Working with AI",
+    "A few agent skills at most, and nothing checks the code against the design system",
+    `${skills.length} agent skills for Claude Code and Codex, and a check that keeps their code on the design system`,
+  ],
+  [
+    "Design to code",
+    "Figma values brought in by hand, or one way",
+    "Tokens go out as Figma variables and come back in",
+  ],
+  [
+    "Style guide",
+    "A hand-written page, colors only, or none",
+    "Every token, rendered from the code, so it can't drift",
+  ],
+  [
+    "Moving a site",
+    "Webflow only, if at all",
+    "Webflow, Framer, WordPress, Wix or Squarespace, with CMS, redirects and SEO, checked against the source",
+  ],
+  [
+    "Launch",
+    "Cookie consent and a security policy left to you",
+    "Cookie consent and a Content Security Policy, ready to switch on",
+  ],
+];
+const others = "Most Astro frameworks";
+---
+
+<Section paddingTop="large" paddingBottom="large" gap="6">
+  <Heading tag="h2" variant="h3" id="why-trix">Why Trix</Heading>
+  <Paragraph maxWidth={36} class="color-faded">
+    What the other Astro frameworks leave to you, and what Trix does instead.
+  </Paragraph>
+  <table class="why-trix_table" aria-labelledby="why-trix">
+    <thead>
+      <tr>
+        <td></td>
+        <th scope="col">{others}</th>
+        <th scope="col">Trix</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(([topic, usual, trix]) => (
+          <tr>
+            <th scope="row">{topic}</th>
+            <td data-label={others}>
+              <span class="why-trix_cell">
+                <Icon name="minus" variant="small" />
+                {usual}
+              </span>
+            </td>
+            <td data-label="Trix">
+              <span class="why-trix_cell">
+                <Icon name="check" variant="small" />
+                {trix}
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <div class="why-trix_skills">
+    <Heading tag="h3" variant="h6">The {skills.length} agent skills</Heading>
+    <ul class="why-trix_skill-list" role="list">
+      {
+        skills.map((name) => (
+          <li>
+            <code>/{name}</code>
+          </li>
+        ))
+      }
+    </ul>
+    <Paragraph variant="small" class="color-faded">
+      Each is a procedure the agent follows the same way every time. <a
+        href="/docs/guides/agent-skills">What each one does</a
+      >
+    </Paragraph>
+  </div>
+</Section>
+
+<style is:global>
+  @layer components {
+    .why-trix_table {
+      --_trix: color-mix(in lab, var(--heading-accent) 8%, transparent);
+      width: 100%;
+      margin: 0;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: var(--text-small);
+      text-align: start;
+
+      :is(th, td) {
+        padding: var(--space-4) var(--space-5);
+        border-top: var(--border-width) solid var(--border);
+        text-align: start;
+        vertical-align: top;
+      }
+      thead :is(th, td) {
+        border-top: 0;
+        color: var(--text-2);
+        font-weight: var(--primary-medium);
+      }
+      tbody th {
+        width: 22%;
+        font-weight: var(--primary-semibold);
+      }
+      td {
+        color: var(--text-2);
+      }
+      /* The Trix column: tinted, full strength, its own heading in the accent. */
+      :is(th, td):last-child {
+        background-color: var(--_trix);
+        color: var(--text);
+      }
+      thead th:last-child {
+        border-radius: var(--radius-main) var(--radius-main) 0 0;
+        color: var(--heading-accent);
+        font-weight: var(--primary-semibold);
+      }
+      tbody tr:last-child td:last-child {
+        border-radius: 0 0 var(--radius-main) var(--radius-main);
+      }
+      td:last-child .icon {
+        color: var(--heading-accent);
+      }
+
+      /* A phone: the topic above, its two answers side by side, labelled. */
+      @media (width < 48rem) {
+        &,
+        :is(tbody, th, td) {
+          display: block;
+        }
+        thead {
+          display: none;
+        }
+        tr {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: var(--space-2);
+          padding-block: var(--space-4);
+          border-top: var(--border-width) solid var(--border);
+        }
+        :is(th, td) {
+          padding: 0;
+          border-top: 0;
+        }
+        tbody th {
+          grid-column: 1 / -1;
+          width: auto;
+        }
+        td {
+          padding: var(--space-3);
+          border-radius: var(--radius-small);
+          background-color: var(--background-2);
+
+          &::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: var(--space-1);
+            color: var(--text-2);
+            font-size: var(--text-xsmall);
+            font-weight: var(--primary-medium);
+          }
+        }
+        tbody tr:last-child td:last-child {
+          border-radius: var(--radius-small);
+        }
+        /* The labels say which is which; the columns need the width. */
+        .icon {
+          display: none;
+        }
+      }
+    }
+    .why-trix_cell {
+      display: flex;
+      align-items: start;
+      gap: var(--space-2);
+
+      /* One line tall, so it sits centred on the first line. */
+      .icon {
+        flex-shrink: 0;
+        height: 1lh;
+      }
+    }
+    .why-trix_skills {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      width: 100%;
+
+      > [class] {
+        margin-block: 0;
+      }
+      a {
+        color: var(--link-text);
+        text-decoration-color: var(--link-border);
+        text-underline-offset: 0.2em;
+      }
+    }
+    .why-trix_skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: 0;
+      padding: 0;
+
+      code {
+        display: block;
+        padding: var(--space-1) var(--space-2);
+        border: var(--border-width) solid var(--border);
+        border-radius: var(--radius-small);
+        background-color: var(--background-2);
+        font-family: var(--mono-family);
+        font-size: var(--text-xsmall);
+      }
+    }
+  }
+</style>
